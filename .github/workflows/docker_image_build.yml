@@ -11,7 +11,7 @@ permissions:
   packages: write
 
 env:
-  image_base: ghcr.io/${{ github.repository }}
+  image_base: ghcr.io/civictechwr/affordable-housing-portal
 
 jobs:
   build-image:
