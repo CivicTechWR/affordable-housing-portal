@@ -143,20 +143,29 @@ As a reviewer on a PR, try not to leave only comments, but a clear next step act
 
 ### Github actions
 
-On all pull requests the following github action jobs are triggered
+On pull requests to `main`, the following GitHub workflows run (some have path filters):
 
-1. API unit tests
-2. API integration tests
-3. Public unit/integration tests
-4. public Cypress tests
-5. Partner unit/integration tests
-6. partner Cypress tests
+1. Backend Unit Tests
+2. Backend Integration
+3. Public Unit
+4. Partners Unit
+5. Shared Helpers Unit
+6. Missing Translations
+7. Public Cypress
+8. Partners Cypress
+9. Partners Cypress (LA)
+10. Lint
+11. CodeQL
+12. Docker Compose CI
+13. gitleaks
 
-Configuration for all of these can be found in the `.github/workflows` directory. For additional investigation of cypress test failures you can change the `record` flag in the respective yml file to true and find the recordings in [cypress cloud](https://cloud.cypress.io/).
+`Docker Image Build` runs on pushes to `main` and can also be triggered manually.
+
+Configuration for all workflows can be found in the `.github/workflows` directory. For additional investigation of Cypress test failures you can change the `record` flag in the respective yml file to true and find the recordings in [cypress cloud](https://cloud.cypress.io/).
 
 ### GitLeaks
 
-[Gitleaks](https://gitleaks.io/) is enabled for this repo. This scans for any potentially leaked secrets on all pull requests to the main branch via a github action.
+[Gitleaks](https://gitleaks.io/) is enabled for this repo. This scans for potentially leaked secrets on pull requests to `main` and on pushes.
 
 If this job fails on your pull request please notify the team of the flagged secret and we can then triage if a secret needs to be rotated
 
@@ -164,7 +173,7 @@ If this job fails on your pull request please notify the team of the flagged sec
 
 Dependabot is enabled for this repo. Dependabot is responsible for raising security and version upgrade PRs for the application's dependencies.
 
-The configuration file is located in `.github/dependabot.yaml`. It scans all npm package.json files within the top level, `api`, `shared-helpers`, `sites/partners` and `sites/public` directories.
+The configuration file is located in `.github/dependabot.yml`. It scans all npm package.json files within the top level, `api`, `shared-helpers`, `sites/partners` and `sites/public` directories.
 
 Current configuration dictates:
 
