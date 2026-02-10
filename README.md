@@ -165,7 +165,7 @@ Configuration for all workflows can be found in the `.github/workflows` director
 
 ### GitLeaks
 
-[Gitleaks](https://gitleaks.io/) is enabled for this repo. This scans for potentially leaked secrets on pull requests to `main` and on pushes.
+[Gitleaks](https://gitleaks.io/) is enabled for this repo. This scans for potentially leaked secrets on pull requests to `main` and pushes to `main`.
 
 If this job fails on your pull request please notify the team of the flagged secret and we can then triage if a secret needs to be rotated
 
