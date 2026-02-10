@@ -43,10 +43,6 @@ jobs:
             docker_context: "{{defaultContext}}"
             dockerfile: Dockerfile.sites.public
             platforms: linux/amd64
-          - container: infra-dev
-            docker_context: "{{defaultContext}}:infra"
-            dockerfile: Dockerfile.dev
-            platforms: linux/amd64,linux/arm64
     runs-on: ubuntu-latest
     steps:
       - name: Log in to GitHub Container Registry
