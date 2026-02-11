@@ -82,9 +82,8 @@ Resources:
 
 ### Resource Settings
 
-The container vCPU and memory limits were set by starting with the smallest [AWS ECS Fargate
-limits](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size)
-then increasing when the container needed more during testing.
+The container vCPU and memory limits were set by starting from conservative baseline values and
+then increasing when services needed more headroom during testing.
 
 The Node JS memory settings were set by manually testing different settings combinations. There are
 likely more optimal configurations, that require a more analytical testing approach to find.
@@ -219,4 +218,3 @@ file:
       api:
         condition: service_healthy
 ```
-

@@ -11,7 +11,7 @@ permissions:
   packages: write
 
 env:
-  image_base: ghcr.io/${{ github.repository }}
+  image_base: ghcr.io/civictechwr/affordable-housing-portal
 
 jobs:
   build-image:
@@ -43,10 +43,6 @@ jobs:
             docker_context: "{{defaultContext}}"
             dockerfile: Dockerfile.sites.public
             platforms: linux/amd64
-          - container: infra-dev
-            docker_context: "{{defaultContext}}:infra"
-            dockerfile: Dockerfile.dev
-            platforms: linux/amd64,linux/arm64
     runs-on: ubuntu-latest
     steps:
       - name: Log in to GitHub Container Registry

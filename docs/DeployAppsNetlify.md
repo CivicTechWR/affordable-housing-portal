@@ -1,6 +1,6 @@
 # Deplying Bloom Apps to Netlify
 
-The Bloom front-end applications are designed to be stateless, and thus can be deployed as static sites to Netlify or directly to any major hosting environment (e.g. AWS, GCP, Azure). The following information is intended to help guide the deployment of the reference implementation to Netlify, but can also serve as a starting point for other front-end deployment scenarios
+The Bloom front-end applications are designed to be stateless, and thus can be deployed as static sites to Netlify or directly to any major hosting environment. The following information is intended to help guide the deployment of the reference implementation to Netlify, but can also serve as a starting point for other front-end deployment scenarios
 
 ## Per-app Deployment
 
