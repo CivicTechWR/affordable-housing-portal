@@ -50,6 +50,7 @@ export const listingFactory = async (
     noImage?: boolean;
     numberOfUnits?: number;
     optionalFeatures?: Prisma.ListingFeaturesCreateInput;
+    optionalUtilities?: Prisma.ListingUtilitiesCreateInput;
     propertyId?: string;
     reviewOrderType?: ReviewOrderTypeEnum;
     status?: ListingsStatusEnum;
@@ -229,7 +230,10 @@ export const listingFactory = async (
       : {},
     ...additionalEligibilityRules(optionalParams?.includeEligibilityRules),
     ...buildingFeatures(optionalParams?.includeBuildingFeatures),
-    ...featuresAndUtilites(optionalParams?.optionalFeatures),
+    ...featuresAndUtilites(
+      optionalParams?.optionalFeatures,
+      optionalParams?.optionalUtilities,
+    ),
     ...(optionalParams?.listing?.listingType === ListingTypeEnum.nonRegulated
       ? listingsRequiredDocuments(optionalParams?.requiredDocumentsList)
       : {}),
@@ -285,8 +289,10 @@ export const listingsRequiredDocuments = (
 
 export const featuresAndUtilites = (
   optionalFeatures?: Prisma.ListingFeaturesCreateInput,
+  optionalUtilities?: Prisma.ListingUtilitiesCreateInput,
 ): {
   listingFeatures: Prisma.ListingFeaturesCreateNestedOneWithoutListingsInput;
+  listingUtilities: Prisma.ListingUtilitiesCreateNestedOneWithoutListingsInput;
 } => {
   return {
     listingFeatures: {
@@ -312,6 +318,19 @@ export const featuresAndUtilites = (
         wideDoorways: randomBoolean(),
         loweredCabinets: randomBoolean(),
         ...optionalFeatures,
+      },
+    },
+    listingUtilities: {
+      create: {
+        water: randomBoolean(),
+        gas: randomBoolean(),
+        trash: randomBoolean(),
+        sewer: randomBoolean(),
+        electricity: randomBoolean(),
+        cable: randomBoolean(),
+        phone: randomBoolean(),
+        internet: randomBoolean(),
+        ...optionalUtilities,
       },
     },
   };

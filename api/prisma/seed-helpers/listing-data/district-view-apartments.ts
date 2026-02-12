@@ -41,8 +41,12 @@ export const districtViewApartments: Prisma.ListingsCreateInput = {
     },
   },
   buildingSelectionCriteria: null,
+  costsNotIncluded: null,
   creditHistory: null,
   criminalBackground: null,
+  depositMin: '500',
+  depositMax: '0',
+  depositHelperText: "Deposit will not exceed one month's rent",
   disableUnitsAccordion: false,
   leasingAgentEmail: 'sgates@abshousing.com',
   leasingAgentName: 'Samuel Gates',
@@ -88,4 +92,5 @@ export const districtViewApartments: Prisma.ListingsCreateInput = {
     ],
   },
   listingFeatures: undefined,
+  listingUtilities: undefined,
 };
