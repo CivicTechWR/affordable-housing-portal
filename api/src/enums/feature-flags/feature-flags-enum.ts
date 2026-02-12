@@ -49,6 +49,7 @@ export enum FeatureFlagEnum {
   enableSupportAdmin = 'enableSupportAdmin',
   enableUnderConstructionHome = 'enableUnderConstructionHome',
   enableUnitGroups = 'enableUnitGroups',
+  enableUtilitiesIncluded = 'enableUtilitiesIncluded',
   enableWaitlistAdditionalFields = 'enableWaitlistAdditionalFields',
   enableWaitlistLottery = 'enableWaitlistLottery',
   enableWhatToExpectAdditionalField = 'enableWhatToExpectAdditionalField',
@@ -287,6 +288,11 @@ export const featureFlagMap: {
   {
     name: FeatureFlagEnum.enableUnitGroups,
     description: 'When true, uses unit groups instead of units',
+  },
+  {
+    name: FeatureFlagEnum.enableUtilitiesIncluded,
+    description:
+      "When true, the 'utilities included' section is displayed in listing creation/edit and the public listing view",
   },
   {
     name: FeatureFlagEnum.enableWaitlistAdditionalFields,

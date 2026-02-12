@@ -3,10 +3,12 @@ import { INestApplication } from '@nestjs/common';
 import {
   ApplicationAddressTypeEnum,
   ApplicationMethodsTypeEnum,
+  DepositTypeEnum,
   HomeTypeEnum,
   LanguagesEnum,
   ListingEventsTypeEnum,
   ListingsStatusEnum,
+  ListingTypeEnum,
   MarketingTypeEnum,
   MultiselectQuestionsApplicationSectionEnum,
   MultiselectQuestionsStatusEnum,
@@ -103,6 +105,17 @@ describe('Listing Controller Tests', () => {
     wideDoorways: true,
     loweredCabinets: false,
   };
+  const listingUtilities = {
+    water: false,
+    gas: true,
+    trash: false,
+    sewer: true,
+    electricity: false,
+    cable: true,
+    phone: false,
+    internet: true,
+  };
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -232,6 +245,8 @@ describe('Listing Controller Tests', () => {
       id: listingId ?? undefined,
       assets: [exampleAsset],
       listingsBuildingAddress: exampleAddress,
+      depositMin: '1000',
+      depositMax: '5000',
       developer: 'example developer',
       digitalApplication: true,
       listingImages: [
@@ -403,8 +418,10 @@ describe('Listing Controller Tests', () => {
       applicationDropOffAddressType: ApplicationAddressTypeEnum.leasingAgent,
       applicationMailingAddressType: ApplicationAddressTypeEnum.leasingAgent,
       buildingSelectionCriteria: 'https://selection-criteria.com',
+      costsNotIncluded: 'all costs included',
       creditHistory: 'credit history',
       criminalBackground: 'criminal background',
+      depositHelperText: 'deposit helper text',
       disableUnitsAccordion: false,
       leasingAgentOfficeHours: 'leasing agent office hours',
       leasingAgentTitle: 'leasing agent title',
@@ -431,6 +448,7 @@ describe('Listing Controller Tests', () => {
         id: reservedCommunityType.id,
       },
       listingFeatures: listingFeatures,
+      listingUtilities: listingUtilities,
       includeCommunityDisclaimer: shouldIncludeCommunityDisclaimer,
       communityDisclaimerTitle: shouldIncludeCommunityDisclaimer
         ? 'example title'
@@ -2250,11 +2268,13 @@ describe('Listing Controller Tests', () => {
       const newDBValues = await prisma.listings.findMany({
         include: {
           listingFeatures: true,
+          listingUtilities: true,
         },
         where: { name: val.name },
       });
       expect(newDBValues.length).toBeGreaterThanOrEqual(1);
       expect(newDBValues[0].listingFeatures).toMatchObject(listingFeatures);
+      expect(newDBValues[0].listingUtilities).toMatchObject(listingUtilities);
     });
 
     it('should create listing with enableV2MSQ as true', async () => {
@@ -2291,6 +2311,120 @@ describe('Listing Controller Tests', () => {
       expect(activatedMSQ.status).toEqual(
         MultiselectQuestionsStatusEnum.active,
       );
+    });
+
+    describe('listing deposit type validation', () => {
+      it("should create listing when deposit is 'fixedDeposit', and 'depositMin' and 'depositMax' are missing", async () => {
+        const val = await constructFullListingData({
+          jurisdictionName: `create listing ${randomName()}`,
+        });
+
+        const res = await request(app.getHttpServer())
+          .post('/listings')
+          .set({ passkey: process.env.API_PASS_KEY || '' })
+          .send({
+            ...val,
+            listingType: ListingTypeEnum.nonRegulated,
+            depositType: DepositTypeEnum.fixedDeposit,
+            depositMin: null,
+            depositMax: null,
+            depositValue: 1000,
+          })
+          .set('Cookie', adminAccessToken)
+          .expect(201);
+
+        expect(res.body.name).toEqual(val.name);
+
+        const newDBValues = await prisma.listings.findFirst({
+          where: { id: res.body.id },
+        });
+
+        expect(newDBValues).toBeDefined();
+        expect(newDBValues.depositType).toEqual(DepositTypeEnum.fixedDeposit);
+        expect(newDBValues.depositMin).toBeNull();
+        expect(newDBValues.depositMax).toBeNull();
+        expect(Number(newDBValues.depositValue)).toEqual(1000);
+      });
+
+      it("should fail when deposit is 'fixedDeposit' but 'depositMin' and 'depositMax' are set", async () => {
+        const val = await constructFullListingData({
+          jurisdictionName: `create listing ${randomName()}`,
+        });
+
+        const res = await request(app.getHttpServer())
+          .post('/listings')
+          .set({ passkey: process.env.API_PASS_KEY || '' })
+          .send({
+            ...val,
+            listingType: ListingTypeEnum.nonRegulated,
+            depositType: DepositTypeEnum.fixedDeposit,
+            depositValue: 1000,
+            depositMin: '100',
+            depositMax: '500',
+          })
+          .set('Cookie', adminAccessToken)
+          .expect(400);
+
+        expect(res.body.message[0]).toEqual(
+          'When deposit is of type "fixedDeposit" the "depositValue" must be filled and the "depositMin"|"depositMax" fields must be null',
+        );
+      });
+
+      it("should create listing when deposit is 'rangeDeposit', and 'depositValue' is missing", async () => {
+        const val = await constructFullListingData({
+          jurisdictionName: `create listing ${randomName()}`,
+        });
+
+        const res = await request(app.getHttpServer())
+          .post('/listings')
+          .set({ passkey: process.env.API_PASS_KEY || '' })
+          .send({
+            ...val,
+            listingType: ListingTypeEnum.nonRegulated,
+            depositType: DepositTypeEnum.depositRange,
+            depositMin: '100',
+            depositMax: '500',
+            depositValue: null,
+          })
+          .set('Cookie', adminAccessToken)
+          .expect(201);
+
+        expect(res.body.name).toEqual(val.name);
+
+        const newDBValues = await prisma.listings.findFirst({
+          where: { id: res.body.id },
+        });
+
+        expect(newDBValues).toBeDefined();
+        expect(newDBValues.depositType).toEqual(DepositTypeEnum.depositRange);
+        expect(Number(newDBValues.depositMax)).toEqual(500);
+        expect(Number(newDBValues.depositMin)).toEqual(100);
+        expect(newDBValues.depositValue).toBeNull();
+      });
+
+      it("should fail when deposit is 'rangeDeposit' but 'depositValue' is set", async () => {
+        const val = await constructFullListingData({
+          jurisdictionName: `create listing ${randomName()}`,
+        });
+
+        const res = await request(app.getHttpServer())
+          .post('/listings')
+          .set({ passkey: process.env.API_PASS_KEY || '' })
+          .send({
+            ...val,
+            listingType: ListingTypeEnum.nonRegulated,
+            depositType: DepositTypeEnum.depositRange,
+            depositValue: 1000,
+            depositMin: '100',
+            depositMax: '500',
+          })
+          .set('Cookie', adminAccessToken)
+          .expect(400);
+
+        expect(res.body.message[0]).toEqual(
+          'When deposit is of type "depositRange" the "depositMin" and "depositMax" fields must be filled and "depositValue" must be null',
+        );
+      });
     });
 
     describe('listing unit group rent type validation', () => {

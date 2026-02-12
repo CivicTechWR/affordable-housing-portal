@@ -27,11 +27,10 @@ import {
 import {
   allListingFeatures,
   cloudinaryPdfFromId,
-  getCurrencyRange,
   getOccupancyDescription,
   ListingFeaturesValues,
-  listingUtilities,
   listingParkingTypes,
+  listingUtilities,
   stackedOccupancyTable,
   stackedUnitGroupsOccupancyTable,
 } from "@bloom-housing/shared-helpers"
@@ -249,46 +248,6 @@ export const getFeatures = (
   }
   if (listing.servicesOffered) {
     features.push({ heading: t("t.servicesOffered"), subheading: listing.servicesOffered })
-  }
-  if (
-    (listing.depositValue !== null && listing.depositValue !== undefined) ||
-    listing.depositMin ||
-    listing.depositMax
-  ) {
-    let depositAmount: string | null = null
-
-    if (listing.depositValue !== null && listing.depositValue !== undefined) {
-      depositAmount = `$${listing.depositValue}`
-    } else if (listing.depositMin || listing.depositMax) {
-      const depositMin = Number.parseInt(listing.depositMin ?? "0", 10)
-      const depositMax = Number.parseInt(listing.depositMax ?? "0", 10)
-
-      if (!Number.isNaN(depositMin) && !Number.isNaN(depositMax)) {
-        depositAmount = getCurrencyRange(depositMin, depositMax)
-      }
-    }
-
-    if (depositAmount || listing.depositHelperText) {
-      features.push({
-        heading: t("t.deposit"),
-        content: (
-          <>
-            {depositAmount && <div>{depositAmount}</div>}
-            {listing.depositHelperText && <div>{listing.depositHelperText}</div>}
-          </>
-        ),
-      })
-    }
-  }
-  const utilitiesIncluded = getUtilitiesIncluded(listing)
-  if (utilitiesIncluded.length > 0) {
-    features.push({
-      heading: t("listings.sections.utilities"),
-      subheading: utilitiesIncluded.join(""),
-    })
-  }
-  if (listing.costsNotIncluded) {
-    features.push({ heading: t("listings.costsNotIncluded"), subheading: listing.costsNotIncluded })
   }
   if (listing.parkingFee) {
     features.push({

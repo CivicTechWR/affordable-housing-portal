@@ -1,2 +1,2 @@
--- AlterTable
-ALTER TABLE "listings" ADD COLUMN     "credit_screening_fee" TEXT;
+-- Intentionally empty.
+-- Credit screening fees are not supported in this fork.

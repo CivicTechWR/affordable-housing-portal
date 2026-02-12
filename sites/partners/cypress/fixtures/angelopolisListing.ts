@@ -152,6 +152,9 @@ export const angelopolisListing: CypressListing = {
       unitAccessibilityPriorityTypes: { id: "Visual" } as UnitAccessibilityPriorityType,
     } as Unit,
   ],
+  depositMin: "2",
+  depositMax: "100",
+  costsNotIncluded: "Internet",
   amenities: "Basic Amenity Info",
   accessibility: "Basic Accessibility Info",
   unitAmenities: "Basic Unit Amenity Info",
@@ -222,6 +225,8 @@ export const angelopolisListing: CypressListing = {
   },
   listingEvents: [],
   editedName: "Basic Listing Edited Name",
+  listingUtilities: undefined,
+  cypressUtilities: undefined,
   listingFeatures: {
     elevator: true,
     mobility: true,

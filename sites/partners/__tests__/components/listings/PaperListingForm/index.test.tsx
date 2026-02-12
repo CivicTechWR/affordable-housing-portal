@@ -53,6 +53,10 @@ const jurisdictions = [
       "communityDisclaimerTitle",
       "disableUnitsAccordion",
       "homeType",
+      "depositMin",
+      "depositMax",
+      "depositHelperText",
+      "costsNotIncluded",
       "amenities",
       "accessibility",
       "unitAmenities",
@@ -137,6 +141,7 @@ describe("add listing", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Listing units" }))
     expect(screen.getByRole("heading", { level: 2, name: "Housing preferences" }))
     expect(screen.getByRole("heading", { level: 2, name: "Housing programs" }))
+    expect(screen.getByRole("heading", { level: 2, name: "Additional fees" }))
     expect(screen.getByRole("heading", { level: 2, name: "Building features" }))
     expect(screen.getByRole("heading", { level: 2, name: "Additional eligibility rules" }))
     expect(screen.getByRole("heading", { level: 2, name: "Additional details" }))
@@ -392,6 +397,8 @@ describe("add listing", () => {
       "Reserved community type",
       "Reserved community description",
       "Units",
+      "Deposit helper text",
+      "Costs not included",
       "Property amenities",
       "Additional accessibility",
       "Unit amenities",
@@ -506,6 +513,8 @@ describe("add listing", () => {
       "Reserved community description",
       "Home type",
       "Units",
+      "Deposit helper text",
+      "Costs not included",
       "Property amenities",
       "Additional accessibility",
       "Unit amenities",
@@ -536,10 +545,7 @@ describe("add listing", () => {
 
     possibleRequiredFields.forEach((fieldName) => {
       const query = screen.getAllByText(fieldName)
-      const hasRequiredAsterisk = query.some((field) =>
-        field.textContent?.includes(`${fieldName} *`)
-      )
-      expect(hasRequiredAsterisk).toBe(true)
+      expect(query[0]).toHaveTextContent(`${fieldName} *`)
     })
   })
 })

@@ -37,8 +37,8 @@ import Unit from '../dtos/units/unit.dto';
 import Listing from '../dtos/listings/listing.dto';
 import { mapTo } from '../utilities/mapTo';
 import { ListingMultiselectQuestion } from '../dtos/listings/listing-multiselect-question.dto';
-import { ListingFeatures } from '../dtos/listings/listing-feature.dto';
 import { ListingUtilities } from '../dtos/listings/listing-utility.dto';
+import { ListingFeatures } from '../dtos/listings/listing-feature.dto';
 import { UnitType } from '../dtos/unit-types/unit-type.dto';
 import { UnitGroupAmiLevel } from '../dtos/unit-groups/unit-group-ami-level.dto';
 import {
@@ -433,10 +433,10 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
 
   buildSelectList(
     val:
+      | ListingUtilities
       | ListingDocuments
       | ListingFeatures
-      | ListingParkingType
-      | ListingUtilities,
+      | ListingParkingType,
   ): string {
     if (!val) return '';
     const selectedValues = Object.entries(val).reduce((combined, entry) => {
@@ -679,6 +679,18 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     if (
       doAnyJurisdictionHaveFeatureFlagSet(
         user.jurisdictions,
+        FeatureFlagEnum.enableUtilitiesIncluded,
+      )
+    ) {
+      headers.push({
+        path: 'listingUtilities',
+        label: 'Utilities Included',
+        format: this.buildSelectList,
+      });
+    }
+    if (
+      doAnyJurisdictionHaveFeatureFlagSet(
+        user.jurisdictions,
         FeatureFlagEnum.enableAccessibilityFeatures,
       )
     ) {
@@ -688,11 +700,6 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         format: this.buildSelectList,
       });
     }
-    headers.push({
-      path: 'listingUtilities',
-      label: 'Utilities Included',
-      format: this.buildSelectList,
-    });
 
     headers.push(
       ...[
@@ -805,6 +812,33 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
             ]
           : []),
         {
+          path: 'depositHelperText',
+          label: 'Deposit Helper Text',
+        },
+        {
+          path: 'depositType',
+          label: 'Deposit Type',
+        },
+        {
+          path: 'depositValue',
+          label: 'Deposit Value',
+          format: this.formatCurrency,
+        },
+        {
+          path: 'depositMin',
+          label: 'Deposit Min',
+          format: this.formatCurrency,
+        },
+        {
+          path: 'depositMax',
+          label: 'Deposit Max',
+          format: this.formatCurrency,
+        },
+        {
+          path: 'costsNotIncluded',
+          label: 'Costs Not Included',
+        },
+        {
           path: 'amenities',
           label: 'Property Amenities',
         },
@@ -841,10 +875,6 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         {
           path: 'servicesOffered',
           label: 'Services Offered',
-        },
-        {
-          path: 'costsNotIncluded',
-          label: 'Costs Not Included',
         },
         {
           path: 'smokingPolicy',

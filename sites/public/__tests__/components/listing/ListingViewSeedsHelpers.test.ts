@@ -12,6 +12,7 @@ import {
   LanguagesEnum,
   PaperApplication,
   ListingFeatures,
+  ListingUtilities,
   Address,
   ApplicationAddressTypeEnum,
   EnumListingListingType,
@@ -30,6 +31,7 @@ import {
   getOnlineApplicationURL,
   getHasNonReferralMethods,
   getAccessibilityFeatures,
+  getUtilitiesIncluded,
   getFeatures,
   getAmiValues,
   getAddress,
@@ -374,6 +376,45 @@ describe("ListingViewSeedsHelpers", () => {
       const result = getAccessibilityFeatures(mockListing, config)
       expect(result).not.toBeNull()
       expect(Array.isArray(result)).toBe(false)
+    })
+  })
+
+  describe("getUtilitiesIncluded", () => {
+    it("should return array of enabled utilities", () => {
+      const mockListing: Listing = {
+        ...listing,
+        listingUtilities: {
+          water: true,
+          gas: false,
+          trash: true,
+        } as ListingUtilities,
+      }
+
+      const result = getUtilitiesIncluded(mockListing)
+      expect(result).toHaveLength(2)
+    })
+
+    it("should return empty array if no utilities are enabled", () => {
+      const mockListing: Listing = {
+        ...listing,
+        listingUtilities: {
+          water: false,
+          gas: false,
+        } as ListingUtilities,
+      }
+
+      const result = getUtilitiesIncluded(mockListing)
+      expect(result).toHaveLength(0)
+    })
+
+    it("should return empty array if listing utilities is undefined", () => {
+      const mockListing: Listing = {
+        ...listing,
+        listingUtilities: undefined,
+      }
+
+      const result = getUtilitiesIncluded(mockListing)
+      expect(result).toHaveLength(0)
     })
   })
 

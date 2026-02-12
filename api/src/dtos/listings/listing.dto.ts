@@ -22,7 +22,6 @@ import { AbstractDTO } from '../shared/abstract.dto';
 import {
   ApplicationAddressTypeEnum,
   ApplicationMethodsTypeEnum,
-  DepositTypeEnum,
   HomeTypeEnum,
   ListingsStatusEnum,
   LotteryStatusEnum,
@@ -31,6 +30,7 @@ import {
   MarketingTypeEnum,
   MonthEnum,
   ReviewOrderTypeEnum,
+  DepositTypeEnum,
   ListingTypeEnum,
 } from '@prisma/client';
 import { EnforceLowerCase } from '../../decorators/enforce-lower-case.decorator';
@@ -42,6 +42,7 @@ import { ListingEvent } from './listing-event.dto';
 import { Address } from '../addresses/address.dto';
 import { ListingImage } from './listing-image.dto';
 import { ListingFeatures } from './listing-feature.dto';
+import { ListingUtilities } from './listing-utility.dto';
 import { Unit } from '../units/unit.dto';
 import { UnitGroup } from '../unit-groups/unit-group.dto';
 import { UnitsSummarized } from '../units/unit-summarized.dto';
@@ -54,18 +55,17 @@ import { LotteryDateParamValidator } from '../../utilities/lottery-date-validato
 import { ApplicationLotteryTotal } from '../applications/application-lottery-total.dto';
 import { ListingNeighborhoodAmenities } from './listing-neighborhood-amenities.dto';
 import { ValidateListingPublish } from '../../decorators/validate-listing-publish.decorator';
-import { ValidateListingDeposit } from '../../decorators/validate-listing-deposit.decorator';
 import { UnitGroupsSummarized } from '../unit-groups/unit-groups-summarized.dto';
 import {
   ValidateAtLeastOneUnit,
   ValidateOnlyUnitsOrUnitGroups,
 } from '../../decorators/validate-units-required.decorator';
+import { ValidateListingDeposit } from '../../decorators/validate-listing-deposit.decorator';
 import { ValidateListingFeatures } from '../../decorators/validate-listing-features.decorator';
 import { ListingDocuments } from './listing-documents.dto';
 import { ValidateListingImages } from '../../decorators/validate-listing-images.decorator';
 import { ListingFeaturesConfiguration } from '../jurisdictions/listing-features-config.dto';
 import { ListingParkingType } from './listing-parking-type.dto';
-import { ListingUtilities } from './listing-utility.dto';
 
 class Listing extends AbstractDTO {
   @Expose()

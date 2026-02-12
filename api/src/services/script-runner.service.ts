@@ -1321,6 +1321,12 @@ export class ScriptRunnerService {
       active: false,
     },
     {
+      name: 'enableUtilitiesIncluded',
+      description:
+        "When true, the 'utilities included' section is displayed in listing creation/edit and the public listing view",
+      active: false,
+    },
+    {
       name: 'enableNeighborhoodAmenities',
       description:
         "When true, the 'neighborhood amenities' section is displayed in listing creation/edit and the public listing view",

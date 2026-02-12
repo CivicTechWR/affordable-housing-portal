@@ -1,0 +1,123 @@
+import React from "react"
+import { render, cleanup, screen } from "@testing-library/react"
+import { AdditionalFees } from "../../../../src/components/listing/listing_sections/AdditionalFees"
+import { EnumListingDepositType } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+
+afterEach(cleanup)
+
+describe("<AdditionalFees>", () => {
+  it("shows nothing if no content", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={null}
+        depositMin={null}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+        utilitiesIncluded={[]}
+      />
+    )
+    expect(screen.queryByText("Additional fees")).toBeNull()
+  })
+
+  it("renders deposit/utilities/costs for regulated listing", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={"Gas, internet"}
+        depositHelperText={"Deposit helper text"}
+        depositMax={"200"}
+        depositMin={"100"}
+        utilitiesIncluded={["Water, Electricity"]}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+      />
+    )
+
+    expect(screen.getByText("Additional fees")).toBeDefined()
+    expect(screen.getByText("Deposit")).toBeDefined()
+    expect(screen.getByText("$100 – $200", { exact: false })).toBeDefined()
+    expect(screen.getByText("Utilities included")).toBeDefined()
+    expect(screen.getByText("Water, Electricity")).toBeDefined()
+    expect(screen.getByText("Costs not included")).toBeDefined()
+    expect(screen.getByText("Gas, internet")).toBeDefined()
+  })
+
+  it("renders just deposit min for regulated listing", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={null}
+        depositMin={"100"}
+        utilitiesIncluded={[]}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+      />
+    )
+
+    expect(screen.getByText("Additional fees")).toBeDefined()
+    expect(screen.getByText("Deposit")).toBeDefined()
+    expect(screen.getByText("$100", { exact: false })).toBeDefined()
+  })
+
+  it("renders just deposit max for regulated listing", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={"200"}
+        depositMin={null}
+        utilitiesIncluded={[]}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+      />
+    )
+
+    expect(screen.getByText("Additional fees")).toBeDefined()
+    expect(screen.getByText("Deposit")).toBeDefined()
+    expect(screen.getByText("$200", { exact: false })).toBeDefined()
+  })
+
+  it("renders deposit value for non-regulated listing", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={null}
+        depositMin={null}
+        utilitiesIncluded={[]}
+        depositValue={2137}
+        depositType={EnumListingDepositType.fixedDeposit}
+        isNonRegulated={true}
+      />
+    )
+
+    expect(screen.getByRole("heading", { level: 3, name: "Additional fees" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { level: 4, name: "Deposit" })).toBeInTheDocument()
+    expect(screen.getByText("$ 2137")).toBeInTheDocument()
+  })
+
+  it("renders deposit range for non-regulated listing", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={"480"}
+        depositMin={"250"}
+        utilitiesIncluded={[]}
+        depositValue={null}
+        depositType={EnumListingDepositType.depositRange}
+        isNonRegulated={true}
+      />
+    )
+
+    expect(screen.getByRole("heading", { level: 3, name: "Additional fees" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { level: 4, name: "Deposit" })).toBeInTheDocument()
+    expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeDefined()
+  })
+})

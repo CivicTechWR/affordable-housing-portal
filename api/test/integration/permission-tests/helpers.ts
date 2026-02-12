@@ -498,6 +498,8 @@ export const constructFullListingData = async (
     id: listingId ?? undefined,
     assets: [exampleAsset],
     listingsBuildingAddress: exampleAddress,
+    depositMin: '1000',
+    depositMax: '5000',
     developer: 'example developer',
     digitalApplication: true,
     listingImages: [
@@ -631,8 +633,10 @@ export const constructFullListingData = async (
     applicationDropOffAddressType: ApplicationAddressTypeEnum.leasingAgent,
     applicationMailingAddressType: ApplicationAddressTypeEnum.leasingAgent,
     buildingSelectionCriteria: 'https://selection-criteria.com',
+    costsNotIncluded: 'all costs included',
     creditHistory: 'credit history',
     criminalBackground: 'criminal background',
+    depositHelperText: 'deposit helper text',
     disableUnitsAccordion: false,
     leasingAgentOfficeHours: 'leasing agent office hours',
     leasingAgentTitle: 'leasing agent title',
@@ -679,6 +683,16 @@ export const constructFullListingData = async (
       barrierFreeBathroom: false,
       wideDoorways: true,
       loweredCabinets: false,
+    },
+    listingUtilities: {
+      water: false,
+      gas: true,
+      trash: false,
+      sewer: true,
+      electricity: false,
+      cable: true,
+      phone: false,
+      internet: true,
     },
   };
 };

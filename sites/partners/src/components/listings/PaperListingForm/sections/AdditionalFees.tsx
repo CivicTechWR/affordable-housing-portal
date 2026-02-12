@@ -1,29 +1,31 @@
-import React, { useContext, useEffect, useMemo } from "react"
+import React, { useMemo, useEffect, useContext } from "react"
 import { useFormContext } from "react-hook-form"
 import { t, Field, Textarea, FieldGroup } from "@bloom-housing/ui-components"
 import { Grid } from "@bloom-housing/ui-seeds"
-import { GridRow } from "@bloom-housing/ui-seeds/src/layout/Grid"
 import { defaultFieldProps } from "../../../../lib/helpers"
 import { listingUtilities } from "@bloom-housing/shared-helpers"
 import {
   EnumListingDepositType,
   EnumListingListingType,
+  ListingUtilitiesCreate,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
-import { ListingContext } from "../../ListingContext"
 import styles from "../ListingForm.module.scss"
+import { GridRow } from "@bloom-housing/ui-seeds/src/layout/Grid"
+import { ListingContext } from "../../ListingContext"
 
-type DepositProps = {
+type AdditionalFeesProps = {
   enableNonRegulatedListings?: boolean
+  enableUtilitiesIncluded?: boolean
+  existingUtilities: ListingUtilitiesCreate
   requiredFields: string[]
 }
 
-const Deposit = (props: DepositProps) => {
+const AdditionalFees = (props: AdditionalFeesProps) => {
   const formMethods = useFormContext()
   const listing = useContext(ListingContext)
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, watch, errors, clearErrors, setValue } = formMethods
-
   const depositType = watch("depositType")
   const listingType = watch("listingType")
 
@@ -32,12 +34,21 @@ const Deposit = (props: DepositProps) => {
       return {
         id: utility,
         label: t(`listings.utilities.${utility}`),
-        defaultChecked: listing?.listingUtilities?.[utility] || false,
+        defaultChecked: props.existingUtilities ? props.existingUtilities[utility] : false,
         register,
       }
     })
-  }, [listing?.listingUtilities, register])
+  }, [props.existingUtilities, register])
 
+  useEffect(() => {
+    // clear the utilities values if the new jurisdiction doesn't have utilities included functionality
+    if (!props.enableUtilitiesIncluded) {
+      setValue("utilities", undefined)
+    }
+  }, [props.enableUtilitiesIncluded, setValue])
+
+  // After submitting the deposit max, min, and value can be removed via AdditionalMetadataFormatter.
+  // On a save and continue flow the values need to be updated in the form
   useEffect(() => {
     setValue("depositMax", listing?.depositMax)
     setValue("depositMin", listing?.depositMin)
@@ -50,39 +61,44 @@ const Deposit = (props: DepositProps) => {
   return (
     <>
       <hr className="spacer-section-above spacer-section" />
-      <SectionWithGrid heading={t("t.deposit")}>
-        {!showAsNonRegulated && (
-          <Grid.Row columns={2}>
-            <Grid.Cell>
-              <Field
-                register={register}
-                type={"number"}
-                prepend={"$"}
-                {...defaultFieldProps(
-                  "depositMin",
-                  t("listings.depositMin"),
-                  props.requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            </Grid.Cell>
-            <Grid.Cell>
-              <Field
-                register={register}
-                type={"number"}
-                prepend={"$"}
-                {...defaultFieldProps(
-                  "depositMax",
-                  t("listings.depositMax"),
-                  props.requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            </Grid.Cell>
-          </Grid.Row>
-        )}
+      <SectionWithGrid
+        heading={t("listings.sections.additionalFees")}
+        subheading={t("listings.sections.additionalFeesSubtitle")}
+      >
+        <Grid.Row columns={2}>
+          {!showAsNonRegulated && (
+            <>
+              <Grid.Cell>
+                <Field
+                  register={register}
+                  type={"number"}
+                  prepend={"$"}
+                  {...defaultFieldProps(
+                    "depositMin",
+                    t("listings.depositMin"),
+                    props.requiredFields,
+                    errors,
+                    clearErrors
+                  )}
+                />
+              </Grid.Cell>
+              <Grid.Cell>
+                <Field
+                  register={register}
+                  type={"number"}
+                  prepend={"$"}
+                  {...defaultFieldProps(
+                    "depositMax",
+                    t("listings.depositMax"),
+                    props.requiredFields,
+                    errors,
+                    clearErrors
+                  )}
+                />
+              </Grid.Cell>
+            </>
+          )}
+        </Grid.Row>
         {showAsNonRegulated && (
           <>
             <GridRow>
@@ -160,7 +176,7 @@ const Deposit = (props: DepositProps) => {
             </Grid.Row>
           </>
         )}
-        <Grid.Row columns={2}>
+        <Grid.Row>
           <Grid.Cell>
             <Textarea
               aria-describedby={"depositHelperText"}
@@ -184,7 +200,7 @@ const Deposit = (props: DepositProps) => {
               placeholder={""}
               {...defaultFieldProps(
                 "costsNotIncluded",
-                t("listings.costsNotIncluded"),
+                t("listings.sections.costsNotIncluded"),
                 props.requiredFields,
                 errors,
                 clearErrors
@@ -192,22 +208,24 @@ const Deposit = (props: DepositProps) => {
             />
           </Grid.Cell>
         </Grid.Row>
-        <Grid.Row>
-          <Grid.Cell>
-            <FieldGroup
-              type="checkbox"
-              name="utilities"
-              groupLabel={t("listings.sections.utilities")}
-              fields={utilitiesFields}
-              register={register}
-              fieldGroupClassName="grid grid-cols-2 mt-2"
-              fieldLabelClassName={styles["label-option"]}
-            />
-          </Grid.Cell>
-        </Grid.Row>
+        {props.enableUtilitiesIncluded && (
+          <Grid.Row>
+            <Grid.Cell>
+              <FieldGroup
+                type="checkbox"
+                name="utilities"
+                groupLabel={t("listings.sections.utilities")}
+                fields={utilitiesFields}
+                register={register}
+                fieldGroupClassName="grid grid-cols-2 mt-2"
+                fieldLabelClassName={styles["label-option"]}
+              />
+            </Grid.Cell>
+          </Grid.Row>
+        )}
       </SectionWithGrid>
     </>
   )
 }
 
-export default Deposit
+export default AdditionalFees

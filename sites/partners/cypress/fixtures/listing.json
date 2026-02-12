@@ -24,6 +24,9 @@
   "monthlyIncomeMin": "900",
   "monthlyRent": "1000",
   "priorityType.id": "Visual",
+  "depositMin": "2",
+  "depositMax": "100",
+  "costsNotIncluded": "Internet",
   "amenities": "Basic Amenity Info",
   "accessibility": "Basic Accessibility Info",
   "unitAmenities": "Basic Unit Amenity Info",
@@ -59,6 +62,7 @@
   "endTime.minutes": "05",
   "note": "Basic Note",
   "editedName": "Basic Listing Edited Name",
+  "utilities": ["Water", "Trash", "Phone"],
   "accessibilityFeatures": [
     ["elevator", "Elevator"],
     ["mobility", "Units for those with mobility accessibility needs"],

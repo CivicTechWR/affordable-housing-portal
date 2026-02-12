@@ -4,6 +4,7 @@ import {
   UnitAccessibilityPriorityType,
   Unit,
   ListingEventsTypeEnum,
+  ListingUtilities,
   ListingFeatures,
   ApplicationMethodsTypeEnum,
   ApplicationMethod,
@@ -54,6 +55,7 @@ export const bloomingtonListing: CypressListing = {
   jurisdiction: {
     id: "Bloomington",
     featureFlags: [
+      { name: FeatureFlagEnum.enableUtilitiesIncluded, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableNeighborhoodAmenities, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableHomeType, active: true } as FeatureFlag,
     ],
@@ -112,6 +114,9 @@ export const bloomingtonListing: CypressListing = {
       unitAccessibilityPriorityTypes: { id: "Visual" } as UnitAccessibilityPriorityType,
     } as Unit,
   ],
+  depositMin: "2",
+  depositMax: "100",
+  costsNotIncluded: "Internet",
   amenities: "Basic Amenity Info",
   accessibility: "Basic Accessibility Info",
   unitAmenities: "Basic Unit Amenity Info",
@@ -198,6 +203,16 @@ export const bloomingtonListing: CypressListing = {
   },
   listingEvents: [],
   editedName: "Basic Listing Edited Name",
+  listingUtilities: {
+    water: true,
+    trash: true,
+    phone: true,
+  } as ListingUtilities,
+  cypressUtilities: [
+    { key: "water", translation: "Water" },
+    { key: "trash", translation: "Trash" },
+    { key: "phone", translation: "Phone" },
+  ],
   listingFeatures: {
     elevator: true,
     mobility: true,

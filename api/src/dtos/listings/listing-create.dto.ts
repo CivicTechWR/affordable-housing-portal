@@ -7,6 +7,7 @@ import { ListingEventCreate } from './listing-event-create.dto';
 import { ListingFeaturesCreate } from './listing-feature-create.dto';
 import { ListingNeighborhoodAmenitiesCreate } from './listing-neighborhood-amenities-create.dto';
 import { ListingUpdate } from './listing-update.dto';
+import { ListingUtilitiesCreate } from './listing-utiliity-create.dto';
 import { LotteryDateParamValidator } from '../../utilities/lottery-date-validator';
 import { UnitCreate } from '../units/unit-create.dto';
 import { UnitGroupCreate } from '../unit-groups/unit-group-create.dto';
@@ -17,19 +18,18 @@ import {
 import { ValidateListingPublish } from '../../decorators/validate-listing-publish.decorator';
 import { ValidationsGroupsEnum } from '../../enums/shared/validation-groups-enum';
 import { ListingParkingTypeCreate } from './listing-parking-type-create.dto';
-import { ListingUtilitiesCreate } from './listing-utiliity-create.dto';
 
 export class ListingCreate extends OmitType(ListingUpdate, [
   'applicationMethods',
   'id',
   'listingEvents',
   'listingNeighborhoodAmenities',
-  'listingUtilities',
   'listingsApplicationDropOffAddress',
   'listingsApplicationMailingAddress',
   'listingsApplicationPickUpAddress',
   'listingsBuildingAddress',
   'listingsLeasingAgentAddress',
+  'listingUtilities',
   'unitGroups',
   'units',
 ]) {

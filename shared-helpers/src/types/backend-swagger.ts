@@ -9586,6 +9586,7 @@ export enum FeatureFlagEnum {
   "enableSupportAdmin" = "enableSupportAdmin",
   "enableUnderConstructionHome" = "enableUnderConstructionHome",
   "enableUnitGroups" = "enableUnitGroups",
+  "enableUtilitiesIncluded" = "enableUtilitiesIncluded",
   "enableWaitlistAdditionalFields" = "enableWaitlistAdditionalFields",
   "enableWaitlistLottery" = "enableWaitlistLottery",
   "enableWhatToExpectAdditionalField" = "enableWhatToExpectAdditionalField",

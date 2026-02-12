@@ -45,8 +45,8 @@ import { cleanRichText, getReadableErrorMessage } from "../PaperListingDetails/s
 import { getListingStatusTag } from "../helpers"
 import AdditionalDetails from "./sections/AdditionalDetails"
 import AdditionalEligibility from "./sections/AdditionalEligibility"
-import Deposit from "./sections/Deposit"
 import LeasingAgent from "./sections/LeasingAgent"
+import AdditionalFees from "./sections/AdditionalFees"
 import Units from "./sections/Units"
 import AccessibilityFeatures from "./sections/AccessibilityFeatures"
 import BuildingDetails from "./sections/BuildingDetails"
@@ -640,6 +640,15 @@ const ListingForm = ({
                             setPrograms={setPrograms}
                             swapCommunityTypeWithPrograms={swapCommunityTypeWithPrograms}
                           />
+                          <AdditionalFees
+                            enableNonRegulatedListings={enableNonRegulatedListings}
+                            enableUtilitiesIncluded={doJurisdictionsHaveFeatureFlagOn(
+                              FeatureFlagEnum.enableUtilitiesIncluded,
+                              jurisdictionId
+                            )}
+                            existingUtilities={listing?.listingUtilities}
+                            requiredFields={requiredFields}
+                          />
                           <AccessibilityFeatures
                             existingFeatures={accessibilityFeatures}
                             enableAccessibilityFeatures={doJurisdictionsHaveFeatureFlagOn(
@@ -669,10 +678,6 @@ const ListingForm = ({
                               jurisdictionId
                             )}
                             existingParkingTypes={listing?.parkType}
-                            requiredFields={requiredFields}
-                          />
-                          <Deposit
-                            enableNonRegulatedListings={enableNonRegulatedListings}
                             requiredFields={requiredFields}
                           />
                           <NeighborhoodAmenities

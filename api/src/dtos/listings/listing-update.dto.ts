@@ -11,6 +11,7 @@ import { ListingEventUpdate } from './listing-event-update.dto';
 import { ListingFeaturesUpdate } from './listing-feature-update.dto';
 import { ListingImageCreate } from './listing-image-create.dto';
 import { ListingNeighborhoodAmenitiesUpdate } from './listing-neighborhood-amenities-update.dto';
+import { ListingUtilitiesUpdate } from './listing-utility-update.dto';
 import { LotteryDateParamValidator } from '../../utilities/lottery-date-validator';
 import { UnitGroupUpdate } from '../unit-groups/unit-group-update.dto';
 import { UnitsSummaryCreate } from '../units/units-summary-create.dto';
@@ -24,7 +25,6 @@ import { ValidateListingPublish } from '../../decorators/validate-listing-publis
 import { ValidateListingFeatures } from '../../decorators/validate-listing-features.decorator';
 import { ValidationsGroupsEnum } from '../../enums/shared/validation-groups-enum';
 import { ListingParkingTypeUpdate } from './listing-parking-type-update.dto';
-import { ListingUtilitiesUpdate } from './listing-utility-update.dto';
 
 export class ListingUpdate extends OmitType(Listing, [
   // fields get their type changed
@@ -35,7 +35,6 @@ export class ListingUpdate extends OmitType(Listing, [
   'listingImages',
   'listingMultiselectQuestions',
   'listingNeighborhoodAmenities',
-  'listingUtilities',
   'listingsAccessibleMarketingFlyerFile',
   'listingsApplicationDropOffAddress',
   'listingsApplicationMailingAddress',
@@ -45,6 +44,7 @@ export class ListingUpdate extends OmitType(Listing, [
   'listingsLeasingAgentAddress',
   'listingsMarketingFlyerFile',
   'listingsResult',
+  'listingUtilities',
   'parkType',
   'requestedChangesUser',
   'unitGroups',

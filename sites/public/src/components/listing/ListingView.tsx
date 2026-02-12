@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 import ReactDOMServer from "react-dom/server"
 import Markdown from "markdown-to-jsx"
 import {
+  AdditionalFees,
   ApplicationStatus,
   Description,
   ExpandableText,
@@ -40,7 +41,6 @@ import {
   pdfUrlFromListingEvents,
   AuthContext,
   Map,
-  listingUtilities,
 } from "@bloom-housing/shared-helpers"
 import { Card, Heading as SeedsHeading } from "@bloom-housing/ui-seeds"
 import dayjs from "dayjs"
@@ -182,23 +182,6 @@ export const ListingView = (props: ListingProps) => {
   const householdMaximumIncomeSubheader = listing?.units[0]?.bmrProgramChart
     ? t("listings.forIncomeCalculationsBMR")
     : t("listings.forIncomeCalculations")
-
-  const depositAmount = (() => {
-    if (listing.depositValue !== null && listing.depositValue !== undefined) {
-      return `$${listing.depositValue}`
-    }
-
-    if (listing.depositMin || listing.depositMax) {
-      const depositMin = Number.parseInt(listing.depositMin ?? "0", 10)
-      const depositMax = Number.parseInt(listing.depositMax ?? "0", 10)
-
-      if (!Number.isNaN(depositMin) && !Number.isNaN(depositMax)) {
-        return getCurrencyRange(depositMin, depositMax)
-      }
-    }
-
-    return null
-  })()
 
   if (listing.listingsBuildingSelectionCriteriaFile) {
     buildingSelectionCriteria = (
@@ -586,24 +569,49 @@ export const ListingView = (props: ListingProps) => {
   const accessibilityFeatures = enableAccessibilityFeatures ? getAccessibilityFeatures() : null
 
   const getUtilitiesIncluded = () => {
-    const enabledUtilities = Object.keys(listing?.listingUtilities ?? {}).filter((feature) => {
-      return listingUtilities.includes(feature) && listing?.listingUtilities[feature]
-    })
-    if (!enabledUtilities.length) return null
-
-    return (
-      <ul>
-        {enabledUtilities.map((utility) => {
-          return (
-            <li key={utility} className={"list-disc list-inside"}>
-              {t(`listings.utilities.${utility}`)}
+    let utilitiesExist = false
+    const utilitiesIncluded = Object.keys(listing?.listingUtilities ?? {}).reduce(
+      (acc, current, index) => {
+        if (listing?.listingUtilities[current]) {
+          utilitiesExist = true
+          acc.push(
+            <li key={index} className={"list-disc list-inside"}>
+              {t(`listings.utilities.${current}`)}
             </li>
           )
-        })}
-      </ul>
+        }
+        return acc
+      },
+      []
+    )
+    return !utilitiesExist ? null : (
+      <div>
+        <div className="text-base">{t("listings.sections.utilities")}</div>
+        {utilitiesIncluded.length <= 4 ? (
+          <ul>{utilitiesIncluded}</ul>
+        ) : (
+          <div className="flex">
+            <ul className="float-left w-1/2">{utilitiesIncluded.slice(0, 4)}</ul>
+            <ul className="float-right w-1/2">{utilitiesIncluded.slice(4)}</ul>
+          </div>
+        )}
+      </div>
     )
   }
-  const utilitiesIncluded = getUtilitiesIncluded()
+
+  const getFooterContent = () => {
+    const footerContent: (string | React.ReactNode)[] = []
+    const enableUtilitiesIncluded = isFeatureFlagOn(
+      props.jurisdiction,
+      FeatureFlagEnum.enableUtilitiesIncluded
+    )
+    if (enableUtilitiesIncluded) {
+      const utilitiesDisplay = getUtilitiesIncluded()
+      if (utilitiesDisplay) footerContent.push(utilitiesDisplay)
+    }
+    if (listing?.costsNotIncluded) footerContent.push(listing.costsNotIncluded)
+    return footerContent
+  }
 
   return (
     <article className="flex flex-wrap relative max-w-5xl m-auto">
@@ -1006,29 +1014,6 @@ export const ListingView = (props: ListingProps) => {
               {listing.servicesOffered && (
                 <Description term={t("t.servicesOffered")} description={listing.servicesOffered} />
               )}
-              {(depositAmount || listing.depositHelperText) && (
-                <Description
-                  term={t("t.deposit")}
-                  description={
-                    <>
-                      {depositAmount && <div>{depositAmount}</div>}
-                      {listing.depositHelperText && <div>{listing.depositHelperText}</div>}
-                    </>
-                  }
-                />
-              )}
-              {utilitiesIncluded && (
-                <Description
-                  term={t("listings.sections.utilities")}
-                  description={utilitiesIncluded}
-                />
-              )}
-              {listing.costsNotIncluded && (
-                <Description
-                  term={t("listings.costsNotIncluded")}
-                  description={listing.costsNotIncluded}
-                />
-              )}
               {accessibilityFeatures && (
                 <Description term={t("t.accessibility")} description={accessibilityFeatures} />
               )}
@@ -1049,6 +1034,15 @@ export const ListingView = (props: ListingProps) => {
                 }
               />
             </dl>
+            <AdditionalFees
+              deposit={getCurrencyRange(parseInt(listing.depositMin), parseInt(listing.depositMax))}
+              footerContent={getFooterContent()}
+              strings={{
+                sectionHeader: t("listings.sections.additionalFees"),
+                deposit: t("t.deposit"),
+                depositSubtext: [listing.depositHelperText],
+              }}
+            />
           </div>
         </ListingDetailItem>
 
