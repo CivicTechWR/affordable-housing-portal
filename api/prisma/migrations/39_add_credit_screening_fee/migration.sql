@@ -1,2 +1,2 @@
--- Intentionally empty.
--- Credit screening fees are not supported in this fork.
+-- AlterTable
+ALTER TABLE "listings" ADD COLUMN     "credit_screening_fee" TEXT;

@@ -425,6 +425,7 @@ CREATE TABLE "listings" (
       "year_built" INTEGER,
       "application_due_date" TIMESTAMPTZ(6),
       "application_open_date" TIMESTAMPTZ(6),
+      "application_fee" TEXT,
       "application_organization" TEXT,
       "application_pick_up_address_office_hours" TEXT,
       "application_pick_up_address_type" "listings_application_pick_up_address_type_enum",
