@@ -142,7 +142,6 @@ describe("add listing", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Listing units" }))
     expect(screen.getByRole("heading", { level: 2, name: "Housing preferences" }))
     expect(screen.getByRole("heading", { level: 2, name: "Housing programs" }))
-    expect(screen.getByRole("heading", { level: 2, name: "Additional fees" }))
     expect(screen.getByRole("heading", { level: 2, name: "Building features" }))
     expect(screen.getByRole("heading", { level: 2, name: "Additional eligibility rules" }))
     expect(screen.getByRole("heading", { level: 2, name: "Additional details" }))
@@ -398,9 +397,6 @@ describe("add listing", () => {
       "Reserved community type",
       "Reserved community description",
       "Units",
-      "Application fee",
-      "Deposit helper text",
-      "Costs not included",
       "Property amenities",
       "Additional accessibility",
       "Unit amenities",
@@ -515,9 +511,6 @@ describe("add listing", () => {
       "Reserved community description",
       "Home type",
       "Units",
-      "Application fee",
-      "Deposit helper text",
-      "Costs not included",
       "Property amenities",
       "Additional accessibility",
       "Unit amenities",

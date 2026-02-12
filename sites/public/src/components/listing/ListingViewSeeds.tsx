@@ -28,10 +28,8 @@ import {
   getFeatures,
   getMarketingFlyers,
   getPaperApplications,
-  getUtilitiesIncluded,
   PaperApplicationDialog,
 } from "./ListingViewSeedsHelpers"
-import { AdditionalFees } from "./listing_sections/AdditionalFees"
 import { AdditionalInformation } from "./listing_sections/AdditionalInformation"
 import { Apply } from "./listing_sections/Apply"
 import { Availability } from "./listing_sections/Availability"
@@ -175,19 +173,8 @@ export const ListingViewSeeds = ({ listing, jurisdiction, profile, preview }: Li
     </>
   )
 
-  const listingUtilities = getUtilitiesIncluded(listing)
-
   const hasUnitFeature =
     listing.units.length ||
-    listing.applicationFee ||
-    listing.depositMin ||
-    listing.depositMax ||
-    listing.depositValue ||
-    listing.costsNotIncluded ||
-    (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableCreditScreeningFee) &&
-      listing.creditScreeningFee) ||
-    (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableUtilitiesIncluded) &&
-      listingUtilities.length) ||
     (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableNonRegulatedListings) &&
       listing.listingType === EnumListingListingType.nonRegulated)
 
@@ -200,29 +187,6 @@ export const ListingViewSeeds = ({ listing, jurisdiction, profile, preview }: Li
         disableUnitsAccordion={listing.disableUnitsAccordion}
         units={listing.units}
         unitSummary={listing.unitsSummarized?.byUnitType}
-      />
-      <AdditionalFees
-        applicationFee={listing.applicationFee}
-        costsNotIncluded={listing.costsNotIncluded}
-        creditScreeningFee={
-          isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableCreditScreeningFee)
-            ? listing.creditScreeningFee
-            : null
-        }
-        depositHelperText={listing.depositHelperText}
-        depositMax={listing.depositMax}
-        depositMin={listing.depositMin}
-        depositValue={listing.depositValue}
-        depositType={listing.depositType}
-        isNonRegulated={
-          isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableNonRegulatedListings) &&
-          listing.listingType === EnumListingListingType.nonRegulated
-        }
-        utilitiesIncluded={
-          isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableUtilitiesIncluded)
-            ? listingUtilities
-            : []
-        }
       />
       {isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableNonRegulatedListings) &&
         listing.listingType === EnumListingListingType.nonRegulated && (

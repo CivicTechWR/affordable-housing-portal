@@ -9,7 +9,7 @@ describe("<Features>", () => {
     const { getByText, getAllByText } = render(<Features features={[]}>{"Children"}</Features>)
     expect(getByText("Children")).toBeDefined()
     expect(getAllByText("Features").length).toBeGreaterThan(0)
-    expect(getAllByText("Amenities, unit details and additional fees").length).toBeGreaterThan(0)
+    expect(getAllByText("Amenities and unit details").length).toBeGreaterThan(0)
   })
   it("shows features and children", () => {
     const { getByText, getAllByText } = render(
@@ -23,7 +23,7 @@ describe("<Features>", () => {
       </Features>
     )
     expect(getAllByText("Features").length).toBeGreaterThan(0)
-    expect(getAllByText("Amenities, unit details and additional fees").length).toBeGreaterThan(0)
+    expect(getAllByText("Amenities and unit details").length).toBeGreaterThan(0)
     expect(getByText("Children")).toBeDefined()
     expect(getByText("Heading 1")).toBeDefined()
     expect(getByText("Subheading 1")).toBeDefined()
