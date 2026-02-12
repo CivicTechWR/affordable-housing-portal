@@ -1,15 +1,17 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { t, Field, Textarea, FieldGroup } from "@bloom-housing/ui-components"
 import { Grid } from "@bloom-housing/ui-seeds"
 import { GridRow } from "@bloom-housing/ui-seeds/src/layout/Grid"
 import { defaultFieldProps } from "../../../../lib/helpers"
+import { listingUtilities } from "@bloom-housing/shared-helpers"
 import {
   EnumListingDepositType,
   EnumListingListingType,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
 import { ListingContext } from "../../ListingContext"
+import styles from "../ListingForm.module.scss"
 
 type DepositProps = {
   enableNonRegulatedListings?: boolean
@@ -24,6 +26,17 @@ const Deposit = (props: DepositProps) => {
 
   const depositType = watch("depositType")
   const listingType = watch("listingType")
+
+  const utilitiesFields = useMemo(() => {
+    return listingUtilities.map((utility) => {
+      return {
+        id: utility,
+        label: t(`listings.utilities.${utility}`),
+        defaultChecked: listing?.listingUtilities?.[utility] || false,
+        register,
+      }
+    })
+  }, [listing?.listingUtilities, register])
 
   useEffect(() => {
     setValue("depositMax", listing?.depositMax)
@@ -147,7 +160,7 @@ const Deposit = (props: DepositProps) => {
             </Grid.Row>
           </>
         )}
-        <Grid.Row>
+        <Grid.Row columns={2}>
           <Grid.Cell>
             <Textarea
               aria-describedby={"depositHelperText"}
@@ -161,6 +174,34 @@ const Deposit = (props: DepositProps) => {
                 errors,
                 clearErrors
               )}
+            />
+          </Grid.Cell>
+          <Grid.Cell>
+            <Textarea
+              aria-describedby={"costsNotIncluded"}
+              fullWidth={true}
+              register={register}
+              placeholder={""}
+              {...defaultFieldProps(
+                "costsNotIncluded",
+                t("listings.costsNotIncluded"),
+                props.requiredFields,
+                errors,
+                clearErrors
+              )}
+            />
+          </Grid.Cell>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Cell>
+            <FieldGroup
+              type="checkbox"
+              name="utilities"
+              groupLabel={t("listings.sections.utilities")}
+              fields={utilitiesFields}
+              register={register}
+              fieldGroupClassName="grid grid-cols-2 mt-2"
+              fieldLabelClassName={styles["label-option"]}
             />
           </Grid.Cell>
         </Grid.Row>

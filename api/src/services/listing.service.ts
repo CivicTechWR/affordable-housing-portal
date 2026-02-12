@@ -127,6 +127,7 @@ includeViews.base = {
     },
   },
   listingFeatures: true,
+  listingUtilities: true,
   listingNeighborhoodAmenities: true,
   units: {
     include: {
@@ -1182,6 +1183,9 @@ export class ListingService implements OnModuleInit {
     if (listing.listingsLeasingAgentAddress) {
       listing.leasingAgentAddress = listing.listingsLeasingAgentAddress;
     }
+    if (listing.listingUtilities) {
+      listing.utilities = listing.listingUtilities;
+    }
     if (listing.parkingType) {
       listing.parkingType = listing.parkingType;
     }
@@ -1467,6 +1471,13 @@ export class ListingService implements OnModuleInit {
                 },
               }
             : undefined,
+        listingUtilities: dto.listingUtilities
+          ? {
+              create: {
+                ...dto.listingUtilities,
+              },
+            }
+          : undefined,
         parkType: dto.parkType
           ? {
               create: {
@@ -2213,6 +2224,7 @@ export class ListingService implements OnModuleInit {
     await this.updateListingEvents(incomingDto.id);
 
     const previousFeaturesId = storedListing.listingFeatures?.id;
+    const previousUtilitiesId = storedListing.listingUtilities?.id;
     const previousParkingTypeId = storedListing.parkType?.id;
     const previousNeighborhoodAmenitiesId =
       storedListing.listingNeighborhoodAmenities?.id;
@@ -2449,6 +2461,21 @@ export class ListingService implements OnModuleInit {
               : {
                   disconnect: true,
                 },
+          listingUtilities: incomingDto.listingUtilities
+            ? {
+                upsert: {
+                  where: {
+                    id: previousUtilitiesId,
+                  },
+                  create: {
+                    ...incomingDto.listingUtilities,
+                  },
+                  update: {
+                    ...incomingDto.listingUtilities,
+                  },
+                },
+              }
+            : undefined,
           parkType: incomingDto.parkType
             ? {
                 upsert: {

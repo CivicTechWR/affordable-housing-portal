@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
 import { t } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
+import { listingUtilities } from "@bloom-housing/shared-helpers"
 import {
   EnumListingDepositType,
   EnumListingListingType,
@@ -12,6 +13,19 @@ import { getDetailFieldNumber, getDetailFieldString } from "./helpers"
 const DetailDeposit = () => {
   const listing = useContext(ListingContext)
   const showNonRegulated = listing.listingType === EnumListingListingType.nonRegulated
+  const utilities = Object.keys(listing?.listingUtilities ?? {})
+    .filter((feature) => listingUtilities.includes(feature))
+    .map((utility) => {
+      if (listing?.listingUtilities[utility]) {
+        return (
+          <li key={utility} className={"list-disc mx-5 mb-1 md:w-1/3 w-full grow"}>
+            {t(`listings.utilities.${utility}`)}
+          </li>
+        )
+      }
+      return null
+    })
+    .filter(Boolean)
 
   return (
     <SectionWithGrid heading={t("t.deposit")} inset>
@@ -64,6 +78,18 @@ const DetailDeposit = () => {
         <Grid.Cell>
           <FieldValue label={t("listings.sections.depositHelperText")}>
             {getDetailFieldString(listing.depositHelperText)}
+          </FieldValue>
+        </Grid.Cell>
+        <Grid.Cell>
+          <FieldValue id="costsNotIncluded" label={t("listings.costsNotIncluded")}>
+            {getDetailFieldString(listing.costsNotIncluded)}
+          </FieldValue>
+        </Grid.Cell>
+      </Grid.Row>
+      <Grid.Row>
+        <Grid.Cell>
+          <FieldValue id="utilities" label={t("listings.sections.utilities")}>
+            {utilities.length ? <ul className={"flex flex-wrap"}>{utilities}</ul> : t("t.none")}
           </FieldValue>
         </Grid.Cell>
       </Grid.Row>

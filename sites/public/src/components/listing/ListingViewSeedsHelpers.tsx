@@ -30,6 +30,7 @@ import {
   getCurrencyRange,
   getOccupancyDescription,
   ListingFeaturesValues,
+  listingUtilities,
   listingParkingTypes,
   stackedOccupancyTable,
   stackedUnitGroupsOccupancyTable,
@@ -188,6 +189,22 @@ export const getAccessibilityFeatures = (
   return null
 }
 
+export const getUtilitiesIncluded = (listing: Listing) => {
+  const enabledUtilities = Object.entries(listing?.listingUtilities ?? {})
+    .filter(([key, value]) => value && listingUtilities.includes(key))
+    .map((item) => item[0])
+
+  if (enabledUtilities.length > 0) {
+    return enabledUtilities.map((utility, index) => {
+      return `${t(`listings.utilities.${utility}`)}${
+        index < enabledUtilities.length - 1 ? ", " : ""
+      }`
+    })
+  }
+
+  return []
+}
+
 export const getFeatures = (
   listing: Listing,
   jurisdiction: Jurisdiction
@@ -262,6 +279,16 @@ export const getFeatures = (
         ),
       })
     }
+  }
+  const utilitiesIncluded = getUtilitiesIncluded(listing)
+  if (utilitiesIncluded.length > 0) {
+    features.push({
+      heading: t("listings.sections.utilities"),
+      subheading: utilitiesIncluded.join(""),
+    })
+  }
+  if (listing.costsNotIncluded) {
+    features.push({ heading: t("listings.costsNotIncluded"), subheading: listing.costsNotIncluded })
   }
   if (listing.parkingFee) {
     features.push({

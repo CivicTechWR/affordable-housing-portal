@@ -6,6 +6,7 @@ import {
   Listing,
   ListingEvent,
   ListingFeaturesCreate,
+  ListingUtilitiesCreate,
   ListingsStatusEnum,
   MultiselectQuestion,
   PaperApplication,
@@ -22,7 +23,10 @@ export enum AnotherAddressEnum {
   anotherAddress = "anotherAddress",
 }
 
-export type FormListing = Omit<Listing, "countyCode" | "listingFeatures" | "parkType"> & {
+export type FormListing = Omit<
+  Listing,
+  "countyCode" | "listingFeatures" | "listingUtilities" | "parkType"
+> & {
   applicationDueDateField?: {
     month: string
     day: string
@@ -89,8 +93,10 @@ export type FormListing = Omit<Listing, "countyCode" | "listingFeatures" | "park
   whereApplicationsPickedUp?: ApplicationAddressTypeEnum | AnotherAddressEnum
   whereApplicationsMailedIn?: ApplicationAddressTypeEnum | AnotherAddressEnum
   accessibilityFeatures?: string[]
+  utilities?: string[]
   selectedRequiredDocuments?: string[]
   listingFeatures?: ListingFeaturesCreate
+  listingUtilities?: ListingUtilitiesCreate
   allowsDogs?: boolean
   allowsCats?: boolean
   parkType?: ListingParkingTypeCreate
@@ -128,6 +134,7 @@ export const formDefaults: FormListing = {
   accessibleMarketingFlyer: "",
   listingsAccessibleMarketingFlyerFile: null,
   jurisdictions: undefined,
+  costsNotIncluded: "",
   creditHistory: "",
   criminalBackground: "",
   disableUnitsAccordion: false,
@@ -137,6 +144,7 @@ export const formDefaults: FormListing = {
   listingFeatures: null,
   listingFileNumber: "",
   listingNeighborhoodAmenities: null,
+  listingUtilities: null,
   listingsLeasingAgentAddress: null,
   leasingAgentEmail: null,
   leasingAgentName: null,

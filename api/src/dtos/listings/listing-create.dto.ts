@@ -17,12 +17,14 @@ import {
 import { ValidateListingPublish } from '../../decorators/validate-listing-publish.decorator';
 import { ValidationsGroupsEnum } from '../../enums/shared/validation-groups-enum';
 import { ListingParkingTypeCreate } from './listing-parking-type-create.dto';
+import { ListingUtilitiesCreate } from './listing-utiliity-create.dto';
 
 export class ListingCreate extends OmitType(ListingUpdate, [
   'applicationMethods',
   'id',
   'listingEvents',
   'listingNeighborhoodAmenities',
+  'listingUtilities',
   'listingsApplicationDropOffAddress',
   'listingsApplicationMailingAddress',
   'listingsApplicationPickUpAddress',
@@ -133,6 +135,15 @@ export class ListingCreate extends OmitType(ListingUpdate, [
   @Type(() => ListingFeaturesCreate)
   @ApiPropertyOptional({ type: ListingFeaturesCreate })
   listingFeatures?: ListingFeaturesCreate;
+
+  @Expose()
+  @ValidateListingPublish('listingUtilities', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
+  @Type(() => ListingUtilitiesCreate)
+  @ApiPropertyOptional({ type: ListingUtilitiesCreate })
+  listingUtilities?: ListingUtilitiesCreate;
 
   @Expose()
   @ValidateListingPublish('parkingType', {

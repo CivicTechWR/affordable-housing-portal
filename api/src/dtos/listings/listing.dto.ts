@@ -65,6 +65,7 @@ import { ListingDocuments } from './listing-documents.dto';
 import { ValidateListingImages } from '../../decorators/validate-listing-images.decorator';
 import { ListingFeaturesConfiguration } from '../jurisdictions/listing-features-config.dto';
 import { ListingParkingType } from './listing-parking-type.dto';
+import { ListingUtilities } from './listing-utility.dto';
 
 class Listing extends AbstractDTO {
   @Expose()
@@ -379,6 +380,14 @@ class Listing extends AbstractDTO {
   })
   @ApiPropertyOptional()
   cocInfo?: string;
+
+  @Expose()
+  @ValidateListingPublish('costsNotIncluded', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @IsString({ groups: [ValidationsGroupsEnum.default] })
+  @ApiPropertyOptional()
+  costsNotIncluded?: string;
 
   @Expose()
   @ValidateListingPublish('creditHistory', {
@@ -951,6 +960,15 @@ class Listing extends AbstractDTO {
   @ValidateListingFeatures({ groups: [ValidationsGroupsEnum.default] })
   @ApiPropertyOptional({ type: ListingFeatures })
   listingFeatures?: ListingFeatures;
+
+  @Expose()
+  @ValidateListingPublish('listingUtilities', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
+  @Type(() => ListingUtilities)
+  @ApiPropertyOptional({ type: ListingUtilities })
+  listingUtilities?: ListingUtilities;
 
   @Expose()
   @ValidateAtLeastOneUnit({

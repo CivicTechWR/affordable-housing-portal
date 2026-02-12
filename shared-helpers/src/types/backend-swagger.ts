@@ -3987,6 +3987,41 @@ export interface ListingFeatures {
   wideDoorways?: boolean
 }
 
+export interface ListingUtilities {
+  /**  */
+  id: string
+
+  /**  */
+  createdAt: Date
+
+  /**  */
+  updatedAt: Date
+
+  /**  */
+  water?: boolean
+
+  /**  */
+  gas?: boolean
+
+  /**  */
+  trash?: boolean
+
+  /**  */
+  sewer?: boolean
+
+  /**  */
+  electricity?: boolean
+
+  /**  */
+  cable?: boolean
+
+  /**  */
+  phone?: boolean
+
+  /**  */
+  internet?: boolean
+}
+
 export interface AmiChartItem {
   /**  */
   percentOfAmi: number
@@ -4654,6 +4689,9 @@ export interface Listing {
   cocInfo?: string
 
   /**  */
+  costsNotIncluded?: string
+
+  /**  */
   creditHistory?: string
 
   /**  */
@@ -4853,6 +4891,9 @@ export interface Listing {
 
   /**  */
   listingFeatures?: ListingFeatures
+
+  /**  */
+  listingUtilities?: ListingUtilities
 
   /**  */
   units: Unit[]
@@ -5427,6 +5468,32 @@ export interface ListingEventCreate {
   assets?: AssetCreate
 }
 
+export interface ListingUtilitiesCreate {
+  /**  */
+  water?: boolean
+
+  /**  */
+  gas?: boolean
+
+  /**  */
+  trash?: boolean
+
+  /**  */
+  sewer?: boolean
+
+  /**  */
+  electricity?: boolean
+
+  /**  */
+  cable?: boolean
+
+  /**  */
+  phone?: boolean
+
+  /**  */
+  internet?: boolean
+}
+
 export interface ListingNeighborhoodAmenitiesCreate {
   /**  */
   groceryStores?: string
@@ -5570,6 +5637,9 @@ export interface ListingCreate {
 
   /**  */
   cocInfo?: string
+
+  /**  */
+  costsNotIncluded?: string
 
   /**  */
   creditHistory?: string
@@ -5810,6 +5880,9 @@ export interface ListingCreate {
 
   /**  */
   listingEvents: ListingEventCreate[]
+
+  /**  */
+  listingUtilities?: ListingUtilitiesCreate
 
   /**  */
   listingNeighborhoodAmenities?: ListingNeighborhoodAmenitiesCreate
@@ -6219,6 +6292,35 @@ export interface ListingFeaturesUpdate {
   id?: string
 }
 
+export interface ListingUtilitiesUpdate {
+  /**  */
+  water?: boolean
+
+  /**  */
+  gas?: boolean
+
+  /**  */
+  trash?: boolean
+
+  /**  */
+  sewer?: boolean
+
+  /**  */
+  electricity?: boolean
+
+  /**  */
+  cable?: boolean
+
+  /**  */
+  phone?: boolean
+
+  /**  */
+  internet?: boolean
+
+  /**  */
+  id?: string
+}
+
 export interface ListingParkingTypeUpdate {
   /**  */
   onStreet?: boolean
@@ -6385,6 +6487,9 @@ export interface ListingUpdate {
 
   /**  */
   cocInfo?: string
+
+  /**  */
+  costsNotIncluded?: string
 
   /**  */
   creditHistory?: string
@@ -6619,6 +6724,9 @@ export interface ListingUpdate {
 
   /**  */
   listingFeatures?: ListingFeaturesUpdate
+
+  /**  */
+  listingUtilities?: ListingUtilitiesUpdate
 
   /**  */
   parkType?: ListingParkingTypeUpdate

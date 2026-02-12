@@ -40,6 +40,7 @@ import {
   pdfUrlFromListingEvents,
   AuthContext,
   Map,
+  listingUtilities,
 } from "@bloom-housing/shared-helpers"
 import { Card, Heading as SeedsHeading } from "@bloom-housing/ui-seeds"
 import dayjs from "dayjs"
@@ -584,6 +585,26 @@ export const ListingView = (props: ListingProps) => {
   )
   const accessibilityFeatures = enableAccessibilityFeatures ? getAccessibilityFeatures() : null
 
+  const getUtilitiesIncluded = () => {
+    const enabledUtilities = Object.keys(listing?.listingUtilities ?? {}).filter((feature) => {
+      return listingUtilities.includes(feature) && listing?.listingUtilities[feature]
+    })
+    if (!enabledUtilities.length) return null
+
+    return (
+      <ul>
+        {enabledUtilities.map((utility) => {
+          return (
+            <li key={utility} className={"list-disc list-inside"}>
+              {t(`listings.utilities.${utility}`)}
+            </li>
+          )
+        })}
+      </ul>
+    )
+  }
+  const utilitiesIncluded = getUtilitiesIncluded()
+
   return (
     <article className="flex flex-wrap relative max-w-5xl m-auto">
       <header className="image-card--leader">
@@ -994,6 +1015,18 @@ export const ListingView = (props: ListingProps) => {
                       {listing.depositHelperText && <div>{listing.depositHelperText}</div>}
                     </>
                   }
+                />
+              )}
+              {utilitiesIncluded && (
+                <Description
+                  term={t("listings.sections.utilities")}
+                  description={utilitiesIncluded}
+                />
+              )}
+              {listing.costsNotIncluded && (
+                <Description
+                  term={t("listings.costsNotIncluded")}
+                  description={listing.costsNotIncluded}
                 />
               )}
               {accessibilityFeatures && (

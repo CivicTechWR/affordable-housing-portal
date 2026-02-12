@@ -38,6 +38,7 @@ import Listing from '../dtos/listings/listing.dto';
 import { mapTo } from '../utilities/mapTo';
 import { ListingMultiselectQuestion } from '../dtos/listings/listing-multiselect-question.dto';
 import { ListingFeatures } from '../dtos/listings/listing-feature.dto';
+import { ListingUtilities } from '../dtos/listings/listing-utility.dto';
 import { UnitType } from '../dtos/unit-types/unit-type.dto';
 import { UnitGroupAmiLevel } from '../dtos/unit-groups/unit-group-ami-level.dto';
 import {
@@ -431,7 +432,11 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
   };
 
   buildSelectList(
-    val: ListingDocuments | ListingFeatures | ListingParkingType,
+    val:
+      | ListingDocuments
+      | ListingFeatures
+      | ListingParkingType
+      | ListingUtilities,
   ): string {
     if (!val) return '';
     const selectedValues = Object.entries(val).reduce((combined, entry) => {
@@ -683,6 +688,11 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         format: this.buildSelectList,
       });
     }
+    headers.push({
+      path: 'listingUtilities',
+      label: 'Utilities Included',
+      format: this.buildSelectList,
+    });
 
     headers.push(
       ...[
@@ -831,6 +841,10 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         {
           path: 'servicesOffered',
           label: 'Services Offered',
+        },
+        {
+          path: 'costsNotIncluded',
+          label: 'Costs Not Included',
         },
         {
           path: 'smokingPolicy',

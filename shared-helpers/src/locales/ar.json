@@ -777,6 +777,7 @@
   "listings.confirmedListings": "القوائم المؤكدة",
   "listings.confirmedListingsOnly": "إظهار القوائم المؤكدة حسب العقار فقط",
   "listings.confirmedPreferenceList": "تم تأكيد قائمة %{preference}",
+  "listings.costsNotIncluded": "التكاليف غير متضمنة",
   "listings.creditHistory": "تاريخ الائتمان",
   "listings.criminalBackground": "الخلفية الجنائية",
   "listings.depositMayBeHigherForLowerCredit": "قد تكون أعلى للحصول على درجات ائتمانية أقل",

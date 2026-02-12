@@ -1169,6 +1169,7 @@ model Listings {
   configurableRegion                   String?                     @map("configurable_region")
   contentUpdatedAt                     DateTime?                   @map("content_updated_at") @db.Timestamptz(6)
   copyOfId                             String?                     @map("copy_of_id") @db.Uuid
+  costsNotIncluded                     String?                     @map("costs_not_included")
   creditHistory                        String?                     @map("credit_history")
   criminalBackground                   String?                     @map("criminal_background")
   customMapPin                         Boolean?                    @map("custom_map_pin")
@@ -1249,6 +1250,7 @@ model Listings {
   temporaryListingId                   Int?                        @map("temporary_listing_id")
   unitAmenities                        String?                     @map("unit_amenities")
   unitsAvailable                       Int?                        @map("units_available")
+  utilitiesId                          String?                     @unique() @map("utilities_id") @db.Uuid
   verifiedAt                           DateTime?                   @map("verified_at") @db.Timestamptz(6)
   waitlistCurrentSize                  Int?                        @map("waitlist_current_size")
   waitlistMaxSize                      Int?                        @map("waitlist_max_size")
@@ -1281,6 +1283,7 @@ model Listings {
   listingsLeasingAgentAddress           Address?                      @relation("leasing_agent_address", fields: [leasingAgentAddressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   listingsMarketingFlyerFile            Assets?                       @relation("marketing_flyer_file", fields: [marketingFlyerFileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   listingsResult                        Assets?                       @relation("listings_result", fields: [resultId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  listingUtilities                      ListingUtilities?             @relation(fields: [utilitiesId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   parkType                              ListingParkingType?           @relation(fields: [parkingTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   property                              Properties?                   @relation(fields: [propertyId], references: [id])
   requestedChangesUser                  UserAccounts?                 @relation("requested_changes_user", fields: [requestedChangesUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -1352,6 +1355,7 @@ model ListingSnapshot {
   configurableRegion                      String?                     @map("configurable_region")
   contentUpdatedAt                        DateTime?                   @map("content_updated_at") @db.Timestamptz(6)
   copyOfId                                String?                     @map("copy_of_id") @db.Uuid
+  costsNotIncluded                        String?                     @map("costs_not_included")
   creditHistory                           String?                     @map("credit_history")
   criminalBackground                      String?                     @map("criminal_background")
   customMapPin                            Boolean?                    @map("custom_map_pin")
@@ -1431,6 +1435,7 @@ model ListingSnapshot {
   temporaryListingId                      Int?                        @map("temporary_listing_id")
   unitAmenities                           String?                     @map("unit_amenities")
   unitsAvailable                          Int?                        @map("units_available")
+  utilitySnapshotId                       String?                     @unique() @map("utility_snapshot_id") @db.Uuid
   verifiedAt                              DateTime?                   @map("verified_at") @db.Timestamptz(6)
   waitlistCurrentSize                     Int?                        @map("waitlist_current_size")
   waitlistMaxSize                         Int?                        @map("waitlist_max_size")
@@ -1456,6 +1461,7 @@ model ListingSnapshot {
   listingsLeasingAgentAddress           AddressSnapshot?                     @relation("leasing_agent_address_snapshot", fields: [leasingAgentAddressSnapshotId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   listingsMarketingFlyerFile            AssetSnapshot?                       @relation("marketing_flyer_file_snapshot", fields: [marketingFlyerFileSnapshotId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   listingsResult                        AssetSnapshot?                       @relation("listings_result_snapshot", fields: [resultSnapshotId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  listingUtility                        ListingUtilitySnapshot?              @relation(fields: [utilitySnapshotId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   property                              PropertySnapshot?                    @relation(fields: [propertySnapshotId], references: [id])
   requiredDocumentsList                 ListingDocumentSnapshot?             @relation(fields: [documentSnapshotId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   reservedCommunityType                 ReservedCommunityTypes?              @relation(fields: [reservedCommunityTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -1466,6 +1472,48 @@ model ListingSnapshot {
 
   @@index([jurisdictionId])
   @@map("listing_snapshot")
+}
+
+// ListingUtility Section
+model ListingUtilities {
+  id        String   @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  cable       Boolean?
+  electricity Boolean?
+  gas         Boolean?
+  internet    Boolean?
+  phone       Boolean?
+  sewer       Boolean?
+  trash       Boolean?
+  water       Boolean?
+
+  listings Listings?
+
+  @@map("listing_utilities")
+}
+
+model ListingUtilitySnapshot {
+  id        String   @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  originalId        String   @map("original_id") @db.Uuid
+  originalCreatedAt DateTime @map("original_created_at") @db.Timestamp(6)
+  updatedAt         DateTime @map("updated_at") @db.Timestamp(6)
+
+  cable       Boolean?
+  electricity Boolean?
+  gas         Boolean?
+  internet    Boolean?
+  phone       Boolean?
+  sewer       Boolean?
+  trash       Boolean?
+  water       Boolean?
+
+  listing ListingSnapshot?
+
+  @@map("listing_utility_snapshot")
 }
 
 // MapLayer Section

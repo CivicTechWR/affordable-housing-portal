@@ -536,7 +536,10 @@ describe("add listing", () => {
 
     possibleRequiredFields.forEach((fieldName) => {
       const query = screen.getAllByText(fieldName)
-      expect(query[0]).toHaveTextContent(`${fieldName} *`)
+      const hasRequiredAsterisk = query.some((field) =>
+        field.textContent?.includes(`${fieldName} *`)
+      )
+      expect(hasRequiredAsterisk).toBe(true)
     })
   })
 })

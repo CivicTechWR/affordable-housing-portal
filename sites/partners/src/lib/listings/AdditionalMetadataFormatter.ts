@@ -1,6 +1,7 @@
 import {
   allListingFeatures,
   listingRequiredDocumentsOptions,
+  listingUtilities,
   listingParkingTypes,
 } from "@bloom-housing/shared-helpers"
 import {
@@ -153,6 +154,16 @@ export default class AdditionalMetadataFormatter extends Formatter {
       }, {})
     } else {
       this.data.requiredDocumentsList = null
+    }
+
+    if (this.data.utilities) {
+      this.data.listingUtilities = listingUtilities.reduce((acc, current) => {
+        const isSelected = this.data.utilities.some((utility) => utility === current)
+        return {
+          ...acc,
+          [current]: isSelected,
+        }
+      }, {})
     }
 
     if (this.data.listingType === EnumListingListingType.nonRegulated) {

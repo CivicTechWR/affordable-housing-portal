@@ -88,6 +88,7 @@ export class TranslationService {
         listing.applicationDropOffAddressOfficeHours,
       applicationPickUpAddressOfficeHours:
         listing.applicationPickUpAddressOfficeHours,
+      costsNotIncluded: listing.costsNotIncluded,
       creditHistory: listing.creditHistory,
       criminalBackground: listing.criminalBackground,
       depositHelperText: listing.depositHelperText,
