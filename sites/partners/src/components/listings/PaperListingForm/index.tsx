@@ -45,6 +45,7 @@ import { cleanRichText, getReadableErrorMessage } from "../PaperListingDetails/s
 import { getListingStatusTag } from "../helpers"
 import AdditionalDetails from "./sections/AdditionalDetails"
 import AdditionalEligibility from "./sections/AdditionalEligibility"
+import Deposit from "./sections/Deposit"
 import LeasingAgent from "./sections/LeasingAgent"
 import Units from "./sections/Units"
 import AccessibilityFeatures from "./sections/AccessibilityFeatures"
@@ -668,6 +669,10 @@ const ListingForm = ({
                               jurisdictionId
                             )}
                             existingParkingTypes={listing?.parkType}
+                            requiredFields={requiredFields}
+                          />
+                          <Deposit
+                            enableNonRegulatedListings={enableNonRegulatedListings}
                             requiredFields={requiredFields}
                           />
                           <NeighborhoodAmenities

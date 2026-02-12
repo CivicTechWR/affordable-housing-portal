@@ -67,6 +67,9 @@ const mockListing = (): Listing => {
     neighborhood: 'untranslated neighborhood',
     leasingAgentOfficeHours: 'untranslated leasing agent office hours',
     criminalBackground: 'untranslated criminal background',
+    depositHelperText: 'untranslated deposit helper text',
+    depositMax: 'untranslated deposit maximum',
+    depositMin: 'untranslated deposit minimum',
     creditHistory: 'untranslated credit history',
     applicationPickUpAddressOfficeHours:
       'untranslated application pick up address office hours',
@@ -119,6 +122,9 @@ const translatedStrings = [
   'translated application pick up address office hours',
   'translated credit history',
   'translated criminal background',
+  'translated deposit helper text',
+  'translated deposit maximum',
+  'translated deposit minimum',
   'translated leasing agent office hours',
   'translated neighborhood',
   'translated pet policy',
@@ -345,6 +351,9 @@ const validateTranslatedFields = (listing: Listing) => {
   );
   expect(listing.creditHistory).toEqual('translated credit history');
   expect(listing.criminalBackground).toEqual('translated criminal background');
+  expect(listing.depositHelperText).toEqual('translated deposit helper text');
+  expect(listing.depositMax).toEqual('translated deposit maximum');
+  expect(listing.depositMin).toEqual('translated deposit minimum');
   expect(listing.leasingAgentOfficeHours).toEqual(
     'translated leasing agent office hours',
   );

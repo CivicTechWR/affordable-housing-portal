@@ -4660,6 +4660,21 @@ export interface Listing {
   criminalBackground?: string
 
   /**  */
+  depositMin?: string
+
+  /**  */
+  depositMax?: string
+
+  /**  */
+  depositType?: EnumListingDepositType
+
+  /**  */
+  depositValue?: number
+
+  /**  */
+  depositHelperText?: string
+
+  /**  */
   disableUnitsAccordion?: boolean
 
   /**  */
@@ -5563,6 +5578,21 @@ export interface ListingCreate {
   criminalBackground?: string
 
   /**  */
+  depositMin?: string
+
+  /**  */
+  depositMax?: string
+
+  /**  */
+  depositType?: EnumListingCreateDepositType
+
+  /**  */
+  depositValue?: number
+
+  /**  */
+  depositHelperText?: string
+
+  /**  */
   disableUnitsAccordion?: boolean
 
   /**  */
@@ -6361,6 +6391,21 @@ export interface ListingUpdate {
 
   /**  */
   criminalBackground?: string
+
+  /**  */
+  depositMin?: string
+
+  /**  */
+  depositMax?: string
+
+  /**  */
+  depositType?: EnumListingUpdateDepositType
+
+  /**  */
+  depositValue?: number
+
+  /**  */
+  depositHelperText?: string
 
   /**  */
   disableUnitsAccordion?: boolean
@@ -9233,6 +9278,10 @@ export enum MonthEnum {
   "november" = "november",
   "december" = "december",
 }
+export enum EnumListingDepositType {
+  "fixedDeposit" = "fixedDeposit",
+  "depositRange" = "depositRange",
+}
 export enum EnumListingListingType {
   "regulated" = "regulated",
   "nonRegulated" = "nonRegulated",
@@ -9241,6 +9290,10 @@ export enum EnumUnitGroupAmiLevelCreateMonthlyRentDeterminationType {
   "flatRent" = "flatRent",
   "percentageOfIncome" = "percentageOfIncome",
 }
+export enum EnumListingCreateDepositType {
+  "fixedDeposit" = "fixedDeposit",
+  "depositRange" = "depositRange",
+}
 export enum EnumListingCreateListingType {
   "regulated" = "regulated",
   "nonRegulated" = "nonRegulated",
@@ -9248,6 +9301,10 @@ export enum EnumListingCreateListingType {
 export enum EnumUnitGroupAmiLevelUpdateMonthlyRentDeterminationType {
   "flatRent" = "flatRent",
   "percentageOfIncome" = "percentageOfIncome",
+}
+export enum EnumListingUpdateDepositType {
+  "fixedDeposit" = "fixedDeposit",
+  "depositRange" = "depositRange",
 }
 export enum EnumListingUpdateListingType {
   "regulated" = "regulated",

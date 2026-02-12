@@ -1172,6 +1172,11 @@ model Listings {
   creditHistory                        String?                     @map("credit_history")
   criminalBackground                   String?                     @map("criminal_background")
   customMapPin                         Boolean?                    @map("custom_map_pin")
+  depositHelperText                    String?                     @map("deposit_helper_text")
+  depositMax                           String?                     @map("deposit_max")
+  depositMin                           String?                     @map("deposit_min")
+  depositType                          DepositTypeEnum?            @map("deposit_type")
+  depositValue                         Decimal?                    @map("deposit_value") @db.Decimal(8, 2)
   developer                            String?
   digitalApplication                   Boolean?                    @map("digital_application")
   disableUnitsAccordion                Boolean?                    @map("disable_units_accordion")
@@ -1350,6 +1355,11 @@ model ListingSnapshot {
   creditHistory                           String?                     @map("credit_history")
   criminalBackground                      String?                     @map("criminal_background")
   customMapPin                            Boolean?                    @map("custom_map_pin")
+  depositHelperText                       String?                     @map("deposit_helper_text")
+  depositMax                              String?                     @map("deposit_max")
+  depositMin                              String?                     @map("deposit_min")
+  depositType                             DepositTypeEnum?            @map("deposit_type")
+  depositValue                            Decimal?                    @map("deposit_value") @db.Decimal(8, 2)
   developer                               String?
   digitalApplication                      Boolean?                    @map("digital_application")
   disableUnitsAccordion                   Boolean?                    @map("disable_units_accordion")
@@ -2180,6 +2190,13 @@ enum ApplicationSubmissionTypeEnum {
   electronical
 
   @@map("application_submission_type_enum")
+}
+
+enum DepositTypeEnum {
+  fixedDeposit
+  depositRange
+
+  @@map("deposit_type_enum")
 }
 
 enum FlaggedSetStatusEnum {

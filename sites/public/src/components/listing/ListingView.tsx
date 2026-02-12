@@ -32,6 +32,7 @@ import {
   imageUrlFromListing,
   occupancyTable,
   getTimeRangeString,
+  getCurrencyRange,
   getPostmarkString,
   UnitTables,
   getSummariesTable,
@@ -180,6 +181,23 @@ export const ListingView = (props: ListingProps) => {
   const householdMaximumIncomeSubheader = listing?.units[0]?.bmrProgramChart
     ? t("listings.forIncomeCalculationsBMR")
     : t("listings.forIncomeCalculations")
+
+  const depositAmount = (() => {
+    if (listing.depositValue !== null && listing.depositValue !== undefined) {
+      return `$${listing.depositValue}`
+    }
+
+    if (listing.depositMin || listing.depositMax) {
+      const depositMin = Number.parseInt(listing.depositMin ?? "0", 10)
+      const depositMax = Number.parseInt(listing.depositMax ?? "0", 10)
+
+      if (!Number.isNaN(depositMin) && !Number.isNaN(depositMax)) {
+        return getCurrencyRange(depositMin, depositMax)
+      }
+    }
+
+    return null
+  })()
 
   if (listing.listingsBuildingSelectionCriteriaFile) {
     buildingSelectionCriteria = (
@@ -966,6 +984,17 @@ export const ListingView = (props: ListingProps) => {
               )}
               {listing.servicesOffered && (
                 <Description term={t("t.servicesOffered")} description={listing.servicesOffered} />
+              )}
+              {(depositAmount || listing.depositHelperText) && (
+                <Description
+                  term={t("t.deposit")}
+                  description={
+                    <>
+                      {depositAmount && <div>{depositAmount}</div>}
+                      {listing.depositHelperText && <div>{listing.depositHelperText}</div>}
+                    </>
+                  }
+                />
               )}
               {accessibilityFeatures && (
                 <Description term={t("t.accessibility")} description={accessibilityFeatures} />

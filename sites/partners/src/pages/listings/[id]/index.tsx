@@ -30,6 +30,7 @@ import DetailUnitDrawer, {
   UnitDrawer,
 } from "../../../components/listings/PaperListingDetails/DetailsUnitDrawer"
 import DetailBuildingFeatures from "../../../components/listings/PaperListingDetails/sections/DetailBuildingFeatures"
+import DetailDeposit from "../../../components/listings/PaperListingDetails/sections/DetailDeposit"
 import DetailRankingsAndResults from "../../../components/listings/PaperListingDetails/sections/DetailRankingsAndResults"
 import DetailApplicationTypes from "../../../components/listings/PaperListingDetails/sections/DetailApplicationTypes"
 import DetailApplicationAddress from "../../../components/listings/PaperListingDetails/sections/DetailApplicationAddress"
@@ -137,6 +138,7 @@ export default function ListingDetail(props: ListingProps) {
                       listingFeaturesConfiguration={jurisdictionData?.listingFeaturesConfiguration}
                     />
                     <DetailBuildingFeatures />
+                    <DetailDeposit />
                     <DetailNeighborhoodAmenities />
                     <DetailAdditionalEligibility />
                     <DetailAdditionalDetails />

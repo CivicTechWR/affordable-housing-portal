@@ -4,6 +4,7 @@ import {
   listingParkingTypes,
 } from "@bloom-housing/shared-helpers"
 import {
+  EnumListingDepositType,
   ReviewOrderTypeEnum,
   YesNoEnum,
   EnumListingListingType,
@@ -152,6 +153,18 @@ export default class AdditionalMetadataFormatter extends Formatter {
       }, {})
     } else {
       this.data.requiredDocumentsList = null
+    }
+
+    if (this.data.listingType === EnumListingListingType.nonRegulated) {
+      if (this.data.depositType === EnumListingDepositType.fixedDeposit) {
+        this.data.depositMin = null
+        this.data.depositMax = null
+      } else if (this.data.depositType === EnumListingDepositType.depositRange) {
+        this.data.depositValue = null
+      }
+    } else {
+      this.data.depositType = null
+      this.data.depositValue = null
     }
 
     if (this.data.petPolicyPreferences) {

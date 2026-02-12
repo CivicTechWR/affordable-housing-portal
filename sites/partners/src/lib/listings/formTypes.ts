@@ -2,6 +2,7 @@ import { TimeFieldPeriod } from "@bloom-housing/ui-components"
 import { LatitudeLongitude } from "@bloom-housing/shared-helpers"
 import {
   ApplicationAddressTypeEnum,
+  EnumListingDepositType,
   Listing,
   ListingEvent,
   ListingFeaturesCreate,
@@ -164,6 +165,11 @@ export const formDefaults: FormListing = {
   listingsBuildingAddress: null,
   buildingTotalUnits: 0,
   developer: null,
+  depositType: EnumListingDepositType.fixedDeposit,
+  depositMax: "",
+  depositMin: "",
+  depositHelperText: "",
+  depositValue: null,
   householdSizeMax: 0,
   householdSizeMin: 0,
   neighborhood: undefined,

@@ -22,6 +22,7 @@ import { AbstractDTO } from '../shared/abstract.dto';
 import {
   ApplicationAddressTypeEnum,
   ApplicationMethodsTypeEnum,
+  DepositTypeEnum,
   HomeTypeEnum,
   ListingsStatusEnum,
   LotteryStatusEnum,
@@ -53,6 +54,7 @@ import { LotteryDateParamValidator } from '../../utilities/lottery-date-validato
 import { ApplicationLotteryTotal } from '../applications/application-lottery-total.dto';
 import { ListingNeighborhoodAmenities } from './listing-neighborhood-amenities.dto';
 import { ValidateListingPublish } from '../../decorators/validate-listing-publish.decorator';
+import { ValidateListingDeposit } from '../../decorators/validate-listing-deposit.decorator';
 import { UnitGroupsSummarized } from '../unit-groups/unit-groups-summarized.dto';
 import {
   ValidateAtLeastOneUnit,
@@ -393,6 +395,51 @@ class Listing extends AbstractDTO {
   @IsString({ groups: [ValidationsGroupsEnum.default] })
   @ApiPropertyOptional()
   criminalBackground?: string;
+
+  @Expose()
+  @ValidateListingPublish('depositMin', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @IsString({ groups: [ValidationsGroupsEnum.default] })
+  @MaxLength(64, { groups: [ValidationsGroupsEnum.default] })
+  @ApiPropertyOptional()
+  depositMin?: string;
+
+  @Expose()
+  @ValidateListingPublish('depositMax', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @IsString({ groups: [ValidationsGroupsEnum.default] })
+  @MaxLength(64, { groups: [ValidationsGroupsEnum.default] })
+  @ApiPropertyOptional()
+  depositMax?: string;
+
+  @Expose()
+  @ValidateListingPublish('depositType', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @IsEnum(DepositTypeEnum, {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @ValidateListingDeposit({ groups: [ValidationsGroupsEnum.default] })
+  @ApiPropertyOptional({ enum: DepositTypeEnum })
+  depositType?: DepositTypeEnum;
+
+  @Expose()
+  @ValidateListingPublish('depositValue', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @IsNumber()
+  @ApiPropertyOptional()
+  depositValue?: number;
+
+  @Expose()
+  @ValidateListingPublish('depositHelperText', {
+    groups: [ValidationsGroupsEnum.default],
+  })
+  @IsString({ groups: [ValidationsGroupsEnum.default] })
+  @ApiPropertyOptional()
+  depositHelperText?: string;
 
   @Expose()
   @ValidateListingPublish('disableUnitsAccordion', {
