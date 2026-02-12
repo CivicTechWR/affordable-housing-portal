@@ -4,7 +4,6 @@ import {
   ApplicationMethodsTypeEnum,
   ApplicationStatusEnum,
   ApplicationSubmissionTypeEnum,
-  FeatureFlagEnum,
   HouseholdMemberRelationship,
   IncomePeriodEnum,
   Jurisdiction,
@@ -688,17 +687,7 @@ export const jurisdiction: Jurisdiction = {
   languages: [LanguagesEnum.en],
   partnerTerms: undefined,
   publicUrl: "",
-  featureFlags: [
-    {
-      name: FeatureFlagEnum.enableUtilitiesIncluded,
-      id: "id",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      active: true,
-      description: "",
-      jurisdictions: [],
-    },
-  ],
+  featureFlags: [],
   requiredListingFields: [],
   emailFromAddress: "Bloomington <bloom-no-reply@exygy.dev>",
   rentalAssistanceDefault:
@@ -768,7 +757,6 @@ export const listing: Listing = {
     id: "id",
     name: "Bloomington",
   },
-  depositMax: "",
   disableUnitsAccordion: false,
   listingEvents: [
     {
@@ -872,11 +860,8 @@ export const listing: Listing = {
   ],
   buildingSelectionCriteria:
     "Tenant Selection Criteria will be available to all applicants upon request.",
-  costsNotIncluded:
-    "Resident responsible for PG&E, internet and phone.  Owner pays for water, trash, and sewage.  Residents encouraged to obtain renter's insurance but this is not a requirement.  Rent is due by the 5th of each month. Late fee $35 and returned check fee is $35 additional.",
   creditHistory:
     "Applications will be rated on a score system for housing. An applicant's score may be impacted by negative tenant peformance information provided to the credit reporting agency.  All applicants are expected have a passing acore of 70 points out of 100 to be considered for housing.  Applicants with no credit history will receive a maximum of 80 points to fairly outweigh positive and/or negative trades as would an applicant with established credit history. Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process.",
-  depositMin: "1140.0",
   specialNotes: "Special notes description",
   programRules:
     "Applicants must adhere to minimum & maximum income limits. Tenant Selection Criteria applies.",
@@ -889,7 +874,6 @@ export const listing: Listing = {
   requiredDocuments: "Completed application and government issued IDs",
   createdAt: new Date("2019-07-08T15:37:19.565-07:00"),
   updatedAt: new Date("2019-07-09T14:35:11.142-07:00"),
-  applicationFee: "30.0",
   criminalBackground:
     "A criminal background investigation will be obtained on each applicant.  As criminal background checks are done county by county and will be ran for all counties in which the applicant lived,  Applicants will be disqualified for tenancy if they have been convicted of a felony or misdemeanor.  Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process. ",
   listingsLeasingAgentAddress: {
@@ -922,14 +906,6 @@ export const listing: Listing = {
     name: "veteran",
   },
   servicesOffered: "Services offered description",
-  listingUtilities: {
-    id: "id",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    water: true,
-    gas: true,
-    electricity: true,
-  },
   listingMultiselectQuestions: [
     {
       ordinal: 1,

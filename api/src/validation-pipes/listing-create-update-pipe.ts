@@ -26,19 +26,6 @@ export class ListingCreateUpdateValidationPipe extends ValidationPipe {
     'units',
   ];
 
-  private removedAdditionalFeeRequiredFields = new Set([
-    'applicationFee',
-    'depositType',
-    'depositValue',
-    'depositMin',
-    'depositMax',
-    'depositHelperText',
-    'costsNotIncluded',
-    'creditScreeningFee',
-    'utilities',
-    'listingUtilities',
-  ]);
-
   constructor(private prisma: PrismaService) {
     super({
       ...defaultValidationPipeOptions,
@@ -70,14 +57,9 @@ export class ListingCreateUpdateValidationPipe extends ValidationPipe {
     });
 
     // Use jurisdiction's required fields, falling back to defaults if none specified
-    const jurisdictionRequiredFields = jurisdiction?.requiredListingFields
-      ?.length
+    const requiredFields = jurisdiction?.requiredListingFields?.length
       ? jurisdiction.requiredListingFields
       : this.defaultRequiredFields;
-
-    const requiredFields = jurisdictionRequiredFields.filter(
-      (field) => !this.removedAdditionalFeeRequiredFields.has(field),
-    );
 
     const minimumImagesRequired =
       jurisdiction?.minimumListingPublishImagesRequired || 0;

@@ -21,8 +21,6 @@ import {
   MultiselectQuestionsStatusEnum,
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
-import DetailAdditionalFees from "../../../../src/components/listings/PaperListingDetails/sections/DetailAdditionalFees"
-import DetailBuildingFeatures from "../../../../src/components/listings/PaperListingDetails/sections/DetailBuildingFeatures"
 import { AuthContext } from "@bloom-housing/shared-helpers"
 import { rest } from "msw"
 import DetailAdditionalEligibility from "../../../../src/components/listings/PaperListingDetails/sections/DetailAdditionalEligibility"
@@ -698,34 +696,6 @@ describe("listing data", () => {
       expect(screen.getAllByText(/Test Program Name_\d{1}/)).toHaveLength(2)
       expect(screen.getByText("Description")).toBeInTheDocument()
       expect(screen.getAllByText(/Test Program Description_\d{1}/)).toHaveLength(2)
-    })
-
-    it("should display Additional Fees section", () => {
-      render(
-        <ListingContext.Provider
-          value={{
-            ...listing,
-            depositMax: "1000",
-            depositHelperText: "Test Deposit Helper Text",
-            costsNotIncluded:
-              "Resident responsible for PG&E, internet and phone. Owner pays for water, trash, and sewage.",
-          }}
-        >
-          <DetailAdditionalFees />
-        </ListingContext.Provider>
-      )
-
-      expect(screen.getByText("Additional fees")).toBeInTheDocument()
-      expect(screen.getByText("Application fee")).toBeInTheDocument()
-      expect(screen.getByText("30.0")).toBeInTheDocument()
-      expect(screen.getByText("Deposit helper text")).toBeInTheDocument()
-      expect(screen.getByText("Test Deposit Helper Text")).toBeInTheDocument()
-      expect(screen.getByText("Costs not included")).toBeInTheDocument()
-      expect(
-        screen.getByText(
-          "Resident responsible for PG&E, internet and phone. Owner pays for water, trash, and sewage."
-        )
-      ).toBeInTheDocument()
     })
 
     describe("should display Additional Eligibility Rules section", () => {

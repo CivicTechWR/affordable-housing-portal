@@ -37,7 +37,6 @@ import Unit from '../dtos/units/unit.dto';
 import Listing from '../dtos/listings/listing.dto';
 import { mapTo } from '../utilities/mapTo';
 import { ListingMultiselectQuestion } from '../dtos/listings/listing-multiselect-question.dto';
-import { ListingUtilities } from '../dtos/listings/listing-utility.dto';
 import { ListingFeatures } from '../dtos/listings/listing-feature.dto';
 import { UnitType } from '../dtos/unit-types/unit-type.dto';
 import { UnitGroupAmiLevel } from '../dtos/unit-groups/unit-group-ami-level.dto';
@@ -432,11 +431,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
   };
 
   buildSelectList(
-    val:
-      | ListingUtilities
-      | ListingDocuments
-      | ListingFeatures
-      | ListingParkingType,
+    val: ListingDocuments | ListingFeatures | ListingParkingType,
   ): string {
     if (!val) return '';
     const selectedValues = Object.entries(val).reduce((combined, entry) => {
@@ -679,18 +674,6 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     if (
       doAnyJurisdictionHaveFeatureFlagSet(
         user.jurisdictions,
-        FeatureFlagEnum.enableUtilitiesIncluded,
-      )
-    ) {
-      headers.push({
-        path: 'listingUtilities',
-        label: 'Utilities Included',
-        format: this.buildSelectList,
-      });
-    }
-    if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
         FeatureFlagEnum.enableAccessibilityFeatures,
       )
     ) {
@@ -808,50 +791,6 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
                     .map((question) => question.multiselectQuestions.text)
                     .join(',');
                 },
-              },
-            ]
-          : []),
-        {
-          path: 'applicationFee',
-          label: 'Application Fee',
-          format: this.formatCurrency,
-        },
-        {
-          path: 'depositHelperText',
-          label: 'Deposit Helper Text',
-        },
-        {
-          path: 'depositType',
-          label: 'Deposit Type',
-        },
-        {
-          path: 'depositValue',
-          label: 'Deposit Value',
-          format: this.formatCurrency,
-        },
-        {
-          path: 'depositMin',
-          label: 'Deposit Min',
-          format: this.formatCurrency,
-        },
-        {
-          path: 'depositMax',
-          label: 'Deposit Max',
-          format: this.formatCurrency,
-        },
-        {
-          path: 'costsNotIncluded',
-          label: 'Costs Not Included',
-        },
-        ...(doAnyJurisdictionHaveFeatureFlagSet(
-          user.jurisdictions,
-          FeatureFlagEnum.enableCreditScreeningFee,
-        )
-          ? [
-              {
-                path: 'creditScreeningFee',
-                label: 'Credit Screening Fee',
-                format: this.formatCurrency,
               },
             ]
           : []),

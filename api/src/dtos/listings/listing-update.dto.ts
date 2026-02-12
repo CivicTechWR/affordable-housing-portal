@@ -11,7 +11,6 @@ import { ListingEventUpdate } from './listing-event-update.dto';
 import { ListingFeaturesUpdate } from './listing-feature-update.dto';
 import { ListingImageCreate } from './listing-image-create.dto';
 import { ListingNeighborhoodAmenitiesUpdate } from './listing-neighborhood-amenities-update.dto';
-import { ListingUtilitiesUpdate } from './listing-utility-update.dto';
 import { LotteryDateParamValidator } from '../../utilities/lottery-date-validator';
 import { UnitGroupUpdate } from '../unit-groups/unit-group-update.dto';
 import { UnitsSummaryCreate } from '../units/units-summary-create.dto';
@@ -44,7 +43,6 @@ export class ListingUpdate extends OmitType(Listing, [
   'listingsLeasingAgentAddress',
   'listingsMarketingFlyerFile',
   'listingsResult',
-  'listingUtilities',
   'parkType',
   'requestedChangesUser',
   'unitGroups',
@@ -238,15 +236,6 @@ export class ListingUpdate extends OmitType(Listing, [
   @Type(() => ListingFeaturesUpdate)
   @ApiPropertyOptional({ type: ListingFeaturesUpdate })
   listingFeatures?: ListingFeaturesUpdate;
-
-  @Expose()
-  @ValidateListingPublish('listingUtilities', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
-  @Type(() => ListingUtilitiesUpdate)
-  @ApiPropertyOptional({ type: ListingUtilitiesUpdate })
-  listingUtilities?: ListingUtilitiesUpdate;
 
   @Expose()
   @ValidateListingPublish('parkType', {

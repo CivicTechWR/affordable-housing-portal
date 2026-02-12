@@ -3987,41 +3987,6 @@ export interface ListingFeatures {
   wideDoorways?: boolean
 }
 
-export interface ListingUtilities {
-  /**  */
-  id: string
-
-  /**  */
-  createdAt: Date
-
-  /**  */
-  updatedAt: Date
-
-  /**  */
-  water?: boolean
-
-  /**  */
-  gas?: boolean
-
-  /**  */
-  trash?: boolean
-
-  /**  */
-  sewer?: boolean
-
-  /**  */
-  electricity?: boolean
-
-  /**  */
-  cable?: boolean
-
-  /**  */
-  phone?: boolean
-
-  /**  */
-  internet?: boolean
-}
-
 export interface AmiChartItem {
   /**  */
   percentOfAmi: number
@@ -4659,12 +4624,6 @@ export interface Listing {
   applicationOpenDate?: Date
 
   /**  */
-  applicationFee?: string
-
-  /**  */
-  creditScreeningFee?: string
-
-  /**  */
   applicationOrganization?: string
 
   /**  */
@@ -4695,28 +4654,10 @@ export interface Listing {
   cocInfo?: string
 
   /**  */
-  costsNotIncluded?: string
-
-  /**  */
   creditHistory?: string
 
   /**  */
   criminalBackground?: string
-
-  /**  */
-  depositMin?: string
-
-  /**  */
-  depositMax?: string
-
-  /**  */
-  depositType?: EnumListingDepositType
-
-  /**  */
-  depositValue?: number
-
-  /**  */
-  depositHelperText?: string
 
   /**  */
   disableUnitsAccordion?: boolean
@@ -4897,9 +4838,6 @@ export interface Listing {
 
   /**  */
   listingFeatures?: ListingFeatures
-
-  /**  */
-  listingUtilities?: ListingUtilities
 
   /**  */
   units: Unit[]
@@ -5474,32 +5412,6 @@ export interface ListingEventCreate {
   assets?: AssetCreate
 }
 
-export interface ListingUtilitiesCreate {
-  /**  */
-  water?: boolean
-
-  /**  */
-  gas?: boolean
-
-  /**  */
-  trash?: boolean
-
-  /**  */
-  sewer?: boolean
-
-  /**  */
-  electricity?: boolean
-
-  /**  */
-  cable?: boolean
-
-  /**  */
-  phone?: boolean
-
-  /**  */
-  internet?: boolean
-}
-
 export interface ListingNeighborhoodAmenitiesCreate {
   /**  */
   groceryStores?: string
@@ -5615,12 +5527,6 @@ export interface ListingCreate {
   applicationOpenDate?: Date
 
   /**  */
-  applicationFee?: string
-
-  /**  */
-  creditScreeningFee?: string
-
-  /**  */
   applicationOrganization?: string
 
   /**  */
@@ -5651,28 +5557,10 @@ export interface ListingCreate {
   cocInfo?: string
 
   /**  */
-  costsNotIncluded?: string
-
-  /**  */
   creditHistory?: string
 
   /**  */
   criminalBackground?: string
-
-  /**  */
-  depositMin?: string
-
-  /**  */
-  depositMax?: string
-
-  /**  */
-  depositType?: EnumListingCreateDepositType
-
-  /**  */
-  depositValue?: number
-
-  /**  */
-  depositHelperText?: string
 
   /**  */
   disableUnitsAccordion?: boolean
@@ -5892,9 +5780,6 @@ export interface ListingCreate {
 
   /**  */
   listingEvents: ListingEventCreate[]
-
-  /**  */
-  listingUtilities?: ListingUtilitiesCreate
 
   /**  */
   listingNeighborhoodAmenities?: ListingNeighborhoodAmenitiesCreate
@@ -6304,35 +6189,6 @@ export interface ListingFeaturesUpdate {
   id?: string
 }
 
-export interface ListingUtilitiesUpdate {
-  /**  */
-  water?: boolean
-
-  /**  */
-  gas?: boolean
-
-  /**  */
-  trash?: boolean
-
-  /**  */
-  sewer?: boolean
-
-  /**  */
-  electricity?: boolean
-
-  /**  */
-  cable?: boolean
-
-  /**  */
-  phone?: boolean
-
-  /**  */
-  internet?: boolean
-
-  /**  */
-  id?: string
-}
-
 export interface ListingParkingTypeUpdate {
   /**  */
   onStreet?: boolean
@@ -6471,12 +6327,6 @@ export interface ListingUpdate {
   applicationOpenDate?: Date
 
   /**  */
-  applicationFee?: string
-
-  /**  */
-  creditScreeningFee?: string
-
-  /**  */
   applicationOrganization?: string
 
   /**  */
@@ -6507,28 +6357,10 @@ export interface ListingUpdate {
   cocInfo?: string
 
   /**  */
-  costsNotIncluded?: string
-
-  /**  */
   creditHistory?: string
 
   /**  */
   criminalBackground?: string
-
-  /**  */
-  depositMin?: string
-
-  /**  */
-  depositMax?: string
-
-  /**  */
-  depositType?: EnumListingUpdateDepositType
-
-  /**  */
-  depositValue?: number
-
-  /**  */
-  depositHelperText?: string
 
   /**  */
   disableUnitsAccordion?: boolean
@@ -6742,9 +6574,6 @@ export interface ListingUpdate {
 
   /**  */
   listingFeatures?: ListingFeaturesUpdate
-
-  /**  */
-  listingUtilities?: ListingUtilitiesUpdate
 
   /**  */
   parkType?: ListingParkingTypeUpdate
@@ -9404,10 +9233,6 @@ export enum MonthEnum {
   "november" = "november",
   "december" = "december",
 }
-export enum EnumListingDepositType {
-  "fixedDeposit" = "fixedDeposit",
-  "depositRange" = "depositRange",
-}
 export enum EnumListingListingType {
   "regulated" = "regulated",
   "nonRegulated" = "nonRegulated",
@@ -9416,10 +9241,6 @@ export enum EnumUnitGroupAmiLevelCreateMonthlyRentDeterminationType {
   "flatRent" = "flatRent",
   "percentageOfIncome" = "percentageOfIncome",
 }
-export enum EnumListingCreateDepositType {
-  "fixedDeposit" = "fixedDeposit",
-  "depositRange" = "depositRange",
-}
 export enum EnumListingCreateListingType {
   "regulated" = "regulated",
   "nonRegulated" = "nonRegulated",
@@ -9427,10 +9248,6 @@ export enum EnumListingCreateListingType {
 export enum EnumUnitGroupAmiLevelUpdateMonthlyRentDeterminationType {
   "flatRent" = "flatRent",
   "percentageOfIncome" = "percentageOfIncome",
-}
-export enum EnumListingUpdateDepositType {
-  "fixedDeposit" = "fixedDeposit",
-  "depositRange" = "depositRange",
 }
 export enum EnumListingUpdateListingType {
   "regulated" = "regulated",
@@ -9568,7 +9385,6 @@ export enum FeatureFlagEnum {
   "enableApplicationStatus" = "enableApplicationStatus",
   "enableCompanyWebsite" = "enableCompanyWebsite",
   "enableConfigurableRegions" = "enableConfigurableRegions",
-  "enableCreditScreeningFee" = "enableCreditScreeningFee",
   "enableFullTimeStudentQuestion" = "enableFullTimeStudentQuestion",
   "enableGeocodingPreferences" = "enableGeocodingPreferences",
   "enableGeocodingRadiusMethod" = "enableGeocodingRadiusMethod",
@@ -9605,7 +9421,6 @@ export enum FeatureFlagEnum {
   "enableSupportAdmin" = "enableSupportAdmin",
   "enableUnderConstructionHome" = "enableUnderConstructionHome",
   "enableUnitGroups" = "enableUnitGroups",
-  "enableUtilitiesIncluded" = "enableUtilitiesIncluded",
   "enableWaitlistAdditionalFields" = "enableWaitlistAdditionalFields",
   "enableWaitlistLottery" = "enableWaitlistLottery",
   "enableWhatToExpectAdditionalField" = "enableWhatToExpectAdditionalField",

@@ -88,12 +88,8 @@ export class TranslationService {
         listing.applicationDropOffAddressOfficeHours,
       applicationPickUpAddressOfficeHours:
         listing.applicationPickUpAddressOfficeHours,
-      costsNotIncluded: listing.costsNotIncluded,
       creditHistory: listing.creditHistory,
       criminalBackground: listing.criminalBackground,
-      depositHelperText: listing.depositHelperText,
-      depositMax: listing.depositMax,
-      depositMin: listing.depositMin,
       leasingAgentOfficeHours: listing.leasingAgentOfficeHours,
       neighborhood: listing.neighborhood,
       petPolicy: listing.petPolicy,

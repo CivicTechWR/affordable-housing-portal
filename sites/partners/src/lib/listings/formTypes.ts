@@ -2,12 +2,10 @@ import { TimeFieldPeriod } from "@bloom-housing/ui-components"
 import { LatitudeLongitude } from "@bloom-housing/shared-helpers"
 import {
   ApplicationAddressTypeEnum,
-  EnumListingDepositType,
   Listing,
   ListingEvent,
   ListingFeaturesCreate,
   ListingsStatusEnum,
-  ListingUtilitiesCreate,
   MultiselectQuestion,
   PaperApplication,
   PaperApplicationCreate,
@@ -23,10 +21,7 @@ export enum AnotherAddressEnum {
   anotherAddress = "anotherAddress",
 }
 
-export type FormListing = Omit<
-  Listing,
-  "countyCode" | "listingFeatures" | "listingUtilities" | "parkType"
-> & {
+export type FormListing = Omit<Listing, "countyCode" | "listingFeatures" | "parkType"> & {
   applicationDueDateField?: {
     month: string
     day: string
@@ -93,10 +88,8 @@ export type FormListing = Omit<
   whereApplicationsPickedUp?: ApplicationAddressTypeEnum | AnotherAddressEnum
   whereApplicationsMailedIn?: ApplicationAddressTypeEnum | AnotherAddressEnum
   accessibilityFeatures?: string[]
-  utilities?: string[]
   selectedRequiredDocuments?: string[]
   listingFeatures?: ListingFeaturesCreate
-  listingUtilities?: ListingUtilitiesCreate
   allowsDogs?: boolean
   allowsCats?: boolean
   parkType?: ListingParkingTypeCreate
@@ -117,7 +110,6 @@ export const formDefaults: FormListing = {
   createdAt: undefined,
   updatedAt: undefined,
   applicationDueDate: null,
-  applicationFee: null,
   applicationMethods: [],
   applicationOpenDate: new Date(),
   applicationOrganization: "",
@@ -135,13 +127,8 @@ export const formDefaults: FormListing = {
   accessibleMarketingFlyer: "",
   listingsAccessibleMarketingFlyerFile: null,
   jurisdictions: undefined,
-  costsNotIncluded: "",
   creditHistory: "",
   criminalBackground: "",
-  depositType: EnumListingDepositType.fixedDeposit,
-  depositMax: "0",
-  depositMin: "0",
-  depositHelperText: "Deposit will not exceed one month's rent",
   disableUnitsAccordion: false,
   displayWaitlistSize: false,
   listingEvents: [],
@@ -149,7 +136,6 @@ export const formDefaults: FormListing = {
   listingFeatures: null,
   listingFileNumber: "",
   listingNeighborhoodAmenities: null,
-  listingUtilities: null,
   listingsLeasingAgentAddress: null,
   leasingAgentEmail: null,
   leasingAgentName: null,
@@ -165,7 +151,6 @@ export const formDefaults: FormListing = {
   rentalAssistance: null,
   rentalHistory: "",
   requiredDocuments: "",
-  creditScreeningFee: null,
   status: ListingsStatusEnum.pending,
   waitlistCurrentSize: null,
   waitlistMaxSize: null,

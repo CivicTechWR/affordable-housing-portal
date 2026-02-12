@@ -13,7 +13,6 @@ export enum FeatureFlagEnum {
   enableApplicationStatus = 'enableApplicationStatus',
   enableCompanyWebsite = 'enableCompanyWebsite',
   enableConfigurableRegions = 'enableConfigurableRegions',
-  enableCreditScreeningFee = 'enableCreditScreeningFee',
   enableFullTimeStudentQuestion = 'enableFullTimeStudentQuestion',
   enableGeocodingPreferences = 'enableGeocodingPreferences',
   enableGeocodingRadiusMethod = 'enableGeocodingRadiusMethod',
@@ -50,7 +49,6 @@ export enum FeatureFlagEnum {
   enableSupportAdmin = 'enableSupportAdmin',
   enableUnderConstructionHome = 'enableUnderConstructionHome',
   enableUnitGroups = 'enableUnitGroups',
-  enableUtilitiesIncluded = 'enableUtilitiesIncluded',
   enableWaitlistAdditionalFields = 'enableWaitlistAdditionalFields',
   enableWaitlistLottery = 'enableWaitlistLottery',
   enableWhatToExpectAdditionalField = 'enableWhatToExpectAdditionalField',
@@ -121,10 +119,6 @@ export const featureFlagMap: {
     name: FeatureFlagEnum.enableConfigurableRegions,
     description:
       'When true, allows for configurable regions per jurisdiction enabled on partners and public',
-  },
-  {
-    name: FeatureFlagEnum.enableCreditScreeningFee,
-    description: 'When true, credit screening fee is enabled for listings',
   },
   {
     name: FeatureFlagEnum.enableFullTimeStudentQuestion,
@@ -293,11 +287,6 @@ export const featureFlagMap: {
   {
     name: FeatureFlagEnum.enableUnitGroups,
     description: 'When true, uses unit groups instead of units',
-  },
-  {
-    name: FeatureFlagEnum.enableUtilitiesIncluded,
-    description:
-      "When true, the 'utilities included' section is displayed in listing creation/edit and the public listing view",
   },
   {
     name: FeatureFlagEnum.enableWaitlistAdditionalFields,

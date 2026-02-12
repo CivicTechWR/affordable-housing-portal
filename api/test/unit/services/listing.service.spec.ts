@@ -337,8 +337,6 @@ describe('Testing listing service', () => {
       id: listingId ?? undefined,
       assets: [exampleAsset],
       listingsBuildingAddress: exampleAddress,
-      depositMin: '1000',
-      depositMax: '5000',
       developer: 'example developer',
       digitalApplication: true,
       listingImages: [
@@ -515,7 +513,6 @@ describe('Testing listing service', () => {
       yearBuilt: 2023,
       applicationDueDate: new Date(),
       applicationOpenDate: new Date(),
-      applicationFee: 'application fee string',
       applicationOrganization: 'app organization string',
       applicationPickUpAddressOfficeHours: 'pick up office hours string',
       applicationPickUpAddressType: ApplicationAddressTypeEnum.leasingAgent,
@@ -523,10 +520,8 @@ describe('Testing listing service', () => {
       applicationDropOffAddressType: ApplicationAddressTypeEnum.leasingAgent,
       applicationMailingAddressType: ApplicationAddressTypeEnum.leasingAgent,
       buildingSelectionCriteria: 'https://selection-criteria.com',
-      costsNotIncluded: 'all costs included',
       creditHistory: 'credit history',
       criminalBackground: 'criminal background',
-      depositHelperText: 'deposit helper text',
       disableUnitsAccordion: false,
       leasingAgentOfficeHours: 'leasing agent office hours',
       leasingAgentTitle: 'leasing agent title',
@@ -579,16 +574,6 @@ describe('Testing listing service', () => {
         offStreet: false,
         garage: false,
         carport: false,
-      },
-      listingUtilities: {
-        water: false,
-        gas: true,
-        trash: false,
-        sewer: true,
-        electricity: false,
-        cable: true,
-        phone: false,
-        internet: true,
       },
       homeType: 'apartment',
       isVerified: true,
@@ -648,7 +633,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           applicationMethods: {
             include: {
@@ -813,7 +797,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           units: {
             include: {
@@ -934,7 +917,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           units: {
             include: {
@@ -1314,7 +1296,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           units: {
             include: {
@@ -2335,7 +2316,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           units: {
             include: {
@@ -2418,7 +2398,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           applicationMethods: {
             include: {
@@ -2820,7 +2799,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           units: {
             include: {
@@ -2939,7 +2917,6 @@ describe('Testing listing service', () => {
             },
           },
           listingFeatures: true,
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           applicationMethods: {
             include: {
@@ -3104,7 +3081,6 @@ describe('Testing listing service', () => {
           },
           listingNeighborhoodAmenities: true,
           listingFeatures: true,
-          listingUtilities: true,
           unitGroups: {
             include: {
               unitTypes: true,
@@ -3176,7 +3152,6 @@ describe('Testing listing service', () => {
       await service.create(
         {
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -3224,7 +3199,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -3277,7 +3251,6 @@ describe('Testing listing service', () => {
               id: user.id,
             },
           },
-          depositMin: '5',
           assets: {
             create: [
               {
@@ -3354,7 +3327,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -3496,18 +3468,6 @@ describe('Testing listing service', () => {
           listingsAccessibleMarketingFlyerFile: {
             create: {
               ...exampleAsset,
-            },
-          },
-          listingUtilities: {
-            create: {
-              water: false,
-              gas: true,
-              trash: false,
-              sewer: true,
-              electricity: false,
-              cable: true,
-              phone: false,
-              internet: true,
             },
           },
           parkType: {
@@ -3695,7 +3655,6 @@ describe('Testing listing service', () => {
       await service.create(
         {
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -3744,7 +3703,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -3792,7 +3750,6 @@ describe('Testing listing service', () => {
         data: {
           name: 'example listing name',
           contentUpdatedAt: expect.anything(),
-          depositMin: '5',
           lastUpdatedByUser: {
             connect: {
               id: user.id,
@@ -3887,8 +3844,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -4028,18 +3983,6 @@ describe('Testing listing service', () => {
           listingsAccessibleMarketingFlyerFile: {
             create: {
               ...exampleAsset,
-            },
-          },
-          listingUtilities: {
-            create: {
-              water: false,
-              gas: true,
-              trash: false,
-              sewer: true,
-              electricity: false,
-              cable: true,
-              phone: false,
-              internet: true,
             },
           },
           parkType: {
@@ -4241,7 +4184,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -4383,18 +4325,6 @@ describe('Testing listing service', () => {
           listingsAccessibleMarketingFlyerFile: {
             create: {
               ...exampleAsset,
-            },
-          },
-          listingUtilities: {
-            create: {
-              water: false,
-              gas: true,
-              trash: false,
-              sewer: true,
-              electricity: false,
-              cable: true,
-              phone: false,
-              internet: true,
             },
           },
           parkType: {
@@ -4650,7 +4580,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -4767,7 +4696,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -4871,7 +4799,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -4964,17 +4891,6 @@ describe('Testing listing service', () => {
       val.reservedCommunityTypes = null;
 
       await service.update(val as ListingUpdate, user);
-
-      const nestedUtilitiesUpdate = {
-        water: false,
-        gas: true,
-        trash: false,
-        sewer: true,
-        electricity: false,
-        cable: true,
-        phone: false,
-        internet: true,
-      };
       const nestedFeaturesUpdate = {
         elevator: true,
         wheelchairRamp: false,
@@ -5043,12 +4959,6 @@ describe('Testing listing service', () => {
       expect(updateCall.data.units.create[0].amiPercentage).toBe('1');
       expect(updateCall.data.units.create[0].bmrProgramChart).toBe(true);
       expect(updateCall.data.unitGroups.create).toEqual([]);
-      expect(updateCall.data.listingUtilities.upsert.create).toEqual(
-        nestedUtilitiesUpdate,
-      );
-      expect(updateCall.data.listingUtilities.upsert.update).toEqual(
-        nestedUtilitiesUpdate,
-      );
       expect(updateCall.data.listingFeatures.upsert.create).toEqual(
         nestedFeaturesUpdate,
       );
@@ -5264,7 +5174,6 @@ describe('Testing listing service', () => {
         {
           id: randomUUID(),
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -5312,7 +5221,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -5365,7 +5273,6 @@ describe('Testing listing service', () => {
               id: user.id,
             },
           },
-          depositMin: '5',
           assets: [
             {
               fileId: expect.anything(),
@@ -5493,7 +5400,6 @@ describe('Testing listing service', () => {
         {
           id: randomUUID(),
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -5542,7 +5448,6 @@ describe('Testing listing service', () => {
         data: {
           name: 'example listing name',
           contentUpdatedAt: expect.anything(),
-          depositMin: '5',
           assets: [
             {
               fileId: expect.anything(),
@@ -5707,7 +5612,6 @@ describe('Testing listing service', () => {
         {
           id: listingId,
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -5809,7 +5713,6 @@ describe('Testing listing service', () => {
         {
           id: randomUUID(),
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -5863,7 +5766,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -5916,7 +5818,6 @@ describe('Testing listing service', () => {
               id: user.id,
             },
           },
-          depositMin: '5',
           assets: [
             {
               fileId: expect.anything(),
@@ -6086,7 +5987,6 @@ describe('Testing listing service', () => {
         {
           id: randomUUID(),
           name: 'example listing name',
-          depositMin: '5',
           assets: [
             {
               fileId: randomUUID(),
@@ -6140,7 +6040,6 @@ describe('Testing listing service', () => {
               multiselectQuestions: true,
             },
           },
-          listingUtilities: true,
           listingNeighborhoodAmenities: true,
           listingsApplicationDropOffAddress: true,
           listingsApplicationPickUpAddress: true,
@@ -6194,7 +6093,6 @@ describe('Testing listing service', () => {
               id: user.id,
             },
           },
-          depositMin: '5',
           assets: [
             {
               fileId: expect.anything(),

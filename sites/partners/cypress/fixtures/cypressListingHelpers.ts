@@ -20,7 +20,6 @@ export type CypressListing = Listing & {
   listingsApplicationPickUpAddress?: CypressAddress
   listingsApplicationDropOffAddress?: CypressAddress
   listingsLeasingAgentAddress: CypressAddress
-  cypressUtilities?: CypressListingFeatures[]
   cypressFeatures?: CypressListingFeatures[]
   jurisdiction: Jurisdiction
 }

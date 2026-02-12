@@ -25,7 +25,6 @@ import DetailNeighborhoodAmenities from "../../../components/listings/PaperListi
 import DetailAdditionalDetails from "../../../components/listings/PaperListingDetails/sections/DetailAdditionalDetails"
 import DetailAdditionalEligibility from "../../../components/listings/PaperListingDetails/sections/DetailAdditionalEligibility"
 import DetailLeasingAgent from "../../../components/listings/PaperListingDetails/sections/DetailLeasingAgent"
-import DetailAdditionalFees from "../../../components/listings/PaperListingDetails/sections/DetailAdditionalFees"
 import { DetailUnits } from "../../../components/listings/PaperListingDetails/sections/DetailUnits"
 import DetailUnitDrawer, {
   UnitDrawer,
@@ -134,7 +133,6 @@ export default function ListingDetail(props: ListingProps) {
                     <DetailUnits setUnitDrawer={setUnitDrawer} />
                     <DetailPreferences />
                     <DetailPrograms />
-                    <DetailAdditionalFees />
                     <DetailAccessibilityFeatures
                       listingFeaturesConfiguration={jurisdictionData?.listingFeaturesConfiguration}
                     />

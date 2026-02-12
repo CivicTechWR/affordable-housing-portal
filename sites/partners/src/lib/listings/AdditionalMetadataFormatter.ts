@@ -1,14 +1,12 @@
 import {
   allListingFeatures,
   listingRequiredDocumentsOptions,
-  listingUtilities,
   listingParkingTypes,
 } from "@bloom-housing/shared-helpers"
 import {
   ReviewOrderTypeEnum,
   YesNoEnum,
   EnumListingListingType,
-  EnumListingDepositType,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import Formatter from "./Formatter"
 
@@ -156,16 +154,6 @@ export default class AdditionalMetadataFormatter extends Formatter {
       this.data.requiredDocumentsList = null
     }
 
-    if (this.data.utilities) {
-      this.data.listingUtilities = listingUtilities.reduce((acc, current) => {
-        const isSelected = this.data.utilities.some((utility) => utility === current)
-        return {
-          ...acc,
-          [current]: isSelected,
-        }
-      }, {})
-    }
-
     if (this.data.petPolicyPreferences) {
       this.data.allowsDogs = this.data.petPolicyPreferences.includes("allowsDogs")
       this.data.allowsCats = this.data.petPolicyPreferences.includes("allowsCats")
@@ -179,17 +167,6 @@ export default class AdditionalMetadataFormatter extends Formatter {
           [current]: isSelected,
         }
       }, {})
-    }
-
-    if (!this.data.listingType || this.data.listingType === EnumListingListingType.regulated) {
-      this.data.depositValue = undefined
-    } else if (this.data.listingType === EnumListingListingType.nonRegulated) {
-      if (this.data.depositType === EnumListingDepositType.fixedDeposit) {
-        this.data.depositMin = null
-        this.data.depositMax = null
-      } else {
-        this.data.depositValue = null
-      }
     }
   }
 }

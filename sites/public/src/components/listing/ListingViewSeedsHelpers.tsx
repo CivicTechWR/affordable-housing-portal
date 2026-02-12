@@ -30,7 +30,6 @@ import {
   getOccupancyDescription,
   ListingFeaturesValues,
   listingParkingTypes,
-  listingUtilities,
   stackedOccupancyTable,
   stackedUnitGroupsOccupancyTable,
 } from "@bloom-housing/shared-helpers"
@@ -186,22 +185,6 @@ export const getAccessibilityFeatures = (
   }
 
   return null
-}
-
-export const getUtilitiesIncluded = (listing: Listing) => {
-  const enabledUtilities = Object.entries(listing?.listingUtilities ?? {})
-    .filter(([key, value]) => value && listingUtilities.includes(key))
-    .map((item) => item[0])
-
-  if (enabledUtilities.length > 0) {
-    return enabledUtilities.map((utility, index) => {
-      return `${t(`listings.utilities.${utility}`)}${
-        index < enabledUtilities.length - 1 ? ", " : ""
-      }`
-    })
-  }
-
-  return []
 }
 
 export const getFeatures = (

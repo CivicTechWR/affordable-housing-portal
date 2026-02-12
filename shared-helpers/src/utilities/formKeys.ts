@@ -332,15 +332,4 @@ export enum RoleOption {
 }
 export const roleKeys = Object.values(RoleOption)
 
-export const listingUtilities = [
-  "water",
-  "gas",
-  "trash",
-  "sewer",
-  "electricity",
-  "cable",
-  "phone",
-  "internet",
-]
-
 export const listingParkingTypes = ["onStreet", "offStreet", "garage", "carport"]

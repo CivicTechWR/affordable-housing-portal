@@ -160,48 +160,6 @@ describe('ListingCreateUpdateValidationPipe', () => {
       );
     });
 
-    it('should remove additional fee required fields from jurisdiction config', async () => {
-      const jurisdictionId = randomUUID();
-      const value = {
-        name: 'Test Listing',
-        jurisdictions: { id: jurisdictionId },
-      };
-
-      mockPrisma.jurisdictions.findFirst.mockResolvedValue({
-        requiredListingFields: [
-          'name',
-          'applicationFee',
-          'depositMin',
-          'depositMax',
-          'depositHelperText',
-          'costsNotIncluded',
-          'creditScreeningFee',
-          'utilities',
-          'listingUtilities',
-        ],
-      });
-
-      const expectedTransformedValue = {
-        ...value,
-        listingFeaturesConfiguration: null,
-        minimumImagesRequired: 0,
-        units: [],
-        unitGroups: [],
-        requiredFields: ['name'],
-      };
-      mockSuperTransform.mockResolvedValue(expectedTransformedValue);
-
-      await pipe.transform(value, metadata);
-
-      expect(mockSuperTransform).toHaveBeenCalledWith(
-        expectedTransformedValue,
-        {
-          ...metadata,
-          metatype: ListingCreate,
-        },
-      );
-    });
-
     it('should use default fields when jurisdiction has empty required fields array', async () => {
       const jurisdictionId = randomUUID();
       const value = {

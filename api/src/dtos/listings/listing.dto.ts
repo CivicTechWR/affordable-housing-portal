@@ -30,7 +30,6 @@ import {
   MarketingTypeEnum,
   MonthEnum,
   ReviewOrderTypeEnum,
-  DepositTypeEnum,
   ListingTypeEnum,
 } from '@prisma/client';
 import { EnforceLowerCase } from '../../decorators/enforce-lower-case.decorator';
@@ -42,7 +41,6 @@ import { ListingEvent } from './listing-event.dto';
 import { Address } from '../addresses/address.dto';
 import { ListingImage } from './listing-image.dto';
 import { ListingFeatures } from './listing-feature.dto';
-import { ListingUtilities } from './listing-utility.dto';
 import { Unit } from '../units/unit.dto';
 import { UnitGroup } from '../unit-groups/unit-group.dto';
 import { UnitsSummarized } from '../units/unit-summarized.dto';
@@ -60,7 +58,6 @@ import {
   ValidateAtLeastOneUnit,
   ValidateOnlyUnitsOrUnitGroups,
 } from '../../decorators/validate-units-required.decorator';
-import { ValidateListingDeposit } from '../../decorators/validate-listing-deposit.decorator';
 import { ValidateListingFeatures } from '../../decorators/validate-listing-features.decorator';
 import { ListingDocuments } from './listing-documents.dto';
 import { ValidateListingImages } from '../../decorators/validate-listing-images.decorator';
@@ -276,22 +273,6 @@ class Listing extends AbstractDTO {
   applicationOpenDate?: Date;
 
   @Expose()
-  @ValidateListingPublish('applicationFee', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  applicationFee?: string;
-
-  @Expose()
-  @ValidateListingPublish('creditScreeningFee', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  creditScreeningFee?: string;
-
-  @Expose()
   @ValidateListingPublish('applicationOrganization', {
     groups: [ValidationsGroupsEnum.default],
   })
@@ -398,14 +379,6 @@ class Listing extends AbstractDTO {
   cocInfo?: string;
 
   @Expose()
-  @ValidateListingPublish('costsNotIncluded', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  costsNotIncluded?: string;
-
-  @Expose()
   @ValidateListingPublish('creditHistory', {
     groups: [ValidationsGroupsEnum.default],
   })
@@ -420,51 +393,6 @@ class Listing extends AbstractDTO {
   @IsString({ groups: [ValidationsGroupsEnum.default] })
   @ApiPropertyOptional()
   criminalBackground?: string;
-
-  @Expose()
-  @ValidateListingPublish('depositMin', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @MaxLength(64, { groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  depositMin?: string;
-
-  @Expose()
-  @ValidateListingPublish('depositMax', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @MaxLength(64, { groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  depositMax?: string;
-
-  @Expose()
-  @ValidateListingPublish('depositType', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsEnum(DepositTypeEnum, {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @ValidateListingDeposit({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional({ enum: DepositTypeEnum })
-  depositType?: DepositTypeEnum;
-
-  @Expose()
-  @ValidateListingPublish('depositValue', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsNumber()
-  @ApiPropertyOptional()
-  depositValue?: number;
-
-  @Expose()
-  @ValidateListingPublish('depositHelperText', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  depositHelperText?: string;
 
   @Expose()
   @ValidateListingPublish('disableUnitsAccordion', {
@@ -976,15 +904,6 @@ class Listing extends AbstractDTO {
   @ValidateListingFeatures({ groups: [ValidationsGroupsEnum.default] })
   @ApiPropertyOptional({ type: ListingFeatures })
   listingFeatures?: ListingFeatures;
-
-  @Expose()
-  @ValidateListingPublish('listingUtilities', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
-  @Type(() => ListingUtilities)
-  @ApiPropertyOptional({ type: ListingUtilities })
-  listingUtilities?: ListingUtilities;
 
   @Expose()
   @ValidateAtLeastOneUnit({
