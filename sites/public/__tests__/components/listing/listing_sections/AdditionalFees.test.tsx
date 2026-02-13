@@ -134,7 +134,7 @@ describe("<AdditionalFees>", () => {
 
     expect(screen.getByRole("heading", { level: 3, name: "Additional fees" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 4, name: "Deposit" })).toBeInTheDocument()
-    expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeDefined()
+    expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeInTheDocument()
   })
 
   it("does not render removed fee labels", () => {
