@@ -29,13 +29,7 @@ export const AdditionalFees = ({
 }: AdditionalFeesProps) => {
   return (
     <>
-      {
-        // prettier-ignore
-        depositMin ||
-        depositMax ||
-        depositValue ||
-        costsNotIncluded ||
-        utilitiesIncluded.length ? (
+      {depositMin || depositMax || depositValue || costsNotIncluded || utilitiesIncluded.length ? (
         <Card className={"seeds-m-bs-header"}>
           <Card.Section>
             <Heading size={"lg"} priority={3} className={"seeds-m-be-header"}>
@@ -78,8 +72,7 @@ export const AdditionalFees = ({
             )}
           </Card.Section>
         </Card>
-        ) : null
-      }
+      ) : null}
     </>
   )
 }
