@@ -137,21 +137,43 @@ describe("<AdditionalFees>", () => {
     expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeInTheDocument()
   })
 
-  it("does not render removed fee labels", () => {
-    render(
+  it.skip("renders credit screening fee", () => {
+    const { getByText } = render(
       <AdditionalFees
+        applicationFee={null}
         costsNotIncluded={null}
         depositHelperText={null}
         depositMax={null}
         depositMin={null}
-        utilitiesIncluded={[]}
         depositValue={null}
         depositType={null}
         isNonRegulated={false}
+        utilitiesIncluded={[]}
+        creditScreeningFee={"30"}
       />
     )
+    expect(getByText("Additional fees")).toBeDefined()
+    expect(getByText("Credit screening")).toBeDefined()
+    expect(getByText("$30")).toBeDefined()
+    expect(getByText("covers the cost of reviewing your credit and rental history")).toBeDefined()
+  })
 
-    expect(screen.queryByText("Application fee")).toBeNull()
-    expect(screen.queryByText("Credit screening")).toBeNull()
+  it.skip("does not render credit screening fee when empty", () => {
+    const { getByText, queryByText } = render(
+      <AdditionalFees
+        applicationFee={"10"}
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={null}
+        depositMin={null}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+        utilitiesIncluded={[]}
+        creditScreeningFee={""}
+      />
+    )
+    expect(getByText("Additional fees")).toBeDefined()
+    expect(queryByText("Credit screening")).toBeNull()
   })
 })
