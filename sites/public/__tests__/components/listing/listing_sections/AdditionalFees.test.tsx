@@ -134,46 +134,6 @@ describe("<AdditionalFees>", () => {
 
     expect(screen.getByRole("heading", { level: 3, name: "Additional fees" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { level: 4, name: "Deposit" })).toBeInTheDocument()
-    expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeInTheDocument()
-  })
-
-  it.skip("renders credit screening fee", () => {
-    const { getByText } = render(
-      <AdditionalFees
-        applicationFee={null}
-        costsNotIncluded={null}
-        depositHelperText={null}
-        depositMax={null}
-        depositMin={null}
-        depositValue={null}
-        depositType={null}
-        isNonRegulated={false}
-        utilitiesIncluded={[]}
-        creditScreeningFee={"30"}
-      />
-    )
-    expect(getByText("Additional fees")).toBeDefined()
-    expect(getByText("Credit screening")).toBeDefined()
-    expect(getByText("$30")).toBeDefined()
-    expect(getByText("covers the cost of reviewing your credit and rental history")).toBeDefined()
-  })
-
-  it.skip("does not render credit screening fee when empty", () => {
-    const { getByText, queryByText } = render(
-      <AdditionalFees
-        applicationFee={"10"}
-        costsNotIncluded={null}
-        depositHelperText={null}
-        depositMax={null}
-        depositMin={null}
-        depositValue={null}
-        depositType={null}
-        isNonRegulated={false}
-        utilitiesIncluded={[]}
-        creditScreeningFee={""}
-      />
-    )
-    expect(getByText("Additional fees")).toBeDefined()
-    expect(queryByText("Credit screening")).toBeNull()
+    expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeDefined()
   })
 })

@@ -27,17 +27,15 @@ export const AdditionalFees = ({
   isNonRegulated,
   utilitiesIncluded,
 }: AdditionalFeesProps) => {
-  const hasAdditionalFees = [
-    depositMin,
-    depositMax,
-    depositValue,
-    costsNotIncluded,
-    utilitiesIncluded.length,
-  ].some(Boolean)
-
   return (
     <>
-      {hasAdditionalFees ? (
+      {
+        // prettier-ignore
+        depositMin ||
+        depositMax ||
+        depositValue ||
+        costsNotIncluded ||
+        utilitiesIncluded.length ? (
         <Card className={"seeds-m-bs-header"}>
           <Card.Section>
             <Heading size={"lg"} priority={3} className={"seeds-m-be-header"}>
@@ -80,7 +78,8 @@ export const AdditionalFees = ({
             )}
           </Card.Section>
         </Card>
-      ) : null}
+        ) : null
+      }
     </>
   )
 }
