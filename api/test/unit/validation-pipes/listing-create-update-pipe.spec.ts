@@ -307,7 +307,7 @@ describe('ListingCreateUpdateValidationPipe', () => {
         requiredListingFields: [
           'name',
           'leasingAgentEmail',
-          'digitalApplication',
+          'rentalAssistance',
         ],
       });
 
@@ -317,7 +317,7 @@ describe('ListingCreateUpdateValidationPipe', () => {
         minimumImagesRequired: 0,
         units: [],
         unitGroups: [],
-        requiredFields: ['name', 'leasingAgentEmail', 'digitalApplication'],
+        requiredFields: ['name', 'leasingAgentEmail', 'rentalAssistance'],
       };
       mockSuperTransform.mockResolvedValue(expectedTransformedValue);
 

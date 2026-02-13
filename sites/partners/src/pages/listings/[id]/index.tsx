@@ -32,7 +32,6 @@ import DetailUnitDrawer, {
 } from "../../../components/listings/PaperListingDetails/DetailsUnitDrawer"
 import DetailBuildingFeatures from "../../../components/listings/PaperListingDetails/sections/DetailBuildingFeatures"
 import DetailRankingsAndResults from "../../../components/listings/PaperListingDetails/sections/DetailRankingsAndResults"
-import DetailApplicationTypes from "../../../components/listings/PaperListingDetails/sections/DetailApplicationTypes"
 import DetailApplicationAddress from "../../../components/listings/PaperListingDetails/sections/DetailApplicationAddress"
 import DetailApplicationDates from "../../../components/listings/PaperListingDetails/sections/DetailApplicationDates"
 import DetailPreferences from "../../../components/listings/PaperListingDetails/sections/DetailPreferences"
@@ -144,7 +143,6 @@ export default function ListingDetail(props: ListingProps) {
                     <DetailAdditionalDetails />
                     <DetailRankingsAndResults />
                     <DetailLeasingAgent />
-                    <DetailApplicationTypes />
                     <DetailApplicationAddress />
                     <DetailApplicationDates />
                     <DetailListingVerification />

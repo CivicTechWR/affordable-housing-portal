@@ -27,15 +27,19 @@ describe("BooleansFormatter", () => {
     expect(formatData(data).applicationDropOffAddressType).toBeNull()
   })
 
-  it("should format digitalApplication", () => {
-    const data = {} as FormListing
+  it("should preserve existing application type values", () => {
+    const data = {
+      digitalApplication: true,
+      commonDigitalApplication: true,
+      paperApplication: false,
+      referralOpportunity: false,
+    } as FormListing
 
-    expect(formatData(data).digitalApplication).toBeNull()
+    const formattedData = formatData(data)
 
-    data.digitalApplicationChoice = YesNoEnum.yes
-    expect(formatData(data).digitalApplication).toBe(true)
-
-    data.digitalApplicationChoice = YesNoEnum.no
-    expect(formatData(data).digitalApplication).toBe(false)
+    expect(formattedData.digitalApplication).toBe(true)
+    expect(formattedData.commonDigitalApplication).toBe(true)
+    expect(formattedData.paperApplication).toBe(false)
+    expect(formattedData.referralOpportunity).toBe(false)
   })
 })

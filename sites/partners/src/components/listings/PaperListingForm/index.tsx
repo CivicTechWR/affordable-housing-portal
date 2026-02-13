@@ -57,7 +57,6 @@ import RankingsAndResults from "./sections/RankingsAndResults"
 import ApplicationAddress from "./sections/ApplicationAddress"
 import ApplicationDates from "./sections/ApplicationDates"
 import LotteryResults from "./sections/LotteryResults"
-import ApplicationTypes from "./sections/ApplicationTypes"
 import CommunityType from "./sections/CommunityType"
 import ListingVerification from "./sections/ListingVerification"
 import NeighborhoodAmenities from "./sections/NeighborhoodAmenities"
@@ -761,19 +760,6 @@ const ListingForm = ({
                               FeatureFlagEnum.enableCompanyWebsite,
                               jurisdictionId
                             )}
-                            requiredFields={requiredFields}
-                          />
-                          <ApplicationTypes
-                            disableCommonApplication={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.disableCommonApplication,
-                              jurisdictionId
-                            )}
-                            enableReferralQuestionUnits={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableReferralQuestionUnits,
-                              jurisdictionId
-                            )}
-                            jurisdiction={jurisdictionId}
-                            listing={listing}
                             requiredFields={requiredFields}
                           />
                           <ApplicationAddress requiredFields={requiredFields} listing={listing} />
