@@ -15,14 +15,14 @@ describe("<AdditionalFees>", () => {
         depositMin={null}
         depositValue={null}
         depositType={null}
-        isNonRegulated={false}
+        isNonRegulated={null}
         utilitiesIncluded={[]}
       />
     )
     expect(screen.queryByText("Additional fees")).toBeNull()
   })
 
-  it("renders deposit/utilities/costs for regulated listing", () => {
+  it("renders all content (regulated listing)", () => {
     render(
       <AdditionalFees
         costsNotIncluded={"Gas, internet"}
@@ -35,7 +35,6 @@ describe("<AdditionalFees>", () => {
         isNonRegulated={false}
       />
     )
-
     expect(screen.getByText("Additional fees")).toBeDefined()
     expect(screen.getByText("Deposit")).toBeDefined()
     expect(screen.getByText("$100 – $200", { exact: false })).toBeDefined()
@@ -45,7 +44,26 @@ describe("<AdditionalFees>", () => {
     expect(screen.getByText("Gas, internet")).toBeDefined()
   })
 
-  it("renders just deposit min for regulated listing", () => {
+  it("renders all content except utilities included (regulated listing)", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={"Costs not included"}
+        depositHelperText={"Deposit helper text"}
+        depositMax={"200"}
+        depositMin={"100"}
+        utilitiesIncluded={[]}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+      />
+    )
+    expect(screen.getByText("Additional fees")).toBeDefined()
+    expect(screen.getByText("Deposit")).toBeDefined()
+    expect(screen.getByText("$100 – $200", { exact: false })).toBeDefined()
+    expect(screen.queryByText("Utilities included")).toBeNull()
+  })
+
+  it("renders just deposit min (regulated)", () => {
     render(
       <AdditionalFees
         costsNotIncluded={null}
@@ -58,13 +76,12 @@ describe("<AdditionalFees>", () => {
         isNonRegulated={false}
       />
     )
-
     expect(screen.getByText("Additional fees")).toBeDefined()
     expect(screen.getByText("Deposit")).toBeDefined()
     expect(screen.getByText("$100", { exact: false })).toBeDefined()
   })
 
-  it("renders just deposit max for regulated listing", () => {
+  it("renders just deposit max (regulated)", () => {
     render(
       <AdditionalFees
         costsNotIncluded={null}
@@ -77,7 +94,6 @@ describe("<AdditionalFees>", () => {
         isNonRegulated={false}
       />
     )
-
     expect(screen.getByText("Additional fees")).toBeDefined()
     expect(screen.getByText("Deposit")).toBeDefined()
     expect(screen.getByText("$200", { exact: false })).toBeDefined()
