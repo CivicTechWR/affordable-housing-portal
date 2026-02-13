@@ -27,9 +27,17 @@ export const AdditionalFees = ({
   isNonRegulated,
   utilitiesIncluded,
 }: AdditionalFeesProps) => {
+  const hasAdditionalFees = [
+    depositMin,
+    depositMax,
+    depositValue,
+    costsNotIncluded,
+    utilitiesIncluded.length,
+  ].some(Boolean)
+
   return (
     <>
-      {depositMin || depositMax || depositValue || costsNotIncluded || utilitiesIncluded.length ? (
+      {hasAdditionalFees ? (
         <Card className={"seeds-m-bs-header"}>
           <Card.Section>
             <Heading size={"lg"} priority={3} className={"seeds-m-be-header"}>

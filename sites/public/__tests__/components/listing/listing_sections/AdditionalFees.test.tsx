@@ -136,4 +136,22 @@ describe("<AdditionalFees>", () => {
     expect(screen.getByRole("heading", { level: 4, name: "Deposit" })).toBeInTheDocument()
     expect(screen.getByText(/\$250.*\$480/, { exact: false })).toBeDefined()
   })
+
+  it("does not render removed fee labels", () => {
+    render(
+      <AdditionalFees
+        costsNotIncluded={null}
+        depositHelperText={null}
+        depositMax={null}
+        depositMin={null}
+        utilitiesIncluded={[]}
+        depositValue={null}
+        depositType={null}
+        isNonRegulated={false}
+      />
+    )
+
+    expect(screen.queryByText("Application fee")).toBeNull()
+    expect(screen.queryByText("Credit screening")).toBeNull()
+  })
 })
