@@ -1036,16 +1036,10 @@ export const ListingView = (props: ListingProps) => {
             </dl>
             <AdditionalFees
               deposit={getCurrencyRange(parseInt(listing.depositMin), parseInt(listing.depositMax))}
-              applicationFee={listing.applicationFee ? `$${listing.applicationFee}` : undefined}
               footerContent={getFooterContent()}
               strings={{
                 sectionHeader: t("listings.sections.additionalFees"),
-                applicationFee: t("listings.applicationFee"),
                 deposit: t("t.deposit"),
-                applicationFeeSubtext: [
-                  t("listings.applicationPerApplicantAgeDescription"),
-                  t("listings.applicationFeeDueAt"),
-                ],
                 depositSubtext: [listing.depositHelperText],
               }}
             />

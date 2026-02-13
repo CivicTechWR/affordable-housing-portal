@@ -716,8 +716,6 @@ describe("listing data", () => {
       )
 
       expect(screen.getByText("Additional fees")).toBeInTheDocument()
-      expect(screen.getByText("Application fee")).toBeInTheDocument()
-      expect(screen.getByText("30.0")).toBeInTheDocument()
       expect(screen.getByText("Deposit helper text")).toBeInTheDocument()
       expect(screen.getByText("Test Deposit Helper Text")).toBeInTheDocument()
       expect(screen.getByText("Costs not included")).toBeInTheDocument()

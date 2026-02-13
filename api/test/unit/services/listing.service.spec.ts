@@ -515,7 +515,6 @@ describe('Testing listing service', () => {
       yearBuilt: 2023,
       applicationDueDate: new Date(),
       applicationOpenDate: new Date(),
-      applicationFee: 'application fee string',
       applicationOrganization: 'app organization string',
       applicationPickUpAddressOfficeHours: 'pick up office hours string',
       applicationPickUpAddressType: ApplicationAddressTypeEnum.leasingAgent,

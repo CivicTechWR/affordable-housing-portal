@@ -35,7 +35,6 @@ export const lakeviewVilla: Prisma.ListingsCreateInput = {
   servicesOffered: null,
   yearBuilt: null,
   applicationOpenDate: dayjs(new Date()).subtract(70, 'days').toDate(),
-  applicationFee: null,
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

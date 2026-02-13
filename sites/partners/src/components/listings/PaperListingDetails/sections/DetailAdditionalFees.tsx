@@ -20,11 +20,6 @@ const DetailAdditionalFees = () => {
     listing.jurisdictions.id
   )
 
-  const enableCreditScreeningFee = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableCreditScreeningFee,
-    listing.jurisdictions.id
-  )
-
   const getUtilitiesIncluded = () => {
     let utilitiesExist = false
     const utilities = Object.keys(listing?.listingUtilities ?? {})
@@ -45,11 +40,6 @@ const DetailAdditionalFees = () => {
   return (
     <SectionWithGrid heading={t("listings.sections.additionalFees")} inset>
       <Grid.Row>
-        <Grid.Cell>
-          <FieldValue id="applicationFee" label={t("listings.applicationFee")}>
-            {getDetailFieldString(listing.applicationFee)}
-          </FieldValue>
-        </Grid.Cell>
         {listing.listingType === EnumListingListingType.regulated && (
           <>
             <Grid.Cell>
@@ -108,15 +98,6 @@ const DetailAdditionalFees = () => {
           </FieldValue>
         </Grid.Cell>
       </Grid.Row>
-      {enableCreditScreeningFee && (
-        <Grid.Row>
-          <Grid.Cell>
-            <FieldValue id="creditScreeningFee" label={t("listings.sections.creditScreeningFee")}>
-              {getDetailFieldString(listing.creditScreeningFee)}
-            </FieldValue>
-          </Grid.Cell>
-        </Grid.Row>
-      )}
       {enableUtilitiesIncluded && (
         <Grid.Row>
           <Grid.Cell>

@@ -26,7 +26,6 @@ export const littleVillageApartments: Prisma.ListingsCreateInput = {
   servicesOffered: null,
   yearBuilt: 1996,
   applicationOpenDate: dayjs(new Date()).subtract(30, 'days').toDate(),
-  applicationFee: null,
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

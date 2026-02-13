@@ -15,7 +15,6 @@ import { GridRow } from "@bloom-housing/ui-seeds/src/layout/Grid"
 import { ListingContext } from "../../ListingContext"
 
 type AdditionalFeesProps = {
-  enableCreditScreeningFee?: boolean
   enableNonRegulatedListings?: boolean
   enableUtilitiesIncluded?: boolean
   existingUtilities: ListingUtilitiesCreate
@@ -66,21 +65,7 @@ const AdditionalFees = (props: AdditionalFeesProps) => {
         heading={t("listings.sections.additionalFees")}
         subheading={t("listings.sections.additionalFeesSubtitle")}
       >
-        <Grid.Row columns={showAsNonRegulated ? 2 : 3}>
-          <Grid.Cell>
-            <Field
-              register={register}
-              type={"currency"}
-              prepend={"$"}
-              {...defaultFieldProps(
-                "applicationFee",
-                t("listings.applicationFee"),
-                props.requiredFields,
-                errors,
-                clearErrors
-              )}
-            />
-          </Grid.Cell>
+        <Grid.Row columns={2}>
           {!showAsNonRegulated && (
             <>
               <Grid.Cell>
@@ -223,24 +208,6 @@ const AdditionalFees = (props: AdditionalFeesProps) => {
             />
           </Grid.Cell>
         </Grid.Row>
-        {props.enableCreditScreeningFee && (
-          <Grid.Row columns={3}>
-            <Grid.Cell>
-              <Field
-                register={register}
-                type={"currency"}
-                prepend={"$"}
-                {...defaultFieldProps(
-                  "creditScreeningFee",
-                  t("listings.sections.creditScreeningFee"),
-                  props.requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            </Grid.Cell>
-          </Grid.Row>
-        )}
         {props.enableUtilitiesIncluded && (
           <Grid.Row>
             <Grid.Cell>

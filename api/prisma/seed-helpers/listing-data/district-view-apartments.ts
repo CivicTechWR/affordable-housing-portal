@@ -28,7 +28,6 @@ export const districtViewApartments: Prisma.ListingsCreateInput = {
   yearBuilt: 2021,
   applicationDueDate: dayjs(new Date()).add(30, 'days').toDate(),
   applicationOpenDate: dayjs(new Date()).subtract(7, 'days').toDate(),
-  applicationFee: '35',
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

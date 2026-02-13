@@ -179,13 +179,10 @@ export const ListingViewSeeds = ({ listing, jurisdiction, profile, preview }: Li
 
   const hasUnitFeature =
     listing.units.length ||
-    listing.applicationFee ||
     listing.depositMin ||
     listing.depositMax ||
     listing.depositValue ||
     listing.costsNotIncluded ||
-    (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableCreditScreeningFee) &&
-      listing.creditScreeningFee) ||
     (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableUtilitiesIncluded) &&
       listingUtilities.length) ||
     (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableNonRegulatedListings) &&
@@ -202,13 +199,7 @@ export const ListingViewSeeds = ({ listing, jurisdiction, profile, preview }: Li
         unitSummary={listing.unitsSummarized?.byUnitType}
       />
       <AdditionalFees
-        applicationFee={listing.applicationFee}
         costsNotIncluded={listing.costsNotIncluded}
-        creditScreeningFee={
-          isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableCreditScreeningFee)
-            ? listing.creditScreeningFee
-            : null
-        }
         depositHelperText={listing.depositHelperText}
         depositMax={listing.depositMax}
         depositMin={listing.depositMin}

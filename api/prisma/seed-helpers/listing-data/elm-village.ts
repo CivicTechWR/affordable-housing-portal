@@ -44,7 +44,6 @@ export const elmVillage: Prisma.ListingsCreateInput = {
   },
   applicationDueDate: dayjs(new Date()).add(6, 'months').toDate(),
   applicationOpenDate: dayjs(new Date()).subtract(1, 'days').toDate(),
-  applicationFee: null,
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

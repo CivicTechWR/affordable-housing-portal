@@ -114,7 +114,6 @@ export const bloomingtonListing: CypressListing = {
       unitAccessibilityPriorityTypes: { id: "Visual" } as UnitAccessibilityPriorityType,
     } as Unit,
   ],
-  applicationFee: "4",
   depositMin: "2",
   depositMax: "100",
   costsNotIncluded: "Internet",

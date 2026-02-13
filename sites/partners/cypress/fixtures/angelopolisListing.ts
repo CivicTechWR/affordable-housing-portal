@@ -106,7 +106,6 @@ export const angelopolisListing: CypressListing = {
       { name: FeatureFlagEnum.disableBuildingSelectionCriteria, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableRegions, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableConfigurableRegions, active: true } as FeatureFlag,
-      { name: FeatureFlagEnum.enableCreditScreeningFee, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableMarketingFlyer, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableListingImageAltText, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableAccessibilityFeatures, active: true } as FeatureFlag,
@@ -131,7 +130,6 @@ export const angelopolisListing: CypressListing = {
   reservedCommunityTypes: {
     id: "Seniors",
   },
-  creditScreeningFee: "150",
   reviewOrderType: ReviewOrderTypeEnum.firstComeFirstServe,
   disableUnitsAccordion: true,
   includeCommunityDisclaimer: true,
@@ -154,7 +152,6 @@ export const angelopolisListing: CypressListing = {
       unitAccessibilityPriorityTypes: { id: "Visual" } as UnitAccessibilityPriorityType,
     } as Unit,
   ],
-  applicationFee: "4",
   depositMin: "2",
   depositMax: "100",
   costsNotIncluded: "Internet",

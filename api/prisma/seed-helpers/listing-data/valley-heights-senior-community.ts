@@ -26,7 +26,6 @@ export const valleyHeightsSeniorCommunity: Prisma.ListingsCreateInput = {
   servicesOffered: null,
   yearBuilt: 2019,
   applicationOpenDate: dayjs(new Date()).subtract(100, 'days').toDate(),
-  applicationFee: '50',
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

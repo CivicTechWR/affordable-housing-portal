@@ -889,7 +889,6 @@ export const listing: Listing = {
   requiredDocuments: "Completed application and government issued IDs",
   createdAt: new Date("2019-07-08T15:37:19.565-07:00"),
   updatedAt: new Date("2019-07-09T14:35:11.142-07:00"),
-  applicationFee: "30.0",
   criminalBackground:
     "A criminal background investigation will be obtained on each applicant.  As criminal background checks are done county by county and will be ran for all counties in which the applicant lived,  Applicants will be disqualified for tenancy if they have been convicted of a felony or misdemeanor.  Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process. ",
   listingsLeasingAgentAddress: {

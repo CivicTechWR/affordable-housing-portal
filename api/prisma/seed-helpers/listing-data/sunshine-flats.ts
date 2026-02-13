@@ -28,7 +28,6 @@ export const sunshineFlats: Prisma.ListingsCreateInput = {
   servicesOffered: null,
   yearBuilt: null,
   applicationOpenDate: dayjs(new Date()).subtract(2, 'days').toDate(),
-  applicationFee: null,
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

@@ -449,14 +449,9 @@ describe("Listing Management Tests", () => {
 
     // ----------
     // Section - Additional fees
-    fillIfDataExists(cy, "applicationFee", listing.applicationFee, "type")
     fillIfDataExists(cy, "depositMin", listing.depositMin, "type")
     fillIfDataExists(cy, "depositMax", listing.depositMax, "type")
     fillIfDataExists(cy, "costsNotIncluded", listing.costsNotIncluded, "type")
-
-    if (getFlagActive(listing, FeatureFlagEnum.enableCreditScreeningFee)) {
-      fillIfDataExists(cy, "creditScreeningFee", listing.creditScreeningFee, "type")
-    }
 
     if (
       getFlagActive(listing, FeatureFlagEnum.enableUtilitiesIncluded) &&
@@ -1045,14 +1040,9 @@ describe("Listing Management Tests", () => {
 
     // ----------
     // Section - Additional fees
-    verifyDetailDataIfExists(cy, "applicationFee", listing.applicationFee)
     verifyDetailDataIfExists(cy, "depositMin", listing.depositMin)
     verifyDetailDataIfExists(cy, "depositMax", listing.depositMax)
     verifyDetailDataIfExists(cy, "costsNotIncluded", listing.costsNotIncluded)
-
-    if (getFlagActive(listing, FeatureFlagEnum.enableCreditScreeningFee)) {
-      verifyDetailDataIfExists(cy, "creditScreeningFee", listing.creditScreeningFee)
-    }
 
     if (
       getFlagActive(listing, FeatureFlagEnum.enableUtilitiesIncluded) &&
@@ -1519,14 +1509,9 @@ describe("Listing Management Tests", () => {
 
     // ----------
     // Section - Additional fees
-    verifyDataIfExists(cy, "applicationFee", listing.applicationFee, "type")
     verifyDataIfExists(cy, "depositMin", listing.depositMin, "type")
     verifyDataIfExists(cy, "depositMax", listing.depositMax, "type")
     verifyDataIfExists(cy, "costsNotIncluded", listing.costsNotIncluded, "type")
-
-    if (getFlagActive(listing, FeatureFlagEnum.enableCreditScreeningFee)) {
-      verifyDataIfExists(cy, "creditScreeningFee", listing.creditScreeningFee, "type")
-    }
 
     if (listing.listingUtilities) {
       Object.keys(listing.listingUtilities).forEach((utility) => {

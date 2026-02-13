@@ -27,7 +27,6 @@ export const hollywoodHillsHeights: Prisma.ListingsCreateInput = {
   servicesOffered: null,
   yearBuilt: null,
   applicationOpenDate: null,
-  applicationFee: null,
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: null,

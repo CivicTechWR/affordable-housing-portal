@@ -13,7 +13,6 @@ export enum FeatureFlagEnum {
   enableApplicationStatus = 'enableApplicationStatus',
   enableCompanyWebsite = 'enableCompanyWebsite',
   enableConfigurableRegions = 'enableConfigurableRegions',
-  enableCreditScreeningFee = 'enableCreditScreeningFee',
   enableFullTimeStudentQuestion = 'enableFullTimeStudentQuestion',
   enableGeocodingPreferences = 'enableGeocodingPreferences',
   enableGeocodingRadiusMethod = 'enableGeocodingRadiusMethod',
@@ -121,10 +120,6 @@ export const featureFlagMap: {
     name: FeatureFlagEnum.enableConfigurableRegions,
     description:
       'When true, allows for configurable regions per jurisdiction enabled on partners and public',
-  },
-  {
-    name: FeatureFlagEnum.enableCreditScreeningFee,
-    description: 'When true, credit screening fee is enabled for listings',
   },
   {
     name: FeatureFlagEnum.enableFullTimeStudentQuestion,

@@ -641,10 +641,6 @@ const ListingForm = ({
                             swapCommunityTypeWithPrograms={swapCommunityTypeWithPrograms}
                           />
                           <AdditionalFees
-                            enableCreditScreeningFee={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableCreditScreeningFee,
-                              jurisdictionId
-                            )}
                             enableNonRegulatedListings={enableNonRegulatedListings}
                             enableUtilitiesIncluded={doJurisdictionsHaveFeatureFlagOn(
                               FeatureFlagEnum.enableUtilitiesIncluded,

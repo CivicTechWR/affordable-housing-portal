@@ -7,7 +7,6 @@ import styles from "./AdditionalFees.module.scss"
 import { EnumListingDepositType } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 
 type AdditionalFeesProps = {
-  applicationFee: string | null
   costsNotIncluded: string | null
   depositHelperText: string | null
   depositMax: string | null
@@ -16,11 +15,9 @@ type AdditionalFeesProps = {
   depositType: EnumListingDepositType | null
   isNonRegulated: boolean
   utilitiesIncluded: string[]
-  creditScreeningFee?: string | null
 }
 
 export const AdditionalFees = ({
-  applicationFee,
   costsNotIncluded,
   depositHelperText,
   depositMax,
@@ -29,33 +26,16 @@ export const AdditionalFees = ({
   depositType,
   isNonRegulated,
   utilitiesIncluded,
-  creditScreeningFee,
 }: AdditionalFeesProps) => {
   return (
     <>
-      {applicationFee ||
-      depositMin ||
-      depositMax ||
-      depositValue ||
-      costsNotIncluded ||
-      utilitiesIncluded.length ||
-      creditScreeningFee ? (
+      {depositMin || depositMax || depositValue || costsNotIncluded || utilitiesIncluded.length ? (
         <Card className={"seeds-m-bs-header"}>
           <Card.Section>
             <Heading size={"lg"} priority={3} className={"seeds-m-be-header"}>
               {t("listings.sections.additionalFees")}
             </Heading>
             <div className={styles["split-card"]}>
-              {applicationFee && (
-                <div className={styles["split-card-cell"]}>
-                  <Heading size={"md"} className={listingStyles["thin-heading"]} priority={4}>
-                    {t("listings.applicationFee")}
-                  </Heading>
-                  <div className={styles.emphasized}>{`$${applicationFee}`}</div>
-                  <div>{t("listings.applicationPerApplicantAgeDescription")}</div>
-                  <div>{t("listings.applicationFeeDueAt")}</div>
-                </div>
-              )}
               {(depositMin || depositMax || depositHelperText || depositValue) && (
                 <div className={styles["split-card-cell"]}>
                   <Heading size={"md"} className={listingStyles["thin-heading"]} priority={4}>
@@ -71,17 +51,6 @@ export const AdditionalFees = ({
                     depositType == EnumListingDepositType.fixedDeposit &&
                     depositValue && <div className={styles.emphasized}>{`$ ${depositValue}`}</div>}
                   <div>{depositHelperText}</div>
-                </div>
-              )}
-              {creditScreeningFee && (
-                <div className={styles["split-card-cell"]}>
-                  <Heading size={"md"} className={listingStyles["thin-heading"]} priority={4}>
-                    {t("listings.creditScreeningFee")}
-                  </Heading>
-
-                  <div className={styles.emphasized}>{`$${creditScreeningFee}`}</div>
-
-                  <div>{t("listings.creditScreeningFeeDescription")}</div>
                 </div>
               )}
             </div>

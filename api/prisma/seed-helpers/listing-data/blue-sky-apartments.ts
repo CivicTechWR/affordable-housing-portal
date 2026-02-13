@@ -33,7 +33,6 @@ export const blueSkyApartments: Prisma.ListingsCreateInput = {
   servicesOffered: null,
   yearBuilt: 1900,
   applicationOpenDate: dayjs(new Date()).subtract(1, 'days').toDate(),
-  applicationFee: '60',
   applicationOrganization: null,
   applicationPickUpAddressOfficeHours: null,
   applicationPickUpAddressType: ApplicationAddressTypeEnum.leasingAgent,

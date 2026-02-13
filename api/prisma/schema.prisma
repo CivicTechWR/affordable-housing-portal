@@ -1149,7 +1149,6 @@ model Listings {
   applicationDropOffAddressOfficeHours String?                     @map("application_drop_off_address_office_hours")
   applicationDropOffAddressType        ApplicationAddressTypeEnum? @map("application_drop_off_address_type")
   applicationDueDate                   DateTime?                   @map("application_due_date") @db.Timestamptz(6)
-  applicationFee                       String?                     @map("application_fee")
   applicationMailingAddressId          String?                     @map("application_mailing_address_id") @db.Uuid
   applicationMailingAddressType        ApplicationAddressTypeEnum? @map("application_mailing_address_type")
   applicationOpenDate                  DateTime?                   @map("application_open_date") @db.Timestamptz(6)
@@ -1172,7 +1171,6 @@ model Listings {
   copyOfId                             String?                     @map("copy_of_id") @db.Uuid
   costsNotIncluded                     String?                     @map("costs_not_included")
   creditHistory                        String?                     @map("credit_history")
-  creditScreeningFee                   String?                     @map("credit_screening_fee")
   criminalBackground                   String?                     @map("criminal_background")
   customMapPin                         Boolean?                    @map("custom_map_pin")
   depositHelperText                    String?                     @map("deposit_helper_text")
@@ -1337,7 +1335,6 @@ model ListingSnapshot {
   applicationDropOffAddressOfficeHours    String?                     @map("application_drop_off_address_office_hours")
   applicationDropOffAddressType           ApplicationAddressTypeEnum? @map("application_drop_off_address_type")
   applicationDueDate                      DateTime?                   @map("application_due_date") @db.Timestamptz(6)
-  applicationFee                          String?                     @map("application_fee")
   applicationMailingAddressSnapshotId     String?                     @map("application_mailing_address_snapshot_id") @db.Uuid
   applicationMailingAddressType           ApplicationAddressTypeEnum? @map("application_mailing_address_type")
   applicationOpenDate                     DateTime?                   @map("application_open_date") @db.Timestamptz(6)
@@ -1360,7 +1357,6 @@ model ListingSnapshot {
   copyOfId                                String?                     @map("copy_of_id") @db.Uuid
   costsNotIncluded                        String?                     @map("costs_not_included")
   creditHistory                           String?                     @map("credit_history")
-  creditScreeningFee                      String?                     @map("credit_screening_fee")
   criminalBackground                      String?                     @map("criminal_background")
   customMapPin                            Boolean?                    @map("custom_map_pin")
   depositHelperText                       String?                     @map("deposit_helper_text")

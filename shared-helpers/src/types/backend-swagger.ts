@@ -4659,12 +4659,6 @@ export interface Listing {
   applicationOpenDate?: Date
 
   /**  */
-  applicationFee?: string
-
-  /**  */
-  creditScreeningFee?: string
-
-  /**  */
   applicationOrganization?: string
 
   /**  */
@@ -5615,12 +5609,6 @@ export interface ListingCreate {
   applicationOpenDate?: Date
 
   /**  */
-  applicationFee?: string
-
-  /**  */
-  creditScreeningFee?: string
-
-  /**  */
   applicationOrganization?: string
 
   /**  */
@@ -6469,12 +6457,6 @@ export interface ListingUpdate {
 
   /**  */
   applicationOpenDate?: Date
-
-  /**  */
-  applicationFee?: string
-
-  /**  */
-  creditScreeningFee?: string
 
   /**  */
   applicationOrganization?: string
@@ -9568,7 +9550,6 @@ export enum FeatureFlagEnum {
   "enableApplicationStatus" = "enableApplicationStatus",
   "enableCompanyWebsite" = "enableCompanyWebsite",
   "enableConfigurableRegions" = "enableConfigurableRegions",
-  "enableCreditScreeningFee" = "enableCreditScreeningFee",
   "enableFullTimeStudentQuestion" = "enableFullTimeStudentQuestion",
   "enableGeocodingPreferences" = "enableGeocodingPreferences",
   "enableGeocodingRadiusMethod" = "enableGeocodingRadiusMethod",

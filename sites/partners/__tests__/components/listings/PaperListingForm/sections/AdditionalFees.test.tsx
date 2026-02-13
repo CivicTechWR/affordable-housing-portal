@@ -46,7 +46,6 @@ describe("AdditionalFees", () => {
       screen.getByText(/^tell us about any other fees required by the applicant.$/i)
     ).toBeInTheDocument()
 
-    expect(screen.getByRole("textbox", { name: /^application fee$/i })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: /^deposit helper text$/i })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: /^costs not included$/i })).toBeInTheDocument()
 
@@ -85,7 +84,6 @@ describe("AdditionalFees", () => {
       screen.getByText(/^tell us about any other fees required by the applicant.$/i)
     ).toBeInTheDocument()
 
-    expect(screen.getByRole("textbox", { name: /^application fee$/i })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: /^deposit helper text$/i })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: /^costs not included$/i })).toBeInTheDocument()
 
