@@ -11,10 +11,8 @@ import DetailUnits from "../../../../src/components/listings/PaperListingDetails
 import DetailPreferences from "../../../../src/components/listings/PaperListingDetails/sections/DetailPreferences"
 import {
   ApplicationAddressTypeEnum,
-  ApplicationMethodsTypeEnum,
   EnumListingListingType,
   FeatureFlagEnum,
-  LanguagesEnum,
   ListingEventsTypeEnum,
   ListingsStatusEnum,
   MultiselectQuestionsApplicationSectionEnum,
@@ -22,14 +20,13 @@ import {
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import DetailAdditionalFees from "../../../../src/components/listings/PaperListingDetails/sections/DetailAdditionalFees"
-import DetailBuildingFeatures from "../../../../src/components/listings/PaperListingDetails/sections/DetailBuildingFeatures"
 import { AuthContext } from "@bloom-housing/shared-helpers"
 import { rest } from "msw"
 import DetailAdditionalEligibility from "../../../../src/components/listings/PaperListingDetails/sections/DetailAdditionalEligibility"
 import DetailAdditionalDetails from "../../../../src/components/listings/PaperListingDetails/sections/DetailAdditionalDetails"
 import DetailRankingsAndResults from "../../../../src/components/listings/PaperListingDetails/sections/DetailRankingsAndResults"
 import DetailLeasingAgent from "../../../../src/components/listings/PaperListingDetails/sections/DetailLeasingAgent"
-import DetailApplicationTypes from "../../../../src/components/listings/PaperListingDetails/sections/DetailApplicationTypes"
+
 import DetailApplicationAddress from "../../../../src/components/listings/PaperListingDetails/sections/DetailApplicationAddress"
 import DetailApplicationDates from "../../../../src/components/listings/PaperListingDetails/sections/DetailApplicationDates"
 import DetailListingPhotos from "../../../../src/components/listings/PaperListingDetails/sections/DetailListingPhotos"
@@ -1168,262 +1165,6 @@ describe("listing data", () => {
       expect(screen.getByText("CA")).toBeInTheDocument()
       expect(screen.getByText("Zip code")).toBeInTheDocument()
       expect(screen.getByText("95112")).toBeInTheDocument()
-    })
-
-    describe("should display Application Types section", () => {
-      it("should display section with missing data", () => {
-        render(
-          <ListingContext.Provider
-            value={{
-              ...listing,
-              commonDigitalApplication: undefined,
-              applicationMethods: [],
-            }}
-          >
-            <DetailApplicationTypes />
-          </ListingContext.Provider>
-        )
-
-        expect(screen.getByText("Application types")).toBeInTheDocument()
-        expect(screen.getByText("Online applications")).toBeInTheDocument()
-        expect(screen.getByText("Paper applications")).toBeInTheDocument()
-        expect(screen.getByText("Referral")).toBeInTheDocument()
-        expect(screen.getAllByText("n/a")).toHaveLength(3)
-        expect(screen.queryByText("Common digital application")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral contact phone")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral summary")).not.toBeInTheDocument()
-        expect(screen.queryByText("Custom online application URL")).not.toBeInTheDocument()
-        expect(screen.queryByText("File name")).not.toBeInTheDocument()
-        expect(screen.queryByText("Language")).not.toBeInTheDocument()
-      })
-
-      it("should display section data - for internal application", () => {
-        render(
-          <ListingContext.Provider
-            value={{
-              ...listing,
-              applicationMethods: [
-                {
-                  id: "method_id",
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  type: ApplicationMethodsTypeEnum.Internal,
-                  externalReference: "Test Reference",
-                },
-              ],
-              digitalApplication: true,
-              paperApplication: true,
-              referralOpportunity: true,
-            }}
-          >
-            <DetailApplicationTypes />
-          </ListingContext.Provider>
-        )
-
-        expect(screen.getByText("Application types")).toBeInTheDocument()
-        expect(screen.getByText("Online applications")).toBeInTheDocument()
-        expect(screen.getByText("Common digital application")).toBeInTheDocument()
-        expect(screen.getByText("Paper applications")).toBeInTheDocument()
-        expect(screen.getByText("Referral")).toBeInTheDocument()
-        expect(screen.getAllByText("Yes")).toHaveLength(4)
-        expect(screen.queryByText("Referral contact phone")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral summary")).not.toBeInTheDocument()
-        expect(screen.queryByText("Custom online application URL")).not.toBeInTheDocument()
-        expect(screen.queryByText("File name")).not.toBeInTheDocument()
-        expect(screen.queryByText("Language")).not.toBeInTheDocument()
-      })
-
-      it("should display section data - for external application", () => {
-        render(
-          <ListingContext.Provider
-            value={{
-              ...listing,
-              applicationMethods: [
-                {
-                  id: "method_id",
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  type: ApplicationMethodsTypeEnum.ExternalLink,
-                  externalReference: "Test reference",
-                },
-              ],
-              digitalApplication: false,
-              paperApplication: false,
-              referralOpportunity: false,
-            }}
-          >
-            <DetailApplicationTypes />
-          </ListingContext.Provider>
-        )
-
-        expect(screen.getByText("Application types")).toBeInTheDocument()
-        expect(screen.getByText("Online applications")).toBeInTheDocument()
-        expect(screen.getByText("Common digital application")).toBeInTheDocument()
-        expect(screen.getByText("Paper applications")).toBeInTheDocument()
-        expect(screen.getByText("Custom online application URL")).toBeInTheDocument()
-        expect(screen.getByText("Test reference")).toBeInTheDocument()
-        expect(screen.getByText("Referral")).toBeInTheDocument()
-        expect(screen.getAllByText("No")).toHaveLength(4)
-        expect(screen.queryByText("Referral contact phone")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral summary")).not.toBeInTheDocument()
-        expect(screen.queryByText("File name")).not.toBeInTheDocument()
-        expect(screen.queryByText("Language")).not.toBeInTheDocument()
-      })
-
-      it("should display section data - for referral application", () => {
-        render(
-          <ListingContext.Provider
-            value={{
-              ...listing,
-              applicationMethods: [
-                {
-                  id: "method_id",
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  type: ApplicationMethodsTypeEnum.Referral,
-                  externalReference: "Test Referral Summary",
-                  phoneNumber: "(509) 786-4500",
-                },
-              ],
-              digitalApplication: false,
-              paperApplication: false,
-              referralOpportunity: false,
-            }}
-          >
-            <DetailApplicationTypes />
-          </ListingContext.Provider>
-        )
-
-        expect(screen.getByText("Application types")).toBeInTheDocument()
-        expect(screen.getByText("Online applications")).toBeInTheDocument()
-        expect(screen.getByText("Paper applications")).toBeInTheDocument()
-        expect(screen.getByText("Referral")).toBeInTheDocument()
-        expect(screen.getAllByText("No")).toHaveLength(3)
-        expect(screen.getByText("Referral contact phone")).toBeInTheDocument()
-        expect(screen.getByText("(509) 786-4500")).toBeInTheDocument()
-        expect(screen.getByText("Referral summary")).toBeInTheDocument()
-        expect(screen.getByText("Test Referral Summary")).toBeInTheDocument()
-        expect(screen.queryByText("Common digital application")).not.toBeInTheDocument()
-        expect(screen.queryByText("Custom online application URL")).not.toBeInTheDocument()
-        expect(screen.queryByText("Test Reference")).not.toBeInTheDocument()
-        expect(screen.queryByText("File name")).not.toBeInTheDocument()
-        expect(screen.queryByText("Language")).not.toBeInTheDocument()
-      })
-
-      it("should display section data - for paper application", () => {
-        render(
-          <ListingContext.Provider
-            value={{
-              ...listing,
-              applicationMethods: [
-                {
-                  id: "method_id",
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                  type: ApplicationMethodsTypeEnum.FileDownload,
-                  externalReference: "Test Refferal Summary",
-                  phoneNumber: "(509) 786-4500",
-                  paperApplications: [
-                    {
-                      id: "application_id_1",
-                      createdAt: new Date(),
-                      updatedAt: new Date(),
-                      language: LanguagesEnum.en,
-                      assets: {
-                        id: "asset_id",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                        fileId: "asset_1_file_id",
-                        label: "Asset 1",
-                      },
-                    },
-                    {
-                      id: "application_id_2",
-                      createdAt: new Date(),
-                      updatedAt: new Date(),
-                      language: LanguagesEnum.es,
-                      assets: {
-                        id: "asset_id",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                        fileId: "asset_2_file_id",
-                        label: "Asset 2",
-                      },
-                    },
-                  ],
-                },
-              ],
-              digitalApplication: false,
-              paperApplication: false,
-              referralOpportunity: false,
-            }}
-          >
-            <DetailApplicationTypes />
-          </ListingContext.Provider>
-        )
-
-        expect(screen.getByText("Application types")).toBeInTheDocument()
-        expect(screen.getByText("Online applications")).toBeInTheDocument()
-        expect(screen.getAllByText("Paper applications")).toHaveLength(2)
-        expect(screen.getByText("Referral")).toBeInTheDocument()
-        expect(screen.getAllByText("No")).toHaveLength(3)
-        expect(screen.getByText("File name")).toBeInTheDocument()
-        expect(screen.getByText("Language")).toBeInTheDocument()
-        expect(screen.getByText("English")).toBeInTheDocument()
-        expect(screen.getByText("Español")).toBeInTheDocument()
-        expect(screen.getAllByText(/asset_\d_file_id.pdf/)).toHaveLength(2)
-
-        expect(screen.queryByText("Referral contact phone")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral summary")).not.toBeInTheDocument()
-        expect(screen.queryByText("Common digital application")).not.toBeInTheDocument()
-        expect(screen.queryByText("Custom online application URL")).not.toBeInTheDocument()
-        expect(screen.queryByText("Test Reference")).not.toBeInTheDocument()
-      })
-
-      it("should hide digital application choice when disable flag is on", () => {
-        render(
-          <AuthContext.Provider
-            value={{
-              profile: { ...user, jurisdictions: [], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) =>
-                featureFlag !== FeatureFlagEnum.enableReferralQuestionUnits,
-            }}
-          >
-            <ListingContext.Provider
-              value={{
-                ...listing,
-                applicationMethods: [
-                  {
-                    id: "method_id",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    type: ApplicationMethodsTypeEnum.ExternalLink,
-                    externalReference: "https://example.com/application",
-                  },
-                ],
-                digitalApplication: false,
-                paperApplication: false,
-                referralOpportunity: false,
-              }}
-            >
-              <DetailApplicationTypes />
-            </ListingContext.Provider>
-          </AuthContext.Provider>
-        )
-
-        expect(screen.getByText("Application types")).toBeInTheDocument()
-        expect(screen.getByText("Online applications")).toBeInTheDocument()
-        expect(screen.getByText("Paper applications")).toBeInTheDocument()
-        expect(screen.getByText("Custom online application URL")).toBeInTheDocument()
-        expect(screen.getByText("https://example.com/application")).toBeInTheDocument()
-        expect(screen.getByText("Referral")).toBeInTheDocument()
-        expect(screen.getAllByText("No")).toHaveLength(3)
-        expect(screen.queryByText("Common digital application")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral contact phone")).not.toBeInTheDocument()
-        expect(screen.queryByText("Referral summary")).not.toBeInTheDocument()
-        expect(screen.queryByText("File name")).not.toBeInTheDocument()
-        expect(screen.queryByText("Language")).not.toBeInTheDocument()
-      })
     })
 
     describe("should display Application Address section", () => {

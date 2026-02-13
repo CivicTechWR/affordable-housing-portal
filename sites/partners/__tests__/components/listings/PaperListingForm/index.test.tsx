@@ -150,7 +150,6 @@ describe("add listing", () => {
     expect(screen.getByRole("button", { name: "Application process" }))
     expect(screen.getByRole("heading", { level: 2, name: "Rankings & results" }))
     expect(screen.getByRole("heading", { level: 2, name: "Leasing agent" }))
-    expect(screen.getByRole("heading", { level: 2, name: "Application types" }))
     expect(screen.getByRole("heading", { level: 2, name: "Application address" }))
     expect(screen.getByRole("heading", { level: 2, name: "Application dates" }))
 
@@ -421,9 +420,6 @@ describe("add listing", () => {
       "Company website",
       "Office hours",
       "Street address or PO box",
-      "Is there a digital application?",
-      "Is there a paper application?",
-      "Is there a referral opportunity?",
       "Additional application submission notes",
       "Application due date",
       "Application due time",
@@ -536,9 +532,6 @@ describe("add listing", () => {
       "Company website",
       "Office hours",
       "Street address or PO box",
-      "Is there a digital application?",
-      "Is there a paper application?",
-      "Is there a referral opportunity?",
       "Additional application submission notes",
       "Application due date",
     ]

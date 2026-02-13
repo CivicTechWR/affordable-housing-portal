@@ -2,6 +2,7 @@ import { TimeFieldPeriod } from "@bloom-housing/ui-components"
 import { LatitudeLongitude } from "@bloom-housing/shared-helpers"
 import {
   ApplicationAddressTypeEnum,
+  ApplicationMethodsTypeEnum,
   EnumListingDepositType,
   Listing,
   ListingEvent,
@@ -51,10 +52,6 @@ export type FormListing = Omit<
   canApplicationsBeDroppedOff?: YesNoEnum
   canPaperApplicationsBePickedUp?: YesNoEnum
   canApplicationsBeMailedIn?: YesNoEnum
-  digitalApplicationChoice?: YesNoEnum
-  commonDigitalApplicationChoice?: YesNoEnum
-  paperApplicationChoice?: YesNoEnum
-  referralOpportunityChoice?: YesNoEnum
   criteriaAttachType?: string
   marketingFlyerAttachType?: "upload" | "url"
   accessibleMarketingFlyerAttachType?: "upload" | "url"
@@ -112,12 +109,22 @@ export const addressTypes = {
 
 export type AlertErrorType = "api" | "form"
 
+const defaultApplicationMethods = [
+  {
+    type: ApplicationMethodsTypeEnum.Internal,
+  },
+] as FormListing["applicationMethods"]
+
 export const formDefaults: FormListing = {
   id: undefined,
   createdAt: undefined,
   updatedAt: undefined,
   applicationDueDate: null,
-  applicationMethods: [],
+  applicationMethods: defaultApplicationMethods,
+  digitalApplication: true,
+  commonDigitalApplication: true,
+  paperApplication: false,
+  referralOpportunity: false,
   applicationOpenDate: new Date(),
   applicationOrganization: "",
   listingsApplicationPickUpAddress: null,

@@ -106,7 +106,6 @@ export const stagingSeed = async (
       languages: Object.values(LanguagesEnum),
       requiredListingFields: [
         'developer',
-        'digitalApplication',
         'jurisdictions',
         'leasingAgentEmail',
         'leasingAgentName',
@@ -114,8 +113,6 @@ export const stagingSeed = async (
         'listingImages',
         'listingsBuildingAddress',
         'name',
-        'paperApplication',
-        'referralOpportunity',
         'rentalAssistance',
         'units',
       ],
@@ -249,7 +246,6 @@ export const stagingSeed = async (
       ],
       minimumListingPublishImagesRequired: 3,
       requiredListingFields: [
-        'digitalApplication',
         'jurisdictions',
         'leasingAgentEmail',
         'leasingAgentName',
@@ -259,8 +255,6 @@ export const stagingSeed = async (
         'listingImages.description',
         'listingsBuildingAddress',
         'name',
-        'paperApplication',
-        'referralOpportunity',
         'rentalAssistance',
         'units',
         'property',

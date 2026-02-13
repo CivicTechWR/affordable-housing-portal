@@ -1,6 +1,5 @@
 import {
   ApplicationAddressTypeEnum,
-  ApplicationMethodsTypeEnum,
   FeatureFlagEnum,
   MultiselectQuestionsApplicationSectionEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
@@ -59,9 +58,6 @@ describe("Listing Management Tests", () => {
     cy.getByID("leasingAgentName-error").contains("This field is required")
     cy.getByID("leasingAgentEmail-error").contains("This field is required")
     cy.getByID("leasingAgentPhone-error").contains("This field is required")
-    cy.getByID("digitalApplicationChoice-error").contains("This field is required")
-    cy.getByID("paperApplicationChoice-error").contains("This field is required")
-    cy.getByID("referralOpportunityChoice-error").contains("This field is required")
     // Verify the behavior of Exit discard & confirm
     cy.contains("Listing details").click()
     cy.getByID("name").clear()
@@ -105,15 +101,6 @@ describe("Listing Management Tests", () => {
     cy.getByID("leasingAgentName-error").contains("This field is required").should("not.exist")
     cy.getByID("leasingAgentEmail-error").contains("This field is required").should("not.exist")
     cy.getByID("leasingAgentPhone-error").should("not.exist")
-    cy.getByID("digitalApplicationChoice-error").should(
-      "not.include.text",
-      "This field is required"
-    )
-    cy.getByID("paperApplicationChoice-error").should("not.include.text", "This field is required")
-    cy.getByID("referralOpportunityChoice-error").should(
-      "not.include.text",
-      "This field is required"
-    )
   })
 
   const setupListingPublish = (listing: CypressListing) => {
@@ -643,40 +630,6 @@ describe("Listing Management Tests", () => {
     )
 
     // ----------
-    // Section - Application types
-    const internalMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.Internal
-    )
-
-    const externalMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.ExternalLink
-    )
-
-    const referralMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.Referral
-    )
-
-    if (internalMethod || externalMethod) {
-      cy.getByID("digitalApplicationChoiceYes").check()
-    }
-
-    if (externalMethod) {
-      cy.getByID("commonDigitalApplicationChoiceNo").check()
-      fillIfDataExists(cy, "customOnlineApplicationUrl", externalMethod.externalReference, "type")
-    } else {
-      cy.getByID("commonDigitalApplicationChoiceYes").check()
-    }
-
-    // TODO - Test paper application upload
-    cy.getByID("paperApplicationNo").check()
-
-    if (referralMethod) {
-      cy.getByID("referralOpportunityYes").check()
-      fillIfDataExists(cy, "referralContactPhone", referralMethod.phoneNumber, "type")
-      fillIfDataExists(cy, "referralSummary", referralMethod.externalReference, "type")
-    }
-
-    // ----------
     // Section - Application address
     if (listing.listingsApplicationMailingAddress) {
       cy.getByID("applicationsMailedInYes").check()
@@ -1195,54 +1148,6 @@ describe("Listing Management Tests", () => {
     )
 
     // ----------
-    // Section - Application types
-    const internalMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.Internal
-    )
-
-    const externalMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.ExternalLink
-    )
-
-    const referralMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.Referral
-    )
-    if (internalMethod || externalMethod) {
-      cy.getByID("digitalApplication").contains("Yes")
-    } else {
-      cy.getByID("digitalApplication").contains("No")
-    }
-
-    if (externalMethod) {
-      cy.getByID("digitalMethod.type").contains("No")
-
-      if (externalMethod.externalReference) {
-        cy.getByID("customOnlineApplicationUrl").contains(externalMethod.externalReference)
-      }
-    } else if (internalMethod) {
-      cy.getByID("digitalMethod.type").contains("Yes")
-    }
-
-    // TODO - Test paper application upload
-    cy.getByID("paperApplication").contains("No")
-
-    if (referralMethod) {
-      cy.getByID("referralOpportunity").contains("Yes")
-      verifyDetailDataIfExists(
-        cy,
-        "referralContactPhone",
-        formatPhoneNumber(referralMethod.phoneNumber)
-      )
-      verifyDetailDataIfExists(
-        cy,
-        "referralSummary",
-        formatPhoneNumber(referralMethod.externalReference)
-      )
-    } else {
-      cy.getByID("referralOpportunity").contains("No")
-    }
-
-    // ----------
     // Section - Application address
 
     if (listing.listingsApplicationMailingAddress) {
@@ -1694,44 +1599,6 @@ describe("Listing Management Tests", () => {
       listing.listingsLeasingAgentAddress?.state,
       "select"
     )
-
-    // ----------
-    // Section - Application types
-    const internalMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.Internal
-    )
-
-    const externalMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.ExternalLink
-    )
-
-    const referralMethod = listing.applicationMethods.find(
-      (method) => method.type === ApplicationMethodsTypeEnum.Referral
-    )
-
-    if (internalMethod || externalMethod) {
-      cy.getByID("digitalApplicationChoiceYes").should("be.checked")
-    }
-
-    if (externalMethod) {
-      cy.getByID("commonDigitalApplicationChoiceNo").should("be.checked")
-      verifyDataIfExists(cy, "customOnlineApplicationUrl", externalMethod.externalReference, "type")
-    } else {
-      cy.getByID("commonDigitalApplicationChoiceYes").should("be.checked")
-    }
-
-    // TODO - Test paper application upload
-    cy.getByID("paperApplicationNo").should("be.checked")
-
-    if (referralMethod) {
-      verifyRadioIfExists(cy, "referralOpportunityYes", "referralOpportunityNo", true)
-      verifyDataIfExists(
-        cy,
-        "referralContactPhone",
-        formatPhoneNumber(referralMethod.phoneNumber),
-        "type"
-      )
-    }
 
     // ----------
     // Section - Application address
