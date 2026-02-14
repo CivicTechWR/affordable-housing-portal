@@ -1,14 +1,14 @@
 # IAM Identity Center Configuration
 
-This directory contains instructions for deploying Bloom dev and prod environments to an AWS
+This directory contains instructions for deploying dev and prod environments to an AWS
 organization. The guide is broken down into a series of files that should be followed in order:
 
 1. [Create AWS Accounts](./1_create_aws_accounts.md)
 2. [IAM Identity Center Configuration](./2_iam_identity_center_configuration.md) (you are here)
 3. [Create Tofu State S3 Bucket](./3_create_tofu_state_s3_bucket.md)
-4. [Fork the Bloom Repo](./4_fork_bloom_repo.md)
+4. [Fork the Repo](./4_fork_bloom_repo.md)
 5. [Apply Deployer Permission Set Tofu Modules](./5_apply_deployer_permission_set_tofu_modules.md)
-6. [Apply Bloom Deployment Tofu Modules](./6_apply_bloom_deployment_tofu_modules.md)
+6. [Apply Deployment Tofu Modules](./6_apply_bloom_deployment_tofu_modules.md)
 
 The steps in this file create the following resources:
 
@@ -108,13 +108,13 @@ graph TB
 1. Create Users in the organization's IAM Identity Center instance.
 2. Create Groups in the organization's IAM Identity Center instance and add users to the groups.
 3. Create Permission sets in the organization's IAM Identity Center instance and assign the
-   Permission sets to the organization management account and the dev and prod Bloom accounts.
-4. List and read roles in the organization management account and the dev and prod Bloom accounts.
+   Permission sets to the organization management account and the dev and prod accounts.
+4. List and read roles in the organization management account and the dev and prod accounts.
 
 ## Before these steps
 
 1. Complete the steps in the [Create AWS Accounts](./1_create_aws_accounts.md). The AWS account
-   numbers for the dev and prod Bloom accounts will be needed.
+   numbers for the dev and prod accounts will be needed.
 2. Open the organization management account and go to the 'IAM Identity Center > Settings'
    page. **Note the IAM Identity Center Instance ARN, Region, and the AWS access portal URL**.
 
@@ -122,14 +122,14 @@ graph TB
 
 ### 1. Create IAM Identity Center Users and Groups
 
-1. Create an IAM Identity Center user for every person who will be interacting with the Bloom
+1. Create an IAM Identity Center user for every person who will be interacting with the
    deployments, if they do not already have a user.
 2. Create a `bloom-dev-deployers` IAM Identity Center group. Add the users who should have access to
-   manage the dev Bloom deployment.
+   manage the dev deployment.
 3. Create a `bloom-prod-iam-admins` IAM Identity Center group. Add the users who should have access
    to manage the `bloom-prod-deployers` permission set policy.
 4. Create a `bloom-prod-deployers` IAM Identity Center group. Add the users who should have access
-   to manage the prod Bloom deployment.
+   to manage the prod deployment.
 
 Optionally, create a `bloom-dev-iam-admins` if the group of people who should have access to manage
 the `bloom-dev-deployer` permission set policy is different from the group of people should should
@@ -154,7 +154,7 @@ have the `bloom-dev-deployer` permissions.
 
       - `CHANGEME_IAM_IDENTITY_CENTER_INSTANCE_ARN` to the IAM Identity Center instance ARN in your
         notes.
-      - `CHANGEME_BLOOM_DEV_ACCOUNT_NUMBER` to the Bloom dev account number in your notes.
+      - `CHANGEME_BLOOM_DEV_ACCOUNT_NUMBER` to the dev account number in your notes.
       - `CHANGEME_DEV_DEPLOYER_PERMISSIONSET_ARN` to the ARN in your notes from step 2.1.4.
 
       ```
@@ -203,7 +203,7 @@ have the `bloom-dev-deployer` permissions.
 
       - `CHANGEME_IAM_IDENTITY_CENTER_INSTANCE_ARN` to the IAM Identity Center instance ARN in your
         notes.
-      - `CHANGEME_BLOOM_PROD_ACCOUNT_NUMBER` to the Bloom prod account number in your notes.
+      - `CHANGEME_BLOOM_PROD_ACCOUNT_NUMBER` to the prod account number in your notes.
       - `CHANGEME_PROD_DEPLOYER_PERMISSIONSET_ARN` to the ARN in your notes from step 2.3.4.
 
       ```
@@ -274,10 +274,10 @@ set was assigned to. These roles need access to a S3 bucket that will be created
    'AWSReservedSSO_bloom'. Two roles, 'AWSReservedSSO_bloom-dev-iam-admin_..' and
    'AWSReservedSSO_bloom-prod-iam-admin_..' should be returned. Go into each role detail page and
    **note the role ARN for each role**.
-2. In the dev Bloom account, go to the 'IAM > Roles' page. Search for 'AWSReservedSSO_bloom'. One
+2. In the dev account, go to the 'IAM > Roles' page. Search for 'AWSReservedSSO_bloom'. One
    role 'AWSReservedSSO_bloom-dev-deployer_..' should be returned. Go into each role detail page and
    **note the role ARN**.
-3. In the prod Bloom account, go to the 'IAM > Roles' page. Search for 'AWSReservedSSO_bloom'. One
+3. In the prod account, go to the 'IAM > Roles' page. Search for 'AWSReservedSSO_bloom'. One
    role 'AWSReservedSSO_bloom-prod-deployer_..' should be returned. Go into each role detail page
    and **note the role ARN**.
 
@@ -285,6 +285,6 @@ set was assigned to. These roles need access to a S3 bucket that will be created
 
 1. The organization management account should have assignments for the bloom-dev-iam-admin and
    bloom-prod-iam-admin permission sets.
-2. The dev Bloom account should have the bloom-dev-deployers permission set assigned.
-3. The prod Bloom account should have the bloom-prod-deployers permission set assigned.
+2. The dev account should have the bloom-dev-deployers permission set assigned.
+3. The prod account should have the bloom-prod-deployers permission set assigned.
 4. Your notes should have the ARNs for 4 AWS-generated roles.

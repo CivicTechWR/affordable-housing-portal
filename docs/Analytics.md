@@ -1,6 +1,6 @@
 # Setting up User Analytics
 
-User Analytics within the Bloom reference apps is handled by Google Analytics (GA). In order to support additional analytics or tag integrations in the future, the default implementation is to use Google Tag Manager (GTM) from the reference code, which is then set up to call GA from within the GTM console.
+User Analytics within the front-end apps is handled by Google Analytics (GA). In order to support additional analytics or tag integrations in the future, the default implementation is to use Google Tag Manager (GTM) from the reference code, which is then set up to call GA from within the GTM console.
 
 ## GA and GTM Console Setup
 

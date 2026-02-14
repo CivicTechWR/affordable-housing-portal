@@ -1,14 +1,14 @@
 # Styling 2nd Generation Components
 
-This covers preliminary documentation for the "2nd generation" UI components in the Bloom design system. (General styling information can be found in the [README for ui-components](https://github.com/bloom-housing/ui-components).)
+This covers preliminary documentation for the "2nd generation" UI components in the design system. (General styling information can be found in the upstream [README for ui-components](https://github.com/bloom-housing/ui-components) — retained as a reference.)
 
 First, we'll go over the what & why of the new component architecture, then we'll explain the process for converting a "1st gen" component to 2nd gen.
 
-## What are Bloom Design Tokens?
+## What are Design Tokens?
 
-In this updated system, the Bloom design tokens are defined as [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) (aka CSS Variables). They're values you can insert into (almost) every place you would put an actual property value in CSS.
+In this updated system, the design tokens (prefixed `--bloom-*` for historical reasons) are defined as [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) (aka CSS Variables). They're values you can insert into (almost) every place you would put an actual property value in CSS.
 
-Bloom design tokens include colors, typography settings, sizes, borders, and so forth. They're located in the [src/global/tokens](https://github.com/bloom-housing/ui-components/tree/main/src/global/tokens) folder.
+Design tokens include colors, typography settings, sizes, borders, and so forth. They originate from the upstream [ui-components tokens folder](https://github.com/bloom-housing/ui-components/tree/main/src/global/tokens) (retained as a reference).
 
 For example, some colors in `tokens/colors.scss`:
 
@@ -208,4 +208,4 @@ It's worth noting what we _didn't_ consider for this upgrade effort.
 
 As the [web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) spec has matured and solidified in all evergreen browsers, many design systems are starting to migrate to using web component technology as the substrate, with "wrappers" generated for specific JS frameworks like React, Vue, Angular, etc. (plus they're completely usable directly within "vanilla" HTML). While web components can be authored completely vanilla without any framework or build process, lightweight libraries such as [Lit](https://lit.dev) have made web components DX rival "legacy" frameworks such as React. Component systems ranging from the open source [Shoelace](https://shoelace.style) to closed source [Nord Health](https://nordhealth.design/components/) show us the breadth of what's possible with this approach.
 
-However, porting Bloom components over to a pure web components toolchain (possibly using Lit) and then exporting React wrappers for use elsewhere seems like a bridge too far at this juncture, particularly since all `ui-components` consumers at present are only using React. The good news is: by migrating to our 2nd-gen styling API based on vanilla CSS techniques, it positions us to consider a web components-based solution farther down the road. While we don't have the ability to use [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM), [shadow parts](https://developer.mozilla.org/en-US/docs/Web/CSS/::part), and [slots](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots#adding_flexibility_with_slots) to aid in our component architecture, we are able to get pretty far simply by utilizing CSS variables and a close 1:1 convention between React props and CSS class-based variants.
+However, porting the existing components over to a pure web components toolchain (possibly using Lit) and then exporting React wrappers for use elsewhere seems like a bridge too far at this juncture, particularly since all `ui-components` consumers at present are only using React. The good news is: by migrating to our 2nd-gen styling API based on vanilla CSS techniques, it positions us to consider a web components-based solution farther down the road. While we don't have the ability to use [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM), [shadow parts](https://developer.mozilla.org/en-US/docs/Web/CSS/::part), and [slots](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_templates_and_slots#adding_flexibility_with_slots) to aid in our component architecture, we are able to get pretty far simply by utilizing CSS variables and a close 1:1 convention between React props and CSS class-based variants.

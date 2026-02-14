@@ -12,8 +12,8 @@
 
 [./Dockerfile.dev](./Dockerfile.dev) builds a container image with the required binaries. Run the
 container with `docker container run` or `podman container run`. The infra-dev container does not
-include the infra source code in its root filesystem - clone the Bloom repo on your host and give
-the container access through volume mounts:
+include the infra source code in its root filesystem - clone the repo on your host and give the
+container access through volume mounts:
 
 1. `-v ./infra:/infra:z` makes the infra directory available to the container.
 2. `-v "${HOME}/.aws/cli":/home/.aws/cli:z` makes the AWS cli directory available to the
@@ -56,19 +56,19 @@ docker container run --rm -it \
 -v ./infra:/infra:z \
 -v "${HOME}/.aws/cli":/home/.aws/cli:z \
 -v "${HOME}/.aws/sso/cache":/home/.aws/sso/cache:z \
-ghcr.io/bloom-housing/bloom/infra-dev \
+ghcr.io/<YOUR_GITHUB_ORG>/affordable-housing-portal/infra-dev \
 [[--skip-sso] | [--skip-init]] <ROOT_MODULE_NAME> <OPEN_TOFU_ARGS>
 ```
 
-You may find it convenient to add an alias. From the root of the Bloom repo:
+You may find it convenient to add an alias. From the root of the repo:
 
 ```bash
-alias bloomtofu="docker container run --rm -it --user $(id -u):$(id -g) -v ${PWD}/infra:/infra:z -v ${HOME}/.aws/cli:/home/.aws/cli:z -v ${HOME}/.aws/sso/cache:/home/.aws/sso/cache:z ghcr.io/bloom-housing/bloom/infra-dev"
+alias infratofu="docker container run --rm -it --user $(id -u):$(id -g) -v ${PWD}/infra:/infra:z -v ${HOME}/.aws/cli:/home/.aws/cli:z -v ${HOME}/.aws/sso/cache:/home/.aws/sso/cache:z ghcr.io/<YOUR_GITHUB_ORG>/affordable-housing-portal/infra-dev"
 
-bloomtofu -ss -si bloom_dev apply
+infratofu -ss -si bloom_dev apply
 ```
 
-## Testing changes in the bloom-dev account:
+## Testing changes in the dev account:
 
 1. Edit the `.tf` files.
 2. Run `tofu apply` on the `bloom_dev` root module and review the planned changes. If there are
