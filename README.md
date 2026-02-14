@@ -1,149 +1,142 @@
-# Bloom Affordable Housing Platform
+# Affordable Housing Portal
 
-Bloom is [Exygy](https://www.exygy.com/)’s affordable housing platform. Bloom's goal is to be a single entry point for affordable housing seekers and application management for developers. You can read more about the platform on [bloomhousing.com](https://bloomhousing.com/).
+Affordable Housing Portal is [Civic Tech Waterloo Region](https://github.com/CivicTechWR)'s affordable housing platform. The goal is to be a single entry point for affordable housing seekers and to streamline application management for housing providers.
+
+## About This Fork
+
+This project is derived from [Bloom Housing](https://github.com/bloom-housing/bloom) by [Exygy](https://www.exygy.com/), licensed under Apache-2.0. See [LICENSE.txt](./LICENSE.txt) for full license details.
 
 ## Overview
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white) ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white) ![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e) ![Testing-Library](https://img.shields.io/badge/-TestingLibrary-%23E33332?style=for-the-badge&logo=testing-library&logoColor=white)
 
-Bloom consists of a client/server architecture using [Next.js](https://nextjs.org) for the frontend applications and [NestJS](https://nestjs.com), [Prisma](https://www.prisma.io/), and [Postgres](https://www.postgresql.org/) on the backend.
+The platform uses a client/server architecture with [Next.js](https://nextjs.org) for the frontend applications and [NestJS](https://nestjs.com), [Prisma](https://www.prisma.io/), and [Postgres](https://www.postgresql.org/) on the backend.
 
-### Structure
+## Repository Structure
 
-Bloom uses a monorepo-style repository containing multiple user-facing applications and backend services. The three main high-level packages are `api`, `sites`, and `shared-helpers`. Additionally, Bloom's UI leverages the in-house packages `@bloom-housing/ui-seeds` and `@bloom-housing/ui-components`.
+This monorepo contains multiple user-facing applications and backend services. The main packages are `api`, `sites`, and `shared-helpers`. The UI also leverages the packages `@bloom-housing/ui-seeds` and `@bloom-housing/ui-components`.
 
-The `sites` folder contains reference implementations for both the public and partner applications:
+- **`sites/public`** — The applicant-facing site available to the general public. It provides the ability to browse and apply for available listings either using the Common Application or an external link to a third-party online or paper application.
+  - See [sites/public/README](./sites/public/README.md) for more details.
 
----
+- **`sites/partners`** — The site designed for housing developers, property managers, and jurisdiction employees. For application management, it offers the ability to view, edit, and export applications. For listing management, it offers the ability to create, edit, and publish listings. A login is required.
+  - See [sites/partners/README](./sites/partners/README.md) for more details.
 
-- `sites/public` is the applicant-facing site available to the general public. It provides the ability to browse and apply for available listings either using the Common Application (which we build and maintain) or an external link to a third-party online or paper application.
-- Visit [sites/public/README](https://github.com/bloom-housing/bloom/blob/main/sites/public/README.md) for more details.
+- **`api`** — The backend service (e.g. listings, applications, users). Information is stored in a Postgres database and served over HTTPS to the frontend. Services expose a REST API.
+  - See [api/README](./api/README.md) for more details.
 
-- `sites/partners` is the site designed for housing developers, property managers, and city/county (jurisdiction) employees. For application management, it offers the ability to view, edit, and export applications for listings and other administrative tasks. For listing management, it offers the ability to create, edit, and publish listings. A login is required to use the Partners Portal.
-- Visit [sites/partners/README](https://github.com/bloom-housing/bloom/blob/main/sites/partners/README.md) for more details.
+- **`shared-helpers`** — Types, functions, and components shared between the public and partners sites.
+  - See [shared-helpers/README](./shared-helpers/README.md) for more details.
 
----
+- **`@bloom-housing/ui-seeds`** — Component library based on the upstream design system, comprised of React components and design system tokens.
 
-- `api` is the container for the key backend services (e.g. listings, applications, users). Information is stored in a Postgres database and served over HTTPS to the front-end (either at build time for things that can be server-rendered, or at run time). Services expose a REST API.
-- Visit [api/README](https://github.com/bloom-housing/bloom/blob/main/api/README.md) for more details.
+- **`@bloom-housing/ui-components`** — Legacy component library being gradually replaced by `ui-seeds`.
 
----
+## Quick Start
 
-- `shared-helpers` contains types, functions, and components that are shared between the public and partners sites.
-- Visit [shared-helpers/README](https://github.com/bloom-housing/bloom/blob/main/shared-helpers/README.md) for more details.
+### Prerequisites
 
----
+- [Node.js](https://nodejs.org/) (see `.node-version` for local version; CI uses Node 22)
+- [Yarn](https://yarnpkg.com/) — install via Homebrew: `brew install yarn`
+- [PostgreSQL](https://www.postgresql.org/) (or use Docker; see [docker.md](./docker.md))
 
-- `@bloom-housing/ui-seeds` (Seeds) is our component library based on our internal design system. It is comprised of React components and design system tokens. The published ui-seeds [Storybook](https://storybook.js.org/) can be found [here](https://storybook-ui-seeds.netlify.app/?path=/story/tokens-introduction--page). For further details visit the [ui-seeds repository](https://github.com/bloom-housing/ui-seeds) and our [external design documentation](https://zeroheight.com/5e69dd4e1/p/938cb5-seeds-design-system) on Zeroheight.
+### Install Dependencies
 
-- `@bloom-housing/ui-components` (UIC) is also an internal component library - but it is being slowly replaced with `ui-seeds` which is the next iteration. The published ui-components storybook can be found [here](https://storybook.bloom.exygy.dev/). For further details visit the [ui-components repository](https://github.com/bloom-housing/ui-components).
+```bash
+# Root workspaces (sites + shared-helpers)
+yarn install
 
-## Getting started for developers
+# API (not a workspace package — install separately)
+cd api && yarn install
+```
 
-If this is your first time working with Bloom, please be sure to check out the `sites/public`, `sites/partners`, and `api` README files for important and specific configuration information. After doing so, you can proceed with the below setup instructions.
+### Configure Environment Variables
 
-## Starting locally
+Copy `.env.template` to `.env` in each of these directories:
 
-### Dependencies
+- `sites/public`
+- `sites/partners`
+- `api`
 
-Run `yarn install` at root and from within the api directory.
+Some keys are secret and available internally — ask the team for access. The template files include default values and descriptions.
 
-If you don't have yarn installed, you can install homebrew with [these instructions](https://brew.sh/) and then do so with `brew install yarn`.
+### Run Locally
 
-### Local environment variables
+```bash
+# Run everything (public, partners, and API)
+yarn dev:all
+```
 
-Configuration of each app and service is read from environment variables. There is an `.env.template` file in `sites/public`, `sites/partners`, and `api` that must be copied to an `.env` at the same level. Some keys are secret and are internally available in a password manager - you can request access through the current team. The template files include default values and descriptions of each variable.
+This starts three processes:
 
-### VSCode Extensions
+| Service  | Port |
+|----------|------|
+| Public   | 3000 |
+| Partners | 3001 |
+| API      | 3100 |
 
-If you use VSCode, these are some recommended extensions.
+You can also run each process individually from separate terminals with `yarn dev` in each directory.
 
-With the [Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) installed, ⌘⇧P Open User Settings, search for and enable `Format on Save`, and then ⌘⇧P Reload Window. When you save a file locally, it should automatically format according to our configuration.
+#### Default Users
 
-The [Postgres explorer plugin](https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres) will let you inspect your local database (more setup instructions in the [api README](https://github.com/bloom-housing/bloom/blob/main/api/README.md)).
+A number of default users are seeded for local development. The most basic is:
 
-The [Code Spell Checker plugin](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) will flag spelling errors.
+- **Email:** `admin@example.com`
+- **Password:** `abcdef`
 
-The [CSS variable autocomplete plugin](https://marketplace.visualstudio.com/items?itemName=vunguyentuan.vscode-css-variables&ssr=false#overview) will pull in all CSS variable definitions from ui-seeds for autocompletion (more setup instructions in the [public README](https://github.com/bloom-housing/bloom/blob/main/sites/public/README.md)).
+This account works on both the public and partners sites. See the [seed file](./api/prisma/seed-staging.ts) for other default users and their permissions.
 
-The [CSS module autocomplete plugin](https://marketplace.visualstudio.com/items?itemName=clinyong.vscode-css-modules) which provides autocomplete for CSS module files.
+### Running Locally in Docker
 
-The [axe Accessibility Linter plugin](https://marketplace.visualstudio.com/items?itemName=deque-systems.vscode-axe-linter) to automatically check for common accessibility issues.
+See [docker.md](./docker.md) for Docker-based setup instructions.
 
-### Running a local test server
+### Recommended VSCode Extensions
 
-Running `yarn dev:all` from root runs 3 processes for both apps and the backend services on 3 different ports:
-
-- 3000 for the public app
-- 3001 for the partners app
-- 3100 for the api
-
-You can also run each process individually from separate terminals with the following command in each directory: `yarn dev`.
-
-We have a number of default users seeded for local development, the most basic of which being (email: `admin@example.com`, password: `abcdef`) which will login to both the public and partners sites, but you can view other default seeded users and their permissions by checking out the user section of the [seed file](https://github.com/bloom-housing/bloom/blob/aed77bf06525be359ef9205044fabbea2ab2576d/api/prisma/seed-staging.ts#L67).
-
-### Running locally in docker
-
-Docker documentation is in [docker.md](./docker.md).
-
-### Bloom UIC development
-
-Because Bloom's ui-components package is a separate open source repository, developing in Bloom while concurrently iterating in ui-components requires linking the folders with the following steps:
-
-### Directory setup
-
-1. Clone both Bloom and the [ui-components repository](https://github.com/bloom-housing/ui-components) on the same directory level.
-
-### Symlinking UIC
-
-1. In the Bloom directory, run `yarn link:uic`.
-2. Open the next.config.js file in the public and partner's directory.
-3. Uncomment the experimental property at the bottom of each file.
-4. Follow the directions above to run Bloom locally.
-   These steps allow you to edit your local version of ui-components and the changes will be reflected in the node_modules in Bloom.
-
-### Unlinking UIC
-
-1. In the Bloom directory, run `yarn unlink:uic`.
-2. Open the next.config.js file in the public and partner's directory.
-3. Comment out the experimental property at the bottom of each file.
-4. Follow the directions above to run Bloom locally.
-   Bloom will now be consuming the published version of @bloom-housing/ui-components specified in package.json and no local ui-component changes will be reflected.
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) — enable "Format on Save" for automatic formatting
+- [Postgres Explorer](https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres) — inspect your local database
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker) — flag spelling errors
+- [CSS Variable Autocomplete](https://marketplace.visualstudio.com/items?itemName=vunguyentuan.vscode-css-variables&ssr=false#overview) — autocomplete for design system tokens
+- [CSS Module Autocomplete](https://marketplace.visualstudio.com/items?itemName=clinyong.vscode-css-modules) — autocomplete for CSS module files
+- [axe Accessibility Linter](https://marketplace.visualstudio.com/items?itemName=deque-systems.vscode-axe-linter) — check for common accessibility issues
 
 ## Contributing
 
-Contributions to the core Bloom applications and services are welcomed. To help us meet the project's goals around quality and maintainability, we ask that all contributors read, understand, and agree to our guidelines.
+Contributions are welcomed! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to participate. By contributing, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-### Issue tracking
+### Issue Tracking
 
-Our development tasks are managed through GitHub issues and development in the vast majority of cases should be tied to an issue. Please feel free to submit issues even if you don't plan on implementing them yourself. Before creating an issue, check first to see if one already exists. When creating an issue fill out all of the provided fields and add as much information as possible including screenshots if possible. Please don't start work on an issue without checking in with the Bloom team first as it may already be in development! You can tag us (@ludtkemorgan, @emilyjablonski, @yazeedloonat) to get started on an issue or ask any questions.
+Development tasks are managed through [GitHub Issues](https://github.com/CivicTechWR/affordable-housing-portal/issues). Please feel free to submit issues even if you don't plan on implementing them yourself. Before creating an issue, check first to see if one already exists. When creating an issue, fill out all provided fields and add as much information as possible, including screenshots where helpful.
 
 ### Committing
 
-We are also using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/), a specification for commit messages that indicates what type and level of change each commit is.
+We use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). You can either:
 
-On commit, two steps automatically run: (1) linting and (2) a verification of the conventional commit standard. You can either, instead of running `git commit`, globally install commitizen (`npm install -g commitizen`) and then commit with `git cz` which will run a commit message CLI (the CLI asks a series of questions about your changeset and builds the commit message for you in the conventional commit format), or alternatively run `git commit` with your own message if you are confident it follows the conventional standard, and the linter will fail if it does not.
+- Globally install commitizen (`npm install -g commitizen`) and commit with `git cz` for a guided experience, or
+- Run `git commit` with your own message — the linter will fail if it doesn't follow the conventional standard.
 
-#### Pre-commit
+#### Pre-commit Hook
 
-To prevent committing secrets please enable the pre-commit hook to check for these patterns on commit. The `.githooks` directory contains a pre-commit script to check for secrets before allowing a `git commit`. To enable this for your local clone please perform the following steps:
+To prevent committing secrets, enable the pre-commit hook:
 
-1. Install gitleaks. On mac you can run `brew install gitleaks`. For other install options see the [gitleaks docs](https://github.com/gitleaks/gitleaks?tab=readme-ov-file#installing)
-2. `cd` into your locally cloned repo and run `git config core.hooksPath .githooks/`
+1. Install gitleaks: `brew install gitleaks` (see [gitleaks docs](https://github.com/gitleaks/gitleaks) for other options)
+2. From the repo root: `git config core.hooksPath .githooks/`
 
 ### Pull Requests
 
-Pull requests are opened to the main branch. When opening a pull request please fill out the entire pull request template which includes tagging the issue your PR is related to, a description of your PR, including details for the reviewer about how to test your PR, and a testing checklist.
+Pull requests are opened to the `main` branch. When opening a PR, fill out the [pull request template](./docs/pull_request_template.md), including:
 
-When your PR is ready for review, add the `needs review(s)` label to surface it to our internal team. If you put up a PR that is not yet ready for eyes, add the `wip` label.
+- Linking the related issue
+- A description of your changes
+- Instructions for reviewers on how to test
+- The testing checklist
 
-As a reviewer on a PR, try not to leave only comments, but a clear next step action. If the PR requires further discussion or changes, mark it with Requested Changes. If a PR looks good to you (or even if there are small changes requested that won't require an additional review), please mark it with Approved and comment on the last few changes needed. This helps other reviewers better understand the state of PRs at the list view and prevents an additional unnecessary review cycle.
+Label your PR `needs review(s)` when ready, or `wip` if it's still in progress.
 
 ## CI/CD
 
-### Github actions
+### GitHub Actions
 
-On pull requests to `main`, the following GitHub workflows run (some have path filters):
+On pull requests to `main`, the following workflows run (some have path filters):
 
 1. Backend Unit Tests
 2. Backend Integration
@@ -161,31 +154,27 @@ On pull requests to `main`, the following GitHub workflows run (some have path f
 
 `Docker Image Build` runs on pushes to `main` and can also be triggered manually.
 
-Configuration for all workflows can be found in the `.github/workflows` directory. For additional investigation of Cypress test failures you can change the `record` flag in the respective yml file to true and find the recordings in [cypress cloud](https://cloud.cypress.io/).
+Configuration for all workflows can be found in the [`.github/workflows`](./.github/workflows) directory.
 
 ### GitLeaks
 
-[Gitleaks](https://gitleaks.io/) is enabled for this repo. This scans for potentially leaked secrets on pull requests to `main` and pushes to `main`.
+[Gitleaks](https://gitleaks.io/) is enabled for this repo. It scans for potentially leaked secrets on pull requests to `main` and pushes to `main`.
 
-If this job fails on your pull request please notify the team of the flagged secret and we can then triage if a secret needs to be rotated
+If this job fails on your pull request, notify the team so the flagged secret can be triaged and rotated if needed.
 
 ### Dependabot
 
-Dependabot is enabled for this repo. Dependabot is responsible for raising security and version upgrade PRs for the application's dependencies.
-
-The configuration file is located in `.github/dependabot.yml`. It scans all npm package.json files within the top level, `api`, `shared-helpers`, `sites/partners` and `sites/public` directories.
-
-Current configuration dictates:
+Dependabot is enabled to raise security and version upgrade PRs. Configuration is in [`.github/dependabot.yml`](./.github/dependabot.yml).
 
 - Scans occur weekly
-- `major` security and version upgrades will have their own PRs. `minor` and `patch` upgrades will be grouped together in weekly PRs, security and version are separate groupings. This is done to try to reduce overwhelming number of PRs but may increase testing difficulty.
-
-Default Configurations:
-
+- `major` upgrades get their own PRs; `minor` and `patch` are grouped
 - Only scans the default branch
-- All pull requests have a `dependencies` label.
-- Generate branch names of the form: `dependabot/PACKAGE_MANAGER/DEPENDENCY`
-- If five pull requests with version updates are open, no further pull requests are raised until some of those open requests are merged or closed.
-- Security updates have a separate, internal limit of ten open pull requests which cannot be changed.
+- PRs are labeled `dependencies`
 
-For more information on Dependabot read the [general documentation](https://docs.github.com/en/code-security/dependabot) or the [config file documentation](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference)
+For more information, see the [Dependabot documentation](https://docs.github.com/en/code-security/dependabot).
+
+## License
+
+This project is licensed under Apache-2.0. See [LICENSE.txt](./LICENSE.txt) for details.
+
+Original work copyright 2021 [Exygy, Inc.](https://www.exygy.com/) Modifications copyright [Civic Tech Waterloo Region](https://github.com/CivicTechWR).
