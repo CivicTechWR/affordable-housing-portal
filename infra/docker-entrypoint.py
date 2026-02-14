@@ -3,7 +3,7 @@
 # At current time of writing: 3.9.24
 #
 # To get the version for a particular image tag:
-# `docker container run --rm -it --entrypoint python3 ghcr.io/bloom-housing/bloom/infra:<tag> --version`
+# `docker container run --rm -it --entrypoint python3 ghcr.io/<YOUR_GITHUB_ORG>/affordable-housing-portal/infra:<tag> --version`
 #
 # Formatted with yapf https://github.com/google/yapf with args:
 # `--style='{based_on_style:google,SPLIT_BEFORE_FIRST_ARGUMENT:true,COLUMN_LIMIT=100}'`
@@ -41,7 +41,7 @@ def run_subprocess(cmd, cwd=None, always_exit=False):
 
 def main():
     # Valid root modules and their AWS CLI profile names:
-    # TODO(https://github.com/bloom-housing/bloom/issues/5760): make this dynamic.
+    # TODO: make this dynamic (upstream: bloom-housing/bloom#5760).
     mod_to_aws_profile = {
         "bloom_dev": "bloom-dev-deployer",
         "bloom_dev_deployer_permission_set_policy": "bloom-dev-iam-admin",
@@ -51,7 +51,7 @@ def main():
 
     p = argparse.ArgumentParser(
         prog="docker-entrypoint.py",
-        description="CLI entrypoint for working with Bloom OpenTofu root modules.",
+        description="CLI entrypoint for working with OpenTofu root modules.",
         allow_abbrev=True)
 
     p.add_argument(

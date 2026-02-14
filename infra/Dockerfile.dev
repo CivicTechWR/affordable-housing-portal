@@ -1,9 +1,9 @@
-# This file creates a docker image with the required binaries to develop on the Bloom infra Open
-# Tofu modules. It is meant to be used for interactive development of the tofu source code. To use:
+# This file creates a docker image with the required binaries to develop on the infra OpenTofu
+# modules. It is meant to be used for interactive development of the tofu source code. To use:
 #
-# 1. Clone the Bloom repo onto their host machine.
-# 2. Run this container, mounting the Bloom infra directory to /infra inside the container
-# filesystem. For example, if your shell is in the root of the Bloom git repo on your host:
+# 1. Clone the repo onto your host machine.
+# 2. Run this container, mounting the infra directory to /infra inside the container filesystem.
+# For example, if your shell is in the root of the git repo on your host:
 #
 #    If using docker:
 #    `docker container run --rm -it --user "$(id -u):$(id -g)" -v ./infra:/infra:z -v "${HOME}/.aws/sso/cache":/home/.aws/sso/cache:z <this_image_name> ...`
@@ -57,7 +57,7 @@ EOF
 ENV HOME=/home
 
 # To help users disambiguate their shell if they run this container with `--entrypoint /bin/bash`.
-ENV PS1='bloom-infra-dev-container$ '
+ENV PS1='infra-dev-container$ '
 
 WORKDIR /infra
 ENTRYPOINT [ "python3", "/infra/docker-entrypoint.py" ]

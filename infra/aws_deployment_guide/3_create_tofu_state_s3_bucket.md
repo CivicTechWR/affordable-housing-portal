@@ -1,14 +1,14 @@
 # Create OpenTofu State S3 Bucket
 
-This directory contains instructions for deploying Bloom dev and prod environments to an AWS
+This directory contains instructions for deploying dev and prod environments to an AWS
 organization. The guide is broken down into a series of files that should be followed in order:
 
 1. [Create AWS Accounts](./1_create_aws_accounts.md)
 2. [IAM Identity Center Configuration](./2_iam_identity_center_configuration.md)
 3. [Create Tofu State S3 Bucket](./3_create_tofu_state_s3_bucket.md) (you are here)
-4. [Fork the Bloom Repo](./4_fork_bloom_repo.md)
+4. [Fork the Repo](./4_fork_bloom_repo.md)
 5. [Apply Deployer Permission Set Tofu Modules](./5_apply_deployer_permission_set_tofu_modules.md)
-6. [Apply Bloom Deployment Tofu Modules](./6_apply_bloom_deployment_tofu_modules.md)
+6. [Apply Deployment Tofu Modules](./6_apply_bloom_deployment_tofu_modules.md)
 
 The steps in this file create the following resources:
 
@@ -26,7 +26,7 @@ graph TB
       subgraph MA[AWS Management Account]
           direction TB
 
-          S3[Bloom Tofu State Files<br/>AWS S3 Bucket]
+          S3[Tofu State Files<br/>AWS S3 Bucket]
       end
   end
 
@@ -67,25 +67,23 @@ graph TB
 
 1. Complete the steps in the [IAM Identity Center
    Configuration](./2_iam_identity_center_configuration.md). The ARNs for the AWS-generated Roles in
-   the organization management account and the dev and prod Bloom accounts will be needed.
+   the organization management account and the dev and prod accounts will be needed.
 
 ## Steps
 
 ### 1. Create a S3 Bucket to store the OpenTofu state files
 
 An AWS S3 bucket is required to store OpenTofu state files. State files record the results of each
-apply command. The S3 bucket can be created in any suitable AWS account in your organization. For
-example, the S3 bucket used by the Bloom Core deployments is in Exygy's organization management
-account.
+apply command. The S3 bucket can be created in any suitable AWS account in your organization (e.g.
+the organization management account).
 
 Create a S3 bucket:
 
 1. In the 'General configuration' section:
    1. Select the 'General purpose' Bucket type.
    2. Enter a descriptive bucket name. S3 bucket names must be globally unique so different names
-      may have to be tried before finding a name that is unused. For example, the S3 bucket used by
-      the Bloom Core deployments is named 'bloom-core-tofu-state-files'. **Note the bucket name and
-      the AWS region it is created in**.
+      may have to be tried before finding a name that is unused (e.g.
+      `my-org-tofu-state-files`). **Note the bucket name and the AWS region it is created in**.
 2. In the 'Object Ownership' section, select the 'ACLs disabled (recommended)' option.
 3. In the 'Block Public Access settings for this bucket' section, select the 'Block all public
   access' option.
@@ -107,10 +105,10 @@ The AWS-generated roles need access to the S3 bucket. On the 'Permissions' tab o
      `AWSReservedSSO_bloom-prod-iam-admin_..` AWS-generated role in the organization management
      account in your notes.
    - `CHANGEME_DEV_DEPLOYER_GENERATED_ROLE_ARN` to the ARN of the
-     `AWSReservedSSO_bloom-dev-deployer_..` AWS-generated role in the dev Bloom account in your
+     `AWSReservedSSO_bloom-dev-deployer_..` AWS-generated role in the dev account in your
      notes.
    - `CHANGEME_PROD_DEPLOYER_GENERATED_ROLE_ARN` to the ARN of the
-     `AWSReservedSSO_bloom-prod-deployer_..` AWS-generated role in the prod Bloom account in your
+     `AWSReservedSSO_bloom-prod-deployer_..` AWS-generated role in the prod account in your
      notes.
 
    ```

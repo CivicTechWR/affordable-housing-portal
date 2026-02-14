@@ -1,8 +1,8 @@
 # Authentication
 
-The [backend/core](./backend/core) service handles authentication for the bloom system using the
-[auth module](backend/core/src/auth). Routes can then use
-[Nest.js guards and Passport](ihttps://docs.nestjs.com/techniques/authentication#authentication) to guard individual
+The API service handles authentication using the
+[auth module](../api/src/auth). Routes can then use
+[Nest.js guards and Passport](https://docs.nestjs.com/techniques/authentication#authentication) to guard individual
 routes.
 
 ## Protect a Route
@@ -71,7 +71,7 @@ The context is provided to a React App using `AuthProvider`, which in turn requi
 properly:
 
 ```tsx
-import { UserProvider, ConfigProvider } from "@bloom-housing/ui-components"
+import { UserProvider, ConfigProvider } from "@bloom-housing/shared-helpers"
 
 <ConfigProvider apiUrl={...}>
   <AuthProvider>
@@ -139,7 +139,7 @@ if (!user) {
 For API authorization, we use a combination of Role Based Access Control (RBAC) and ABAC (Attribute Based Access
 Control) implemented using the [casbin library](https://casbin.org/). We define authorizations in the context of
 performing a given _action_ on _resource type_ as a _role_. Actions are strings defined in
-[authz.service.ts](../backend/core/src/auth/authz.service.ts) as an enum `authzActions`.
+[authz.service.ts](../api/src/auth/authz.service.ts) as an enum `authzActions`.
 
 For high-level Role-Based Access Control (RBAC), a Nest.js guard, `AuthzGuard` is provided. It can be defined on either
 a controller or individual request handler (method) scope, although the former is probably a more common use case. It
@@ -155,7 +155,7 @@ we are checking specific attributes about the resource access is requested on, s
 handler rather than as a guard (since the resource must be loaded from the DB). This is accomplished using the
 `AuthzService.can` or `AuthzService.canOrThrow` methods.
 
-The rules themselves are defined in [authz_policy.csv](../backend/core/src/auth/authz_policy.csv). Each line in this
+The rules themselves are defined in [authz_policy.csv](../api/src/auth/authz_policy.csv). Each line in this
 CSV starting with `p` is a policy and follows the following format:
 
 ```
