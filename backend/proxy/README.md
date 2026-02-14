@@ -7,7 +7,7 @@ To achieve that an NGINX proxy has been created and set up as an entrypoint to t
 
 # make sure Docker Desktop is started
 
-# build the image: `docker build --pull --rm -f "backend/proxy/Dockerfile" -t bloom:latest "backend/proxy"`
+# build the image: `docker build --pull --rm -f "backend/proxy/Dockerfile" -t api-proxy:latest "backend/proxy"`
 
 # In the Docker Desktop Dashboard, go to "Images", find the image and click "Run" (play button)
 
@@ -25,6 +25,8 @@ To achieve that an NGINX proxy has been created and set up as an entrypoint to t
 # Run and you should be able to access listings at http://localhost:9000/listings
 
 ### Setup
+
+> **Note:** This section originates from the upstream [Bloom Housing](https://github.com/bloom-housing/bloom) project and references their Heroku-based deployment. It is retained as reference material and may not reflect this fork's infrastructure.
 
 Based on [this tutorial](https://dashboard.heroku.com/apps/bloom-reference-backend-proxy/deploy/heroku-container). All values are for `bloom-reference-backend-proxy` and each environment requires it's own proxy.
 
@@ -70,6 +72,8 @@ $ heroku container:release --app bloom-reference-backend-proxy web
 ```
 
 #### Configuration
+
+> **Note:** The values below are from the upstream Bloom Housing project's reference environment. Replace them with your own deployment's hostnames and domains.
 
 Heroku Proxy app requires four environment variables to work:
 

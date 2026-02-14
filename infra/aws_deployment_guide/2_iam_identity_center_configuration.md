@@ -1,5 +1,7 @@
 # IAM Identity Center Configuration
 
+> **Note:** This guide originates from the upstream [Bloom Housing](https://github.com/bloom-housing/bloom) project. Resource names (e.g. `bloom-dev-deployer`, `bloom-prod-deployer`) reflect the upstream naming convention and may be renamed for your deployment.
+
 This directory contains instructions for deploying dev and prod environments to an AWS
 organization. The guide is broken down into a series of files that should be followed in order:
 

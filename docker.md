@@ -91,12 +91,12 @@ likely more optimal configurations, that require a more analytical testing appro
 The default memory limits are described in
 https://developers.redhat.com/articles/2025/10/10/nodejs-20-memory-management-containers. The limits
 were increased for the Next js sites because they run `next build` at container start time. The
-current `next build` requires access to a deployed Bloom api and database to succeed. The current
+current `next build` requires access to a deployed API and database to succeed. The current
 container resource usage pattern is to spike to the limit during `next build` then decrease to
 minimal usage after starting serving the server.
 
-Hacking the next build process was explored in
-https://github.com/bloom-housing/bloom/issues/5437#issuecomment-3434286013. Configuring a [shared
+Hacking the next build process was explored in an
+[upstream issue](https://github.com/bloom-housing/bloom/issues/5437#issuecomment-3434286013). Configuring a [shared
 build cache](https://nextjs.org/docs/15/pages/guides/self-hosting#configuring-caching) is the
 current planned workaround to reducing container start latency and resource utilization but not yet
 implemented.

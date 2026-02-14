@@ -1,8 +1,8 @@
-# Bloom Public Application
+# Public Site
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white) ![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e) ![Testing-Library](https://img.shields.io/badge/-TestingLibrary-%23E33332?style=for-the-badge&logo=testing-library&logoColor=white) ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
 
-This is the reference implementation of our public-facing portal. It displays listings and allows users to apply for those listings. Users are also able to create accounts they can use to view submitted applications. You can read more about the product at [bloomhousing.com](https://bloomhousing.com/).
+This is the applicant-facing portal available to the general public. It displays listings and allows users to apply for those listings. Users are also able to create accounts they can use to view submitted applications. See the [root README](../../README.md) for a full project overview.
 
 ## Getting Started
 
@@ -44,7 +44,7 @@ After installing the extension, ⌘⇧P Open User Settings (JSON), and add the f
 
 ## Tests
 
-For our public application, our tests currently consist of both a Cypress end to end suite and a jest unit/integration suite.
+For the public site, tests currently consist of both a Cypress end-to-end suite and a Jest unit/integration suite.
 
 To run the Cypress suite, with the application already running, run `yarn test` from within `sites/public`.
 
