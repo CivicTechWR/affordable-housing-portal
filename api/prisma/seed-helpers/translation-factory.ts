@@ -28,15 +28,14 @@ const translations = (
         reviewListing: 'Review Listing',
       },
       footer: {
-        line1: 'Bloom',
+        line1: 'Affordable Housing Portal',
         line2: '',
         thankYou: 'Thank you',
-        footer: 'Bloom Housing',
+        footer: 'Affordable Housing Portal',
       },
       header: {
-        logoUrl:
-          'https://res.cloudinary.com/exygy/image/upload/w_400,c_limit,q_65/dev/bloom_logo_generic_zgb4sg.jpg',
-        logoTitle: 'Bloom Housing Portal',
+        logoUrl: '',
+        logoTitle: 'Affordable Housing Portal',
       },
       invite: {
         hello: 'Welcome to the Partners Portal',
@@ -159,7 +158,7 @@ const translations = (
         passwordInfo:
           "Your password won't change until you access the link above and create a new one.",
         resetRequest:
-          'A request to reset your Bloom Housing Portal website password for %{appUrl} has recently been made.',
+          'A request to reset your Affordable Housing Portal website password for %{appUrl} has recently been made.',
         ignoreRequest: "If you didn't request this, please ignore this email.",
         changePassword: 'Change my password',
       },
@@ -236,10 +235,10 @@ const translations = (
         otherOpportunities4: 'Housing Portal Help Center',
       },
       accountRemoval: {
-        subject: 'Bloom Housing Scheduled Account Removal Due to Inactivity',
+        subject: 'Scheduled Account Removal Due to Inactivity',
         courtesyText:
-          'This is a courtesy email to let you know that because your Bloom Housing Portal account has been inactive for 3 years, your account will be deleted in 30 days per our Terms of Use and Privacy Policy. If you’d like to keep your account, please log in sometime in the next month and we’ll consider your account active again.',
-        signIn: 'Sign in to Bloom Housing',
+          'This is a courtesy email to let you know that because your Affordable Housing Portal account has been inactive for 3 years, your account will be deleted in 30 days per our Terms of Use and Privacy Policy. If you’d like to keep your account, please log in sometime in the next month and we’ll consider your account active again.',
+        signIn: 'Sign in to Affordable Housing Portal',
       },
     };
   } else if (language === LanguagesEnum.es) {
@@ -249,7 +248,7 @@ const translations = (
         seeListing: 'VER EL LISTADO',
       },
       footer: {
-        line1: 'Bloom',
+        line1: 'Affordable Housing Portal',
         line2: '',
       },
       confirmation: {
@@ -293,11 +292,10 @@ const translations = (
         otherOpportunities4: 'Housing Portal Centro de ayuda',
       },
       accountRemoval: {
-        subject:
-          'Eliminación programada de cuenta de Bloom Housing debido a inactividad',
+        subject: 'Eliminación programada de cuenta debido a inactividad',
         courtesyText:
-          'Este es un correo electrónico de cortesía para informarle que, debido a que su cuenta del Portal de Bloom Housing ha estado inactiva durante 3 años, se eliminará en 30 días según nuestros Términos de Uso y Política de Privacidad. Si desea conservar su cuenta, inicie sesión durante el próximo mes y la consideraremos activa de nuevo.',
-        signIn: 'Iniciar sesión en Bloom Housing',
+          'Este es un correo electrónico de cortesía para informarle que, debido a que su cuenta del Portal de Vivienda Asequible ha estado inactiva durante 3 años, se eliminará en 30 días según nuestros Términos de Uso y Política de Privacidad. Si desea conservar su cuenta, inicie sesión durante el próximo mes y la consideraremos activa de nuevo.',
+        signIn: 'Iniciar sesión en el Portal de Vivienda Asequible',
       },
       register: {
         welcome: 'Bienvenido',
