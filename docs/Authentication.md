@@ -71,6 +71,7 @@ The context is provided to a React App using `AuthProvider`, which in turn requi
 properly:
 
 ```tsx
+// Note: @bloom-housing is the upstream npm package scope — this is the real import path.
 import { UserProvider, ConfigProvider } from "@bloom-housing/shared-helpers"
 
 <ConfigProvider apiUrl={...}>

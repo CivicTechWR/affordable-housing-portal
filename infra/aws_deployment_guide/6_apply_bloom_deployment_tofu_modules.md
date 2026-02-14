@@ -1,5 +1,7 @@
 # Apply Deployment OpenTofu Modules
 
+> **Note:** This guide originates from the upstream [Bloom Housing](https://github.com/bloom-housing/bloom) project. Resource and module names (e.g. `bloom_dev`, `bloom_deployment`) reflect the upstream naming convention and match the actual OpenTofu identifiers in the `infra/` tree.
+
 This directory contains instructions for deploying dev and prod environments to an AWS
 organization. The guide is broken down into a series of files that should be followed in order:
 

@@ -1,4 +1,4 @@
-# Bloom Backend
+# API
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
@@ -44,7 +44,7 @@ If this is your first time running this command and you see `psql: error: FATAL:
 
 You will also need to update the `DATABASE_URL` environment variable to include your username.
 
-If you're using VSCode, you can install [the Postgres explorer extension](https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres) to inspect your local database. When you click on the + to create a new connection, you can use the following inputs to each question to create a connection to the newly created database: `localhost`, `<username>`, hit enter for password, `5432`, standard, `bloom_prisma`, and a descriptive name like `local-bloom`. Once the connection is established, you can inspect the database.
+If you're using VSCode, you can install [the Postgres explorer extension](https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres) to inspect your local database. When you click on the + to create a new connection, you can use the following inputs to each question to create a connection to the newly created database: `localhost`, `<username>`, hit enter for password, `5432`, standard, `bloom_prisma`, and a descriptive name like `local-dev`. Once the connection is established, you can inspect the database.
 
 To start the application run: `yarn dev`.
 

@@ -1,5 +1,7 @@
 # Infrastructure Development
 
+> **Note:** Module and resource names in this file (e.g. `bloom_dev`, `bloom_deployment`) are the actual OpenTofu identifiers inherited from the upstream [Bloom Housing](https://github.com/bloom-housing/bloom) project. They match the directory and resource names in the `infra/` tree and should be used as-is when running commands.
+
 ## Required environment
 
 1. bash: https://www.gnu.org/software/bash/bash.html
