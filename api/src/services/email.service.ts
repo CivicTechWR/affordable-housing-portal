@@ -259,7 +259,7 @@ export class EmailService {
     await this.send(
       newEmail,
       jurisdiction.emailFromAddress,
-      'Bloom email change request',
+      this.polyglot.t('changeEmail.message'),
       this.template('change-email')({
         user: user,
         confirmationUrl: confirmationUrl,
@@ -769,8 +769,8 @@ export class EmailService {
             },
             signInUrl: `${jurisdiction.publicUrl}/${language}/sign-in`,
             // These two URLs are placeholders and must be updated per jurisdiction
-            notificationsUrl: 'https://www.exygy.com',
-            helpCenterUrl: 'https://www.exygy.com',
+            notificationsUrl: jurisdiction.notificationsSignUpUrl || '',
+            helpCenterUrl: jurisdiction.publicUrl || '',
           }),
         );
       }

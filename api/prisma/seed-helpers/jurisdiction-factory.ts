@@ -23,13 +23,13 @@ export const jurisdictionFactory = (
   },
 ): Prisma.JurisdictionsCreateInput => ({
   name: jurisdictionName,
-  notificationsSignUpUrl: 'https://www.exygy.com',
+  notificationsSignUpUrl: 'https://www.example.com',
   languages: optionalFields?.languages || [LanguagesEnum.en, LanguagesEnum.es],
   partnerTerms: 'Example Terms',
   publicUrl: optionalFields?.publicSiteBaseURL
     ? optionalFields.publicSiteBaseURL
     : 'http://localhost:3000',
-  emailFromAddress: 'Bloom <bloom-no-reply@exygy.dev>',
+  emailFromAddress: 'Affordable Housing Portal <no-reply@example.com>',
   rentalAssistanceDefault:
     'Housing Choice Vouchers, Section 8 and other valid rental assistance programs will be considered for this property. In the case of a valid rental subsidy, the required minimum income will be based on the portion of the rent that the tenant pays after use of the subsidy.',
   whatToExpect:
