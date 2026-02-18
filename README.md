@@ -60,6 +60,14 @@ Copy `.env.template` to `.env` in each of these directories:
 
 Some keys are secret and available internally — ask the team for access. The template files include default values and descriptions.
 
+#### Secrets / Infisical
+
+We use Infisical to manage and seed third-party API credentials and other secrets for local development. To retrieve secrets locally:
+
+- Install the Infisical CLI and authenticate with the team account (for example, run `infisical login`).
+- If you do not yet have access to the Infisical workspace, ping the appropriate Slack channel (e.g. `#project-accessible-housing-portal`) to request access and the credentials/invite. Once invited, re-run the login and fetch steps.
+
+
 ### Run Locally
 
 ```bash
