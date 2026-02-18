@@ -32,7 +32,7 @@ const skipLoginRoutes = [
   "/unauthorized",
 ]
 
-function BloomApp({ Component, router, pageProps }: AppProps) {
+function PartnersApp({ Component, router, pageProps }: AppProps) {
   const { locale } = router
 
   // fix for rehydration
@@ -96,4 +96,4 @@ function BloomApp({ Component, router, pageProps }: AppProps) {
   )
 }
 
-export default BloomApp
+export default PartnersApp

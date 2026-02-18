@@ -50,8 +50,8 @@ async function bootstrap() {
   );
   app.use(json({ limit: '50mb' }));
   const config = new DocumentBuilder()
-    .setTitle('Bloom API')
-    .setDescription('The API for Bloom')
+    .setTitle('Affordable Housing Portal API')
+    .setDescription('The API for the Affordable Housing Portal')
     .setVersion('2.0')
     .addTag('listings')
     .build();
