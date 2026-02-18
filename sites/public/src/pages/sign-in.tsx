@@ -299,7 +299,7 @@ const SignIn = (props: SignInProps) => {
                   setConfirmationStatusMessage(undefined)
                 },
               }}
-              showRegisterBtn={true}
+              showRegisterBtn={false}
               control={{ errors }}
             >
               {process.env.showPwdless ? (
