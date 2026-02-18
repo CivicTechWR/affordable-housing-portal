@@ -18,8 +18,8 @@ Optionally, start pgadmin for looking around the database:
 - pgadmin: http://localhost:3200
    - username: `admin@example.com`
    - password: `abcdef`
-   - database user: `bloom_readonly`
-   - database password: `bloom_readonly_pw`
+   - database user: `ahp_readonly`
+   - database password: `ahp_readonly_pw`
 
 > [!NOTE]
 > If running on mac apple silicon, docker and podman run a linux VM where the images are build and
@@ -147,10 +147,10 @@ For example, the ID of of the public site container in the following example out
 ```
 $ docker container ls
 CONTAINER ID  IMAGE                                    COMMAND               CREATED         STATUS                   PORTS                   NAMES
-5b4b92589171  docker.io/library/postgres:18            postgres              13 minutes ago  Up 13 minutes (healthy)  5432/tcp                bloom-db-1
-3fb2c2f39540  docker.io/library/bloom-api:latest       /bin/bash -c yarn...  13 minutes ago  Up 13 minutes (healthy)  0.0.0.0:3100->3100/tcp  bloom-api-1
-d111808885be  docker.io/library/bloom-partners:latest  /bin/bash -c yarn...  13 minutes ago  Up 13 minutes            0.0.0.0:3001->3001/tcp  bloom-partners-1
-62de5c066288  docker.io/library/bloom-public:latest    /bin/bash -c yarn...  13 minutes ago  Up 13 minutes            0.0.0.0:3000->3000/tcp  bloom-public-1
+5b4b92589171  docker.io/library/postgres:18                               postgres              13 minutes ago  Up 13 minutes (healthy)  5432/tcp                affordable-housing-portal-db-1
+3fb2c2f39540  docker.io/library/affordable-housing-portal-api:latest      /bin/bash -c yarn...  13 minutes ago  Up 13 minutes (healthy)  0.0.0.0:3100->3100/tcp  affordable-housing-portal-api-1
+d111808885be  docker.io/library/affordable-housing-portal-partners:latest  /bin/bash -c yarn...  13 minutes ago  Up 13 minutes            0.0.0.0:3001->3001/tcp  affordable-housing-portal-partners-1
+62de5c066288  docker.io/library/affordable-housing-portal-public:latest    /bin/bash -c yarn...  13 minutes ago  Up 13 minutes            0.0.0.0:3000->3000/tcp  affordable-housing-portal-public-1
 ```
 
 Then, use `docker exec` to run a command. For example, the following command runs `ls
@@ -169,13 +169,13 @@ docker exec -it 62de5c066288 /bin/bash
 
 ### Start an additional container in the network
 
-The docker-compose.yml file creates a docker network called `bloom_default`. To run a new container
-inside the network, use the `--network=bloom_default` flag in `docker container run`. For example, the
+The docker-compose.yml file creates a docker network called `affordable-housing-portal_default`. To run a new container
+inside the network, use the `--network=affordable-housing-portal_default` flag in `docker container run`. For example, the
 following command starts a python docker image and runs a bash shell in it. Then in the shell it
 curls the api and pretty-prints the result using python:
 
 ```
-docker container run --network=bloom_default --rm -it python:latest /bin/bash
+docker container run --network=affordable-housing-portal_default --rm -it python:latest /bin/bash
 root@c89395fd8af3:/# curl api:3100/jurisdictions | python -m json
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -186,7 +186,7 @@ root@c89395fd8af3:/# curl api:3100/jurisdictions | python -m json
         "createdAt": "2025-10-20T23:01:27.920Z",
         "updatedAt": "2025-10-20T23:01:27.920Z",
         "name": "Revitalizing Rosewood",
-        "notificationsSignUpUrl": "https://www.exygy.com",
+        "notificationsSignUpUrl": "https://www.example.com",
         "languages": [
             "en",
              ...
@@ -209,7 +209,7 @@ file:
       dockerfile: Dockerfile.dbseed.dev
     restart: no
     environment:
-      DATABASE_URL: "postgres://postgres:example@db:5432/bloom_prisma"
+      DATABASE_URL: "postgres://postgres:example@db:5432/ahp_prisma"
     command:
     - "yarn"
     - "db:seed:development" # <- change this line to your desired DB seed
