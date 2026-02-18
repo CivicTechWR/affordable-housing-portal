@@ -11,6 +11,7 @@ import {
   isFiltered,
 } from "../components/browse/FilterDrawerHelpers"
 import { ListingBrowse, TabsIndexEnum } from "../components/browse/ListingBrowse"
+import { ListingBrowseDeprecated } from "../components/browse/ListingBrowseDeprecated"
 import { isFeatureFlagOn } from "../lib/helpers"
 import {
   fetchClosedListings,
@@ -37,15 +38,21 @@ export interface ListingsProps {
 export default function ListingsPage(props: ListingsProps) {
   return (
     <>
-      <ListingBrowse
-        listings={props.openListings}
-        tab={TabsIndexEnum.open}
-        jurisdiction={props.jurisdiction}
-        multiselectData={props.multiselectData}
-        paginationData={props.paginationData}
-        areFiltersActive={props.areFiltersActive}
-      />
-
+      {process.env.showNewSeedsDesigns ? (
+        <ListingBrowse
+          listings={props.openListings}
+          tab={TabsIndexEnum.open}
+          jurisdiction={props.jurisdiction}
+          multiselectData={props.multiselectData}
+          paginationData={props.paginationData}
+          areFiltersActive={props.areFiltersActive}
+        />
+      ) : (
+        <ListingBrowseDeprecated
+          openListings={props.openListings}
+          closedListings={props.closedListings}
+        />
+      )}
     </>
   )
 }

@@ -64,6 +64,10 @@ export const ListingBrowse = (props: ListingBrowseProps) => {
   const metaDescription = t("pageDescription.welcome", { regionName: t("region.name") })
 
   const filterQuery = getFilterQueryFromURL(router.query)
+  const enableFiltering = isFeatureFlagOn(
+    props.jurisdiction,
+    FeatureFlagEnum.enableListingFiltering
+  )
 
   const jurisdictionActiveFeatureFlags = props.jurisdiction?.featureFlags
     .filter((featureFlag) => featureFlag.active)
@@ -192,17 +196,18 @@ export const ListingBrowse = (props: ListingBrowseProps) => {
                       totalCount: props.paginationData.totalItems,
                     })}
                 </span>
-
-                <span>
-                  <Button
-                    size={"sm"}
-                    onClick={() => setIsFilterDrawerOpen(true)}
-                    variant={"primary-outlined"}
-                  >
-                    {t("t.filter")}
-                    {!!numberOfFilters && <span>{numberOfFilters}</span>}
-                  </Button>
-                </span>
+                {enableFiltering && (
+                  <span>
+                    <Button
+                      size={"sm"}
+                      onClick={() => setIsFilterDrawerOpen(true)}
+                      variant={"primary-outlined"}
+                    >
+                      {t("t.filter")}
+                      {!!numberOfFilters && <span>{numberOfFilters}</span>}
+                    </Button>
+                  </span>
+                )}
               </div>
             </MaxWidthLayout>
           </div>
@@ -280,8 +285,9 @@ export const ListingBrowse = (props: ListingBrowseProps) => {
                           props.paginationData.currentPage > 0 &&
                             router.push({
                               pathname: router.pathname,
-                              query: `page=${(props.paginationData.currentPage - 1).toString()}${filterQuery ? `&${filterQuery}` : ""
-                                }`,
+                              query: `page=${(props.paginationData.currentPage - 1).toString()}${
+                                filterQuery ? `&${filterQuery}` : ""
+                              }`,
                             })
                         }}
                         variant="primary-outlined"
@@ -304,8 +310,9 @@ export const ListingBrowse = (props: ListingBrowseProps) => {
                           props.paginationData.currentPage < props.paginationData.totalPages &&
                             router.push({
                               pathname: router.pathname,
-                              query: `page=${(props.paginationData.currentPage + 1).toString()}${filterQuery ? `&${filterQuery}` : ""
-                                }`,
+                              query: `page=${(props.paginationData.currentPage + 1).toString()}${
+                                filterQuery ? `&${filterQuery}` : ""
+                              }`,
                             })
                         }}
                         variant="primary-outlined"
