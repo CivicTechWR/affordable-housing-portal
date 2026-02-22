@@ -13,7 +13,7 @@ env:
   CLOUDINARY_SECRET: CLOUDINARY_SECRET
   CLOUDINARY_KEY: CLOUDINARY_KEY
   PARTNERS_PORTAL_URL: http://localhost:3001
-  DATABASE_URL: postgres://bloom-dev:bloom@127.0.0.1:5432/bloom
+  DATABASE_URL: postgres://ahp-dev:ahp@127.0.0.1:5432/ahp_prisma
   JURISDICTION_NAME: 'Bloomington'
   BACKEND_API_BASE: http://localhost:3100
   LISTINGS_QUERY: /listings
@@ -42,8 +42,8 @@ jobs:
         image: postgres
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
-          POSTGRES_USER: bloom-dev
-          POSTGRES_PASSWORD: bloom
+          POSTGRES_USER: ahp-dev
+          POSTGRES_PASSWORD: ahp
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 5432:5432
@@ -71,17 +71,17 @@ jobs:
         run: pg_isready -h 127.0.0.1 -p 5432
 
       - name: Create DB
-        run: psql -U bloom-dev -c 'CREATE DATABASE bloom;'
+        run: psql -U ahp-dev -c 'CREATE DATABASE ahp_prisma;'
         env:
           PGHOST: 127.0.0.1
-          PGPASSWORD: bloom
+          PGPASSWORD: ahp
 
       - name: Setup backend
         run: yarn test:backend:new:dbsetup:withseed
         env:
           PGHOST: 127.0.0.1
-          PGPASSWORD: bloom
-          PGUSER: bloom-dev
+          PGPASSWORD: ahp
+          PGUSER: ahp-dev
 
       - name: Cypress run
         uses: cypress-io/github-action@v5

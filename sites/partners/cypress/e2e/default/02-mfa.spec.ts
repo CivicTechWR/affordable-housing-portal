@@ -3,11 +3,11 @@ describe("Log in using MFA Tests", () => {
     cy.intercept("POST", "api/adapter/auth/request-mfa-code", {
       statusCode: 201,
       body: {
-        email: "mfauser@bloom.com",
+        email: "mfauser@example.com",
       },
     })
     cy.visit("/")
-    cy.get("input#email").type("mfauser@bloom.com")
+    cy.get("input#email").type("mfauser@example.com")
     cy.get("input#password").type("Abcdef12345!")
     cy.get("button").contains("Sign in").click()
     cy.getByID("verify-by-email").click()
