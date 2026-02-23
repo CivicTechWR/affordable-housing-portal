@@ -14,8 +14,8 @@ env:
   CLOUDINARY_KEY: CLOUDINARY_KEY
   CLOUDINARY_CLOUD_NAME: "exygy"
   PARTNERS_PORTAL_URL: http://127.0.0.1:3001
-  DATABASE_URL: postgres://bloom-dev:bloom@127.0.0.1:5432/bloom
-  TEST_DATABASE_URL: postgres://bloom-dev:bloom@127.0.0.1:5432/bloom_test
+  DATABASE_URL: postgres://ahp-dev:ahp@127.0.0.1:5432/ahp_prisma
+  TEST_DATABASE_URL: postgres://ahp-dev:ahp@127.0.0.1:5432/ahp_prisma_test
   TWILIO_ACCOUNT_SID: 'AC.TEST'
   TWILIO_AUTH_TOKEN: 'TEST'
   MFA_CODE_VALID: '600000'
@@ -37,9 +37,9 @@ jobs:
         image: postgres
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
-          POSTGRES_DB: bloom-dev
-          POSTGRES_USER: bloom-dev
-          POSTGRES_PASSWORD: bloom
+          POSTGRES_DB: ahp-dev
+          POSTGRES_USER: ahp-dev
+          POSTGRES_PASSWORD: ahp
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 5432:5432
@@ -68,5 +68,5 @@ jobs:
         run: yarn test:e2e
         env:
           PGHOST: 127.0.0.1
-          PGPASSWORD: bloom
-          PGUSER: bloom-dev
+          PGPASSWORD: ahp
+          PGUSER: ahp-dev

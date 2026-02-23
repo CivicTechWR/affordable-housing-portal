@@ -1,8 +1,8 @@
 {
   "name": "@bloom-housing/shared-helpers",
   "version": "7.7.1",
-  "description": "Shared helpers for Bloom affordable housing system",
-  "homepage": "https://github.com/bloom-housing/bloom/tree/master/shared-helpers",
+  "description": "Shared helpers for the Affordable Housing Portal",
+  "homepage": "https://github.com/CivicTechWR/affordable-housing-portal/tree/main/shared-helpers",
   "main": "index.js",
   "license": "Apache-2.0",
   "private": true,
