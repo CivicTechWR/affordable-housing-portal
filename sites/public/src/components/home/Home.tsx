@@ -29,7 +29,7 @@ export const Home = (props: HomeProps) => {
   useEffect(() => {
     pushGtmEvent<PageView>({
       event: "pageView",
-      pageTitle: "Housing Portal",
+      pageTitle: "Affordable Housing Portal",
       status: profile ? UserStatus.LoggedIn : UserStatus.NotLoggedIn,
     })
   }, [profile])

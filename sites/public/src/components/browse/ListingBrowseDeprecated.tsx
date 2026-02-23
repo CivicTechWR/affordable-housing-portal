@@ -44,7 +44,7 @@ export const ListingBrowseDeprecated = (props: ListingBrowseDeprecatedProps) => 
   useEffect(() => {
     pushGtmEvent<ListingList>({
       event: "pageView",
-      pageTitle: "Rent Affordable Housing - Housing Portal",
+      pageTitle: "Rent Affordable Housing - Affordable Housing Portal",
       status: profile ? UserStatus.LoggedIn : UserStatus.NotLoggedIn,
       numberOfListings: props.openListings.length,
       listingIds: props.openListings.map((listing) => listing.id),
