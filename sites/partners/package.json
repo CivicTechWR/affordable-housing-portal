@@ -1,7 +1,6 @@
 {
   "name": "@bloom-housing/partners",
   "version": "7.13.1",
-  "author": "Sean Albert <sean.albert@exygy.com>",
   "description": "Partners app for the Affordable Housing Portal",
   "main": "index.js",
   "license": "Apache-2.0",
