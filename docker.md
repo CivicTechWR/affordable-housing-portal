@@ -209,7 +209,7 @@ file:
       dockerfile: Dockerfile.dbseed.dev
     restart: no
     environment:
-      DATABASE_URL: "postgres://postgres:example@db:5432/bloom_prisma"
+      DATABASE_URL: "postgres://postgres:example@db:5432/affordable_housing_portal"
     command:
     - "yarn"
     - "db:seed:development" # <- change this line to your desired DB seed

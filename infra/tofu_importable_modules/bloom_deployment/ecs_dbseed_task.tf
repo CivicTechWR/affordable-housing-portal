@@ -5,7 +5,7 @@ locals {
     DB_HOST                     = aws_db_instance.bloom.address
     DB_PORT                     = "5432"
     DB_USER                     = "bloom_api"
-    DB_DATABASE                 = "bloom_prisma"
+    DB_DATABASE                 = "affordable_housing_portal"
     DB_USE_RDS_IAM_AUTH         = "1"
     DBSEED_PUBLIC_SITE_BASE_URL = "https://${var.domain_name}"
   }
