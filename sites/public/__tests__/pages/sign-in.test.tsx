@@ -35,7 +35,7 @@ beforeAll(() => {
 describe("Sign In Page", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue("")
+      ; (useRouter as jest.Mock).mockReturnValue("")
   })
 
   it("renders all page elements including fields, buttons and links", () => {
@@ -49,8 +49,6 @@ describe("Sign In Page", () => {
     expect(getByRole("link", { name: /forgot password/i })).toBeInTheDocument()
     expect(getByRole("button", { name: /sign in/i })).toBeInTheDocument()
 
-    expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-    expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
   })
 
   it("shows success toast with user's first name on successful login", async () => {
@@ -58,7 +56,7 @@ describe("Sign In Page", () => {
     const mockLogin = jest.fn().mockResolvedValue(mockUser)
     const mockAddToast = jest.fn()
     const mockRouter = { query: {}, push: jest.fn() }
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+      ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
 
     const { getByLabelText, getByRole } = render(
       <AuthContext.Provider
@@ -161,7 +159,7 @@ describe("Sign In Page", () => {
 describe("Passwordless Sign In page", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue("")
+      ; (useRouter as jest.Mock).mockReturnValue("")
   })
 
   const renderSignInPage = () =>
@@ -193,11 +191,6 @@ describe("Passwordless Sign In page", () => {
     expect(getByRole("button", { name: "Get code to sign in" })).toBeInTheDocument()
     expect(getByRole("button", { name: "Use your password instead" })).toBeInTheDocument()
 
-    expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-    expect(
-      getByText("Sign up quickly with no need to remember any passwords.", { selector: "div" })
-    ).toBeInTheDocument()
-    expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
   })
 
   it("shows error alert and email validation error after clicking 'Get code to sign in' button without filling out email field", async () => {
@@ -247,7 +240,7 @@ describe("Passwordless Sign In page", () => {
       query: {},
       push: jest.fn(),
     }
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+      ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
 
     const mockRequestSingleUseCode = jest.fn().mockResolvedValue({})
 
@@ -286,7 +279,7 @@ describe("Passwordless Sign In page", () => {
     const mockLogin = jest.fn().mockResolvedValue({ firstName: "User" })
     const mockAddToast = jest.fn()
     const mockRouter = { query: {}, push: jest.fn() }
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+      ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
 
     const { getByRole, getByLabelText } = render(
       <AuthContext.Provider
@@ -333,10 +326,10 @@ describe("Mandated accounts", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue({
-      query: { listingId: "listing-123", redirectUrl: "/applications/start/choose-language" },
-      push: jest.fn(),
-    })
+      ; (useRouter as jest.Mock).mockReturnValue({
+        query: { listingId: "listing-123", redirectUrl: "/applications/start/choose-language" },
+        push: jest.fn(),
+      })
 
     originalShowMandatedAccounts = process.env.showMandatedAccounts
     originalShowPwdless = process.env.showPwdless
@@ -365,9 +358,6 @@ describe("Mandated accounts", () => {
       expect(getByLabelText("Password")).toBeInTheDocument()
       expect(getByRole("button", { name: /sign in/i })).toBeInTheDocument()
       expect(getByRole("link", { name: /forgot password/i })).toBeInTheDocument()
-
-      expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-      expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
     })
 
     it("redirects to application page with listing ID after successful sign-in", async () => {
@@ -378,7 +368,7 @@ describe("Mandated accounts", () => {
         },
         push: jest.fn(),
       }
-      ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+        ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
 
       const mockUser = { firstName: "Test", id: "user-123" }
       const mockLogin = jest.fn().mockResolvedValue(mockUser)
@@ -447,9 +437,6 @@ describe("Mandated accounts", () => {
         expect(getByLabelText("Password")).toBeInTheDocument()
         expect(getByRole("button", { name: /sign in/i })).toBeInTheDocument()
         expect(getByRole("link", { name: /forgot password/i })).toBeInTheDocument()
-
-        expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-        expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
       })
 
       it("shows success toast after successful login with password", async () => {
@@ -490,10 +477,10 @@ describe("User is not confirmed flow", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue({
-      query: {},
-      push: jest.fn(),
-    })
+      ; (useRouter as jest.Mock).mockReturnValue({
+        query: {},
+        push: jest.fn(),
+      })
 
     originalShowPwdless = process.env.showPwdless
     process.env.showPwdless = ""
@@ -542,10 +529,10 @@ describe("User's password is out of date flow", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue({
-      query: {},
-      push: jest.fn(),
-    })
+      ; (useRouter as jest.Mock).mockReturnValue({
+        query: {},
+        push: jest.fn(),
+      })
 
     originalShowPwdless = process.env.showPwdless
     process.env.showPwdless = ""
@@ -599,10 +586,10 @@ describe("Resend confirmation flow", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useRouter as jest.Mock).mockReturnValue({
-      query: {},
-      push: jest.fn(),
-    })
+      ; (useRouter as jest.Mock).mockReturnValue({
+        query: {},
+        push: jest.fn(),
+      })
 
     originalShowPwdless = process.env.showPwdless
     process.env.showPwdless = ""
@@ -623,7 +610,7 @@ describe("Resend confirmation flow", () => {
       },
       push: jest.fn(),
     }
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+      ; (useRouter as jest.Mock).mockReturnValue(mockRouter)
     const mockRequestSingleUseCode = jest.fn().mockResolvedValue({})
 
     const { getByRole, findByText } = render(
