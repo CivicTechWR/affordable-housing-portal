@@ -35,7 +35,9 @@ beforeAll(() => {
 describe("Sign In Page", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-      ; (useRouter as jest.Mock).mockReturnValue("")
+    ;(useRouter as jest.Mock).mockReturnValue("")
+
+
   })
 
   it("renders all page elements including fields, buttons and links", () => {
@@ -159,7 +161,9 @@ describe("Sign In Page", () => {
 describe("Passwordless Sign In page", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-      ; (useRouter as jest.Mock).mockReturnValue("")
+    ;(useRouter as jest.Mock).mockReturnValue("")
+
+
   })
 
   const renderSignInPage = () =>
