@@ -31,7 +31,7 @@ export default function ListingPage(props: ListingProps) {
     if (!listing.id) return
     pushGtmEvent<ListingDetail>({
       event: "pageView",
-      pageTitle: `${listing.name} - Housing Portal`,
+      pageTitle: `${listing.name} - Affordable Housing Portal`,
       status: profile ? UserStatus.LoggedIn : UserStatus.NotLoggedIn,
       listingStartDate: dayjs(listing.applicationOpenDate).format("YYYY-MM-DD"),
       listingStatus: listing.status,

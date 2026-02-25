@@ -1,8 +1,8 @@
 {
-  "name": "bloom-housing",
+  "name": "affordable-housing-portal",
   "version": "4.4.0",
-  "author": "Sean Albert <sean.albert@exygy.com>",
-  "description": "Bloom is a system to manage processes for affordable housing",
+  "author": "CivicTechWR",
+  "description": "Affordable Housing Portal - a system to manage processes for affordable housing",
   "workspaces": {
     "packages": [
       "sites/public",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bloom-housing/bloom.git"
+    "url": "https://github.com/CivicTechWR/affordable-housing-portal.git"
   },
   "license": "Apache-2.0",
   "private": true,
@@ -24,8 +24,6 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "link:uic": "cd node_modules/react && yarn link && cd ../../../ui-components && yarn link 'react' && yarn link && cd ../bloom && yarn link '@bloom-housing/ui-components'",
-    "unlink:uic": "yarn unlink @bloom-housing/ui-components && cd ../ui-components && yarn unlink react && yarn unlink && yarn install --force && cd ../bloom/node_modules/react && yarn unlink && cd ../.. && yarn install --force",
     "dev:app:public": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn dev",
     "test:app:public": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn test",
     "test:app:public:headless": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn test:headless",
@@ -59,7 +57,7 @@
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
     "@types/jest": "^26.0.14",
-    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "commitizen": "^4.3.1",
     "concurrently": "^5.3.0",
@@ -94,7 +92,6 @@
   "lint-staged": {
     "*.{js,ts,tsx}": "eslint"
   },
-  "dependencies": {},
   "resolutions": {
     "react": "19.2.3",
     "react-dom": "19.2.3",

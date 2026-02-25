@@ -72,7 +72,7 @@ export const ListingBrowse = (props: ListingBrowseProps) => {
   useEffect(() => {
     pushGtmEvent<ListingList>({
       event: "pageView",
-      pageTitle: "Rent Affordable Housing - Housing Portal",
+      pageTitle: "Rent Affordable Housing - Affordable Housing Portal",
       status: profile ? UserStatus.LoggedIn : UserStatus.NotLoggedIn,
       numberOfListings: props.listings?.length,
       listingIds: props.listings?.map((listing) => listing.id),

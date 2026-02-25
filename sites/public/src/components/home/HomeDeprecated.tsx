@@ -19,7 +19,7 @@ export const HomeDeprecated = (props: HomeDeprecatedProps) => {
   useEffect(() => {
     pushGtmEvent<PageView>({
       event: "pageView",
-      pageTitle: "Housing Portal",
+      pageTitle: "Affordable Housing Portal",
       status: profile ? UserStatus.LoggedIn : UserStatus.NotLoggedIn,
     })
   }, [profile])

@@ -2089,7 +2089,7 @@ describe('Application Controller Tests', () => {
         data: await userFactory(),
       });
       const juris = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
+        data: jurisdictionFactory(`publicAppsView-jurisdiction-${randomUUID()}`),
       });
       await reservedCommunityTypeFactoryAll(juris.id, prisma);
 

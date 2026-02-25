@@ -1,6 +1,6 @@
 # Affordable Housing Portal
 
-Affordable Housing Portal is [Civic Tech Waterloo Region](https://github.com/CivicTechWR)'s affordable housing platform. The goal is to be a single entry point for affordable housing seekers and to streamline application management for housing providers.
+Affordable Housing Portal is [Civic Tech Waterloo Region](https://github.com/CivicTechWR)'s affordable housing platform. It aims to make it easier for housing seekers to find and access listings from affordable housing providers. Many existing platforms fail to centre the needs of marginalized communities — key information is often missing, and listings can be structured in ways that discourage these communities from applying. This project seeks to address those gaps with a more accessible and equitable experience.
 
 ## About This Fork
 
@@ -59,6 +59,14 @@ Copy `.env.template` to `.env` in each of these directories:
 - `api`
 
 Some keys are secret and available internally — ask the team for access. The template files include default values and descriptions.
+
+#### Secrets / Infisical
+
+We use Infisical to manage and seed third-party API credentials and other secrets for local development. To retrieve secrets locally:
+
+- Install the Infisical CLI and authenticate with the team account (for example, run `infisical login`).
+- If you do not yet have access to the Infisical workspace, ping the appropriate Slack channel (e.g. `#project-accessible-housing-portal`) to request access and the credentials/invite. Once invited, re-run the login and fetch steps.
+
 
 ### Run Locally
 
