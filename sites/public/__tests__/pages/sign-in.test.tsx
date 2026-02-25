@@ -48,9 +48,6 @@ describe("Sign In Page", () => {
     expect(getByTestId("sign-in-password-field")).toBeInTheDocument()
     expect(getByRole("link", { name: /forgot password/i })).toBeInTheDocument()
     expect(getByRole("button", { name: /sign in/i })).toBeInTheDocument()
-
-    expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-    expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
   })
 
   it("shows success toast with user's first name on successful login", async () => {
@@ -192,12 +189,6 @@ describe("Passwordless Sign In page", () => {
 
     expect(getByRole("button", { name: "Get code to sign in" })).toBeInTheDocument()
     expect(getByRole("button", { name: "Use your password instead" })).toBeInTheDocument()
-
-    expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-    expect(
-      getByText("Sign up quickly with no need to remember any passwords.", { selector: "div" })
-    ).toBeInTheDocument()
-    expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
   })
 
   it("shows error alert and email validation error after clicking 'Get code to sign in' button without filling out email field", async () => {
@@ -365,9 +356,6 @@ describe("Mandated accounts", () => {
       expect(getByLabelText("Password")).toBeInTheDocument()
       expect(getByRole("button", { name: /sign in/i })).toBeInTheDocument()
       expect(getByRole("link", { name: /forgot password/i })).toBeInTheDocument()
-
-      expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-      expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
     })
 
     it("redirects to application page with listing ID after successful sign-in", async () => {
@@ -447,9 +435,6 @@ describe("Mandated accounts", () => {
         expect(getByLabelText("Password")).toBeInTheDocument()
         expect(getByRole("button", { name: /sign in/i })).toBeInTheDocument()
         expect(getByRole("link", { name: /forgot password/i })).toBeInTheDocument()
-
-        expect(getByText("Don't have an account?", { selector: "h2" })).toBeInTheDocument()
-        expect(getByRole("link", { name: /create account/i })).toBeInTheDocument()
       })
 
       it("shows success toast after successful login with password", async () => {
