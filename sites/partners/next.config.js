@@ -27,7 +27,7 @@ console.log(`Using ${BACKEND_API_BASE}${LISTINGS_QUERY} for the listing service.
 
 const BACKEND_PROXY_BASE = process.env.BACKEND_PROXY_BASE
 
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN
+const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN || "pk.fake"
 // Load the Tailwind theme and set up SASS vars
 const bloomTheme = require("./tailwind.config.js")
 const tailwindVars = require("@bloom-housing/ui-components/tailwind.tosass.js")(bloomTheme)
