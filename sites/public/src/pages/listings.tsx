@@ -45,7 +45,6 @@ export default function ListingsPage(props: ListingsProps) {
         paginationData={props.paginationData}
         areFiltersActive={props.areFiltersActive}
       />
-
     </>
   )
 }
