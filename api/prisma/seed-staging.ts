@@ -421,7 +421,7 @@ export const stagingSeed = async (
   await prismaClient.userAccounts.create({
     data: await userFactory({
       roles: { isAdmin: true },
-      email: 'mfauser@bloom.com',
+      email: 'mfauser@example.com',
       confirmedAt: new Date(),
       jurisdictionIds: [mainJurisdiction.id],
       acceptedTerms: true,
@@ -736,7 +736,7 @@ export const stagingSeed = async (
   const unitTypes = await unitTypeFactoryAll(prismaClient);
   await unitAccessibilityPriorityTypeFactoryAll(prismaClient);
   await reservedCommunityTypeFactoryAll(mainJurisdiction.id, prismaClient);
-  // list of predefined listings WARNING: images only work if image setup is cloudinary on exygy account
+  // list of predefined listings WARNING: images only work if CLOUDINARY_CLOUD_NAME is configured
   const listingsToCreate: Parameters<typeof listingFactory>[] = [
     [
       angelopolisJurisdiction.id,

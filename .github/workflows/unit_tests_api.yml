@@ -8,7 +8,7 @@ on:
       - 'infra/**'
 env:
   APP_SECRET: 'SOME-LONG-SECRET-KEY'
-  DATABASE_URL: postgres://bloom-dev:bloom@127.0.0.1:5432/bloom
+  DATABASE_URL: postgres://ahp-dev:ahp@127.0.0.1:5432/ahp_prisma
   EMAIL_API_KEY: 'SG.SOME-LONG-SECRET-KEY'
   TWILIO_ACCOUNT_SID: 'AC.TEST'
   TWILIO_AUTH_TOKEN: 'TEST'
@@ -20,7 +20,7 @@ env:
   TIME_ZONE: America/Los_Angeles
   THROTTLE_TTL: 3600000
   THROTTLE_LIMIT: 100
-  TEST_CONNECTION_STRING: postgres://bloom-dev:bloom@127.0.0.1:5432/bloom
+  TEST_CONNECTION_STRING: postgres://ahp-dev:ahp@127.0.0.1:5432/ahp_prisma
   GOOGLE_API_KEY: "secret-key"
   GOOGLE_API_EMAIL: "secret-key"
   GOOGLE_API_ID: "secret-key"
