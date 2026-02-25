@@ -30,7 +30,7 @@ import "../../styles/overrides.scss"
 
 const rtlLocales = process.env.rtlLanguages.split(",")
 
-function BloomApp({ Component, router, pageProps }: AppProps) {
+function PublicApp({ Component, router, pageProps }: AppProps) {
   const { locale } = router
   //  const initialized = useState(true)
   const [application, setApplication] = useState(() => {
@@ -133,4 +133,4 @@ function BloomApp({ Component, router, pageProps }: AppProps) {
   )
 }
 
-export default BloomApp
+export default PublicApp

@@ -1,6 +1,6 @@
 {
-  "name": "Bloom Listing Service",
-  "repository": "https://github.com/bloom-housing/bloom",
+  "name": "Affordable Housing Portal",
+  "repository": "https://github.com/CivicTechWR/affordable-housing-portal",
   "buildpacks": [
     {
       "url": "https://github.com/lstoll/heroku-buildpack-monorepo.git"

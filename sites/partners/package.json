@@ -1,8 +1,7 @@
 {
   "name": "@bloom-housing/partners",
   "version": "7.13.1",
-  "author": "Sean Albert <sean.albert@exygy.com>",
-  "description": "Partners app reference implementation for the Bloom affordable housing system",
+  "description": "Partners app for the Affordable Housing Portal",
   "main": "index.js",
   "license": "Apache-2.0",
   "private": true,
@@ -50,7 +49,7 @@
     "mapbox-gl": "^3.16.0",
     "markdown-to-jsx": "^7.7.16",
     "nanoid": "^3.1.12",
-    "next": "^15.5.7",
+    "next": "^15.5.9",
     "qs": "^6.10.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
