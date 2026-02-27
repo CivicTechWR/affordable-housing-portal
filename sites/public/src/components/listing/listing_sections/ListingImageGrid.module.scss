@@ -13,23 +13,35 @@
     position: relative;
     background-color: var(--bloom-color-gray-500, #71717a);
     border-radius: 0;
+}
 
-    img {
-        width: 100%;
-        object-fit: cover;
-        cursor: pointer;
-        transition: filter 0.2s ease-in-out;
+.image-grid__tile {
+    position: relative;
+    display: block;
+    width: 100%;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: inherit;
 
-        &:hover,
-        &:focus-visible {
-            filter: brightness(0.85);
-        }
-
-        &:focus-visible {
-            outline: 2px solid var(--bloom-color-blue-700, #0057b8);
-            outline-offset: 2px;
-        }
+    &:focus-visible {
+        outline: 2px solid var(--bloom-color-blue-700, #0057b8);
+        outline-offset: 2px;
     }
+
+    &:hover .image-grid__image,
+    &:focus-visible .image-grid__image {
+        filter: brightness(0.85);
+    }
+}
+
+.image-grid__image {
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.2s ease-in-out;
 }
 
 .image-grid__inner--multi {
@@ -44,9 +56,8 @@
         grid-template-rows: 1.2fr 0.5fr;
     }
 
-    img {
+    .image-grid__image {
         aspect-ratio: 16 / 9;
-        display: block;
     }
 }
 
@@ -56,12 +67,12 @@
         "Main Secondary-1"
         "Main Secondary-1";
 
-    img:nth-child(1) {
+    .image-grid__tile:nth-child(1) {
         grid-area: Main;
         height: 100%;
     }
 
-    img:nth-child(2) {
+    .image-grid__tile:nth-child(2) {
         grid-area: Secondary-1;
         height: 100%;
     }
@@ -79,23 +90,23 @@
             "Secondary-1 Secondary-2";
     }
 
-    img:nth-child(1) {
+    .image-grid__tile:nth-child(1) {
         grid-area: Main;
         height: 100%;
     }
 
-    img:nth-child(2) {
+    .image-grid__tile:nth-child(2) {
         grid-area: Secondary-1;
         height: 100%;
     }
 
-    img:nth-child(3) {
+    .image-grid__tile:nth-child(3) {
         grid-area: Secondary-2;
     }
 }
 
 .image-grid__inner--overflow {
-    img:nth-child(3) {
+    .image-grid__tile:nth-child(3) .image-grid__image {
         opacity: 0.5;
     }
 }
@@ -115,10 +126,19 @@
     color: #fff;
     background: rgba(0, 0, 0, 0.6);
     cursor: pointer;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    font: inherit;
 
     @media (max-width: 640px) {
         font-size: 12px;
         line-height: 1;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--bloom-color-blue-700, #0057b8);
+        outline-offset: 2px;
     }
 }
 

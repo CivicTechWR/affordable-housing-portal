@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext } from "react"
 import ReactDOMServer from "react-dom/server"
 import Markdown from "markdown-to-jsx"
 import {
@@ -68,8 +68,7 @@ import {
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { DownloadLotteryResults } from "./DownloadLotteryResults"
-import { ImageGalleryLightbox, LightboxImage } from "./listing_sections/ImageGalleryLightbox"
-import { ListingImageGrid } from "./listing_sections/ListingImageGrid"
+import { ListingImageGallery } from "./listing_sections/ListingImageGallery"
 
 interface ListingProps {
   listing: Listing
@@ -90,8 +89,6 @@ const getUnhiddenMultiselectQuestions = (
 
 export const ListingView = (props: ListingProps) => {
   const { initialStateLoaded, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
   let buildingSelectionCriteria, preferencesSection, programsSection
   const { listing, jurisdiction } = props
 
@@ -617,31 +614,21 @@ export const ListingView = (props: ListingProps) => {
   }
 
   const legacyImageUrls = imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize))
-  const legacyLightboxImages: LightboxImage[] = legacyImageUrls.map((imageUrl: string) => ({
+  const legacyListingImages = legacyImageUrls.map((imageUrl: string) => ({
     url: imageUrl,
   }))
 
   return (
     <article className="flex flex-wrap relative max-w-5xl m-auto">
       <header className="image-card--leader">
-        <ListingImageGrid
-          images={legacyLightboxImages}
+        <ListingImageGallery
+          images={legacyListingImages}
           description={listing.name}
           moreImagesLabel={t("listings.moreImagesLabel")}
           moreImagesDescription={t("listings.moreImagesAltDescription", {
             listingName: listing.name,
           })}
           fallbackImageUrl={IMAGE_FALLBACK_URL}
-          onClick={(index) => {
-            setLightboxIndex(index)
-            setLightboxOpen(true)
-          }}
-        />
-        <ImageGalleryLightbox
-          images={legacyLightboxImages}
-          isOpen={lightboxOpen}
-          initialIndex={lightboxIndex}
-          onClose={() => setLightboxOpen(false)}
           closeLabel={t("t.backToListing")}
         />
         <div className="py-3 mx-3 mt-4 flex flex-col items-center md:items-start text-center md:text-left">

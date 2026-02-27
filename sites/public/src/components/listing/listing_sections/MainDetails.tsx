@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react"
+import React, { Dispatch, SetStateAction } from "react"
 import { CheckIcon, HandRaisedIcon } from "@heroicons/react/16/solid"
 import {
   FeatureFlagEnum,
@@ -18,8 +18,7 @@ import {
 } from "@bloom-housing/shared-helpers"
 import FavoriteButton from "../../shared/FavoriteButton"
 import { Availability } from "./Availability"
-import { ImageGalleryLightbox, LightboxImage } from "./ImageGalleryLightbox"
-import { ListingImageGrid } from "./ListingImageGrid"
+import { ListingImageGallery } from "./ListingImageGallery"
 import listingStyles from "../ListingViewSeeds.module.scss"
 import styles from "./MainDetails.module.scss"
 import { isFeatureFlagOn } from "../../../lib/helpers"
@@ -128,9 +127,6 @@ export const MainDetails = ({
   showFavoriteButton,
   showHomeType,
 }: MainDetailsProps) => {
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
-
   if (!listing) return
 
   const googleMapsHref =
@@ -145,31 +141,21 @@ export const MainDetails = ({
   )
 
   const imageUrls = imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize))
-  const lightboxImages: LightboxImage[] = imageUrls.map((imageUrl: string, index: number) => ({
+  const listingImages = imageUrls.map((imageUrl: string, index: number) => ({
     url: imageUrl,
     description: listing.listingImages?.[index]?.description,
   }))
 
   return (
     <div>
-      <ListingImageGrid
-        images={lightboxImages}
+      <ListingImageGallery
+        images={listingImages}
         description={t("listings.buildingImageAltText")}
         moreImagesLabel={t("listings.moreImagesLabel")}
         moreImagesDescription={t("listings.moreImagesAltDescription", {
           listingName: listing.name,
         })}
         fallbackImageUrl={IMAGE_FALLBACK_URL}
-        onClick={(index) => {
-          setLightboxIndex(index)
-          setLightboxOpen(true)
-        }}
-      />
-      <ImageGalleryLightbox
-        images={lightboxImages}
-        isOpen={lightboxOpen}
-        initialIndex={lightboxIndex}
-        onClose={() => setLightboxOpen(false)}
         closeLabel={t("t.backToListing")}
       />
       <div className={`${styles["listing-main-details"]} seeds-m-bs-header`}>

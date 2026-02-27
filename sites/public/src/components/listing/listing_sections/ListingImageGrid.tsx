@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useCallback, useRef } from "react"
+import React, { SyntheticEvent, useCallback } from "react"
 import styles from "./ListingImageGrid.module.scss"
 import { t } from "@bloom-housing/ui-components"
 
@@ -32,12 +32,10 @@ export const ListingImageGrid = ({
   images,
   description,
   moreImagesLabel,
-  moreImagesDescription: _moreImagesDescription,
+  moreImagesDescription,
   fallbackImageUrl,
   onClick,
 }: ListingImageGridProps) => {
-  const imgRefs = useRef<(HTMLImageElement | null)[]>([])
-
   const onError = useCallback(
     (e: SyntheticEvent<HTMLImageElement>) => {
       if (fallbackImageUrl) {
@@ -50,6 +48,7 @@ export const ListingImageGrid = ({
   const displayed = images.slice(0, 3)
   const hasMultiple = images.length > 1
   const hasOverflow = images.length > 3
+  const moreButtonAriaLabel = moreImagesDescription || moreImagesLabel || "View more images"
 
   const getGridClass = () => {
     const classes = [styles["image-grid__inner"]]
@@ -82,23 +81,16 @@ export const ListingImageGrid = ({
     <div className={styles["image-grid"]}>
       <figure className={getGridClass()}>
         {displayed.map((image, index) => (
-          <React.Fragment key={index}>
-            {/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */}
+          <button
+            key={`${image.url}-${index}`}
+            className={styles["image-grid__tile"]}
+            type="button"
+            onClick={() => onClick?.(index)}
+          >
             <img
+              className={styles["image-grid__image"]}
               src={image.url}
               alt={getAltText(index, image)}
-              role="button"
-              tabIndex={0}
-              ref={(el) => {
-                imgRefs.current[index] = el
-              }}
-              onClick={() => onClick?.(index)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  onClick?.(index)
-                }
-              }}
               onError={onError}
             />
             {index === 0 && hasMultiple && (
@@ -119,21 +111,14 @@ export const ListingImageGrid = ({
                 {t("listings.moreImagesLabel") || "View Photos"}
               </div>
             )}
-            {/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */}
-          </React.Fragment>
+          </button>
         ))}
         {hasOverflow && (
-          <div
+          <button
             className={styles["image-grid__more"]}
-            role="button"
-            tabIndex={0}
+            aria-label={moreButtonAriaLabel}
+            type="button"
             onClick={() => onClick?.(2)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault()
-                onClick?.(2)
-              }
-            }}
           >
             <svg
               className={styles["image-grid__more-icon"]}
@@ -150,7 +135,7 @@ export const ListingImageGrid = ({
                 {images.length - 2} {moreImagesLabel}
               </span>
             )}
-          </div>
+          </button>
         )}
       </figure>
     </div>
