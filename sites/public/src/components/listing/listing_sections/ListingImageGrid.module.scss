@@ -1,0 +1,123 @@
+/* ============================================
+   Listing Image Grid
+   A thumbnail grid for listing images that
+   opens the lightbox on click. No built-in modal.
+   Mirrors the layout of the upstream ImageCard grid.
+   ============================================ */
+
+.image-grid {
+    position: relative;
+    cursor: pointer;
+}
+
+.image-grid__inner {
+    position: relative;
+    background-color: var(--bloom-color-gray-500, #71717a);
+    border-radius: 0;
+
+    img {
+        width: 100%;
+        object-fit: cover;
+    }
+}
+
+.image-grid__inner--multi {
+    background-color: transparent;
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--bloom-s4, 16px);
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1.2fr 0.5fr;
+    }
+
+    img {
+        aspect-ratio: 16 / 9;
+        display: block;
+    }
+}
+
+.image-grid__inner--2 {
+    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-areas:
+        "Main Secondary-1"
+        "Main Secondary-1";
+
+    img:nth-child(1) {
+        grid-area: Main;
+        height: 100%;
+    }
+
+    img:nth-child(2) {
+        grid-area: Secondary-1;
+        height: 100%;
+    }
+}
+
+.image-grid__inner--3,
+.image-grid__inner--overflow {
+    grid-template-areas:
+        "Main Secondary-1"
+        "Main Secondary-2";
+
+    @media (max-width: 640px) {
+        grid-template-areas:
+            "Main Main"
+            "Secondary-1 Secondary-2";
+    }
+
+    img:nth-child(1) {
+        grid-area: Main;
+        height: 100%;
+    }
+
+    img:nth-child(2) {
+        grid-area: Secondary-1;
+        height: 100%;
+    }
+
+    img:nth-child(3) {
+        grid-area: Secondary-2;
+    }
+}
+
+.image-grid__inner--overflow {
+    img:nth-child(3) {
+        opacity: 0.5;
+    }
+}
+
+.image-grid__more {
+    font-weight: bold;
+    grid-area: Secondary-2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+
+    @media (max-width: 640px) {
+        font-size: 12px;
+        line-height: 1;
+    }
+}
+
+.image-grid__more-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+.image-grid__placeholder {
+    height: 300px;
+    background-color: var(--bloom-color-gray-500, #71717a);
+}

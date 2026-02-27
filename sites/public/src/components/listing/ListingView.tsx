@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react"
+import React, { useContext, useState } from "react"
 import ReactDOMServer from "react-dom/server"
 import Markdown from "markdown-to-jsx"
 import {
@@ -8,7 +8,6 @@ import {
   ExpandableText,
   GroupedTable,
   Heading,
-  ImageCard,
   InfoCard,
   Contact,
   ListSection,
@@ -70,6 +69,7 @@ import {
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { DownloadLotteryResults } from "./DownloadLotteryResults"
 import { ImageGalleryLightbox, LightboxImage } from "./listing_sections/ImageGalleryLightbox"
+import { ListingImageGrid } from "./listing_sections/ListingImageGrid"
 
 interface ListingProps {
   listing: Listing
@@ -92,11 +92,6 @@ export const ListingView = (props: ListingProps) => {
   const { initialStateLoaded, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
-  const handleLegacyImageClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    setLightboxIndex(0)
-    setLightboxOpen(true)
-  }, [])
   let buildingSelectionCriteria, preferencesSection, programsSection
   const { listing, jurisdiction } = props
 
@@ -629,31 +624,19 @@ export const ListingView = (props: ListingProps) => {
   return (
     <article className="flex flex-wrap relative max-w-5xl m-auto">
       <header className="image-card--leader">
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-        <div onClickCapture={handleLegacyImageClick}>
-          <ImageCard
-            images={legacyLightboxImages.map((img) => ({
-              url: img.url,
-            }))}
-            tags={
-              listing.reservedCommunityTypes
-                ? [
-                    {
-                      text: t(
-                        `listings.reservedCommunityTypes.${props.listing.reservedCommunityTypes.name}`
-                      ),
-                    },
-                  ]
-                : undefined
-            }
-            description={listing.name}
-            moreImagesLabel={t("listings.moreImagesLabel")}
-            moreImagesDescription={t("listings.moreImagesAltDescription", {
-              listingName: listing.name,
-            })}
-            fallbackImageUrl={IMAGE_FALLBACK_URL}
-          />
-        </div>
+        <ListingImageGrid
+          images={legacyLightboxImages}
+          description={listing.name}
+          moreImagesLabel={t("listings.moreImagesLabel")}
+          moreImagesDescription={t("listings.moreImagesAltDescription", {
+            listingName: listing.name,
+          })}
+          fallbackImageUrl={IMAGE_FALLBACK_URL}
+          onClick={() => {
+            setLightboxIndex(0)
+            setLightboxOpen(true)
+          }}
+        />
         <ImageGalleryLightbox
           images={legacyLightboxImages}
           isOpen={lightboxOpen}

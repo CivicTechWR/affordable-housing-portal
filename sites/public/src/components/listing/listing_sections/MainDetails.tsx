@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useState } from "react"
+import React, { Dispatch, SetStateAction, useState } from "react"
 import { CheckIcon, HandRaisedIcon } from "@heroicons/react/16/solid"
 import {
   FeatureFlagEnum,
@@ -10,7 +10,7 @@ import {
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { Heading, Link, Tag, Icon } from "@bloom-housing/ui-seeds"
 import { TagVariant } from "@bloom-housing/ui-seeds/src/text/Tag"
-import { ImageCard, t } from "@bloom-housing/ui-components"
+import { t } from "@bloom-housing/ui-components"
 import {
   IMAGE_FALLBACK_URL,
   imageUrlFromListing,
@@ -19,6 +19,7 @@ import {
 import FavoriteButton from "../../shared/FavoriteButton"
 import { Availability } from "./Availability"
 import { ImageGalleryLightbox, LightboxImage } from "./ImageGalleryLightbox"
+import { ListingImageGrid } from "./ListingImageGrid"
 import listingStyles from "../ListingViewSeeds.module.scss"
 import styles from "./MainDetails.module.scss"
 import { isFeatureFlagOn } from "../../../lib/helpers"
@@ -130,12 +131,6 @@ export const MainDetails = ({
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
-  const handleImageClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    setLightboxIndex(0)
-    setLightboxOpen(true)
-  }, [])
-
   if (!listing) return
 
   const googleMapsHref =
@@ -157,21 +152,19 @@ export const MainDetails = ({
 
   return (
     <div>
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-      <div onClickCapture={handleImageClick}>
-        <ImageCard
-          images={lightboxImages.map((img) => ({
-            url: img.url,
-            description: img.description,
-          }))}
-          description={t("listings.buildingImageAltText")}
-          moreImagesLabel={t("listings.moreImagesLabel")}
-          moreImagesDescription={t("listings.moreImagesAltDescription", {
-            listingName: listing.name,
-          })}
-          fallbackImageUrl={IMAGE_FALLBACK_URL}
-        />
-      </div>
+      <ListingImageGrid
+        images={lightboxImages}
+        description={t("listings.buildingImageAltText")}
+        moreImagesLabel={t("listings.moreImagesLabel")}
+        moreImagesDescription={t("listings.moreImagesAltDescription", {
+          listingName: listing.name,
+        })}
+        fallbackImageUrl={IMAGE_FALLBACK_URL}
+        onClick={() => {
+          setLightboxIndex(0)
+          setLightboxOpen(true)
+        }}
+      />
       <ImageGalleryLightbox
         images={lightboxImages}
         isOpen={lightboxOpen}
