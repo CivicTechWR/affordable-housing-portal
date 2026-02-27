@@ -21,7 +21,7 @@ interface ImageGalleryLightboxProps {
  * Features:
  * - Left/right arrow navigation
  * - Keyboard navigation (ArrowLeft, ArrowRight, Escape)
- * - Touch swipe with drag animation on mobile
+ * - Touch swipe with peek animation (adjacent image slides in during drag)
  * - Image counter (e.g. "2 / 5")
  * - Dot indicators for quick navigation
  * - Focus trapping for accessibility
@@ -35,17 +35,20 @@ export const ImageGalleryLightbox = ({
   counterLabel,
 }: ImageGalleryLightboxProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
-  const [dragOffset, setDragOffset] = useState(0)
-  const [isDragging, setIsDragging] = useState(false)
+  const [dragX, setDragX] = useState(0)
+  const [transitioning, setTransitioning] = useState(false)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
+  const pendingIndex = useRef<number | null>(null)
 
-  // Reset to the requested initial index when the lightbox opens
+  // Reset when the lightbox opens
   useEffect(() => {
     if (isOpen) {
       setCurrentIndex(initialIndex)
-      setDragOffset(0)
-      setIsDragging(false)
+      setDragX(0)
+      setTransitioning(false)
+      pendingIndex.current = null
     }
   }, [isOpen, initialIndex])
 
@@ -62,14 +65,20 @@ export const ImageGalleryLightbox = ({
 
   const goToPrevious = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
+    setDragX(0)
+    setTransitioning(false)
   }, [images.length])
 
   const goToNext = useCallback(() => {
     setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
+    setDragX(0)
+    setTransitioning(false)
   }, [images.length])
 
   const goToIndex = useCallback((index: number) => {
     setCurrentIndex(index)
+    setDragX(0)
+    setTransitioning(false)
   }, [])
 
   // Keyboard navigation
@@ -96,46 +105,65 @@ export const ImageGalleryLightbox = ({
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [isOpen, onClose, goToPrevious, goToNext])
 
-  // Focus the overlay when it opens for accessibility
+  // Focus the overlay when it opens
   useEffect(() => {
     if (isOpen && overlayRef.current) {
       overlayRef.current.focus()
     }
   }, [isOpen])
 
-  // Touch swipe handlers with drag animation
+  // ----- Touch swipe with peek animation -----
+
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Don't start a new swipe while snapping
+    if (transitioning) return
     touchStartX.current = e.touches[0].clientX
-    setIsDragging(true)
-    setDragOffset(0)
+    setDragX(0)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return
-    const currentX = e.touches[0].clientX
-    const delta = currentX - touchStartX.current
-    setDragOffset(delta)
+    if (touchStartX.current === null || transitioning) return
+    const delta = e.touches[0].clientX - touchStartX.current
+    setDragX(delta)
   }
 
   const handleTouchEnd = () => {
-    if (touchStartX.current === null) {
-      setIsDragging(false)
-      return
-    }
+    if (touchStartX.current === null) return
+    touchStartX.current = null
 
     const minSwipeDistance = 50
+    const stageWidth = trackRef.current?.parentElement?.clientWidth || window.innerWidth
 
-    if (Math.abs(dragOffset) >= minSwipeDistance) {
-      if (dragOffset < 0) {
-        goToNext()
+    if (Math.abs(dragX) >= minSwipeDistance && images.length > 1) {
+      // Threshold met: animate to the full slide position, then change index
+      setTransitioning(true)
+      if (dragX < 0) {
+        // Swiped left → go to next
+        setDragX(-stageWidth)
+        const nextIdx = currentIndex < images.length - 1 ? currentIndex + 1 : 0
+        pendingIndex.current = nextIdx
       } else {
-        goToPrevious()
+        // Swiped right → go to previous
+        setDragX(stageWidth)
+        const prevIdx = currentIndex > 0 ? currentIndex - 1 : images.length - 1
+        pendingIndex.current = prevIdx
       }
+    } else {
+      // Below threshold: snap back
+      setTransitioning(true)
+      setDragX(0)
+      pendingIndex.current = null
     }
+  }
 
-    touchStartX.current = null
-    setDragOffset(0)
-    setIsDragging(false)
+  const handleTransitionEnd = () => {
+    if (!transitioning) return
+    if (pendingIndex.current !== null) {
+      setCurrentIndex(pendingIndex.current)
+      pendingIndex.current = null
+    }
+    setDragX(0)
+    setTransitioning(false)
   }
 
   // Close when clicking the dark backdrop (not the image or controls)
@@ -151,17 +179,16 @@ export const ImageGalleryLightbox = ({
   const showNav = images.length > 1
   const counter = counterLabel || `${currentIndex + 1} / ${images.length}`
 
-  // Image transform style for drag animation
-  const imageStyle: React.CSSProperties =
-    isDragging && dragOffset !== 0
-      ? {
-          transform: `translateX(${dragOffset}px)`,
-          transition: "none",
-        }
-      : {
-          transform: "translateX(0)",
-          transition: "transform 0.2s ease-out",
-        }
+  // Adjacent image indices (wrap around)
+  const prevIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1
+  const nextIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0
+
+  // Track style: base position shows the middle slide (-33.333%),
+  // plus the drag offset in pixels
+  const trackStyle: React.CSSProperties = {
+    transform: `translateX(calc(-33.333% + ${dragX}px))`,
+    transition: transitioning ? "transform 0.25s ease-out" : "none",
+  }
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
@@ -213,28 +240,51 @@ export const ImageGalleryLightbox = ({
         </button>
       )}
 
-      {/* Image */}
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      {/* 3-slide carousel track */}
       <div
         className={styles["lightbox-image-stage"]}
-        role="presentation"
-        onClick={handleOverlayClick}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") goToPrevious()
-          if (e.key === "ArrowRight") goToNext()
-        }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className={styles["lightbox-image-wrapper"]} style={imageStyle}>
-          <img
-            key={currentIndex}
-            className={styles["lightbox-image"]}
-            src={currentImage.url}
-            alt={currentImage.description || `Image ${currentIndex + 1} of ${images.length}`}
-            draggable={false}
-          />
+        <div
+          ref={trackRef}
+          className={styles["lightbox-image-track"]}
+          style={trackStyle}
+          onTransitionEnd={handleTransitionEnd}
+        >
+          {/* Previous slide */}
+          <div className={styles["lightbox-image-slide"]}>
+            {showNav && (
+              <img
+                className={styles["lightbox-image"]}
+                src={images[prevIndex].url}
+                alt={images[prevIndex].description || `Image ${prevIndex + 1} of ${images.length}`}
+                draggable={false}
+              />
+            )}
+          </div>
+          {/* Current slide */}
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+          <div className={styles["lightbox-image-slide"]} onClick={handleOverlayClick}>
+            <img
+              className={styles["lightbox-image"]}
+              src={currentImage.url}
+              alt={currentImage.description || `Image ${currentIndex + 1} of ${images.length}`}
+              draggable={false}
+            />
+          </div>
+          {/* Next slide */}
+          <div className={styles["lightbox-image-slide"]}>
+            {showNav && (
+              <img
+                className={styles["lightbox-image"]}
+                src={images[nextIndex].url}
+                alt={images[nextIndex].description || `Image ${nextIndex + 1} of ${images.length}`}
+                draggable={false}
+              />
+            )}
+          </div>
         </div>
       </div>
 
