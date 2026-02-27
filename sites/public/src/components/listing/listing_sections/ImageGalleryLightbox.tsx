@@ -33,6 +33,7 @@ export const ImageGalleryLightbox = ({
   const stageRef = useRef<HTMLDivElement>(null)
 
   const n = images.length
+  const getClampedIndex = useCallback((index: number) => Math.min(Math.max(index, 0), n - 1), [n])
 
   const normalizeIndex = useCallback(
     (index: number) => {
@@ -58,10 +59,8 @@ export const ImageGalleryLightbox = ({
   useIsomorphicLayoutEffect(() => {
     if (!isOpen || !n) return
 
-    const nextIndex = Math.min(Math.max(initialIndex, 0), n - 1)
-    setCurrentIndex(nextIndex)
-    scrollToIndex(nextIndex, false)
-  }, [initialIndex, isOpen, n, scrollToIndex])
+    setCurrentIndex(getClampedIndex(initialIndex))
+  }, [getClampedIndex, initialIndex, isOpen, n])
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return
@@ -95,12 +94,19 @@ export const ImageGalleryLightbox = ({
     if (!dialog || dialog.open) return
     dialog.showModal()
 
+    const nextIndex = getClampedIndex(initialIndex)
+    scrollToIndex(nextIndex, false)
+    const animationFrame = window.requestAnimationFrame(() => {
+      scrollToIndex(nextIndex, false)
+    })
+
     return () => {
+      window.cancelAnimationFrame(animationFrame)
       if (dialog.open) {
         dialog.close()
       }
     }
-  }, [isOpen])
+  }, [getClampedIndex, initialIndex, isOpen, scrollToIndex])
 
   const goToIndex = useCallback(
     (index: number) => {
