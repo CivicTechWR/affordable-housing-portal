@@ -21,11 +21,10 @@ interface ImageGalleryLightboxProps {
  * Features:
  * - Left/right arrow navigation
  * - Keyboard navigation (ArrowLeft, ArrowRight, Escape)
- * - Touch swipe support on mobile
+ * - Touch swipe with drag animation on mobile
  * - Image counter (e.g. "2 / 5")
  * - Dot indicators for quick navigation
  * - Focus trapping for accessibility
- * - Smooth transitions between images
  */
 export const ImageGalleryLightbox = ({
   images,
@@ -36,14 +35,17 @@ export const ImageGalleryLightbox = ({
   counterLabel,
 }: ImageGalleryLightboxProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [dragOffset, setDragOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
   const overlayRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
-  const touchEndX = useRef<number | null>(null)
 
   // Reset to the requested initial index when the lightbox opens
   useEffect(() => {
     if (isOpen) {
       setCurrentIndex(initialIndex)
+      setDragOffset(0)
+      setIsDragging(false)
     }
   }, [isOpen, initialIndex])
 
@@ -101,24 +103,30 @@ export const ImageGalleryLightbox = ({
     }
   }, [isOpen])
 
-  // Touch swipe handlers
+  // Touch swipe handlers with drag animation
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
-    touchEndX.current = null
+    setIsDragging(true)
+    setDragOffset(0)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.touches[0].clientX
+    if (touchStartX.current === null) return
+    const currentX = e.touches[0].clientX
+    const delta = currentX - touchStartX.current
+    setDragOffset(delta)
   }
 
   const handleTouchEnd = () => {
-    if (touchStartX.current === null || touchEndX.current === null) return
+    if (touchStartX.current === null) {
+      setIsDragging(false)
+      return
+    }
 
-    const delta = touchStartX.current - touchEndX.current
     const minSwipeDistance = 50
 
-    if (Math.abs(delta) >= minSwipeDistance) {
-      if (delta > 0) {
+    if (Math.abs(dragOffset) >= minSwipeDistance) {
+      if (dragOffset < 0) {
         goToNext()
       } else {
         goToPrevious()
@@ -126,7 +134,8 @@ export const ImageGalleryLightbox = ({
     }
 
     touchStartX.current = null
-    touchEndX.current = null
+    setDragOffset(0)
+    setIsDragging(false)
   }
 
   // Close when clicking the dark backdrop (not the image or controls)
@@ -141,6 +150,18 @@ export const ImageGalleryLightbox = ({
   const currentImage = images[currentIndex]
   const showNav = images.length > 1
   const counter = counterLabel || `${currentIndex + 1} / ${images.length}`
+
+  // Image transform style for drag animation
+  const imageStyle: React.CSSProperties =
+    isDragging && dragOffset !== 0
+      ? {
+          transform: `translateX(${dragOffset}px)`,
+          transition: "none",
+        }
+      : {
+          transform: "translateX(0)",
+          transition: "transform 0.2s ease-out",
+        }
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
@@ -206,12 +227,13 @@ export const ImageGalleryLightbox = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className={styles["lightbox-image-wrapper"]}>
+        <div className={styles["lightbox-image-wrapper"]} style={imageStyle}>
           <img
             key={currentIndex}
             className={styles["lightbox-image"]}
             src={currentImage.url}
             alt={currentImage.description || `Image ${currentIndex + 1} of ${images.length}`}
+            draggable={false}
           />
         </div>
       </div>

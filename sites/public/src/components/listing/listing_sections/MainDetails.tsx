@@ -160,8 +160,8 @@ export const MainDetails = ({
           listingName: listing.name,
         })}
         fallbackImageUrl={IMAGE_FALLBACK_URL}
-        onClick={() => {
-          setLightboxIndex(0)
+        onClick={(index) => {
+          setLightboxIndex(index)
           setLightboxOpen(true)
         }}
       />

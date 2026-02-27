@@ -17,8 +17,8 @@ interface ListingImageGridProps {
   moreImagesDescription?: string
   /** Fallback image URL used when an image fails to load */
   fallbackImageUrl?: string
-  /** Called when the grid is clicked */
-  onClick?: () => void
+  /** Called when an image in the grid is clicked, with the index of the clicked image */
+  onClick?: (index: number) => void
 }
 
 /**
@@ -31,7 +31,7 @@ export const ListingImageGrid = ({
   images,
   description,
   moreImagesLabel,
-  moreImagesDescription,
+  moreImagesDescription: _moreImagesDescription,
   fallbackImageUrl,
   onClick,
 }: ListingImageGridProps) => {
@@ -78,37 +78,43 @@ export const ListingImageGrid = ({
   }
 
   return (
-    <div
-      className={styles["image-grid"]}
-      role="button"
-      tabIndex={0}
-      aria-label={
-        hasMultiple && moreImagesDescription
-          ? `${images.length} ${moreImagesDescription}`
-          : description || "View images"
-      }
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault()
-          onClick?.()
-        }
-      }}
-    >
+    <div className={styles["image-grid"]}>
       <figure className={getGridClass()}>
         {displayed.map((image, index) => (
+          /* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
           <img
             key={index}
             src={image.url}
             alt={getAltText(index, image)}
+            role="button"
+            tabIndex={0}
             ref={(el) => {
               imgRefs.current[index] = el
             }}
+            onClick={() => onClick?.(index)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                onClick?.(index)
+              }
+            }}
             onError={onError}
           />
+          /* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
         ))}
         {hasOverflow && (
-          <div className={styles["image-grid__more"]}>
+          <div
+            className={styles["image-grid__more"]}
+            role="button"
+            tabIndex={0}
+            onClick={() => onClick?.(2)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault()
+                onClick?.(2)
+              }
+            }}
+          >
             <svg
               className={styles["image-grid__more-icon"]}
               viewBox="0 0 24 24"
