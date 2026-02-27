@@ -38,9 +38,12 @@ export const ListingImageGrid = ({
 }: ListingImageGridProps) => {
   const onError = useCallback(
     (e: SyntheticEvent<HTMLImageElement>) => {
-      if (fallbackImageUrl) {
-        e.currentTarget.src = fallbackImageUrl
-      }
+      if (!fallbackImageUrl) return
+
+      const image = e.currentTarget
+      if (image.dataset.fallbackApplied === "true") return
+      image.dataset.fallbackApplied = "true"
+      image.src = fallbackImageUrl
     },
     [fallbackImageUrl]
   )

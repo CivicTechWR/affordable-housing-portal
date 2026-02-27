@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
+import { t } from "@bloom-housing/ui-components"
 import styles from "./ImageGalleryLightbox.module.scss"
 
 export interface LightboxImage {
@@ -23,7 +24,7 @@ export const ImageGalleryLightbox = ({
   isOpen,
   initialIndex = 0,
   onClose,
-  closeLabel = "Close",
+  closeLabel,
   counterLabel,
   fallbackImageUrl,
 }: ImageGalleryLightboxProps) => {
@@ -172,6 +173,10 @@ export const ImageGalleryLightbox = ({
 
   if (!isOpen || !n) return null
 
+  const imagesLabel = t("listings.moreImagesLabel")
+  const closeButtonLabel = closeLabel || t("t.close")
+  const previousButtonLabel = `${t("t.previous")} ${imagesLabel}`
+  const nextButtonLabel = `${t("t.next")} ${imagesLabel}`
   const showNav = n > 1
   const currentImage = images[currentIndex]
   const counter = counterLabel || `${currentIndex + 1} / ${n}`
@@ -181,7 +186,7 @@ export const ImageGalleryLightbox = ({
     <dialog
       className={styles["lightbox-overlay"]}
       ref={dialogRef}
-      aria-label="Image gallery"
+      aria-label={imagesLabel}
       onClick={handleDialogClick}
       onCancel={handleDialogCancel}
       onKeyDown={handleDialogKeyDown}
@@ -197,7 +202,7 @@ export const ImageGalleryLightbox = ({
         <button
           className={styles["lightbox-close"]}
           onClick={onClose}
-          aria-label={closeLabel}
+          aria-label={closeButtonLabel}
           type="button"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -211,7 +216,7 @@ export const ImageGalleryLightbox = ({
         <button
           className={`${styles["lightbox-nav"]} ${styles["lightbox-nav-prev"]}`}
           onClick={goToPrevious}
-          aria-label="Previous image"
+          aria-label={previousButtonLabel}
           type="button"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -235,7 +240,7 @@ export const ImageGalleryLightbox = ({
             <img
               className={styles["lightbox-image"]}
               src={image.url}
-              alt={image.description || `Image ${index + 1} of ${n}`}
+              alt={image.description || `${imagesLabel} ${index + 1}`}
               draggable={false}
               onError={handleImageError}
             />
@@ -247,7 +252,7 @@ export const ImageGalleryLightbox = ({
         <button
           className={`${styles["lightbox-nav"]} ${styles["lightbox-nav-next"]}`}
           onClick={goToNext}
-          aria-label="Next image"
+          aria-label={nextButtonLabel}
           type="button"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -269,7 +274,7 @@ export const ImageGalleryLightbox = ({
                 index === currentIndex ? styles["lightbox-dot-active"] : ""
               }`}
               onClick={() => goToIndex(index)}
-              aria-label={`Go to image ${index + 1}`}
+              aria-label={`${imagesLabel} ${index + 1}`}
               aria-current={index === currentIndex ? "true" : undefined}
               type="button"
             />
