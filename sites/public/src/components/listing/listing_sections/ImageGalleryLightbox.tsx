@@ -13,6 +13,7 @@ interface ImageGalleryLightboxProps {
   onClose: () => void
   closeLabel?: string
   counterLabel?: string
+  fallbackImageUrl?: string
 }
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect
@@ -24,6 +25,7 @@ export const ImageGalleryLightbox = ({
   onClose,
   closeLabel = "Close",
   counterLabel,
+  fallbackImageUrl,
 }: ImageGalleryLightboxProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [isMobileViewport, setIsMobileViewport] = useState(false)
@@ -150,6 +152,18 @@ export const ImageGalleryLightbox = ({
     }
   }
 
+  const handleImageError = useCallback(
+    (e: React.SyntheticEvent<HTMLImageElement>) => {
+      if (!fallbackImageUrl) return
+
+      const image = e.currentTarget
+      if (image.dataset.fallbackApplied === "true") return
+      image.dataset.fallbackApplied = "true"
+      image.src = fallbackImageUrl
+    },
+    [fallbackImageUrl]
+  )
+
   if (!isOpen || !n) return null
 
   const showNav = n > 1
@@ -217,6 +231,7 @@ export const ImageGalleryLightbox = ({
               src={image.url}
               alt={image.description || `Image ${index + 1} of ${n}`}
               draggable={false}
+              onError={handleImageError}
             />
           </div>
         ))}

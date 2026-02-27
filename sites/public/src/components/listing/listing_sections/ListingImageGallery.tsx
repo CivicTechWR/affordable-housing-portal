@@ -46,6 +46,7 @@ export const ListingImageGallery = ({
         onClose={() => setLightboxOpen(false)}
         closeLabel={closeLabel}
         counterLabel={counterLabel}
+        fallbackImageUrl={fallbackImageUrl}
       />
     </>
   )
