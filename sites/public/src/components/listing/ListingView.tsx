@@ -92,7 +92,8 @@ export const ListingView = (props: ListingProps) => {
   const { initialStateLoaded, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
-  const handleLegacyImageClick = useCallback(() => {
+  const handleLegacyImageClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
     setLightboxIndex(0)
     setLightboxOpen(true)
   }, [])
@@ -629,7 +630,7 @@ export const ListingView = (props: ListingProps) => {
     <article className="flex flex-wrap relative max-w-5xl m-auto">
       <header className="image-card--leader">
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-        <div onClick={handleLegacyImageClick}>
+        <div onClickCapture={handleLegacyImageClick}>
           <ImageCard
             images={legacyLightboxImages.map((img) => ({
               url: img.url,

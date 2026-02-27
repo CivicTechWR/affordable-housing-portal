@@ -20,6 +20,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -108,21 +109,9 @@
   max-height: calc(100vh - 160px);
   object-fit: contain;
   border-radius: 4px;
-  animation: imageSlideIn 0.25s ease-out;
 
   @media (max-width: 768px) {
     max-height: calc(100vh - 140px);
-  }
-}
-
-@keyframes imageSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
   }
 }
 
