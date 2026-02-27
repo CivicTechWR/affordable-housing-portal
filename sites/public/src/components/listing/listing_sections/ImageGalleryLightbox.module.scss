@@ -88,17 +88,18 @@
   touch-action: pan-y;
 }
 
-/* Horizontal track containing prev + current + next slides */
+/* Horizontal track containing all slides side-by-side.
+   Width is set dynamically via inline style (N * 100%). */
 .lightbox-image-track {
   display: flex;
-  width: 300%;
   height: 100%;
   will-change: transform;
 }
 
-/* Each slide takes 1/3 of the track = 100% of the stage */
+/* Each slide divides the track equally = 100% of the stage */
 .lightbox-image-slide {
-  flex: 0 0 33.333%;
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;

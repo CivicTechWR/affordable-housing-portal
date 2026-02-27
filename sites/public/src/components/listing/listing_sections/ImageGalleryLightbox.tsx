@@ -18,10 +18,14 @@ interface ImageGalleryLightboxProps {
 /**
  * A full-screen lightbox carousel for listing images.
  *
+ * Uses a continuous horizontal track with ALL images rendered side-by-side.
+ * This eliminates any re-arrangement flicker during navigation since images
+ * never swap between slots.
+ *
  * Features:
  * - Left/right arrow navigation
  * - Keyboard navigation (ArrowLeft, ArrowRight, Escape)
- * - Touch swipe with peek animation (adjacent image slides in during drag)
+ * - Touch swipe with peek animation (adjacent image visible during drag)
  * - Image counter (e.g. "2 / 5")
  * - Dot indicators for quick navigation
  * - Focus trapping for accessibility
@@ -36,19 +40,16 @@ export const ImageGalleryLightbox = ({
 }: ImageGalleryLightboxProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [dragX, setDragX] = useState(0)
-  const [transitioning, setTransitioning] = useState(false)
+  const [animating, setAnimating] = useState(false)
   const overlayRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number | null>(null)
-  const pendingIndex = useRef<number | null>(null)
 
   // Reset when the lightbox opens
   useEffect(() => {
     if (isOpen) {
       setCurrentIndex(initialIndex)
       setDragX(0)
-      setTransitioning(false)
-      pendingIndex.current = null
+      setAnimating(false)
     }
   }, [isOpen, initialIndex])
 
@@ -63,22 +64,23 @@ export const ImageGalleryLightbox = ({
     }
   }, [isOpen])
 
+  // Button/dot navigation — instant, supports wrapping
   const goToPrevious = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
     setDragX(0)
-    setTransitioning(false)
+    setAnimating(false)
   }, [images.length])
 
   const goToNext = useCallback(() => {
     setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
     setDragX(0)
-    setTransitioning(false)
+    setAnimating(false)
   }, [images.length])
 
   const goToIndex = useCallback((index: number) => {
     setCurrentIndex(index)
     setDragX(0)
-    setTransitioning(false)
+    setAnimating(false)
   }, [])
 
   // Keyboard navigation
@@ -112,19 +114,27 @@ export const ImageGalleryLightbox = ({
     }
   }, [isOpen])
 
-  // ----- Touch swipe with peek animation -----
+  // ----- Touch swipe -----
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Don't start a new swipe while snapping
-    if (transitioning) return
+    if (animating) return
     touchStartX.current = e.touches[0].clientX
     setDragX(0)
+    setAnimating(false)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || transitioning) return
+    if (touchStartX.current === null || animating) return
     const delta = e.touches[0].clientX - touchStartX.current
-    setDragX(delta)
+
+    // Add rubber-band resistance at boundaries
+    if (currentIndex === 0 && delta > 0) {
+      setDragX(delta * 0.3)
+    } else if (currentIndex === images.length - 1 && delta < 0) {
+      setDragX(delta * 0.3)
+    } else {
+      setDragX(delta)
+    }
   }
 
   const handleTouchEnd = () => {
@@ -132,54 +142,35 @@ export const ImageGalleryLightbox = ({
     touchStartX.current = null
 
     const minSwipeDistance = 50
-    const stageWidth = trackRef.current?.parentElement?.clientWidth || window.innerWidth
 
     if (Math.abs(dragX) >= minSwipeDistance && images.length > 1) {
-      // Threshold met: animate to the full slide position, then change index
-      setTransitioning(true)
-      if (dragX < 0) {
-        // Swiped left → go to next
-        setDragX(-stageWidth)
-        const nextIdx = currentIndex < images.length - 1 ? currentIndex + 1 : 0
-        pendingIndex.current = nextIdx
+      if (dragX < 0 && currentIndex < images.length - 1) {
+        // Swipe left → next (animate to new position)
+        setAnimating(true)
+        setCurrentIndex(currentIndex + 1)
+        setDragX(0)
+      } else if (dragX > 0 && currentIndex > 0) {
+        // Swipe right → prev (animate to new position)
+        setAnimating(true)
+        setCurrentIndex(currentIndex - 1)
+        setDragX(0)
       } else {
-        // Swiped right → go to previous
-        setDragX(stageWidth)
-        const prevIdx = currentIndex > 0 ? currentIndex - 1 : images.length - 1
-        pendingIndex.current = prevIdx
+        // At boundary — snap back with animation
+        setAnimating(true)
+        setDragX(0)
       }
     } else {
-      // Below threshold: snap back
-      setTransitioning(true)
+      // Below threshold — snap back with animation
+      setAnimating(true)
       setDragX(0)
-      pendingIndex.current = null
     }
   }
 
   const handleTransitionEnd = () => {
-    if (!transitioning) return
-    if (pendingIndex.current !== null) {
-      const newIndex = pendingIndex.current
-      pendingIndex.current = null
-
-      // Directly set the track DOM style BEFORE updating React state.
-      // This prevents the single-frame flash where the old images are
-      // still rendered but the track has already jumped to the reset position.
-      if (trackRef.current) {
-        trackRef.current.style.transition = "none"
-        trackRef.current.style.transform = "translateX(-33.333%)"
-      }
-
-      setCurrentIndex(newIndex)
-      setDragX(0)
-      setTransitioning(false)
-    } else {
-      setDragX(0)
-      setTransitioning(false)
-    }
+    setAnimating(false)
   }
 
-  // Close when clicking the dark backdrop (not the image or controls)
+  // Close when clicking the dark backdrop
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
@@ -188,19 +179,22 @@ export const ImageGalleryLightbox = ({
 
   if (!isOpen || !images.length) return null
 
+  const n = images.length
   const currentImage = images[currentIndex]
-  const showNav = images.length > 1
-  const counter = counterLabel || `${currentIndex + 1} / ${images.length}`
+  const showNav = n > 1
+  const counter = counterLabel || `${currentIndex + 1} / ${n}`
 
-  // Adjacent image indices (wrap around)
-  const prevIndex = currentIndex > 0 ? currentIndex - 1 : images.length - 1
-  const nextIndex = currentIndex < images.length - 1 ? currentIndex + 1 : 0
+  // Track positioning: each slide is (100/n)% of the track
+  const slidePercent = 100 / n
+  const baseTranslate = -(currentIndex * slidePercent)
 
-  // Track style: base position shows the middle slide (-33.333%),
-  // plus the drag offset in pixels
   const trackStyle: React.CSSProperties = {
-    transform: `translateX(calc(-33.333% + ${dragX}px))`,
-    transition: transitioning ? "transform 0.25s ease-out" : "none",
+    width: `${n * 100}%`,
+    transform:
+      dragX !== 0 && !animating
+        ? `translateX(calc(${baseTranslate}% + ${dragX}px))`
+        : `translateX(${baseTranslate}%)`,
+    transition: animating ? "transform 0.25s ease-out" : "none",
   }
 
   return (
@@ -253,7 +247,7 @@ export const ImageGalleryLightbox = ({
         </button>
       )}
 
-      {/* 3-slide carousel track */}
+      {/* Continuous image track */}
       <div
         className={styles["lightbox-image-stage"]}
         onTouchStart={handleTouchStart}
@@ -261,43 +255,25 @@ export const ImageGalleryLightbox = ({
         onTouchEnd={handleTouchEnd}
       >
         <div
-          ref={trackRef}
           className={styles["lightbox-image-track"]}
           style={trackStyle}
           onTransitionEnd={handleTransitionEnd}
         >
-          {/* Previous slide */}
-          <div className={styles["lightbox-image-slide"]}>
-            {showNav && (
+          {images.map((image, index) => (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+            <div
+              key={index}
+              className={styles["lightbox-image-slide"]}
+              onClick={handleOverlayClick}
+            >
               <img
                 className={styles["lightbox-image"]}
-                src={images[prevIndex].url}
-                alt={images[prevIndex].description || `Image ${prevIndex + 1} of ${images.length}`}
+                src={image.url}
+                alt={image.description || `Image ${index + 1} of ${n}`}
                 draggable={false}
               />
-            )}
-          </div>
-          {/* Current slide */}
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-          <div className={styles["lightbox-image-slide"]} onClick={handleOverlayClick}>
-            <img
-              className={styles["lightbox-image"]}
-              src={currentImage.url}
-              alt={currentImage.description || `Image ${currentIndex + 1} of ${images.length}`}
-              draggable={false}
-            />
-          </div>
-          {/* Next slide */}
-          <div className={styles["lightbox-image-slide"]}>
-            {showNav && (
-              <img
-                className={styles["lightbox-image"]}
-                src={images[nextIndex].url}
-                alt={images[nextIndex].description || `Image ${nextIndex + 1} of ${images.length}`}
-                draggable={false}
-              />
-            )}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -321,7 +297,7 @@ export const ImageGalleryLightbox = ({
       )}
 
       {/* Dot indicators */}
-      {showNav && images.length <= 10 && (
+      {showNav && n <= 10 && (
         <div className={styles["lightbox-dots"]} role="tablist" aria-label="Image navigation">
           {images.map((_, index) => (
             <button
