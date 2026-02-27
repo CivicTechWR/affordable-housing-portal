@@ -38,7 +38,9 @@
 }
 
 .image-grid__image {
+    border-radius: 0;
     width: 100%;
+    height: auto;
     object-fit: cover;
     display: block;
     transition: filter 0.2s ease-in-out;
@@ -70,11 +72,19 @@
     .image-grid__tile:nth-child(1) {
         grid-area: Main;
         height: 100%;
+
+        .image-grid__image {
+            height: 100%;
+        }
     }
 
     .image-grid__tile:nth-child(2) {
         grid-area: Secondary-1;
         height: 100%;
+
+        .image-grid__image {
+            height: 100%;
+        }
     }
 }
 
@@ -93,11 +103,19 @@
     .image-grid__tile:nth-child(1) {
         grid-area: Main;
         height: 100%;
+
+        .image-grid__image {
+            height: 100%;
+        }
     }
 
     .image-grid__tile:nth-child(2) {
         grid-area: Secondary-1;
         height: 100%;
+
+        .image-grid__image {
+            height: 100%;
+        }
     }
 
     .image-grid__tile:nth-child(3) {

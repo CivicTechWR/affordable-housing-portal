@@ -90,7 +90,6 @@
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
 
@@ -118,7 +117,6 @@
   max-height: calc(100vh - 160px);
   object-fit: contain;
   border-radius: 4px;
-  pointer-events: none;
 
   @media (max-width: 768px) {
     max-height: calc(100vh - 140px);

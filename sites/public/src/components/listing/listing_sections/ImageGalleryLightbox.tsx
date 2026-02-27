@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
 import styles from "./ImageGalleryLightbox.module.scss"
 
 export interface LightboxImage {
@@ -15,6 +15,8 @@ interface ImageGalleryLightboxProps {
   counterLabel?: string
 }
 
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect
+
 export const ImageGalleryLightbox = ({
   images,
   isOpen,
@@ -24,6 +26,7 @@ export const ImageGalleryLightbox = ({
   counterLabel,
 }: ImageGalleryLightboxProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [isMobileViewport, setIsMobileViewport] = useState(false)
   const dialogRef = useRef<HTMLDialogElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
@@ -37,25 +40,51 @@ export const ImageGalleryLightbox = ({
     [n]
   )
 
-  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
-    const stage = stageRef.current
-    if (!stage) return
+  const scrollToIndex = useCallback(
+    (index: number, animate: boolean) => {
+      const stage = stageRef.current
+      if (!stage) return
 
-    stage.scrollTo({
-      left: stage.clientWidth * index,
-      behavior,
-    })
-  }, [])
+      stage.scrollTo({
+        left: stage.clientWidth * index,
+        behavior: animate && isMobileViewport ? "smooth" : "auto",
+      })
+    },
+    [isMobileViewport]
+  )
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!isOpen || !n) return
 
     const nextIndex = Math.min(Math.max(initialIndex, 0), n - 1)
     setCurrentIndex(nextIndex)
-    requestAnimationFrame(() => {
-      scrollToIndex(nextIndex, "auto")
-    })
+    scrollToIndex(nextIndex, false)
   }, [initialIndex, isOpen, n, scrollToIndex])
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return
+
+    const mediaQuery = window.matchMedia("(max-width: 768px)")
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches)
+
+    updateViewport()
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", updateViewport)
+      return () => mediaQuery.removeEventListener("change", updateViewport)
+    }
+
+    mediaQuery.addListener(updateViewport)
+    return () => mediaQuery.removeListener(updateViewport)
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleResize = () => scrollToIndex(currentIndex, false)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [currentIndex, isOpen, scrollToIndex])
 
   useEffect(() => {
     if (!isOpen) return
@@ -75,7 +104,7 @@ export const ImageGalleryLightbox = ({
     (index: number) => {
       const nextIndex = normalizeIndex(index)
       setCurrentIndex(nextIndex)
-      scrollToIndex(nextIndex)
+      scrollToIndex(nextIndex, true)
     },
     [normalizeIndex, scrollToIndex]
   )
@@ -177,6 +206,11 @@ export const ImageGalleryLightbox = ({
             key={`${image.url}-${index}`}
             className={styles["lightbox-image-slide"]}
             aria-hidden={index !== currentIndex}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                onClose()
+              }
+            }}
           >
             <img
               className={styles["lightbox-image"]}
