@@ -15,21 +15,6 @@ interface ImageGalleryLightboxProps {
   counterLabel?: string
 }
 
-/**
- * A full-screen lightbox carousel for listing images.
- *
- * Uses a continuous horizontal track with ALL images rendered side-by-side.
- * This eliminates any re-arrangement flicker during navigation since images
- * never swap between slots.
- *
- * Features:
- * - Left/right arrow navigation
- * - Keyboard navigation (ArrowLeft, ArrowRight, Escape)
- * - Touch swipe with peek animation (adjacent image visible during drag)
- * - Image counter (e.g. "2 / 5")
- * - Dot indicators for quick navigation
- * - Focus trapping for accessibility
- */
 export const ImageGalleryLightbox = ({
   images,
   isOpen,
@@ -39,179 +24,119 @@ export const ImageGalleryLightbox = ({
   counterLabel,
 }: ImageGalleryLightboxProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
-  const [dragX, setDragX] = useState(0)
-  const [animating, setAnimating] = useState(false)
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const touchStartX = useRef<number | null>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
 
-  // Reset when the lightbox opens
-  useEffect(() => {
-    if (isOpen) {
-      setCurrentIndex(initialIndex)
-      setDragX(0)
-      setAnimating(false)
-    }
-  }, [isOpen, initialIndex])
+  const n = images.length
 
-  // Lock body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      const originalOverflow = document.body.style.overflow
-      document.body.style.overflow = "hidden"
-      return () => {
-        document.body.style.overflow = originalOverflow
-      }
-    }
-  }, [isOpen])
+  const normalizeIndex = useCallback(
+    (index: number) => {
+      if (!n) return 0
+      return (index + n) % n
+    },
+    [n]
+  )
 
-  // Button/dot navigation — instant, supports wrapping
-  const goToPrevious = useCallback(() => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
-    setDragX(0)
-    setAnimating(false)
-  }, [images.length])
+  const scrollToIndex = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
+    const stage = stageRef.current
+    if (!stage) return
 
-  const goToNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
-    setDragX(0)
-    setAnimating(false)
-  }, [images.length])
-
-  const goToIndex = useCallback((index: number) => {
-    setCurrentIndex(index)
-    setDragX(0)
-    setAnimating(false)
+    stage.scrollTo({
+      left: stage.clientWidth * index,
+      behavior,
+    })
   }, [])
 
-  // Keyboard navigation
+  useEffect(() => {
+    if (!isOpen || !n) return
+
+    const nextIndex = Math.min(Math.max(initialIndex, 0), n - 1)
+    setCurrentIndex(nextIndex)
+    requestAnimationFrame(() => {
+      scrollToIndex(nextIndex, "auto")
+    })
+  }, [initialIndex, isOpen, n, scrollToIndex])
+
   useEffect(() => {
     if (!isOpen) return
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case "Escape":
-          onClose()
-          break
-        case "ArrowLeft":
-          e.preventDefault()
-          goToPrevious()
-          break
-        case "ArrowRight":
-          e.preventDefault()
-          goToNext()
-          break
+    const dialog = dialogRef.current
+    if (!dialog || dialog.open) return
+    dialog.showModal()
+
+    return () => {
+      if (dialog.open) {
+        dialog.close()
       }
-    }
-
-    document.addEventListener("keydown", handleKeyDown)
-    return () => document.removeEventListener("keydown", handleKeyDown)
-  }, [isOpen, onClose, goToPrevious, goToNext])
-
-  // Focus the overlay when it opens
-  useEffect(() => {
-    if (isOpen && overlayRef.current) {
-      overlayRef.current.focus()
     }
   }, [isOpen])
 
-  // ----- Touch swipe -----
+  const goToIndex = useCallback(
+    (index: number) => {
+      const nextIndex = normalizeIndex(index)
+      setCurrentIndex(nextIndex)
+      scrollToIndex(nextIndex)
+    },
+    [normalizeIndex, scrollToIndex]
+  )
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (animating) return
-    touchStartX.current = e.touches[0].clientX
-    setDragX(0)
-    setAnimating(false)
-  }
+  const goToPrevious = useCallback(() => {
+    goToIndex(currentIndex - 1)
+  }, [currentIndex, goToIndex])
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || animating) return
-    const delta = e.touches[0].clientX - touchStartX.current
+  const goToNext = useCallback(() => {
+    goToIndex(currentIndex + 1)
+  }, [currentIndex, goToIndex])
 
-    // Add rubber-band resistance at boundaries
-    if (currentIndex === 0 && delta > 0) {
-      setDragX(delta * 0.3)
-    } else if (currentIndex === images.length - 1 && delta < 0) {
-      setDragX(delta * 0.3)
-    } else {
-      setDragX(delta)
+  const handleStageScroll = useCallback(() => {
+    const stage = stageRef.current
+    if (!stage || !n) return
+
+    const nextIndex = Math.min(Math.max(Math.round(stage.scrollLeft / stage.clientWidth), 0), n - 1)
+    if (nextIndex !== currentIndex) {
+      setCurrentIndex(nextIndex)
     }
-  }
+  }, [currentIndex, n])
 
-  const handleTouchEnd = () => {
-    if (touchStartX.current === null) return
-    touchStartX.current = null
-
-    const minSwipeDistance = 50
-
-    if (Math.abs(dragX) >= minSwipeDistance && images.length > 1) {
-      if (dragX < 0 && currentIndex < images.length - 1) {
-        // Swipe left → next (animate to new position)
-        setAnimating(true)
-        setCurrentIndex(currentIndex + 1)
-        setDragX(0)
-      } else if (dragX > 0 && currentIndex > 0) {
-        // Swipe right → prev (animate to new position)
-        setAnimating(true)
-        setCurrentIndex(currentIndex - 1)
-        setDragX(0)
-      } else {
-        // At boundary — snap back with animation
-        setAnimating(true)
-        setDragX(0)
-      }
-    } else {
-      // Below threshold — snap back with animation
-      setAnimating(true)
-      setDragX(0)
-    }
-  }
-
-  const handleTransitionEnd = () => {
-    setAnimating(false)
-  }
-
-  // Close when clicking the dark backdrop
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  const handleDialogClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     if (e.target === e.currentTarget) {
       onClose()
     }
   }
 
-  if (!isOpen || !images.length) return null
-
-  const n = images.length
-  const currentImage = images[currentIndex]
-  const showNav = n > 1
-  const counter = counterLabel || `${currentIndex + 1} / ${n}`
-
-  // Track positioning: each slide is (100/n)% of the track
-  const slidePercent = 100 / n
-  const baseTranslate = -(currentIndex * slidePercent)
-
-  const trackStyle: React.CSSProperties = {
-    width: `${n * 100}%`,
-    transform:
-      dragX !== 0 && !animating
-        ? `translateX(calc(${baseTranslate}% + ${dragX}px))`
-        : `translateX(${baseTranslate}%)`,
-    transition: animating ? "transform 0.25s ease-out" : "none",
+  const handleDialogCancel = (e: React.SyntheticEvent<HTMLDialogElement, Event>) => {
+    e.preventDefault()
+    onClose()
   }
+
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault()
+      goToPrevious()
+    }
+
+    if (e.key === "ArrowRight") {
+      e.preventDefault()
+      goToNext()
+    }
+  }
+
+  if (!isOpen || !n) return null
+
+  const showNav = n > 1
+  const currentImage = images[currentIndex]
+  const counter = counterLabel || `${currentIndex + 1} / ${n}`
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-    <div
+    <dialog
       className={styles["lightbox-overlay"]}
-      ref={overlayRef}
-      role="dialog"
-      aria-modal="true"
+      ref={dialogRef}
       aria-label="Image gallery"
-      tabIndex={-1}
-      onClick={handleOverlayClick}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onClose()
-      }}
+      onClick={handleDialogClick}
+      onCancel={handleDialogCancel}
+      onKeyDown={handleDialogKeyDown}
     >
-      {/* Header: counter + close */}
       <div className={styles["lightbox-header"]}>
         {showNav ? (
           <span className={styles["lightbox-counter"]} aria-live="polite">
@@ -233,7 +158,6 @@ export const ImageGalleryLightbox = ({
         </button>
       </div>
 
-      {/* Previous arrow */}
       {showNav && (
         <button
           className={`${styles["lightbox-nav"]} ${styles["lightbox-nav-prev"]}`}
@@ -247,37 +171,23 @@ export const ImageGalleryLightbox = ({
         </button>
       )}
 
-      {/* Continuous image track */}
-      <div
-        className={styles["lightbox-image-stage"]}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div
-          className={styles["lightbox-image-track"]}
-          style={trackStyle}
-          onTransitionEnd={handleTransitionEnd}
-        >
-          {images.map((image, index) => (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div
-              key={index}
-              className={styles["lightbox-image-slide"]}
-              onClick={handleOverlayClick}
-            >
-              <img
-                className={styles["lightbox-image"]}
-                src={image.url}
-                alt={image.description || `Image ${index + 1} of ${n}`}
-                draggable={false}
-              />
-            </div>
-          ))}
-        </div>
+      <div className={styles["lightbox-image-stage"]} ref={stageRef} onScroll={handleStageScroll}>
+        {images.map((image, index) => (
+          <div
+            key={`${image.url}-${index}`}
+            className={styles["lightbox-image-slide"]}
+            aria-hidden={index !== currentIndex}
+          >
+            <img
+              className={styles["lightbox-image"]}
+              src={image.url}
+              alt={image.description || `Image ${index + 1} of ${n}`}
+              draggable={false}
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Next arrow */}
       {showNav && (
         <button
           className={`${styles["lightbox-nav"]} ${styles["lightbox-nav-next"]}`}
@@ -291,14 +201,12 @@ export const ImageGalleryLightbox = ({
         </button>
       )}
 
-      {/* Image description */}
       {currentImage.description && (
         <div className={styles["lightbox-description"]}>{currentImage.description}</div>
       )}
 
-      {/* Dot indicators */}
       {showNav && n <= 10 && (
-        <div className={styles["lightbox-dots"]} role="tablist" aria-label="Image navigation">
+        <div className={styles["lightbox-dots"]} aria-label="Image navigation">
           {images.map((_, index) => (
             <button
               key={index}
@@ -306,14 +214,13 @@ export const ImageGalleryLightbox = ({
                 index === currentIndex ? styles["lightbox-dot-active"] : ""
               }`}
               onClick={() => goToIndex(index)}
-              role="tab"
-              aria-selected={index === currentIndex}
               aria-label={`Go to image ${index + 1}`}
+              aria-current={index === currentIndex ? "true" : undefined}
               type="button"
             />
           ))}
         </div>
       )}
-    </div>
+    </dialog>
   )
 }
