@@ -18,6 +18,17 @@
         width: 100%;
         object-fit: cover;
         cursor: pointer;
+        transition: filter 0.2s ease-in-out;
+
+        &:hover,
+        &:focus-visible {
+            filter: brightness(0.85);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--bloom-color-blue-700, #0057b8);
+            outline-offset: 2px;
+        }
     }
 }
 
@@ -115,6 +126,42 @@
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
+}
+
+.image-grid__badge {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: none;
+    /* Let clicks pass through to the image */
+    backdrop-filter: blur(4px);
+    z-index: 2;
+
+    @media (max-width: 640px) {
+        bottom: 8px;
+        left: 8px;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+.image-grid__badge-icon {
+    width: 18px;
+    height: 18px;
+
+    @media (max-width: 640px) {
+        width: 16px;
+        height: 16px;
+    }
 }
 
 .image-grid__placeholder {
