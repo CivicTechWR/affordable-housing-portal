@@ -159,11 +159,24 @@ export const ImageGalleryLightbox = ({
   const handleTransitionEnd = () => {
     if (!transitioning) return
     if (pendingIndex.current !== null) {
-      setCurrentIndex(pendingIndex.current)
+      const newIndex = pendingIndex.current
       pendingIndex.current = null
+
+      // Directly set the track DOM style BEFORE updating React state.
+      // This prevents the single-frame flash where the old images are
+      // still rendered but the track has already jumped to the reset position.
+      if (trackRef.current) {
+        trackRef.current.style.transition = "none"
+        trackRef.current.style.transform = "translateX(-33.333%)"
+      }
+
+      setCurrentIndex(newIndex)
+      setDragX(0)
+      setTransitioning(false)
+    } else {
+      setDragX(0)
+      setTransitioning(false)
     }
-    setDragX(0)
-    setTransitioning(false)
   }
 
   // Close when clicking the dark backdrop (not the image or controls)
