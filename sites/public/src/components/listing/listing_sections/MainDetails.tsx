@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react"
+import React, { Dispatch, SetStateAction, useCallback, useState } from "react"
 import { CheckIcon, HandRaisedIcon } from "@heroicons/react/16/solid"
 import {
   FeatureFlagEnum,
@@ -18,6 +18,7 @@ import {
 } from "@bloom-housing/shared-helpers"
 import FavoriteButton from "../../shared/FavoriteButton"
 import { Availability } from "./Availability"
+import { ImageGalleryLightbox, LightboxImage } from "./ImageGalleryLightbox"
 import listingStyles from "../ListingViewSeeds.module.scss"
 import styles from "./MainDetails.module.scss"
 import { isFeatureFlagOn } from "../../../lib/helpers"
@@ -126,6 +127,14 @@ export const MainDetails = ({
   showFavoriteButton,
   showHomeType,
 }: MainDetailsProps) => {
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+
+  const handleImageClick = useCallback(() => {
+    setLightboxIndex(0)
+    setLightboxOpen(true)
+  }, [])
+
   if (!listing) return
 
   const googleMapsHref =
@@ -138,25 +147,36 @@ export const MainDetails = ({
     isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableIsVerified),
     isFeatureFlagOn(jurisdiction, FeatureFlagEnum.swapCommunityTypeWithPrograms)
   )
+
+  const imageUrls = imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize))
+  const lightboxImages: LightboxImage[] = imageUrls.map((imageUrl: string, index: number) => ({
+    url: imageUrl,
+    description: listing.listingImages?.[index]?.description,
+  }))
+
   return (
     <div>
-      <ImageCard
-        images={imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize)).map(
-          (imageUrl: string, index: number) => {
-            return {
-              url: imageUrl,
-              description: listing.listingImages?.[index]?.description,
-            }
-          }
-        )}
-        description={t("listings.buildingImageAltText")}
-        moreImagesLabel={t("listings.moreImagesLabel")}
-        moreImagesDescription={t("listings.moreImagesAltDescription", {
-          listingName: listing.name,
-        })}
-        modalCloseLabel={t("t.backToListing")}
-        modalCloseInContent
-        fallbackImageUrl={IMAGE_FALLBACK_URL}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div onClick={handleImageClick}>
+        <ImageCard
+          images={lightboxImages.map((img) => ({
+            url: img.url,
+            description: img.description,
+          }))}
+          description={t("listings.buildingImageAltText")}
+          moreImagesLabel={t("listings.moreImagesLabel")}
+          moreImagesDescription={t("listings.moreImagesAltDescription", {
+            listingName: listing.name,
+          })}
+          fallbackImageUrl={IMAGE_FALLBACK_URL}
+        />
+      </div>
+      <ImageGalleryLightbox
+        images={lightboxImages}
+        isOpen={lightboxOpen}
+        initialIndex={lightboxIndex}
+        onClose={() => setLightboxOpen(false)}
+        closeLabel={t("t.backToListing")}
       />
       <div className={`${styles["listing-main-details"]} seeds-m-bs-header`}>
         <Heading
