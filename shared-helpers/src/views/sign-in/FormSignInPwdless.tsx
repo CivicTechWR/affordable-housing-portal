@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
 import { useRouter } from "next/router"
 import type { UseFormMethods } from "react-hook-form"
-import { Field, Form, NavigationContext, t } from "@bloom-housing/ui-components"
+import { Field, NavigationContext, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
 import { getListingRedirectUrl } from "../../utilities/getListingRedirectUrl"
 import styles from "./FormSignIn.module.scss"
@@ -41,7 +41,7 @@ const FormSignInPwdless = ({
   const forgetPasswordURL = getListingRedirectUrl(listingIdRedirect, "/forgot-password")
 
   return (
-    <Form id="sign-in" onSubmit={handleSubmit(onSubmit, onError)}>
+    <form id="sign-in" onSubmit={handleSubmit(onSubmit, onError)} noValidate>
       <Field
         className={styles["sign-in-email-input"]}
         name="email"
@@ -57,11 +57,6 @@ const FormSignInPwdless = ({
 
       {!useCode && (
         <>
-          <aside>
-            <LinkComponent href={forgetPasswordURL} className={styles["forgot-password"]}>
-              {t("authentication.signIn.forgotPassword")}
-            </LinkComponent>
-          </aside>
           <Field
             className={styles["sign-in-password-input"]}
             name="password"
@@ -74,6 +69,11 @@ const FormSignInPwdless = ({
             type={"password"}
             dataTestId="sign-in-password-field"
           />
+          <aside className={styles["forgot-password-container"]}>
+            <LinkComponent href={forgetPasswordURL} className={styles["forgot-password"]}>
+              {t("authentication.signIn.forgotPassword")}
+            </LinkComponent>
+          </aside>
         </>
       )}
       <div className={styles["sign-in-action"]}>
@@ -87,13 +87,13 @@ const FormSignInPwdless = ({
         </Button>
       </div>
       <div className={styles["sign-in-action"]}>
-        <Button variant={"text"} onClick={() => setUseCode(!useCode)}>
+        <Button type="button" variant={"text"} onClick={() => setUseCode(!useCode)}>
           {useCode
             ? t("authentication.signIn.pwdless.usePassword")
             : t("authentication.signIn.pwdless.useCode")}
         </Button>
       </div>
-    </Form>
+    </form>
   )
 }
 
