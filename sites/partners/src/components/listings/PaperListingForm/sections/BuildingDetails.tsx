@@ -101,11 +101,15 @@ const BuildingDetails = ({
 
   useEffect(() => {
     if (process.env.mapBoxToken || process.env.MAPBOX_TOKEN) {
-      setGeocodingClient(
-        GeocodeService({
-          accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-        })
-      )
+      try {
+        setGeocodingClient(
+          GeocodeService({
+            accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
+          })
+        )
+      } catch (err) {
+        console.warn("Could not initialize Mapbox GeocodeService:", err)
+      }
     }
   }, [])
 

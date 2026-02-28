@@ -17,6 +17,7 @@ const NewApplication = () => {
   const { listingDto: listing } = useSingleListingData(listingId)
 
   if (profile?.userRoles?.isLimitedJurisdictionalAdmin) return null
+  if (!router.isReady || !listingId) return null
 
   return (
     <ListingGuard>

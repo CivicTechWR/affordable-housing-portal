@@ -17,10 +17,15 @@ const NewListing = () => {
   const isNonRegulated = !!router.query.nonRegulated
 
   useEffect(() => {
+    if (!router.isReady) return
     if (!selectedJurisdiction) {
       void router.replace("/")
     }
-  }, [router, selectedJurisdiction])
+  }, [router, router.isReady, selectedJurisdiction])
+
+  if (!router.isReady || !selectedJurisdiction) {
+    return null
+  }
 
   return (
     <ListingGuard>
