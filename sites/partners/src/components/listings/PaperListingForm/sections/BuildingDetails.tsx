@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import * as Sentry from "@sentry/nextjs"
 import { useFormContext, useWatch } from "react-hook-form"
 import GeocodeService, {
   GeocodeService as GeocodeServiceType,
@@ -110,7 +109,6 @@ const BuildingDetails = ({
         )
       } catch (err) {
         console.warn("Could not initialize Mapbox GeocodeService:", err)
-        Sentry.captureException(err)
       }
     }
   }, [])

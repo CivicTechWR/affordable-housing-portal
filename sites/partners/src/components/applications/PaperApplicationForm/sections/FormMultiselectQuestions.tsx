@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react"
-import * as Sentry from "@sentry/nextjs"
 import { Field, t, resolveObject } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
 import { useFormContext, UseFormMethods } from "react-hook-form"
@@ -81,7 +80,6 @@ const FormMultiselectQuestions = ({
         )
       } catch (err) {
         console.warn("Could not initialize Mapbox GeocodeService:", err)
-        Sentry.captureException(err)
       }
     }
   }, [])
