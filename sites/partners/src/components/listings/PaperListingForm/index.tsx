@@ -219,7 +219,12 @@ const ListingForm = ({
   }, [profile, jurisdictionId, router])
 
   useEffect(() => {
-    if (selectedJurisdictionData && !listing) {
+    if (
+      selectedJurisdictionData &&
+      !listing &&
+      whatToExpectEditor &&
+      whatToExpectAdditionalDetailsEditor
+    ) {
       if (
         marketingTypeChoice === MarketingTypeEnum.comingSoon &&
         !!selectedJurisdictionData.whatToExpectUnderConstruction
@@ -243,7 +248,14 @@ const ListingForm = ({
       }
     }
     //eslint-disable-next-line
-  }, [selectedJurisdictionData, marketingTypeChoice])
+  }, [
+    selectedJurisdictionData,
+    listing,
+    marketingTypeChoice,
+    editMode,
+    whatToExpectEditor,
+    whatToExpectAdditionalDetailsEditor,
+  ])
 
   const enableUnitGroups = doJurisdictionsHaveFeatureFlagOn(
     FeatureFlagEnum.enableUnitGroups,

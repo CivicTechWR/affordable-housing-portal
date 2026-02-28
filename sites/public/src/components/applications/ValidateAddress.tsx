@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs"
 import { Address, MultiLineAddress, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
 import GeocodeService from "@mapbox/mapbox-sdk/services/geocoding"
@@ -13,9 +14,18 @@ export const findValidatedAddress = (
   setFoundAddress: React.Dispatch<React.SetStateAction<FoundAddress>>,
   setNewAddressSelected: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const geocodingClient = GeocodeService({
-    accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-  })
+  let geocodingClient
+  try {
+    geocodingClient = GeocodeService({
+      accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
+    })
+  } catch (err) {
+    console.warn("Could not initialize Mapbox GeocodeService:", err)
+    Sentry.captureException(err)
+    setNewAddressSelected(false)
+    setFoundAddress({ invalid: true, originalAddress: address })
+    return
+  }
 
   geocodingClient
     .forwardGeocode({
