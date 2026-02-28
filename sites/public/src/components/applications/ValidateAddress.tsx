@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs"
 import { Address, MultiLineAddress, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
 import GeocodeService from "@mapbox/mapbox-sdk/services/geocoding"
@@ -20,6 +21,7 @@ export const findValidatedAddress = (
     })
   } catch (err) {
     console.warn("Could not initialize Mapbox GeocodeService:", err)
+    Sentry.captureException(err)
     setNewAddressSelected(false)
     setFoundAddress({ invalid: true, originalAddress: address })
     return
