@@ -37,6 +37,7 @@ export const mockNextRouter = (query?: any) => {
     query: query ?? "",
     push: pushMock,
     back: backMock,
+    isReady: true,
   }))
 
   return { useRouter, pushMock, backMock }

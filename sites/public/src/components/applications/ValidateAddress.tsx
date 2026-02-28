@@ -13,9 +13,17 @@ export const findValidatedAddress = (
   setFoundAddress: React.Dispatch<React.SetStateAction<FoundAddress>>,
   setNewAddressSelected: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const geocodingClient = GeocodeService({
-    accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-  })
+  let geocodingClient
+  try {
+    geocodingClient = GeocodeService({
+      accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
+    })
+  } catch (err) {
+    console.warn("Could not initialize Mapbox GeocodeService:", err)
+    setNewAddressSelected(false)
+    setFoundAddress({ invalid: true, originalAddress: address })
+    return
+  }
 
   geocodingClient
     .forwardGeocode({
