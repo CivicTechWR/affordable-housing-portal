@@ -34,12 +34,10 @@ export const ImageGalleryLightbox = ({
   const stageRef = useRef<HTMLDivElement>(null)
 
   const n = images.length
-  const getClampedIndex = useCallback((index: number) => Math.min(Math.max(index, 0), n - 1), [n])
-
-  const normalizeIndex = useCallback(
+  const getClampedIndex = useCallback(
     (index: number) => {
       if (!n) return 0
-      return (index + n) % n
+      return Math.min(Math.max(index, 0), n - 1)
     },
     [n]
   )
@@ -111,11 +109,11 @@ export const ImageGalleryLightbox = ({
 
   const goToIndex = useCallback(
     (index: number) => {
-      const nextIndex = normalizeIndex(index)
+      const nextIndex = getClampedIndex(index)
       setCurrentIndex(nextIndex)
       scrollToIndex(nextIndex, true)
     },
-    [normalizeIndex, scrollToIndex]
+    [getClampedIndex, scrollToIndex]
   )
 
   const goToPrevious = useCallback(() => {
@@ -178,6 +176,8 @@ export const ImageGalleryLightbox = ({
   const previousButtonLabel = `${t("t.previous")} ${imagesLabel}`
   const nextButtonLabel = `${t("t.next")} ${imagesLabel}`
   const showNav = n > 1
+  const isAtFirstImage = currentIndex === 0
+  const isAtLastImage = currentIndex === n - 1
   const currentImage = images[currentIndex]
   const counter = counterLabel || `${currentIndex + 1} / ${n}`
 
@@ -217,6 +217,7 @@ export const ImageGalleryLightbox = ({
           className={`${styles["lightbox-nav"]} ${styles["lightbox-nav-prev"]}`}
           onClick={goToPrevious}
           aria-label={previousButtonLabel}
+          disabled={isAtFirstImage}
           type="button"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -253,6 +254,7 @@ export const ImageGalleryLightbox = ({
           className={`${styles["lightbox-nav"]} ${styles["lightbox-nav-next"]}`}
           onClick={goToNext}
           aria-label={nextButtonLabel}
+          disabled={isAtLastImage}
           type="button"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

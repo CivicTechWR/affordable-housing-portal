@@ -175,6 +175,17 @@
     transform: translateY(-50%) scale(0.95);
   }
 
+  &:disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+
+  &:disabled:hover,
+  &:disabled:active {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-50%);
+  }
+
   svg {
     width: 24px;
     height: 24px;
