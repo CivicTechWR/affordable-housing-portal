@@ -68,10 +68,7 @@ import {
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { DownloadLotteryResults } from "./DownloadLotteryResults"
-import {
-  ListingImageGallery,
-  ListingImageGalleryTag,
-} from "./listing_sections/ListingImageGallery"
+import { ListingImageGallery, ListingImageGalleryTag } from "./listing_sections/ListingImageGallery"
 
 interface ListingProps {
   listing: Listing
