@@ -116,23 +116,25 @@ export const ImageGalleryLightbox = ({
     [getClampedIndex, scrollToIndex]
   )
 
+  const safeCurrentIndex = getClampedIndex(currentIndex)
+
   const goToPrevious = useCallback(() => {
-    goToIndex(currentIndex - 1)
-  }, [currentIndex, goToIndex])
+    goToIndex(safeCurrentIndex - 1)
+  }, [goToIndex, safeCurrentIndex])
 
   const goToNext = useCallback(() => {
-    goToIndex(currentIndex + 1)
-  }, [currentIndex, goToIndex])
+    goToIndex(safeCurrentIndex + 1)
+  }, [goToIndex, safeCurrentIndex])
 
   const handleStageScroll = useCallback(() => {
     const stage = stageRef.current
     if (!stage || !n) return
 
     const nextIndex = Math.min(Math.max(Math.round(stage.scrollLeft / stage.clientWidth), 0), n - 1)
-    if (nextIndex !== currentIndex) {
+    if (nextIndex !== safeCurrentIndex) {
       setCurrentIndex(nextIndex)
     }
-  }, [currentIndex, n])
+  }, [n, safeCurrentIndex])
 
   const handleDialogClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     if (e.target === e.currentTarget) {
@@ -176,10 +178,10 @@ export const ImageGalleryLightbox = ({
   const previousButtonLabel = `${t("t.previous")} ${imagesLabel}`
   const nextButtonLabel = `${t("t.next")} ${imagesLabel}`
   const showNav = n > 1
-  const isAtFirstImage = currentIndex === 0
-  const isAtLastImage = currentIndex === n - 1
-  const currentImage = images[currentIndex]
-  const counter = counterLabel || `${currentIndex + 1} / ${n}`
+  const isAtFirstImage = safeCurrentIndex === 0
+  const isAtLastImage = safeCurrentIndex === n - 1
+  const currentImage = images[safeCurrentIndex]
+  const counter = counterLabel || `${safeCurrentIndex + 1} / ${n}`
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
@@ -231,7 +233,7 @@ export const ImageGalleryLightbox = ({
           <div
             key={`${image.url}-${index}`}
             className={styles["lightbox-image-slide"]}
-            aria-hidden={index !== currentIndex}
+            aria-hidden={index !== safeCurrentIndex}
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 onClose()
@@ -273,11 +275,11 @@ export const ImageGalleryLightbox = ({
             <button
               key={index}
               className={`${styles["lightbox-dot"]} ${
-                index === currentIndex ? styles["lightbox-dot-active"] : ""
+                index === safeCurrentIndex ? styles["lightbox-dot-active"] : ""
               }`}
               onClick={() => goToIndex(index)}
               aria-label={`${imagesLabel} ${index + 1}`}
-              aria-current={index === currentIndex ? "true" : undefined}
+              aria-current={index === safeCurrentIndex ? "true" : undefined}
               type="button"
             />
           ))}
