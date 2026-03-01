@@ -1,5 +1,6 @@
 import React from "react"
 import { render, fireEvent, waitFor, act } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { useRouter } from "next/router"
 import { MessageContext, AuthContext } from "@bloom-housing/shared-helpers"
 import { jurisdiction } from "@bloom-housing/shared-helpers/__tests__/testHelpers"
@@ -90,6 +91,57 @@ describe("Sign In Page", () => {
         variant: "success",
       })
     })
+  })
+
+  it("submits the sign-in form when enter is pressed in the password field", async () => {
+    const user = userEvent.setup()
+    const mockUser = { firstName: "User", id: "user-123" }
+    const mockLogin = jest.fn().mockResolvedValue(mockUser)
+    const mockRouter = { query: {}, push: jest.fn() }
+    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+
+    const { getByLabelText } = render(
+      <AuthContext.Provider
+        value={{
+          initialStateLoaded: true,
+          profile: undefined,
+          login: mockLogin,
+        }}
+      >
+        <MessageContext.Provider value={TOAST_MESSAGE}>
+          <SignInComponent jurisdiction={jurisdiction} />
+        </MessageContext.Provider>
+      </AuthContext.Provider>
+    )
+
+    await user.type(getByLabelText("Email"), "user@example.com")
+    await user.type(getByLabelText("Password"), "password123{Enter}")
+
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith(
+        "user@example.com",
+        "password123",
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      )
+    })
+  })
+
+  it("tabs from email to password before forgot password", async () => {
+    const user = userEvent.setup()
+    const { getByLabelText, getByRole } = renderSignInPage()
+
+    const emailInput = getByLabelText("Email")
+    const passwordInput = getByLabelText("Password")
+    const forgotPasswordLink = getByRole("link", { name: /forgot password/i })
+
+    await user.click(emailInput)
+    await user.tab()
+    expect(passwordInput).toHaveFocus()
+    await user.tab()
+    expect(forgotPasswordLink).toHaveFocus()
   })
 
   describe("Field validation errors", () => {
@@ -274,6 +326,7 @@ describe("Passwordless Sign In page", () => {
   })
 
   it("logs in with password after clicking 'Use your password instead' button", async () => {
+    const user = userEvent.setup()
     const mockLogin = jest.fn().mockResolvedValue({ firstName: "User" })
     const mockAddToast = jest.fn()
     const mockRouter = { query: {}, push: jest.fn() }
@@ -292,11 +345,9 @@ describe("Passwordless Sign In page", () => {
       </AuthContext.Provider>
     )
 
-    fireEvent.click(getByRole("button", { name: "Use your password instead" }))
-
-    fireEvent.change(getByLabelText("Email"), { target: { value: "user@example.com" } })
-    fireEvent.change(getByLabelText("Password"), { target: { value: "password123" } })
-    fireEvent.click(getByRole("button", { name: /sign in/i }))
+    await user.click(getByRole("button", { name: "Use your password instead" }))
+    await user.type(getByLabelText("Email"), "user@example.com")
+    await user.type(getByLabelText("Password"), "password123{Enter}")
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith(

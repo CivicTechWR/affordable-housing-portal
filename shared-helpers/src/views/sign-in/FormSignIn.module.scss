@@ -1,5 +1,10 @@
+.forgot-password-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .forgot-password {
-  float: inline-end;
+  display: inline-flex;
   font-size: var(--seeds-font-size-sm);
   text-decoration-line: underline;
   color: var(--seeds-color-blue-900);

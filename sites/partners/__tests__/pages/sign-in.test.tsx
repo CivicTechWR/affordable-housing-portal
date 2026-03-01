@@ -1,5 +1,6 @@
 import React from "react"
 import { render, fireEvent, waitFor } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { useRouter } from "next/router"
 import { MessageContext, AuthContext } from "@bloom-housing/shared-helpers"
 import { UserService, MfaType } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
@@ -116,6 +117,69 @@ describe("Partners Sign In Page", () => {
         )
         expect(mockRouter.push).toHaveBeenCalledWith("/")
       })
+    })
+
+    it("submits the sign-in form when enter is pressed in the password field", async () => {
+      const user = userEvent.setup()
+      const mockLogin = jest.fn().mockResolvedValue({ firstName: "Partner", id: "user-123" })
+      const mockRouter = { query: {}, push: jest.fn() }
+      ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+
+      const { getByLabelText } = render(
+        <AuthContext.Provider
+          value={{
+            initialStateLoaded: true,
+            profile: undefined,
+            login: mockLogin,
+            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+          }}
+        >
+          <MessageContext.Provider value={TOAST_MESSAGE}>
+            <SignIn />
+          </MessageContext.Provider>
+        </AuthContext.Provider>
+      )
+
+      await user.type(getByLabelText("Email"), "partner@example.com")
+      await user.type(getByLabelText("Password"), "password123{Enter}")
+
+      await waitFor(() => {
+        expect(mockLogin).toHaveBeenCalledWith(
+          "partner@example.com",
+          "password123",
+          undefined,
+          undefined,
+          true,
+          undefined
+        )
+      })
+    })
+
+    it("tabs from email to password before forgot password", async () => {
+      const user = userEvent.setup()
+      const { getByLabelText, getByRole } = render(
+        <AuthContext.Provider
+          value={{
+            initialStateLoaded: true,
+            profile: undefined,
+            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+          }}
+        >
+          <MessageContext.Provider value={TOAST_MESSAGE}>
+            <SignIn />
+          </MessageContext.Provider>
+        </AuthContext.Provider>
+      )
+
+      const emailInput = getByLabelText("Email")
+      const passwordInput = getByLabelText("Password")
+      const forgotPasswordLink = getByRole("link", { name: /forgot password/i })
+
+      await user.click(emailInput)
+      await user.tab()
+      expect(passwordInput).toHaveFocus()
+      await user.tab()
+      expect(forgotPasswordLink).toHaveFocus()
     })
 
     it("shows error when email is missing", async () => {
