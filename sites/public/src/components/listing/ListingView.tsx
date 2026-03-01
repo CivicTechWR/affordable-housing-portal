@@ -68,7 +68,10 @@ import {
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { DownloadLotteryResults } from "./DownloadLotteryResults"
-import { ListingImageGallery } from "./listing_sections/ListingImageGallery"
+import {
+  ListingImageGallery,
+  ListingImageGalleryTag,
+} from "./listing_sections/ListingImageGallery"
 
 interface ListingProps {
   listing: Listing
@@ -617,12 +620,21 @@ export const ListingView = (props: ListingProps) => {
   const legacyListingImages = legacyImageUrls.map((imageUrl: string) => ({
     url: imageUrl,
   }))
+  const legacyListingTags: ListingImageGalleryTag[] | undefined = listing.reservedCommunityTypes
+    ? [
+        {
+          text: t(`listings.reservedCommunityTypes.${listing.reservedCommunityTypes.name}`),
+          variant: "highlight-warm",
+        },
+      ]
+    : undefined
 
   return (
     <article className="flex flex-wrap relative max-w-5xl m-auto">
       <header className="image-card--leader">
         <ListingImageGallery
           images={legacyListingImages}
+          tags={legacyListingTags}
           description={listing.name}
           moreImagesLabel={t("listings.moreImagesLabel")}
           moreImagesDescription={t("listings.moreImagesAltDescription", {
