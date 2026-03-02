@@ -8,7 +8,6 @@ import {
   ExpandableText,
   GroupedTable,
   Heading,
-  ImageCard,
   InfoCard,
   Contact,
   ListSection,
@@ -69,6 +68,7 @@ import {
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { DownloadLotteryResults } from "./DownloadLotteryResults"
+import { ListingImageGallery, ListingImageGalleryTag } from "./listing_sections/ListingImageGallery"
 
 interface ListingProps {
   listing: Listing
@@ -613,36 +613,32 @@ export const ListingView = (props: ListingProps) => {
     return footerContent
   }
 
+  const legacyImageUrls = imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize))
+  const legacyListingImages = legacyImageUrls.map((imageUrl: string) => ({
+    url: imageUrl,
+  }))
+  const legacyListingTags: ListingImageGalleryTag[] | undefined = listing.reservedCommunityTypes
+    ? [
+        {
+          text: t(`listings.reservedCommunityTypes.${listing.reservedCommunityTypes.name}`),
+          variant: "highlight-warm",
+        },
+      ]
+    : undefined
+
   return (
     <article className="flex flex-wrap relative max-w-5xl m-auto">
       <header className="image-card--leader">
-        <ImageCard
-          images={imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize)).map(
-            (imageUrl: string) => {
-              return {
-                url: imageUrl,
-              }
-            }
-          )}
-          tags={
-            listing.reservedCommunityTypes
-              ? [
-                  {
-                    text: t(
-                      `listings.reservedCommunityTypes.${props.listing.reservedCommunityTypes.name}`
-                    ),
-                  },
-                ]
-              : undefined
-          }
+        <ListingImageGallery
+          images={legacyListingImages}
+          tags={legacyListingTags}
           description={listing.name}
           moreImagesLabel={t("listings.moreImagesLabel")}
           moreImagesDescription={t("listings.moreImagesAltDescription", {
             listingName: listing.name,
           })}
-          modalCloseLabel={t("t.backToListing")}
-          modalCloseInContent
           fallbackImageUrl={IMAGE_FALLBACK_URL}
+          closeLabel={t("t.backToListing")}
         />
         <div className="py-3 mx-3 mt-4 flex flex-col items-center md:items-start text-center md:text-left">
           <Heading priority={1} styleType={"largePrimary"} className={"text-black"}>
