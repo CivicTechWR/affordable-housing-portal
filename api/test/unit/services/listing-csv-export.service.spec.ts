@@ -38,9 +38,9 @@ describe('Testing listing csv export service', () => {
 
   afterEach(() => {
     writeStream.end();
-    if (fs.existsSync('sampleFile.csv')) {
-      fs.unlinkSync('sampleFile.csv');
-    }
+    fs.unlink('sampleFile.csv', () => {
+      // do nothing
+    });
     jest.restoreAllMocks();
   });
   const timestamp = new Date(1759430299657);
