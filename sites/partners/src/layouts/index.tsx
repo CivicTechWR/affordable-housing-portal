@@ -9,7 +9,7 @@ import {
   t,
   MenuLink,
 } from "@bloom-housing/ui-components"
-import { AuthContext, ExygyFooter, MessageContext } from "@bloom-housing/shared-helpers"
+import { AuthContext, CivicTechWRFooter, MessageContext } from "@bloom-housing/shared-helpers"
 import { Toast } from "@bloom-housing/ui-seeds"
 import { FeatureFlagEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 
@@ -88,7 +88,7 @@ const Layout = (props) => {
         <SiteFooter>
           <FooterNav copyright={`© ${currentYear} • All Rights Reserved`} />
           <FooterSection className="bg-black" small>
-            <ExygyFooter />
+            <CivicTechWRFooter />
           </FooterSection>
         </SiteFooter>
       </div>

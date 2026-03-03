@@ -21,7 +21,10 @@ if (process.env.INCOMING_HOOK_BODY && process.env.INCOMING_HOOK_BODY.startsWith(
 const LISTINGS_QUERY = process.env.LISTINGS_QUERY || "/listings"
 console.log(`Using ${BACKEND_API_BASE}${LISTINGS_QUERY} for the listing service.`)
 
-const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN
+const MAPBOX_TOKEN =
+  process.env.MAPBOX_TOKEN && process.env.MAPBOX_TOKEN !== "pk.fake"
+    ? process.env.MAPBOX_TOKEN
+    : "pk.eyJ1IjoiZmFrZSIsImEiOiJmYWtlIn0.fake"
 const HOUSING_COUNSELOR_SERVICE_URL = process.env.HOUSING_COUNSELOR_SERVICE_URL
 
 // Load the Tailwind theme and set up SASS vars

@@ -10,7 +10,7 @@ import {
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { Heading, Link, Tag, Icon } from "@bloom-housing/ui-seeds"
 import { TagVariant } from "@bloom-housing/ui-seeds/src/text/Tag"
-import { ImageCard, t } from "@bloom-housing/ui-components"
+import { t } from "@bloom-housing/ui-components"
 import {
   IMAGE_FALLBACK_URL,
   imageUrlFromListing,
@@ -18,6 +18,7 @@ import {
 } from "@bloom-housing/shared-helpers"
 import FavoriteButton from "../../shared/FavoriteButton"
 import { Availability } from "./Availability"
+import { ListingImageGallery } from "./ListingImageGallery"
 import listingStyles from "../ListingViewSeeds.module.scss"
 import styles from "./MainDetails.module.scss"
 import { isFeatureFlagOn } from "../../../lib/helpers"
@@ -138,25 +139,24 @@ export const MainDetails = ({
     isFeatureFlagOn(jurisdiction, FeatureFlagEnum.enableIsVerified),
     isFeatureFlagOn(jurisdiction, FeatureFlagEnum.swapCommunityTypeWithPrograms)
   )
+
+  const imageUrls = imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize))
+  const listingImages = imageUrls.map((imageUrl: string, index: number) => ({
+    url: imageUrl,
+    description: listing.listingImages?.[index]?.description,
+  }))
+
   return (
     <div>
-      <ImageCard
-        images={imageUrlFromListing(listing, parseInt(process.env.listingPhotoSize)).map(
-          (imageUrl: string, index: number) => {
-            return {
-              url: imageUrl,
-              description: listing.listingImages?.[index]?.description,
-            }
-          }
-        )}
+      <ListingImageGallery
+        images={listingImages}
         description={t("listings.buildingImageAltText")}
         moreImagesLabel={t("listings.moreImagesLabel")}
         moreImagesDescription={t("listings.moreImagesAltDescription", {
           listingName: listing.name,
         })}
-        modalCloseLabel={t("t.backToListing")}
-        modalCloseInContent
         fallbackImageUrl={IMAGE_FALLBACK_URL}
+        closeLabel={t("t.backToListing")}
       />
       <div className={`${styles["listing-main-details"]} seeds-m-bs-header`}>
         <Heading
