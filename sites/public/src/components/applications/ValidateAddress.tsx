@@ -1,7 +1,6 @@
-import * as Sentry from "@sentry/nextjs"
 import { Address, MultiLineAddress, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
-import GeocodeService from "@mapbox/mapbox-sdk/services/geocoding"
+import { forwardGeocode } from "@bloom-housing/shared-helpers"
 
 export interface FoundAddress {
   newAddress?: Address
@@ -14,33 +13,11 @@ export const findValidatedAddress = (
   setFoundAddress: React.Dispatch<React.SetStateAction<FoundAddress>>,
   setNewAddressSelected: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  let geocodingClient
-  try {
-    geocodingClient = GeocodeService({
-      accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-    })
-  } catch (err) {
-    console.warn("Could not initialize Mapbox GeocodeService:", err)
-    Sentry.captureException(err)
-    setNewAddressSelected(false)
-    setFoundAddress({ invalid: true, originalAddress: address })
-    return
-  }
-
-  geocodingClient
-    .forwardGeocode({
-      query: `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, United States`,
-      limit: 1,
-      types: ["address"],
-    })
-    .send()
-    .then((response) => {
-      const [street, city, region] = response.body.features[0].place_name.split(", ")
-      const coordinates = response.body.features[0].geometry?.coordinates
-      const regionElements = region.split(" ")
-      const zipCode = regionElements[regionElements.length - 1]
-
-      if (!zipCode) {
+  forwardGeocode(
+    `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, United States`
+  )
+    .then((coordinates) => {
+      if (!coordinates) {
         setNewAddressSelected(false)
         setFoundAddress({ invalid: true, originalAddress: address })
       } else {
@@ -48,19 +25,19 @@ export const findValidatedAddress = (
         setFoundAddress({
           originalAddress: address,
           newAddress: {
-            street,
+            street: address.street,
             street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
-            city,
+            city: address.city,
             state: address.state,
-            zipCode,
-            longitude: coordinates ? coordinates[0] : undefined,
-            latitude: coordinates ? coordinates[1] : undefined,
+            zipCode: address.zipCode,
+            longitude: coordinates.longitude,
+            latitude: coordinates.latitude,
           },
         })
       }
     })
     .catch((err) => {
-      console.error(`Error calling Mapbox API: ${err}`)
+      console.error(`Error calling Photon API: ${err}`)
       setNewAddressSelected(false)
       setFoundAddress({ invalid: true, originalAddress: address })
     })

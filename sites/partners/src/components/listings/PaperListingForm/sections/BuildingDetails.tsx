@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
-import GeocodeService, {
-  GeocodeService as GeocodeServiceType,
-} from "@mapbox/mapbox-sdk/services/geocoding"
 import { t, Field, Select, FieldGroup, GridCell } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
-import { stateKeys, Map, LatitudeLongitude } from "@bloom-housing/shared-helpers"
+import { stateKeys, Map, LatitudeLongitude, forwardGeocode } from "@bloom-housing/shared-helpers"
 import {
   EnumListingListingType,
   RegionEnum,
@@ -22,18 +19,6 @@ import {
 import { neighborhoodRegions } from "../../../../lib/listings/Neighborhoods"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
 import styles from "../ListingForm.module.scss"
-
-interface MapBoxFeature {
-  center: number[] // Index 0: longitude, Index 1: latitude
-}
-
-interface MapboxApiResponseBody {
-  features: MapBoxFeature[]
-}
-
-interface MapboxApiResponse {
-  body: MapboxApiResponseBody
-}
 
 type BuildingDetailsProps = {
   customMapPositionChosen?: boolean
@@ -64,8 +49,6 @@ const BuildingDetails = ({
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, watch, control, getValues, setValue, errors, clearErrors } = formMethods
-
-  const [geocodingClient, setGeocodingClient] = useState<GeocodeServiceType>()
 
   interface BuildingAddress {
     city: string
@@ -99,48 +82,27 @@ const BuildingDetails = ({
     )
   }
 
-  useEffect(() => {
-    if (process.env.mapBoxToken || process.env.MAPBOX_TOKEN) {
-      try {
-        setGeocodingClient(
-          GeocodeService({
-            accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-          })
-        )
-      } catch (err) {
-        console.warn("Could not initialize Mapbox GeocodeService:", err)
-      }
-    }
-  }, [])
-
-  const getNewLatLong = () => {
+  const getNewLatLong = async () => {
     if (
       buildingAddress?.city &&
       buildingAddress?.state &&
       buildingAddress?.street &&
-      buildingAddress?.zipCode &&
-      geocodingClient
+      buildingAddress?.zipCode
     ) {
-      geocodingClient
-        .forwardGeocode({
-          query: `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}`,
-          limit: 1,
-        })
-        .send()
-        .then((response: MapboxApiResponse) => {
-          setLatLong({
-            latitude: response.body.features[0].center[1],
-            longitude: response.body.features[0].center[0],
-          })
-        })
-        .catch((err) => console.error(`Error calling Mapbox API: ${err}`))
+      const coordinates = await forwardGeocode(
+        `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}`
+      )
+
+      if (coordinates) {
+        setLatLong?.(coordinates)
+      }
     }
   }
   useEffect(() => {
     let timeout
     if (!customMapPositionChosen || mapPinPosition === "automatic") {
       timeout = setTimeout(() => {
-        getNewLatLong()
+        void getNewLatLong()
       }, 1000)
     }
     return () => {
@@ -156,7 +118,7 @@ const BuildingDetails = ({
 
   useEffect(() => {
     if (mapPinPosition === "automatic") {
-      getNewLatLong()
+      void getNewLatLong()
       setCustomMapPositionChosen(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
