@@ -1,0 +1,32 @@
+Name,Description,Status
+Remove Application Submission Wizard,"Delete the entire multi-step application wizard under sites/public/src/pages/applications/. This removes the forms collecting income, household size, demographics, SSN, and other applicant data.
+
+Tests to update:
+- Delete all Cypress e2e tests for the public application flow
+- Delete application-related React component unit tests
+- Remove application form test fixtures and mock data",Planned
+Remove Apply Online Buttons,"Strip out the 'Apply Online' CTA buttons and related apply flow from individual listing detail pages on the public portal.
+
+Tests to update:
+- Update listing detail page e2e tests to remove apply button assertions
+- Update listing detail component tests",Planned
+Remove My Applications Tracking,"Delete the 'My Applications' view from the user account portal (sites/public/src/pages/account/applications.tsx) so social workers no longer see an empty application tracker.
+
+Tests to update:
+- Delete My Applications page tests
+- Update account navigation tests to remove applications link",Planned
+Remove Lottery Status Badges,"Remove timeline states and status badges related to lotteries (e.g. 'Waitlist Closed', 'Lottery Results') from listing cards and detail pages that are driven by internal application logic.
+
+Tests to update:
+- Update listing card component tests to remove lottery status assertions
+- Update listing detail e2e tests",Planned
+Remove Application Backend Services and Endpoints,"Remove backend API controllers and services that handle creating new applications from the public frontend, and endpoints that fetch a user's submitted applications. Delete application.module.ts, application-exporter.module.ts, and related controllers/services.
+
+Tests to update:
+- Delete application.controller.spec.ts and application.service.spec.ts
+- Delete application-related integration/e2e tests in api/test/",Planned
+Remove Application Prisma Models and Seeders,"Remove the Application, ApplicationSnapshot, Applicant, ApplicantSnapshot, AlternateContact, AlternateContactSnapshot, HouseholdMember, Accessibility, and related join-table Prisma models from schema.prisma. Create a database migration. Also remove all database seeders that generate fake application and applicant data.
+
+Tests to update:
+- Update prisma seed scripts and test database setup
+- Remove application-related test fixtures across all test suites",Planned
