@@ -137,9 +137,6 @@
       "jest-extended/all"
     ]
   },
-  "resolutions": {
-    "proper-lockfile/signal-exit": "3.0.7"
-  },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   }
