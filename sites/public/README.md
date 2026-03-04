@@ -14,6 +14,13 @@ If you don't have yarn installed, you can install homebrew with [these instructi
 - From within `sites/public` copy the `.env.template` to `.env` and edit variables appropriate to your local environment - some keys are secret and are internally available - the template file includes default values and descriptions of each variable
 - `yarn dev:all` at root will start up the backend at port 3100 and the public app at port 3000
 
+### Secrets / Infisical
+
+We use Infisical to manage and seed third-party API credentials and other secrets for this service. These secret values are not committed to the repository.
+
+- Install the Infisical CLI and authenticate with the team account (for example, run `infisical login`).
+- If you do not yet have access to the Infisical workspace, ping the appropriate Slack channel (e.g. `#project-accessible-housing-portal`) to request access and the credentials/invite. Once invited, re-run the login and fetch steps.
+
 ## Recommended Extension
 
 If you're using VSCode, the [CSS variable autocomplete plugin](https://marketplace.visualstudio.com/items?itemName=vunguyentuan.vscode-css-variables&ssr=false#overview) will pull in all CSS variable definitions from ui-seeds for autocompletion.
