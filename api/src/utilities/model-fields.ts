@@ -7,7 +7,7 @@ export const fillModelStringFields = (
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) => model.name === modelName)[0]
-      .fields.filter((field) => !field.isId && field.type === 'String')
+      .fields.filter((field) => field.name !== 'id' && field.type === 'String')
       .map((field) => [field.name, data[field.name] || null]),
   );
 };
