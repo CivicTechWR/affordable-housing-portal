@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { FieldGroup, t } from "@bloom-housing/ui-components"
-import { Map, LatitudeLongitude } from "@bloom-housing/shared-helpers"
+import { Map, LatitudeLongitude, ForwardGeocodeResult } from "@bloom-housing/shared-helpers"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
 import { useFormContext, useWatch } from "react-hook-form"
 
@@ -14,7 +14,7 @@ interface BuildingAddress {
 }
 
 type MultiselectQuestionsMapProps = {
-  forwardGeocode: (query: string) => Promise<LatitudeLongitude | null>
+  forwardGeocode: (query: string) => Promise<ForwardGeocodeResult | null>
   dataKey: string
 }
 
