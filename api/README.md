@@ -51,7 +51,7 @@ If this is your first time running this command and you see `psql: error: FATAL:
 
 You will also need to update the `DATABASE_URL` environment variable to include your username.
 
-If you're using VSCode, you can install [the Postgres explorer extension](https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres) to inspect your local database. When you click on the + to create a new connection, you can use the following inputs to each question to create a connection to the newly created database: `localhost`, `<username>`, hit enter for password, `5432`, standard, `affordable_housing_portal`, and a descriptive name like `local-dev`. Once the connection is established, you can inspect the database.
+If you're using VSCode, you can install [the Postgres explorer extension](https://marketplace.visualstudio.com/items?itemName=ckolkman.vscode-postgres) to inspect your local database. When you click on the + to create a new connection, you can use the following inputs to each question to create a connection to the newly created database: `localhost`, `<username>`, hit enter for password, `5432`, standard, `ahp_prisma`, and a descriptive name like `local-dev`. Once the connection is established, you can inspect the database.
 
 To start the application run: `yarn dev`.
 
