@@ -39,7 +39,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       super({ adapter: new PrismaPg(pool) });
     } else {
       // Maintain backwards-compatibility for non-RDS IAM deployments.
-      super();
+      super({});
     }
   }
 
