@@ -2552,7 +2552,6 @@ describe('Testing application flagged set service', () => {
                   afsLastRunAt: {
                     lte: expect.objectContaining({
                       isEnum: false,
-                      isList: false,
                       modelName: 'Listings',
                       name: 'lastApplicationUpdateAt',
                       typeName: 'DateTime',
@@ -2605,7 +2604,6 @@ describe('Testing application flagged set service', () => {
                   afsLastRunAt: {
                     lte: expect.objectContaining({
                       isEnum: false,
-                      isList: false,
                       modelName: 'Listings',
                       name: 'lastApplicationUpdateAt',
                       typeName: 'DateTime',

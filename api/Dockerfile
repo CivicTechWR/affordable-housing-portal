@@ -13,6 +13,7 @@ USER 2002:2002
 # image.
 WORKDIR /build/runtime_dependencies
 COPY --chown=2002:2002 package.json yarn.lock ./
+COPY --chown=2002:2002 scripts/patch-proper-lockfile.js ./scripts/
 RUN yarn install --frozen-lockfile --production
 
 # Copy package.json and yarn.lock in a separate layer from the source code and install the
@@ -20,6 +21,7 @@ RUN yarn install --frozen-lockfile --production
 # from the last docker build, making build times a lot faster.
 WORKDIR /build
 COPY --chown=2002:2002 package.json yarn.lock ./
+COPY --chown=2002:2002 scripts/patch-proper-lockfile.js ./scripts/
 RUN yarn install --frozen-lockfile
 
 # Copy the source code and build.

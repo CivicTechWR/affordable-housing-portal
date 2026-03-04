@@ -14,6 +14,7 @@ USER 2002:2002
 # from the last docker build, making build times a lot faster.
 WORKDIR /build
 COPY --chown=2002:2002 package.json yarn.lock ./
+COPY --chown=2002:2002 scripts/patch-proper-lockfile.js ./scripts/
 RUN yarn install --frozen-lockfile
 
 # Copy the source code and generate the prisma client.
