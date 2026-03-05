@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS=\"--inspect=9231\" next -p ${NEXTJS_PORT:-3001}",
+    "dev:secrets": "NODE_OPTIONS=\"--inspect=9231\" infisical run -- next -p ${NEXTJS_PORT:-3001}",
     "build": "next build",
     "test": "concurrently \"yarn dev\" \"cypress open\"",
     "test:unit": "jest -w 1",
