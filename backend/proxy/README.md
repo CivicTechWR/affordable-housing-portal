@@ -1,83 +1,26 @@
 ### Rationale
 
 We want to serve different versions of the API under different paths e.g. `/v2`, `/v3` but not necessarily reflect that convention in the code.
-To achieve that an NGINX proxy has been created and set up as an entrypoint to the entire API. It provides path level routing e.g. `/v2` will be routed to a different heroku APP then `/`.
+To achieve that an NGINX proxy has been created and set up as an entrypoint to the entire API. It provides path-level routing so `/v2` can be routed differently from `/`.
 
-### Running Locally with Docker Desktop
+## Current Status
 
-# make sure Docker Desktop is started
+This fork does not ship Docker packaging for the proxy.
 
-# build the image: `docker build --pull --rm -f "backend/proxy/Dockerfile" -t api-proxy:latest "backend/proxy"`
+The files in this directory are the NGINX configuration fragments only:
 
-# In the Docker Desktop Dashboard, go to "Images", find the image and click "Run" (play button)
+- `default.conf`
+- `shared-location.conf`
 
-# Configure Optional Settings before running:
+If you deploy the proxy outside Docker, provide these environment variables to NGINX:
 
-# Ports -> Host Port: 9000
-
-# Environment Variables:
-
-    - PORT: 80
-    - BACKEND_HOSTNAME: [Your local IP]:3100 (e.g. 192.168.86.231:3100)
-    - PROTOCOL: http
-    - ALLOW_LIST: localhost:3000|localhost:3001
-
-# Run and you should be able to access listings at http://localhost:9000/listings
+- `PORT`
+- `BACKEND_HOSTNAME`
+- `PROTOCOL`
+- `ALLOW_LIST`
 
 ### Setup
 
-> **Note:** This section originates from the upstream [Bloom Housing](https://github.com/bloom-housing/bloom) project and references their Heroku-based deployment. It is retained as reference material and may not reflect this fork's infrastructure.
+> **Note:** This directory originates from the upstream [Bloom Housing](https://github.com/bloom-housing/bloom) project. The original Docker and Heroku container deployment instructions were removed from this fork.
 
-Based on [this tutorial](https://dashboard.heroku.com/apps/bloom-reference-backend-proxy/deploy/heroku-container). All values are for `bloom-reference-backend-proxy` and each environment requires it's own proxy.
-
-#### Install the Heroku CLI
-
-Download and install the Heroku CLI.
-
-If you haven't already, log in to your Heroku account and follow the prompts to create a new SSH public key.
-
-```
-$ heroku login
-```
-
-#### Log in to Container Registry
-
-You must have Docker set up locally to continue. You should see output when you run this command.
-
-```
-$ docker ps
-```
-
-Now you can sign into Container Registry.
-
-```
-$ heroku container:login
-```
-
-_Note_ if you are using an Apple M1 device the following steps will not work. You will have to do the following: https://stackoverflow.com/a/67001433
-
-Push your Docker-based app
-Build the Dockerfile in the current directory and push the Docker image.
-
-```
-# workdir: backend/proxy
-$ heroku container:push --app bloom-reference-backend-proxy web
-```
-
-Deploy the changes
-Release the newly pushed images to deploy your app.
-
-```
-$ heroku container:release --app bloom-reference-backend-proxy web
-```
-
-#### Configuration
-
-> **Note:** The values below are from the upstream Bloom Housing project's reference environment. Replace them with your own deployment's hostnames and domains.
-
-Heroku Proxy app requires four environment variables to work:
-
-PORT: 443
-BACKEND_HOSTNAME: bloom-backend-orm.herokuapp.com
-PROTOCOL: https
-ALLOW_LIST: partners.bloom.exygy.dev|bloom.exygy.dev
+Any deployment-specific setup should document how it renders these NGINX templates and supplies the required environment variables.
