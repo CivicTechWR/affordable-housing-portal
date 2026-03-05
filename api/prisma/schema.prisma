@@ -902,6 +902,53 @@ model ListingEventSnapshot {
   @@map("listing_event_snapshot")
 }
 
+enum CustomListingScope {
+  PROPERTY
+  UNIT
+
+  @@map("custom_listing_scope")
+}
+
+model CustomListingFeatures {
+  id        String   @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  displayName String
+  key         String
+  category    String
+  scope       CustomListingScope
+
+  listings CustomListingFeaturesOnListings[]
+  units    CustomListingFeaturesOnUnits[]
+
+  @@map("custom_listing_fields")
+}
+
+model CustomListingFeaturesOnListings {
+  customListingFeatureId String @map("custom_listing_feature_id") @db.Uuid
+  listingId              String @map("listing_id") @db.Uuid
+
+  customListingFeature CustomListingFeatures @relation(fields: [customListingFeatureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  listing              Listings              @relation(fields: [listingId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([customListingFeatureId, listingId])
+  @@index([listingId])
+  @@map("custom_listing_features_listings")
+}
+
+model CustomListingFeaturesOnUnits {
+  customListingFeatureId String @map("custom_listing_feature_id") @db.Uuid
+  unitId                 String @map("unit_id") @db.Uuid
+
+  customListingFeature CustomListingFeatures @relation(fields: [customListingFeatureId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unit                 Units                 @relation(fields: [unitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([customListingFeatureId, unitId])
+  @@index([unitId])
+  @@map("custom_listing_features_units")
+}
+
 // ListingFeature Section
 model ListingFeatures {
   id        String   @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
@@ -1268,6 +1315,7 @@ model Listings {
   jurisdictions                         Jurisdictions?                @relation(fields: [jurisdictionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lastUpdatedByUser                     UserAccounts?                 @relation("last_updated_by_user", fields: [lastUpdatedByUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   listingEvents                         ListingEvents[]
+  customListingFeatures                 CustomListingFeaturesOnListings[]
   listingFeatures                       ListingFeatures?              @relation(fields: [featuresId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   listingImages                         ListingImages[]
   listingMultiselectQuestions           ListingMultiselectQuestions[]
@@ -1904,6 +1952,8 @@ model Units {
   unitAmiChartOverrides          UnitAmiChartOverrides?          @relation(fields: [amiChartOverrideId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   unitRentTypes                  UnitRentTypes?                  @relation(fields: [unitRentTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   unitTypes                      UnitTypes?                      @relation(fields: [unitTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  customListingFeatures CustomListingFeaturesOnUnits[]
 
   @@map("units")
 }
