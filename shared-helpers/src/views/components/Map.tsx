@@ -110,7 +110,8 @@ const Map = (props: MapProps) => {
         <MapGL
           mapStyle="https://tiles.openfreemap.org/styles/liberty"
           style={{ height: "400px" }}
-          scrollZoom={false}
+          scrollZoom={true}
+          cooperativeGestures={true}
           initialViewState={viewport}
         >
           {marker.latitude &&
