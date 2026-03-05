@@ -39,7 +39,7 @@ describe("forwardGeocode", () => {
       longitude: -122.40273,
       street: "600 Montgomery Street",
       city: "San Francisco",
-      state: "California",
+      state: "CA",
       zipCode: "94111",
       countryCode: "US",
       country: "United States",
@@ -74,10 +74,48 @@ describe("forwardGeocode", () => {
       longitude: -113.9839888,
       street: "Grinnell Drive",
       city: "West Glacier",
-      state: "Montana",
+      state: "MT",
       zipCode: "59936",
       countryCode: undefined,
       country: undefined,
+    })
+  })
+
+  it("normalizes Canadian province names when country code is Canada", async () => {
+    const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          features: [
+            {
+              geometry: { coordinates: [-80.5204, 43.4643] },
+              properties: {
+                street: "King Street North",
+                housenumber: "200",
+                city: "Waterloo",
+                state: "Ontario",
+                postcode: "N2J 2Y8",
+                countrycode: "ca",
+                country: "Canada",
+              },
+            },
+          ],
+        }),
+    } as Response)
+    global.fetch = mockFetch
+
+    const result = await forwardGeocode("200 King St N, Waterloo, ON N2J 2Y8")
+
+    expect(result).toEqual({
+      latitude: 43.4643,
+      longitude: -80.5204,
+      street: "200 King Street North",
+      city: "Waterloo",
+      state: "ON",
+      zipCode: "N2J 2Y8",
+      countryCode: "CA",
+      country: "Canada",
     })
   })
 
