@@ -8,11 +8,19 @@ export interface FoundAddress {
   invalid?: boolean
 }
 
+const streetIncludesHouseNumber = (street?: string) => {
+  if (typeof street !== "string") {
+    return false
+  }
+
+  return /^\s*\d[\dA-Za-z/-]*\s+\S/.test(street)
+}
+
 const hasAddressLevelMatch = (street?: string, zipCode?: string, hasHouseNumber?: boolean) => {
   const hasStreet = typeof street === "string" && street.trim().length > 0
   const hasZipCode = typeof zipCode === "string" && zipCode.trim().length > 0
 
-  return hasStreet && hasZipCode && hasHouseNumber === true
+  return hasStreet && hasZipCode && (hasHouseNumber === true || streetIncludesHouseNumber(street))
 }
 
 export const findValidatedAddress = (

@@ -80,6 +80,37 @@ describe("findValidatedAddress", () => {
     })
   })
 
+  it("returns a suggested address when street includes a house number but Photon omits housenumber", async () => {
+    mockForwardGeocode.mockResolvedValue({
+      latitude: 38.8977,
+      longitude: -77.0365,
+      street: "1600 Pennsylvania Ave",
+      city: "Washington",
+      state: "DC",
+      zipCode: "20500",
+      hasHouseNumber: false,
+    })
+
+    const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
+    const setNewAddressSelected = jest.fn() as React.Dispatch<React.SetStateAction<boolean>>
+
+    await findValidatedAddress(inputAddress, setFoundAddress, setNewAddressSelected)
+
+    expect(setNewAddressSelected).toHaveBeenCalledWith(true)
+    expect(setFoundAddress).toHaveBeenCalledWith({
+      originalAddress: inputAddress,
+      newAddress: {
+        street: "1600 Pennsylvania Ave",
+        street2: undefined,
+        city: "Washington",
+        state: "DC",
+        zipCode: "20500",
+        longitude: -77.0365,
+        latitude: 38.8977,
+      },
+    })
+  })
+
   it("marks address invalid when geocoder returns street/zip without a house number", async () => {
     mockForwardGeocode.mockResolvedValue({
       latitude: 43.4643,
