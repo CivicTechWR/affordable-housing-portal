@@ -16,8 +16,8 @@ export const findValidatedAddress = (
   forwardGeocode(
     `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, United States`
   )
-    .then((coordinates) => {
-      if (!coordinates) {
+    .then((geocodedAddress) => {
+      if (!geocodedAddress) {
         setNewAddressSelected(false)
         setFoundAddress({ invalid: true, originalAddress: address })
       } else {
@@ -25,13 +25,13 @@ export const findValidatedAddress = (
         setFoundAddress({
           originalAddress: address,
           newAddress: {
-            street: address.street,
+            street: geocodedAddress.street || address.street,
             street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
-            city: address.city,
-            state: address.state,
-            zipCode: address.zipCode,
-            longitude: coordinates.longitude,
-            latitude: coordinates.latitude,
+            city: geocodedAddress.city || address.city,
+            state: geocodedAddress.state || address.state,
+            zipCode: geocodedAddress.zipCode || address.zipCode,
+            longitude: geocodedAddress.longitude,
+            latitude: geocodedAddress.latitude,
           },
         })
       }
