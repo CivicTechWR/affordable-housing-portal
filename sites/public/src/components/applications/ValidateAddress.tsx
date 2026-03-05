@@ -8,16 +8,26 @@ export interface FoundAddress {
   invalid?: boolean
 }
 
+const hasAddressLevelMatch = (street?: string, zipCode?: string) => {
+  const hasStreet = typeof street === "string" && street.trim().length > 0
+  const hasZipCode = typeof zipCode === "string" && zipCode.trim().length > 0
+
+  return hasStreet && hasZipCode
+}
+
 export const findValidatedAddress = (
   address: Address,
   setFoundAddress: React.Dispatch<React.SetStateAction<FoundAddress>>,
   setNewAddressSelected: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  forwardGeocode(
+  return forwardGeocode(
     `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, United States`
   )
     .then((geocodedAddress) => {
-      if (!geocodedAddress) {
+      if (
+        !geocodedAddress ||
+        !hasAddressLevelMatch(geocodedAddress.street, geocodedAddress.zipCode)
+      ) {
         setNewAddressSelected(false)
         setFoundAddress({ invalid: true, originalAddress: address })
       } else {
@@ -25,11 +35,11 @@ export const findValidatedAddress = (
         setFoundAddress({
           originalAddress: address,
           newAddress: {
-            street: geocodedAddress.street || address.street,
+            street: geocodedAddress.street,
             street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
             city: geocodedAddress.city || address.city,
             state: geocodedAddress.state || address.state,
-            zipCode: geocodedAddress.zipCode || address.zipCode,
+            zipCode: geocodedAddress.zipCode,
             longitude: geocodedAddress.longitude,
             latitude: geocodedAddress.latitude,
           },
