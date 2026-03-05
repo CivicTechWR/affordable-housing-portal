@@ -8,11 +8,11 @@ export interface FoundAddress {
   invalid?: boolean
 }
 
-const hasAddressLevelMatch = (street?: string, zipCode?: string) => {
+const hasAddressLevelMatch = (street?: string, zipCode?: string, hasHouseNumber?: boolean) => {
   const hasStreet = typeof street === "string" && street.trim().length > 0
   const hasZipCode = typeof zipCode === "string" && zipCode.trim().length > 0
 
-  return hasStreet && hasZipCode
+  return hasStreet && hasZipCode && hasHouseNumber === true
 }
 
 export const findValidatedAddress = (
@@ -26,7 +26,11 @@ export const findValidatedAddress = (
     .then((geocodedAddress) => {
       if (
         !geocodedAddress ||
-        !hasAddressLevelMatch(geocodedAddress.street, geocodedAddress.zipCode)
+        !hasAddressLevelMatch(
+          geocodedAddress.street,
+          geocodedAddress.zipCode,
+          geocodedAddress.hasHouseNumber
+        )
       ) {
         setNewAddressSelected(false)
         setFoundAddress({ invalid: true, originalAddress: address })

@@ -7,6 +7,7 @@ export interface ForwardGeocodeResult {
   zipCode?: string
   countryCode?: string
   country?: string
+  hasHouseNumber?: boolean
 }
 
 interface PhotonResponse {
@@ -115,6 +116,14 @@ const getStreet = (properties?: PhotonFeatureProperties) => {
   return properties.name || properties.street
 }
 
+const hasHouseNumber = (properties?: PhotonFeatureProperties) => {
+  if (!properties?.housenumber) {
+    return false
+  }
+
+  return properties.housenumber.trim().length > 0
+}
+
 const getCity = (properties?: PhotonFeatureProperties) => {
   if (!properties) {
     return undefined
@@ -205,6 +214,7 @@ export const forwardGeocode = async (query: string): Promise<ForwardGeocodeResul
       zipCode: topResult.properties?.postcode,
       countryCode,
       country: topResult.properties?.country,
+      hasHouseNumber: hasHouseNumber(topResult.properties),
     }
   } catch (error) {
     console.error(`Error calling Photon API: ${error}`)

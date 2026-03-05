@@ -43,6 +43,7 @@ describe("forwardGeocode", () => {
       zipCode: "94111",
       countryCode: "US",
       country: "United States",
+      hasHouseNumber: true,
     })
   })
 
@@ -78,6 +79,7 @@ describe("forwardGeocode", () => {
       zipCode: "59936",
       countryCode: undefined,
       country: undefined,
+      hasHouseNumber: false,
     })
   })
 
@@ -116,6 +118,7 @@ describe("forwardGeocode", () => {
       zipCode: "N2J 2Y8",
       countryCode: "CA",
       country: "Canada",
+      hasHouseNumber: true,
     })
   })
 

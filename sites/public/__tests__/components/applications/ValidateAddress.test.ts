@@ -57,6 +57,7 @@ describe("findValidatedAddress", () => {
       city: "Waterloo",
       state: "ON",
       zipCode: "N2J 2Y8",
+      hasHouseNumber: true,
     })
 
     const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
@@ -76,6 +77,29 @@ describe("findValidatedAddress", () => {
         longitude: -80.5204,
         latitude: 43.4643,
       },
+    })
+  })
+
+  it("marks address invalid when geocoder returns street/zip without a house number", async () => {
+    mockForwardGeocode.mockResolvedValue({
+      latitude: 43.4643,
+      longitude: -80.5204,
+      street: "Main Street",
+      city: "Waterloo",
+      state: "ON",
+      zipCode: "N2J 2Y8",
+      hasHouseNumber: false,
+    })
+
+    const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
+    const setNewAddressSelected = jest.fn() as React.Dispatch<React.SetStateAction<boolean>>
+
+    await findValidatedAddress(inputAddress, setFoundAddress, setNewAddressSelected)
+
+    expect(setNewAddressSelected).toHaveBeenCalledWith(false)
+    expect(setFoundAddress).toHaveBeenCalledWith({
+      invalid: true,
+      originalAddress: inputAddress,
     })
   })
 })
