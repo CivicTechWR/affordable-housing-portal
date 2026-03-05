@@ -83,6 +83,43 @@ describe("forwardGeocode", () => {
     })
   })
 
+  it("prefers street over name when housenumber is missing", async () => {
+    const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          features: [
+            {
+              geometry: { coordinates: [-77.0365, 38.8977] },
+              properties: {
+                name: "The White House",
+                street: "Pennsylvania Ave NW",
+                city: "Washington",
+                state: "District of Columbia",
+                postcode: "20500",
+              },
+            },
+          ],
+        }),
+    } as Response)
+    global.fetch = mockFetch
+
+    const result = await forwardGeocode("1600 Pennsylvania Ave, Washington, DC 20500")
+
+    expect(result).toEqual({
+      latitude: 38.8977,
+      longitude: -77.0365,
+      street: "Pennsylvania Ave NW",
+      city: "Washington",
+      state: "DC",
+      zipCode: "20500",
+      countryCode: undefined,
+      country: undefined,
+      hasHouseNumber: false,
+    })
+  })
+
   it("normalizes Canadian province names when country code is Canada", async () => {
     const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>
     mockFetch.mockResolvedValue({

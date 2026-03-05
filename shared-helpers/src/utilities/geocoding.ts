@@ -113,7 +113,7 @@ const getStreet = (properties?: PhotonFeatureProperties) => {
     return `${properties.housenumber} ${properties.street}`
   }
 
-  return properties.name || properties.street
+  return properties.street || properties.name
 }
 
 const hasHouseNumber = (properties?: PhotonFeatureProperties) => {
