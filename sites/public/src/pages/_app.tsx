@@ -33,10 +33,13 @@ const rtlLocales = process.env.rtlLanguages.split(",")
 
 const skipLoginRoutes = [
   "/sign-in",
+  "/create-account",
   "/forgot-password",
   "/reset-password",
   "/users/confirm",
   "/verify",
+  "/disclaimer",
+  "/privacy",
 ]
 
 function PublicApp({ Component, router, pageProps }: AppProps) {
