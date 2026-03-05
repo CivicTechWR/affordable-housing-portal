@@ -16,6 +16,7 @@ import {
   ConfigProvider,
   AuthProvider,
   MessageProvider,
+  RequireLogin,
 } from "@bloom-housing/shared-helpers"
 import { pageChangeHandler, gaLoadScript, gaCaptureScript, uaScript } from "../lib/customScripts"
 import { AppSubmissionContext } from "../lib/applications/AppSubmissionContext"
@@ -29,6 +30,17 @@ import LinkComponent from "../components/core/LinkComponent"
 import "../../styles/overrides.scss"
 
 const rtlLocales = process.env.rtlLanguages.split(",")
+
+const skipLoginRoutes = [
+  "/sign-in",
+  "/create-account",
+  "/forgot-password",
+  "/reset-password",
+  "/users/confirm",
+  "/verify",
+  "/disclaimer",
+  "/privacy",
+]
 
 function PublicApp({ Component, router, pageProps }: AppProps) {
   const { locale } = router
@@ -93,12 +105,18 @@ function PublicApp({ Component, router, pageProps }: AppProps) {
   const pageContent = (
     <ConfigProvider apiUrl={process.env.backendApiBase}>
       <AuthProvider>
-        <MessageProvider>
-          <LoggedInUserIdleTimeout onTimeout={() => conductor.reset()} />
-          <div className={jurisdictionClassname}>
-            <Component {...pageProps} />
-          </div>
-        </MessageProvider>
+        <RequireLogin
+          signInPath="/sign-in"
+          signInMessage={"Login is required to view this page."}
+          skipForRoutes={skipLoginRoutes}
+        >
+          <MessageProvider>
+            <LoggedInUserIdleTimeout onTimeout={() => conductor.reset()} />
+            <div className={jurisdictionClassname}>
+              <Component {...pageProps} />
+            </div>
+          </MessageProvider>
+        </RequireLogin>
       </AuthProvider>
     </ConfigProvider>
   )
