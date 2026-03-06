@@ -1,6 +1,7 @@
 import { Address, MultiLineAddress, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
 import { forwardGeocode } from "@bloom-housing/shared-helpers"
+import * as Sentry from "@sentry/react"
 
 export interface FoundAddress {
   newAddress?: Address
@@ -23,46 +24,46 @@ const hasAddressLevelMatch = (street?: string, zipCode?: string, hasHouseNumber?
   return hasStreet && hasZipCode && (hasHouseNumber === true || streetIncludesHouseNumber(street))
 }
 
-export const findValidatedAddress = (
+export async function findValidatedAddress(
   address: Address,
   setFoundAddress: React.Dispatch<React.SetStateAction<FoundAddress>>,
   setNewAddressSelected: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  return forwardGeocode(
-    `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, United States`
-  )
-    .then((geocodedAddress) => {
-      if (
-        !geocodedAddress ||
-        !hasAddressLevelMatch(
-          geocodedAddress.street,
-          geocodedAddress.zipCode,
-          geocodedAddress.hasHouseNumber
-        )
-      ) {
-        setNewAddressSelected(false)
-        setFoundAddress({ invalid: true, originalAddress: address })
-      } else {
-        setNewAddressSelected(true)
-        setFoundAddress({
-          originalAddress: address,
-          newAddress: {
-            street: geocodedAddress.street,
-            street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
-            city: geocodedAddress.city || address.city,
-            state: geocodedAddress.state || address.state,
-            zipCode: geocodedAddress.zipCode,
-            longitude: geocodedAddress.longitude,
-            latitude: geocodedAddress.latitude,
-          },
-        })
-      }
-    })
-    .catch((err) => {
-      console.error(`Error calling Photon API: ${err}`)
+) {
+  try {
+    const geocodedAddress = await forwardGeocode(
+      `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, Canada`
+    )
+    if (
+      !geocodedAddress ||
+      !hasAddressLevelMatch(
+        geocodedAddress.street,
+        geocodedAddress.zipCode,
+        geocodedAddress.hasHouseNumber
+      )
+    ) {
       setNewAddressSelected(false)
       setFoundAddress({ invalid: true, originalAddress: address })
-    })
+    } else {
+      setNewAddressSelected(true)
+      setFoundAddress({
+        originalAddress: address,
+        newAddress: {
+          street: geocodedAddress.street,
+          street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
+          city: geocodedAddress.city || address.city,
+          state: geocodedAddress.state || address.state,
+          zipCode: geocodedAddress.zipCode,
+          longitude: geocodedAddress.longitude,
+          latitude: geocodedAddress.latitude,
+        },
+      })
+    }
+  } catch (err) {
+    Sentry.captureException(err)
+    console.error(`Error calling Photon API: ${err}`)
+    setNewAddressSelected(false)
+    setFoundAddress({ invalid: true, originalAddress: address })
+  }
 }
 
 interface AddressValidationSelectionProps {

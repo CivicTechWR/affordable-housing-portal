@@ -1,4 +1,4 @@
-import React from "react"
+import type { Dispatch, SetStateAction } from "react"
 import { Address } from "@bloom-housing/ui-components"
 import { forwardGeocode } from "@bloom-housing/shared-helpers"
 import {
@@ -37,8 +37,8 @@ describe("findValidatedAddress", () => {
       state: "ON",
     })
 
-    const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
-    const setNewAddressSelected = jest.fn() as React.Dispatch<React.SetStateAction<boolean>>
+    const setFoundAddress = jest.fn() as Dispatch<SetStateAction<FoundAddress>>
+    const setNewAddressSelected = jest.fn() as Dispatch<SetStateAction<boolean>>
 
     await findValidatedAddress(inputAddress, setFoundAddress, setNewAddressSelected)
 
@@ -60,8 +60,8 @@ describe("findValidatedAddress", () => {
       hasHouseNumber: true,
     })
 
-    const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
-    const setNewAddressSelected = jest.fn() as React.Dispatch<React.SetStateAction<boolean>>
+    const setFoundAddress = jest.fn() as Dispatch<SetStateAction<FoundAddress>>
+    const setNewAddressSelected = jest.fn() as Dispatch<SetStateAction<boolean>>
 
     await findValidatedAddress(inputAddress, setFoundAddress, setNewAddressSelected)
 
@@ -91,8 +91,8 @@ describe("findValidatedAddress", () => {
       hasHouseNumber: false,
     })
 
-    const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
-    const setNewAddressSelected = jest.fn() as React.Dispatch<React.SetStateAction<boolean>>
+    const setFoundAddress = jest.fn() as Dispatch<SetStateAction<FoundAddress>>
+    const setNewAddressSelected = jest.fn() as Dispatch<SetStateAction<boolean>>
 
     await findValidatedAddress(inputAddress, setFoundAddress, setNewAddressSelected)
 
@@ -122,8 +122,8 @@ describe("findValidatedAddress", () => {
       hasHouseNumber: false,
     })
 
-    const setFoundAddress = jest.fn() as React.Dispatch<React.SetStateAction<FoundAddress>>
-    const setNewAddressSelected = jest.fn() as React.Dispatch<React.SetStateAction<boolean>>
+    const setFoundAddress = jest.fn() as Dispatch<SetStateAction<FoundAddress>>
+    const setNewAddressSelected = jest.fn() as Dispatch<SetStateAction<boolean>>
 
     await findValidatedAddress(inputAddress, setFoundAddress, setNewAddressSelected)
 

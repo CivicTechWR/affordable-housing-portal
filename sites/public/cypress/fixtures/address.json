@@ -3,15 +3,22 @@
   "features": [
     {
       "type": "Feature",
-      "geometry": { "type": "Point", "coordinates": [-122.40273, 37.79516] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.5204,
+          43.4643
+        ]
+      },
       "properties": {
-        "name": "600 Montgomery Street",
-        "street": "Montgomery Street",
-        "housenumber": "600",
-        "city": "San Francisco",
-        "state": "California",
-        "postcode": "94111",
-        "country": "United States"
+        "name": "200 King Street North",
+        "street": "King Street North",
+        "housenumber": "200",
+        "city": "Waterloo",
+        "state": "Ontario",
+        "postcode": "N2J 2Y8",
+        "countrycode": "ca",
+        "country": "Canada"
       }
     }
   ]

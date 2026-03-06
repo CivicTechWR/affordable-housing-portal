@@ -57,7 +57,7 @@ const MultiselectQuestionsMap = ({ forwardGeocode, dataKey }: MultiselectQuestio
       buildingAddress?.zipCode
     ) {
       const coordinates = await forwardGeocode(
-        `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}`
+        `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
       )
 
       if (coordinates) {
