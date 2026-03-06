@@ -2,23 +2,16 @@ import { ElmVillageApplication, autofillBlueSkyApplication } from "../../mockDat
 
 describe("Submit", function () {
   it("should submit an application for the Elm Village listing, then autofill and submit an application for Blue Sky Apartments", function () {
-    cy.intercept("GET", "https://photon.komoot.io/api/*", { fixture: "address" })
+    cy.intercept("GET", "/geocoding/v5/**", { fixture: "address" })
     // Interceptor for the address in the preference
     cy.intercept(
       "GET",
-      "https://photon.komoot.io/api/?q=1600%20pennsylvania%20ave%2C%20Washington%2C%20DC%2020500%2C%20United%20States*",
+      "https://api.mapbox.com/geocoding/v5/mapbox.places/1600%20pennsylvania%20ave%2C%20Washington%2C%20DC%2020500%2C%20United%20States.json**",
       {
         features: [
           {
-            geometry: {
-              coordinates: [-77.0365, 38.8977],
-            },
-            properties: {
-              name: "1600 Pennsylvania Ave",
-              city: "Washington",
-              state: "District of Columbia",
-              postcode: "20500",
-            },
+            place_name:
+              "1600 pennsylvania ave, Washington, District of Columbia 20500, United States",
           },
         ],
       }
