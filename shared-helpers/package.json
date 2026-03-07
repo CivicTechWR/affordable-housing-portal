@@ -22,8 +22,8 @@
     "@heroicons/react": "^2.1.1",
     "@vis.gl/react-maplibre": "^8.1.0",
     "axios-cookiejar-support": "^5.0.5",
-    "maplibre-gl": "^5.9.0",
-    "markdown-to-jsx": "^7.7.16"
+    "markdown-to-jsx": "^7.7.16",
+    "maplibre-gl": "^5.9.0"
   },
   "devDependencies": {
     "@google-cloud/translate": "^9.2.0",
