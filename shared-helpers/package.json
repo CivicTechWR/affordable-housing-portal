@@ -20,9 +20,10 @@
     "@bloom-housing/ui-components": "13.0.3",
     "@bloom-housing/ui-seeds": "3.3.0",
     "@heroicons/react": "^2.1.1",
+    "@vis.gl/react-maplibre": "^8.1.0",
     "axios-cookiejar-support": "^5.0.5",
     "markdown-to-jsx": "^7.7.16",
-    "react-map-gl": "^8.1.0"
+    "maplibre-gl": "^5.9.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.9.1",
