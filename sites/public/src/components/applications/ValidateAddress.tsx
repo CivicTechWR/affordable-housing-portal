@@ -1,7 +1,7 @@
 import { Address, MultiLineAddress, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
 import { forwardGeocode } from "@bloom-housing/shared-helpers"
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/nextjs"
 
 export interface FoundAddress {
   newAddress?: Address

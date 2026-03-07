@@ -7,7 +7,6 @@ export interface ForwardGeocodeResult {
   zipCode?: string
   countryCode?: string
   country?: string
-  hasHouseNumber?: boolean
 }
 
 interface PhotonResponse {
@@ -32,60 +31,6 @@ interface PhotonFeatureProperties {
   postcode?: string
   countrycode?: string
   country?: string
-}
-
-const US_STATE_NAME_TO_CODE: Record<string, string> = {
-  ALABAMA: "AL",
-  ALASKA: "AK",
-  ARIZONA: "AZ",
-  ARKANSAS: "AR",
-  CALIFORNIA: "CA",
-  COLORADO: "CO",
-  CONNECTICUT: "CT",
-  DELAWARE: "DE",
-  FLORIDA: "FL",
-  GEORGIA: "GA",
-  HAWAII: "HI",
-  IDAHO: "ID",
-  ILLINOIS: "IL",
-  INDIANA: "IN",
-  IOWA: "IA",
-  KANSAS: "KS",
-  KENTUCKY: "KY",
-  LOUISIANA: "LA",
-  MAINE: "ME",
-  MARYLAND: "MD",
-  MASSACHUSETTS: "MA",
-  MICHIGAN: "MI",
-  MINNESOTA: "MN",
-  MISSISSIPPI: "MS",
-  MISSOURI: "MO",
-  MONTANA: "MT",
-  NEBRASKA: "NE",
-  NEVADA: "NV",
-  "NEW HAMPSHIRE": "NH",
-  "NEW JERSEY": "NJ",
-  "NEW MEXICO": "NM",
-  "NEW YORK": "NY",
-  "NORTH CAROLINA": "NC",
-  "NORTH DAKOTA": "ND",
-  OHIO: "OH",
-  OKLAHOMA: "OK",
-  OREGON: "OR",
-  PENNSYLVANIA: "PA",
-  "RHODE ISLAND": "RI",
-  "SOUTH CAROLINA": "SC",
-  "SOUTH DAKOTA": "SD",
-  TENNESSEE: "TN",
-  TEXAS: "TX",
-  UTAH: "UT",
-  VERMONT: "VT",
-  VIRGINIA: "VA",
-  WASHINGTON: "WA",
-  "WEST VIRGINIA": "WV",
-  WISCONSIN: "WI",
-  WYOMING: "WY",
-  "DISTRICT OF COLUMBIA": "DC",
 }
 
 const CANADA_PROVINCE_NAME_TO_CODE: Record<string, string> = {
@@ -116,20 +61,12 @@ const getStreet = (properties?: PhotonFeatureProperties) => {
   return properties.street || properties.name
 }
 
-const hasHouseNumber = (properties?: PhotonFeatureProperties) => {
-  if (!properties?.housenumber) {
-    return false
-  }
-
-  return properties.housenumber.trim().length > 0
-}
-
 const getCity = (properties?: PhotonFeatureProperties) => {
   if (!properties) {
     return undefined
   }
 
-  return properties.city || properties.district || properties.county
+  return properties.city || properties.district
 }
 
 const normalizeCountryCode = (countryCode?: string) => {
@@ -158,13 +95,6 @@ const normalizeState = (state?: string, countryCode?: string) => {
   const normalizedCountryCode = countryCode?.toUpperCase()
 
   if (
-    normalizedCountryCode === "US" ||
-    (!normalizedCountryCode && US_STATE_NAME_TO_CODE[normalizedStateName])
-  ) {
-    return US_STATE_NAME_TO_CODE[normalizedStateName] ?? trimmedState
-  }
-
-  if (
     normalizedCountryCode === "CA" ||
     (!normalizedCountryCode && CANADA_PROVINCE_NAME_TO_CODE[normalizedStateName])
   ) {
@@ -174,50 +104,43 @@ const normalizeState = (state?: string, countryCode?: string) => {
   return trimmedState
 }
 
-export const forwardGeocode = async (query: string): Promise<ForwardGeocodeResult | null> => {
+export const forwardGeocode = async (query: string): Promise<ForwardGeocodeResult> => {
   if (!query?.trim()) {
-    return null
+    throw new Error("Query cannot be empty")
   }
 
-  try {
-    const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`
-    )
+  const response = await fetch(
+    `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`
+  )
 
-    if (!response.ok) {
-      console.error(`Error calling Photon API: ${response.status} ${response.statusText}`)
-      return null
-    }
+  if (!response.ok) {
+    throw new Error(`Error calling Photon API: ${response.status} ${response.statusText}`)
+  }
 
-    const body = (await response.json()) as PhotonResponse
-    const topResult = body.features?.[0]
-    const coordinates = topResult?.geometry?.coordinates
+  const body = (await response.json()) as PhotonResponse
+  const topResult = body.features?.[0]
+  const coordinates = topResult?.geometry?.coordinates
 
-    if (!coordinates || coordinates.length < 2) {
-      return null
-    }
+  if (!coordinates || coordinates.length < 2) {
+    throw new Error("No coordinates found")
+  }
 
-    const [longitude, latitude] = coordinates
+  const [longitude, latitude] = coordinates
 
-    if (typeof latitude !== "number" || typeof longitude !== "number") {
-      return null
-    }
+  if (typeof latitude !== "number" || typeof longitude !== "number") {
+    throw new Error("Invalid coordinates")
+  }
 
-    const countryCode = normalizeCountryCode(topResult.properties?.countrycode)
+  const countryCode = normalizeCountryCode(topResult.properties?.countrycode)
 
-    return {
-      latitude,
-      longitude,
-      street: getStreet(topResult.properties),
-      city: getCity(topResult.properties),
-      state: normalizeState(topResult.properties?.state, countryCode),
-      zipCode: topResult.properties?.postcode,
-      countryCode,
-      country: topResult.properties?.country,
-      hasHouseNumber: hasHouseNumber(topResult.properties),
-    }
-  } catch (error) {
-    console.error(`Error calling Photon API: ${error}`)
-    return null
+  return {
+    latitude,
+    longitude,
+    street: getStreet(topResult.properties),
+    city: getCity(topResult.properties),
+    state: normalizeState(topResult.properties?.state, countryCode),
+    zipCode: topResult.properties?.postcode,
+    countryCode,
+    country: topResult.properties?.country,
   }
 }
