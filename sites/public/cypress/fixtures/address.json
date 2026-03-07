@@ -8,7 +8,7 @@
       },
       "type": "Feature",
       "properties": {
-        "street": "Montgomery Street",
+        "street": "Montgomery St",
         "housenumber": "600",
         "city": "San Francisco",
         "state": "CA",
