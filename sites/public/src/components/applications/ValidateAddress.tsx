@@ -17,11 +17,11 @@ const streetIncludesHouseNumber = (street?: string) => {
   return /^\s*\d[\dA-Za-z/-]*\s+\S/.test(street)
 }
 
-const hasAddressLevelMatch = (street?: string, zipCode?: string, hasHouseNumber?: boolean) => {
+const hasAddressLevelMatch = (street?: string, zipCode?: string) => {
   const hasStreet = typeof street === "string" && street.trim().length > 0
   const hasZipCode = typeof zipCode === "string" && zipCode.trim().length > 0
 
-  return hasStreet && hasZipCode && (hasHouseNumber === true || streetIncludesHouseNumber(street))
+  return hasStreet && hasZipCode && streetIncludesHouseNumber(street)
 }
 
 export async function findValidatedAddress(
@@ -35,11 +35,7 @@ export async function findValidatedAddress(
     )
     if (
       !geocodedAddress ||
-      !hasAddressLevelMatch(
-        geocodedAddress.street,
-        geocodedAddress.zipCode,
-        geocodedAddress.hasHouseNumber
-      )
+      !hasAddressLevelMatch(geocodedAddress.street, geocodedAddress.zipCode)
     ) {
       setNewAddressSelected(false)
       setFoundAddress({ invalid: true, originalAddress: address })
