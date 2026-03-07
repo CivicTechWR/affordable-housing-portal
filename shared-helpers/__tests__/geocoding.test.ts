@@ -39,11 +39,10 @@ describe("forwardGeocode", () => {
       longitude: -122.40273,
       street: "600 Montgomery Street",
       city: "San Francisco",
-      state: "CA",
+      state: "California",
       zipCode: "94111",
       countryCode: "US",
       country: "United States",
-      hasHouseNumber: true,
     })
   })
 
@@ -75,11 +74,10 @@ describe("forwardGeocode", () => {
       longitude: -113.9839888,
       street: "Grinnell Drive",
       city: "West Glacier",
-      state: "MT",
+      state: "Montana",
       zipCode: "59936",
       countryCode: undefined,
       country: undefined,
-      hasHouseNumber: false,
     })
   })
 
@@ -112,11 +110,10 @@ describe("forwardGeocode", () => {
       longitude: -77.0365,
       street: "Pennsylvania Ave NW",
       city: "Washington",
-      state: "DC",
+      state: "District of Columbia",
       zipCode: "20500",
       countryCode: undefined,
       country: undefined,
-      hasHouseNumber: false,
     })
   })
 
@@ -155,11 +152,10 @@ describe("forwardGeocode", () => {
       zipCode: "N2J 2Y8",
       countryCode: "CA",
       country: "Canada",
-      hasHouseNumber: true,
     })
   })
 
-  it("returns null when no geocode feature is returned", async () => {
+  it("throws when no geocode feature is returned", async () => {
     const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>
     mockFetch.mockResolvedValue({
       ok: true,
@@ -167,8 +163,6 @@ describe("forwardGeocode", () => {
     } as Response)
     global.fetch = mockFetch
 
-    const result = await forwardGeocode("not a real address")
-
-    expect(result).toBeNull()
+    await expect(forwardGeocode("not a real address")).rejects.toThrow("No coordinates found")
   })
 })
