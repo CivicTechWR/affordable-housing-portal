@@ -89,12 +89,13 @@ const BuildingDetails = ({
       buildingAddress?.street &&
       buildingAddress?.zipCode
     ) {
-      const coordinates = await forwardGeocode(
-        `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
-      )
-
-      if (coordinates) {
+      try {
+        const coordinates = await forwardGeocode(
+          `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
+        )
         setLatLong?.(coordinates)
+      } catch (err) {
+        console.warn("Geocoding failed for building address:", err)
       }
     }
   }

@@ -56,12 +56,13 @@ const MultiselectQuestionsMap = ({ forwardGeocode, dataKey }: MultiselectQuestio
       buildingAddress?.street &&
       buildingAddress?.zipCode
     ) {
-      const coordinates = await forwardGeocode(
-        `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
-      )
-
-      if (coordinates) {
+      try {
+        const coordinates = await forwardGeocode(
+          `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
+        )
         setLatLong(coordinates)
+      } catch (err) {
+        console.warn("Geocoding failed for multiselect address:", err)
       }
     }
   }
