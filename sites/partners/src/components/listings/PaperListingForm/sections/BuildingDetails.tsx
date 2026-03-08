@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { t, Field, Select, FieldGroup, GridCell } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
@@ -33,6 +33,20 @@ type BuildingDetailsProps = {
   setLatLong?: (latLong: LatitudeLongitude) => void
 }
 
+const WATERLOO_ON_COORDINATES: LatitudeLongitude = {
+  latitude: 43.4701994,
+  longitude: -80.5452429,
+}
+
+const hasValidCoordinates = (coordinates?: LatitudeLongitude) => {
+  return (
+    typeof coordinates?.latitude === "number" &&
+    Number.isFinite(coordinates.latitude) &&
+    typeof coordinates?.longitude === "number" &&
+    Number.isFinite(coordinates.longitude)
+  )
+}
+
 const BuildingDetails = ({
   customMapPositionChosen,
   enableNonRegulatedListings,
@@ -46,6 +60,7 @@ const BuildingDetails = ({
   setLatLong,
 }: BuildingDetailsProps) => {
   const formMethods = useFormContext()
+  const [geocodingError, setGeocodingError] = useState(false)
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, watch, control, getValues, setValue, errors, clearErrors } = formMethods
@@ -94,8 +109,14 @@ const BuildingDetails = ({
           `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
         )
         setLatLong?.(coordinates)
+        setGeocodingError(false)
       } catch (err) {
         console.warn("Geocoding failed for building address:", err)
+        setLatLong?.({
+          latitude: null,
+          longitude: null,
+        })
+        setGeocodingError(true)
       }
     }
   }
@@ -159,6 +180,8 @@ const BuildingDetails = ({
   }
 
   const eitherRegionEnabled = enableRegions || enableConfigurableRegions
+  const mapPreviewCoordinates =
+    mapPinPosition === "custom" && !hasValidCoordinates(latLong) ? WATERLOO_ON_COORDINATES : latLong
 
   return (
     <>
@@ -363,20 +386,36 @@ const BuildingDetails = ({
           <Grid.Cell className="seeds-grid-span-2">
             <FieldValue label={t("listings.mapPreview")} className={styles["custom-label"]}>
               {displayMapPreview() ? (
-                <Map
-                  listingName={listing?.name}
-                  address={{
-                    city: buildingAddress.city,
-                    state: buildingAddress.state,
-                    street: buildingAddress.street,
-                    zipCode: buildingAddress.zipCode,
-                    latitude: latLong.latitude,
-                    longitude: latLong.longitude,
-                  }}
-                  enableCustomPinPositioning={getValues("mapPinPosition") === "custom"}
-                  setCustomMapPositionChosen={setCustomMapPositionChosen}
-                  setLatLong={setLatLong}
-                />
+                <>
+                  {geocodingError && mapPinPosition !== "custom" ? (
+                    <div
+                      className={"w-full p-3 flex items-center justify-center"}
+                      style={{
+                        height: "400px",
+                        backgroundColor: "#fef3cd",
+                        border: "1px solid #ffc107",
+                        color: "#856404",
+                      }}
+                    >
+                      {t("listings.mapPreviewGeocodingError")}
+                    </div>
+                  ) : (
+                    <Map
+                      listingName={listing?.name}
+                      address={{
+                        city: buildingAddress.city,
+                        state: buildingAddress.state,
+                        street: buildingAddress.street,
+                        zipCode: buildingAddress.zipCode,
+                        latitude: mapPreviewCoordinates?.latitude,
+                        longitude: mapPreviewCoordinates?.longitude,
+                      }}
+                      enableCustomPinPositioning={mapPinPosition === "custom"}
+                      setCustomMapPositionChosen={setCustomMapPositionChosen}
+                      setLatLong={setLatLong}
+                    />
+                  )}
+                </>
               ) : (
                 <div
                   className={"w-full bg-gray-400 p-3 flex items-center justify-center"}
