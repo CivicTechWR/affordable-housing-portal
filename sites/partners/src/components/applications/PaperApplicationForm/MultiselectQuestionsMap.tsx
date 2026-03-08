@@ -1,21 +1,8 @@
 import React, { useEffect, useState } from "react"
 import { FieldGroup, t } from "@bloom-housing/ui-components"
-import { Map, LatitudeLongitude } from "@bloom-housing/shared-helpers"
+import { Map, LatitudeLongitude, ForwardGeocodeResult } from "@bloom-housing/shared-helpers"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
 import { useFormContext, useWatch } from "react-hook-form"
-import { GeocodeService as GeocodeServiceType } from "@mapbox/mapbox-sdk/services/geocoding"
-
-interface MapBoxFeature {
-  center: number[] // Index 0: longitude, Index 1: latitude
-}
-
-interface MapboxApiResponseBody {
-  features: MapBoxFeature[]
-}
-
-interface MapboxApiResponse {
-  body: MapboxApiResponseBody
-}
 
 interface BuildingAddress {
   city: string
@@ -27,11 +14,11 @@ interface BuildingAddress {
 }
 
 type MultiselectQuestionsMapProps = {
-  geocodingClient: GeocodeServiceType
+  forwardGeocode: (query: string) => Promise<ForwardGeocodeResult | null>
   dataKey: string
 }
 
-const MultiselectQuestionsMap = ({ geocodingClient, dataKey }: MultiselectQuestionsMapProps) => {
+const MultiselectQuestionsMap = ({ forwardGeocode, dataKey }: MultiselectQuestionsMapProps) => {
   const [customMapPositionChosen, setCustomMapPositionChosen] = useState(true)
   const formMethods = useFormContext()
 
@@ -62,27 +49,21 @@ const MultiselectQuestionsMap = ({ geocodingClient, dataKey }: MultiselectQuesti
     )
   }
 
-  const getNewLatLong = () => {
+  const getNewLatLong = async () => {
     if (
       buildingAddress?.city &&
       buildingAddress?.state &&
       buildingAddress?.street &&
-      buildingAddress?.zipCode &&
-      geocodingClient
+      buildingAddress?.zipCode
     ) {
-      geocodingClient
-        .forwardGeocode({
-          query: `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}`,
-          limit: 1,
-        })
-        .send()
-        .then((response: MapboxApiResponse) => {
-          setLatLong({
-            latitude: response.body.features[0].center[1],
-            longitude: response.body.features[0].center[0],
-          })
-        })
-        .catch((err) => console.error(`Error calling Mapbox API: ${err}`))
+      try {
+        const coordinates = await forwardGeocode(
+          `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
+        )
+        setLatLong(coordinates)
+      } catch (err) {
+        console.warn("Geocoding failed for multiselect address:", err)
+      }
     }
   }
 
@@ -105,7 +86,7 @@ const MultiselectQuestionsMap = ({ geocodingClient, dataKey }: MultiselectQuesti
     let timeout
     if (!customMapPositionChosen || mapPinPosition === "automatic") {
       timeout = setTimeout(() => {
-        getNewLatLong()
+        void getNewLatLong()
       }, 1000)
     }
     return () => {
@@ -121,7 +102,7 @@ const MultiselectQuestionsMap = ({ geocodingClient, dataKey }: MultiselectQuesti
 
   useEffect(() => {
     if (mapPinPosition === "automatic") {
-      getNewLatLong()
+      void getNewLatLong()
       setCustomMapPositionChosen(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
