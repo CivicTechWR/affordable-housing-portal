@@ -60,7 +60,10 @@ const RequireLogin: FunctionComponent<RequireLoginProps> = ({
 
     if (loginRequiredForPath && initialStateLoaded && !profile) {
       addToast(signInMessage, { variant: "primary" })
-      void router.push(signInPath)
+      void router.push({
+        pathname: signInPathname,
+        query: { redirectUrl: router.asPath },
+      })
     }
 
     if (termsPath && profile && !profile?.agreedToTermsOfService && hasTerms) {

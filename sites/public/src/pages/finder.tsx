@@ -41,7 +41,7 @@ export async function getStaticProps(context: { req: any; query: any }) {
     FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
     ? await fetchMultiselectProgramData(context.req, jurisdiction?.id)
-    : null
+    : []
 
   return {
     props: {
