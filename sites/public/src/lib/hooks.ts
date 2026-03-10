@@ -12,6 +12,7 @@ import {
   ListingFilterParams,
   ListingOrderByKeys,
   ListingsStatusEnum,
+  MultiselectQuestion,
   MultiselectQuestionsApplicationSectionEnum,
   MultiselectQuestionFilterParams,
   OrderByEnum,
@@ -319,7 +320,10 @@ export async function fetchJurisdictionByName(req?: any) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function fetchMultiselectProgramData(req: any, jurisdictionId: string) {
+export async function fetchMultiselectProgramData(
+  req: any,
+  jurisdictionId: string
+): Promise<MultiselectQuestion[]> {
   try {
     const headers = {
       passkey: process.env.API_PASS_KEY,
@@ -351,8 +355,18 @@ export async function fetchMultiselectProgramData(req: any, jurisdictionId: stri
         headers,
       }
     )
-    return multiselectDataResponse?.data
+
+    const responseData = multiselectDataResponse?.data
+    if (Array.isArray(responseData)) {
+      return responseData
+    }
+    if (Array.isArray(responseData?.items)) {
+      return responseData.items
+    }
+
+    return []
   } catch (error) {
     console.log("error = ", error)
+    return []
   }
 }
