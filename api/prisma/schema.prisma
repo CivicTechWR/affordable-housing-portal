@@ -1185,7 +1185,7 @@ model Listings {
   accessibleMarketingFlyer             String?                     @map("accessible_marketing_flyer")
   accessibleMarketingFlyerFileId       String?                     @map("accessible_marketing_flyer_file_id") @db.Uuid
   additionalApplicationSubmissionNotes String?                     @map("additional_application_submission_notes")
-  afsLastRunAt                         DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("afs_last_run_at") @db.Timestamptz(6)
+  afsLastRunAt                         DateTime?                   @default("1970-01-01T07:00:00.000Z") @map("afs_last_run_at") @db.Timestamptz(6)
   allowsCats                           Boolean?                    @map("allows_cats")
   allowsDogs                           Boolean?                    @map("allows_dogs")
   amenities                            String?
@@ -1239,7 +1239,7 @@ model Listings {
   isVerified                           Boolean?                    @default(false) @map("is_verified")
   isWaitlistOpen                       Boolean?                    @map("is_waitlist_open")
   jurisdictionId                       String?                     @map("jurisdiction_id") @db.Uuid
-  lastApplicationUpdateAt              DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("last_application_update_at") @db.Timestamptz(6)
+  lastApplicationUpdateAt              DateTime?                   @default("1970-01-01T07:00:00.000Z") @map("last_application_update_at") @db.Timestamptz(6)
   lastUpdatedByUserId                  String?                     @map("last_updated_by_user_id") @db.Uuid
   leasingAgentAddressId                String?                     @map("leasing_agent_address_id") @db.Uuid
   leasingAgentEmail                    String?                     @map("leasing_agent_email")
@@ -1279,7 +1279,7 @@ model Listings {
   rentalAssistance                     String?                     @map("rental_assistance")
   rentalHistory                        String?                     @map("rental_history")
   requestedChanges                     String?                     @map("requested_changes")
-  requestedChangesDate                 DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("requested_changes_date") @db.Timestamptz(6)
+  requestedChangesDate                 DateTime?                   @default("1970-01-01T07:00:00.000Z") @map("requested_changes_date") @db.Timestamptz(6)
   requestedChangesUserId               String?                     @map("requested_changes_user_id") @db.Uuid
   requiredDocuments                    String?                     @map("required_documents")
   reservedCommunityDescription         String?                     @map("reserved_community_description")
@@ -1372,7 +1372,7 @@ model ListingSnapshot {
   accessibleMarketingFlyer                String?                     @map("accessible_marketing_flyer")
   accessibleMarketingFlyerFileSnapshotId  String?                     @map("accessible_marketing_flyer_file_snapshot_id") @db.Uuid
   additionalApplicationSubmissionNotes    String?                     @map("additional_application_submission_notes")
-  afsLastRunAt                            DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("afs_last_run_at") @db.Timestamptz(6)
+  afsLastRunAt                            DateTime?                   @default("1970-01-01T07:00:00.000Z") @map("afs_last_run_at") @db.Timestamptz(6)
   allowsCats                              Boolean?                    @map("allows_cats")
   allowsDogs                              Boolean?                    @map("allows_dogs")
   amenities                               String?
@@ -1426,7 +1426,7 @@ model ListingSnapshot {
   isVerified                              Boolean?                    @default(false) @map("is_verified")
   isWaitlistOpen                          Boolean?                    @map("is_waitlist_open")
   jurisdictionId                          String?                     @map("jurisdiction_id") @db.Uuid
-  lastApplicationUpdateAt                 DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("last_application_update_at") @db.Timestamptz(6)
+  lastApplicationUpdateAt                 DateTime?                   @default("1970-01-01T07:00:00.000Z") @map("last_application_update_at") @db.Timestamptz(6)
   lastUpdatedByUserId                     String?                     @map("last_updated_by_user_id") @db.Uuid
   leasingAgentAddressSnapshotId           String?                     @map("leasing_agent_address_snapshot_id") @db.Uuid
   leasingAgentEmail                       String?                     @map("leasing_agent_email")
@@ -1465,7 +1465,7 @@ model ListingSnapshot {
   rentalAssistance                        String?                     @map("rental_assistance")
   rentalHistory                           String?                     @map("rental_history")
   requestedChanges                        String?                     @map("requested_changes")
-  requestedChangesDate                    DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("requested_changes_date") @db.Timestamptz(6)
+  requestedChangesDate                    DateTime?                   @default("1970-01-01T07:00:00.000Z") @map("requested_changes_date") @db.Timestamptz(6)
   requestedChangesUserId                  String?                     @map("requested_changes_user_id") @db.Uuid
   requiredDocuments                       String?                     @map("required_documents")
   reservedCommunityDescription            String?                     @map("reserved_community_description")
