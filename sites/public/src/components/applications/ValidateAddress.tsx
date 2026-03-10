@@ -1,7 +1,7 @@
-import * as Sentry from "@sentry/nextjs"
 import { Address, MultiLineAddress, t } from "@bloom-housing/ui-components"
 import { Button } from "@bloom-housing/ui-seeds"
-import GeocodeService from "@mapbox/mapbox-sdk/services/geocoding"
+import { forwardGeocode } from "@bloom-housing/shared-helpers"
+import * as Sentry from "@sentry/nextjs"
 
 export interface FoundAddress {
   newAddress?: Address
@@ -9,61 +9,57 @@ export interface FoundAddress {
   invalid?: boolean
 }
 
-export const findValidatedAddress = (
+const streetIncludesHouseNumber = (street?: string) => {
+  if (typeof street !== "string") {
+    return false
+  }
+
+  return /^\s*\d[\dA-Za-z/-]*\s+\S/.test(street)
+}
+
+const hasAddressLevelMatch = (street?: string, zipCode?: string) => {
+  const hasStreet = typeof street === "string" && street.trim().length > 0
+  const hasZipCode = typeof zipCode === "string" && zipCode.trim().length > 0
+
+  return hasStreet && hasZipCode && streetIncludesHouseNumber(street)
+}
+
+export async function findValidatedAddress(
   address: Address,
   setFoundAddress: React.Dispatch<React.SetStateAction<FoundAddress>>,
   setNewAddressSelected: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  let geocodingClient
+) {
   try {
-    geocodingClient = GeocodeService({
-      accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-    })
-  } catch (err) {
-    console.warn("Could not initialize Mapbox GeocodeService:", err)
-    Sentry.captureException(err)
-    setNewAddressSelected(false)
-    setFoundAddress({ invalid: true, originalAddress: address })
-    return
-  }
-
-  geocodingClient
-    .forwardGeocode({
-      query: `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, United States`,
-      limit: 1,
-      types: ["address"],
-    })
-    .send()
-    .then((response) => {
-      const [street, city, region] = response.body.features[0].place_name.split(", ")
-      const coordinates = response.body.features[0].geometry?.coordinates
-      const regionElements = region.split(" ")
-      const zipCode = regionElements[regionElements.length - 1]
-
-      if (!zipCode) {
-        setNewAddressSelected(false)
-        setFoundAddress({ invalid: true, originalAddress: address })
-      } else {
-        setNewAddressSelected(true)
-        setFoundAddress({
-          originalAddress: address,
-          newAddress: {
-            street,
-            street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
-            city,
-            state: address.state,
-            zipCode,
-            longitude: coordinates ? coordinates[0] : undefined,
-            latitude: coordinates ? coordinates[1] : undefined,
-          },
-        })
-      }
-    })
-    .catch((err) => {
-      console.error(`Error calling Mapbox API: ${err}`)
+    const geocodedAddress = await forwardGeocode(
+      `${address.street}, ${address.city}, ${address.state} ${address.zipCode}, Canada`
+    )
+    if (
+      !geocodedAddress ||
+      !hasAddressLevelMatch(geocodedAddress.street, geocodedAddress.zipCode)
+    ) {
       setNewAddressSelected(false)
       setFoundAddress({ invalid: true, originalAddress: address })
-    })
+    } else {
+      setNewAddressSelected(true)
+      setFoundAddress({
+        originalAddress: address,
+        newAddress: {
+          street: geocodedAddress.street,
+          street2: address.street2 && address.street2 !== "" ? address.street2 : undefined,
+          city: geocodedAddress.city || address.city,
+          state: geocodedAddress.state || address.state,
+          zipCode: geocodedAddress.zipCode,
+          longitude: geocodedAddress.longitude,
+          latitude: geocodedAddress.latitude,
+        },
+      })
+    }
+  } catch (err) {
+    Sentry.captureException(err)
+    console.error(`Error calling Photon API: ${err}`)
+    setNewAddressSelected(false)
+    setFoundAddress({ invalid: true, originalAddress: address })
+  }
 }
 
 interface AddressValidationSelectionProps {

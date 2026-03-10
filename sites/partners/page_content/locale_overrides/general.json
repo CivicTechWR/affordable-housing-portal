@@ -370,6 +370,7 @@
   "listings.mapPinCustomDescription": "Drag the pin to update the marker location",
   "listings.mapPinPosition": "Map pin position",
   "listings.mapPreview": "Map preview",
+  "listings.mapPreviewGeocodingError": "Could not find coordinates for this address. Try adjusting the address or use a custom pin position.",
   "listings.mapPreviewNoAddress": "Enter an address to preview the map",
   "listings.marketing": "Marketing",
   "listings.marketingFlyer.accessibleTitle": "Accessible marketing flyer",

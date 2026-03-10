@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useMemo, useState } from "react"
+import React, { ReactNode, useMemo } from "react"
 import { Field, t, resolveObject } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
 import { useFormContext, UseFormMethods } from "react-hook-form"
@@ -9,6 +9,7 @@ import {
   AddressHolder,
   cleanMultiselectString,
   getAllOptions,
+  forwardGeocode,
 } from "@bloom-housing/shared-helpers"
 import {
   ListingMultiselectQuestion,
@@ -18,9 +19,6 @@ import {
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
 import { FormAddressAlternate } from "@bloom-housing/shared-helpers/src/views/address/FormAddressAlternate"
-import GeocodeService, {
-  GeocodeService as GeocodeServiceType,
-} from "@mapbox/mapbox-sdk/services/geocoding"
 import MultiselectQuestionsMap from "../MultiselectQuestionsMap"
 
 type FormMultiselectQuestionsProps = {
@@ -67,22 +65,6 @@ const FormMultiselectQuestions = ({
 
     return keys
   }, [questions, applicationSection])
-
-  const [geocodingClient, setGeocodingClient] = useState<GeocodeServiceType>()
-
-  useEffect(() => {
-    if (process.env.mapBoxToken || process.env.MAPBOX_TOKEN) {
-      try {
-        setGeocodingClient(
-          GeocodeService({
-            accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-          })
-        )
-      } catch (err) {
-        console.warn("Could not initialize Mapbox GeocodeService:", err)
-      }
-    }
-  }, [])
 
   if (questions?.length === 0) {
     return null
@@ -149,7 +131,7 @@ const FormMultiselectQuestions = ({
             />
             <MultiselectQuestionsMap
               dataKey={fieldName(question.text, applicationSection, `${option.text}`)}
-              geocodingClient={geocodingClient}
+              forwardGeocode={forwardGeocode}
             />
           </div>
         )}
