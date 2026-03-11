@@ -16,7 +16,9 @@ import {
   getListingStatusMessage,
   getListingStatusMessageContent,
   getStatusPrefix,
+  isFeatureFlagOn,
 } from "../../src/lib/helpers"
+import { StubJurisdiction } from "./helpers.stub"
 
 describe("helpers", () => {
   describe("getStatusPrefix", () => {
@@ -592,6 +594,20 @@ describe("helpers", () => {
       expect(getApplicationSeason(MarketingSeasonEnum.spring, null, 2027)).toEqual(
         "Residents should apply in Spring 2027"
       )
+    })
+  })
+
+  describe("isFeatureFlagOn", () => {
+    it("should return correctly for unset flag", () => {
+      expect(isFeatureFlagOn(StubJurisdiction, "disableWorkInRegion")).toEqual(false)
+    })
+
+    it("should return correctly for disableListingPreferences", () => {
+      expect(isFeatureFlagOn(StubJurisdiction, "disableListingPreferences")).toEqual(true)
+    })
+
+    it("should return correctly for disableBuildingSelectionCriteria", () => {
+      expect(isFeatureFlagOn(StubJurisdiction, "disableBuildingSelectionCriteria")).toEqual(true)
     })
   })
 })

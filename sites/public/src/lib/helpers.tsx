@@ -481,7 +481,24 @@ export const isFeatureFlagOn = (
   jurisdiction: Jurisdiction | { featureFlags: FeatureFlag[] },
   featureFlag: string
 ) => {
-  return jurisdiction?.featureFlags?.some((flag) => flag.name === featureFlag && flag.active)
+  const featureFlagOverrides = [
+    {
+      name: "disableListingPreferences",
+      active: true,
+    },
+    {
+      name: "disableBuildingSelectionCriteria",
+      active: true,
+    },
+  ]
+
+  const flagOverride = featureFlagOverrides.find((flag) => flag.name == featureFlag)
+
+  if (flagOverride !== undefined) {
+    return flagOverride.active
+  } else {
+    return jurisdiction?.featureFlags?.some((flag) => flag.name === featureFlag && flag.active)
+  }
 }
 
 export const setFeatureFlagLocalStorage = (

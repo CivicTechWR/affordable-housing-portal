@@ -27,9 +27,28 @@ export const doJurisdictionHaveFeatureFlagSet = (
   jurisdiction: Jurisdiction,
   featureFlagName: FeatureFlagEnum,
 ) => {
-  return jurisdiction?.featureFlags?.some(
-    (flag) => flag.name === featureFlagName && flag.active,
+  const featureFlagOverrides = [
+    {
+      name: 'disableListingPreferences',
+      active: true,
+    },
+    {
+      name: 'disableBuildingSelectionCriteria',
+      active: true,
+    },
+  ];
+
+  const flagOverride = featureFlagOverrides.find(
+    (flag) => flag.name == featureFlagName,
   );
+
+  if (flagOverride !== undefined) {
+    return flagOverride.active;
+  } else {
+    return jurisdiction?.featureFlags?.some(
+      (flag) => flag.name === featureFlagName && flag.active,
+    );
+  }
 };
 
 export const doAnyJurisdictionHaveFalsyFeatureFlagValue = (
