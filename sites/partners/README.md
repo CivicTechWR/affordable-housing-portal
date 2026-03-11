@@ -14,6 +14,13 @@ If you don't have yarn installed, you can install homebrew with [these instructi
 - From within `sites/partners` copy the `.env.template` to `.env` and edit variables appropriate to your local environment - some keys are secret and are internally available - the template file includes default values and descriptions of each variable
 - `yarn dev:all` at root will start up the backend at port 3100 and the partners app at port 3001
 
+### Secrets / Infisical
+
+We use Infisical to manage and seed third-party API credentials and other secrets for this service. These secret values are not committed to the repository.
+
+- Install the Infisical CLI and authenticate with the team account (for example, run `infisical login`).
+- If you do not yet have access to the Infisical workspace, ping the appropriate Slack channel (e.g. `#project-accessible-housing-portal`) to request access and the credentials/invite.
+
 ## Tests
 
 For the partners site, tests currently consist of both a Cypress end-to-end suite and a Jest unit/integration suite.
