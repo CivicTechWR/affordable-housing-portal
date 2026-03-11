@@ -91,23 +91,6 @@ const DetailApplicationDates = () => {
   return (
     <>
       <SectionWithGrid heading={t("listings.sections.applicationDatesTitle")} inset>
-        <Grid.Row columns={3}>
-          <Grid.Cell>
-            <FieldValue id="applicationDeadline" label={t("listings.applicationDeadline")}>
-              {getDetailFieldDate(listing.applicationDueDate) ?? t("t.n/a")}
-            </FieldValue>
-          </Grid.Cell>
-          <Grid.Cell>
-            <FieldValue
-              id="applicationDueTime"
-              className="seeds-grid-span-2"
-              label={t("listings.applicationDueTime")}
-            >
-              {getDetailFieldTime(listing.applicationDueDate) ?? t("t.n/a")}
-            </FieldValue>
-          </Grid.Cell>
-        </Grid.Row>
-
         {!!openHouseEvents.length && (
           <Grid.Row columns={1}>
             <Grid.Cell>

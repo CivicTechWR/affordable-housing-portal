@@ -1,5 +1,4 @@
 import { TimeFieldPeriod } from "@bloom-housing/ui-components"
-import { createTime } from "../../../src/lib/helpers"
 import DatesFormatter from "../../../src/lib/listings/DatesFormatter"
 import { FormMetadata } from "../../../src/lib/listings/formTypes"
 import { YesNoEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
@@ -21,14 +20,12 @@ const dueTime = {
 }
 
 describe("DatesFormatter", () => {
-  it("should format applicationDueDate and Time", () => {
+  it("should format applicationDueDate", () => {
     const data = {
       applicationDueDateField: dueDate,
       applicationDueTimeField: dueTime,
     }
-    const applicationDueDate = formatData(data).applicationDueDate
-    expect(applicationDueDate).toEqual(createTime(applicationDueDate, dueTime))
-    expect(formatData(data).applicationDueDate).toEqual(createTime(applicationDueDate, dueTime))
+    expect(formatData(data).applicationDueDate).toBeNull()
   })
 
   it("should format postmarkedApplicationsReceivedByDate", () => {

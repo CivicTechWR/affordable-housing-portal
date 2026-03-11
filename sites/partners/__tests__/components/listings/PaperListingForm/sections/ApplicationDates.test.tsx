@@ -40,39 +40,8 @@ describe("ApplicationDates", () => {
     expect(
       screen.getByText("Tell us about important dates related to this listing.")
     ).toBeInTheDocument()
-    expect(screen.getByRole("group", { name: "Application due date" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Month" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Day" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Year" })).toBeInTheDocument()
-    expect(screen.getByRole("group", { name: "Application due time" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Hour" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "minutes" })).toBeInTheDocument()
-    expect(screen.getByRole("combobox", { name: "time" })).toBeInTheDocument()
-    expect(screen.getByRole("option", { name: "AM" })).toBeInTheDocument()
-    expect(screen.getByRole("option", { name: "PM" })).toBeInTheDocument()
-    expect(screen.getByText("When applications close to the public")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Add open house" })).toBeInTheDocument()
     expect(screen.queryByText("Marketing status")).not.toBeInTheDocument()
-  })
-
-  it("should mark due date as required", () => {
-    render(
-      <FormProviderWrapper>
-        <ApplicationDates
-          enableMarketingStatus={false}
-          enableMarketingStatusMonths={false}
-          listing={{} as unknown as FormListing}
-          requiredFields={["applicationDueDate"]}
-          openHouseEvents={[]}
-          setOpenHouseEvents={() => {
-            return
-          }}
-        />
-      </FormProviderWrapper>
-    )
-
-    expect(screen.getByRole("group", { name: "Application due date *" })).toBeInTheDocument()
-    expect(screen.getByRole("group", { name: "Application due time *" })).toBeInTheDocument()
   })
 
   it("should show marketing status section with seasons", async () => {
