@@ -4,8 +4,6 @@ import { getDetailFieldDate, getDetailFieldTime } from "../../PaperListingDetail
 import dayjs from "dayjs"
 import {
   t,
-  DateField,
-  TimeField,
   MinimalTable,
   FieldGroup,
   Field,
@@ -22,7 +20,7 @@ import {
   MarketingSeasonEnum,
   MonthEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
-import { fieldMessage, fieldHasError, getLabel } from "../../../../lib/helpers"
+import { fieldMessage, fieldHasError } from "../../../../lib/helpers"
 import styles from "../ListingForm.module.scss"
 
 type ApplicationDatesProps = {
@@ -135,8 +133,6 @@ const ApplicationDates = ({
     }
   }
 
-  const hasDueDateError = errors?.applicationDueDate || errors?.applicationDueDateField
-
   const marketingTypeChoice = watch("marketingType")
 
   return (
@@ -146,72 +142,6 @@ const ApplicationDates = ({
         heading={t("listings.sections.applicationDatesTitle")}
         subheading={t("listings.sections.applicationDatesSubtitle")}
       >
-        <Grid.Row columns={2}>
-          <Grid.Cell>
-            <DateField
-              label={getLabel(
-                "applicationDueDate",
-                requiredFields,
-                t("listings.applicationDeadline")
-              )}
-              name={"applicationDueDateField"}
-              id={"applicationDueDateField"}
-              register={register}
-              setValue={setValue}
-              watch={watch}
-              error={
-                hasDueDateError && {
-                  month: hasDueDateError,
-                  day: hasDueDateError,
-                  year: hasDueDateError,
-                }
-              }
-              note={t("listings.whenApplicationsClose")}
-              defaultDate={{
-                month: listing?.applicationDueDate
-                  ? dayjs(new Date(listing?.applicationDueDate)).format("MM")
-                  : null,
-                day: listing?.applicationDueDate
-                  ? dayjs(new Date(listing?.applicationDueDate)).format("DD")
-                  : null,
-                year: listing?.applicationDueDate
-                  ? dayjs(new Date(listing?.applicationDueDate)).format("YYYY")
-                  : null,
-              }}
-            />
-          </Grid.Cell>
-          <Grid.Cell>
-            <TimeField
-              label={getLabel(
-                "applicationDueDate",
-                requiredFields,
-                t("listings.applicationDueTime")
-              )}
-              name={"applicationDueTimeField"}
-              id={"applicationDueTimeField"}
-              register={register}
-              setValue={setValue}
-              watch={watch}
-              error={errors?.applicationDueDate || errors?.applicationDueTimeField}
-              defaultValues={{
-                hours: listing?.applicationDueDate
-                  ? dayjs(new Date(listing?.applicationDueDate)).format("hh")
-                  : null,
-                minutes: listing?.applicationDueDate
-                  ? dayjs(new Date(listing?.applicationDueDate)).format("mm")
-                  : null,
-                seconds: listing?.applicationDueDate
-                  ? dayjs(new Date(listing?.applicationDueDate)).format("ss")
-                  : null,
-                period: listing?.applicationDueDate
-                  ? new Date(listing?.applicationDueDate).getHours() >= 12
-                    ? "pm"
-                    : "am"
-                  : "pm",
-              }}
-            />
-          </Grid.Cell>
-        </Grid.Row>
         {enableMarketingStatus && (
           <Grid.Row columns={2}>
             <Grid.Cell>

@@ -74,7 +74,6 @@ const jurisdictions = [
       "leasingAgentOfficeHours",
       "listingsLeasingAgentAddress",
       "additionalApplicationSubmissionNotes",
-      "applicationDueDate",
       "configurableRegion",
     ],
   },
@@ -421,8 +420,6 @@ describe("add listing", () => {
       "Office hours",
       "Street address or PO box",
       "Additional application submission notes",
-      "Application due date",
-      "Application due time",
     ]
 
     requiredFields.forEach((fieldName) => {
@@ -532,7 +529,6 @@ describe("add listing", () => {
       "Office hours",
       "Street address or PO box",
       "Additional application submission notes",
-      "Application due date",
     ]
 
     possibleRequiredFields.forEach((fieldName) => {
