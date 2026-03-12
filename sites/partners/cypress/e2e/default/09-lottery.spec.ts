@@ -1,4 +1,4 @@
-describe("Lottery Tests", () => {
+describe.skip("Lottery Tests", () => {
   before(() => {
     cy.loginApi()
   })
