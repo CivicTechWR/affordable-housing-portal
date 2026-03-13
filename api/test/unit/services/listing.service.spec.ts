@@ -51,7 +51,6 @@ import { GeocodingService } from '../../../src/services/geocoding.service';
 import { FilterAvailabilityEnum } from '../../../src/enums/listings/filter-availability-enum';
 import { CronJobService } from '../../../src/services/cron-job.service';
 import { MultiselectQuestionService } from '../../../src/services/multiselect-question.service';
-import { create } from 'domain';
 
 /*
   generates a super simple mock listing for us to test logic with
@@ -4583,6 +4582,10 @@ describe('Testing listing service', () => {
   describe('Test duplicate endpoint', () => {
     it('should duplicate a listing, including units', async () => {
       const listing = mockListing(1, { numberToMake: 2, date: new Date() });
+      const adminUser = {
+        ...user,
+        userRoles: { isAdmin: true },
+      } as User;
 
       const newName = 'duplicate name';
 
@@ -4611,7 +4614,7 @@ describe('Testing listing service', () => {
             id: listing.id.toString(),
           },
         },
-        user,
+        adminUser,
       );
 
       expect(newListing.name).toBe(newName);
@@ -4699,6 +4702,10 @@ describe('Testing listing service', () => {
 
     it('should duplicate a listing, excluding units', async () => {
       const listing = mockListing(1, { numberToMake: 2, date: new Date() });
+      const adminUser = {
+        ...user,
+        userRoles: { isAdmin: true },
+      } as User;
 
       const newName = 'duplicate name';
 
@@ -4728,7 +4735,7 @@ describe('Testing listing service', () => {
             id: listing.id.toString(),
           },
         },
-        user,
+        adminUser,
       );
 
       expect(newListing.name).toBe(newName);
