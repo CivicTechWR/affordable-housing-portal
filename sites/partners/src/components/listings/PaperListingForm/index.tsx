@@ -462,7 +462,7 @@ const ListingForm = ({
                   updateListing(result as Listing)
                 }
               } else {
-                if (loadProfile) {
+                if (profile?.userRoles?.isPartner && loadProfile) {
                   await loadProfile(`/listings/${result.id}`)
                 } else {
                   await router.push(`/listings/${result.id}`)
