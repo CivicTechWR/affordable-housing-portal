@@ -1917,16 +1917,6 @@ export class ListingService implements OnModuleInit {
       requestingUser?.userRoles?.isPartner &&
       duplicateListingPermissions?.includes(UserRoleEnum.partner)
     ) {
-      await this.prisma.userAccounts.update({
-        data: {
-          listings: {
-            connect: { id: res.id },
-          },
-        },
-        where: {
-          id: requestingUser.id,
-        },
-      });
       await this.prisma.activityLog.create({
         data: {
           module: 'user',
