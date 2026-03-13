@@ -77,7 +77,7 @@ export const stagingSeed = async (
   const mainJurisdiction = await prismaClient.jurisdictions.create({
     data: jurisdictionFactory(jurisdictionName, {
       publicSiteBaseURL: publicSiteBaseURL,
-      listingApprovalPermissions: [],
+      listingApprovalPermissions: [UserRoleEnum.admin],
       featureFlags: [
         ...optionalMainFlags,
         FeatureFlagEnum.enableAccessibilityFeatures,

@@ -159,6 +159,11 @@ describe('Testing permission service', () => {
       userRoles: {
         isPartner: true,
       },
+      jurisdictions: [
+        {
+          id: 'juris id',
+        },
+      ],
       listings: [
         {
           id: 'listing id 1',
@@ -172,6 +177,15 @@ describe('Testing permission service', () => {
     const enforcer = await service.addUserPermissions(e, user);
     expect(
       await enforcer.hasRoleForUser('example id', UserRoleEnum.partner),
+    ).toEqual(true);
+
+    expect(
+      await enforcer.hasPermissionForUser(
+        'example id',
+        'listing',
+        `r.obj.jurisdictionId == 'juris id'`,
+        `(${permissionActions.create})`,
+      ),
     ).toEqual(true);
 
     expect(

@@ -1749,7 +1749,7 @@ export class ListingService implements OnModuleInit {
           )
     )?.duplicateListingPermissions;
 
-    const userRoles =
+    const canDuplicate =
       requestingUser?.userRoles?.isAdmin ||
       requestingUser?.userRoles?.isSupportAdmin ||
       (requestingUser?.userRoles?.isJurisdictionalAdmin &&
@@ -1761,15 +1761,16 @@ export class ListingService implements OnModuleInit {
           UserRoleEnum.limitedJurisdictionAdmin,
         )) ||
       (requestingUser?.userRoles?.isPartner &&
-        duplicateListingPermissions?.includes(UserRoleEnum.partner))
-        ? {
-            ...requestingUser.userRoles,
-            isAdmin: true,
-          }
-        : {
-            ...requestingUser?.userRoles,
-            isAdmin: false,
-          };
+        duplicateListingPermissions?.includes(UserRoleEnum.partner));
+
+    if (!canDuplicate) {
+      throw new ForbiddenException();
+    }
+
+    const userRoles = {
+      ...requestingUser.userRoles,
+      isAdmin: true,
+    };
 
     await this.permissionService.canOrThrow(
       { ...requestingUser, userRoles: userRoles },
