@@ -19,6 +19,7 @@ const ListingGuard = ({ children }: AuthGuardProps) => {
     profile?.userRoles?.isSupportAdmin ||
     profile?.userRoles?.isJurisdictionalAdmin ||
     profile?.userRoles?.isLimitedJurisdictionalAdmin ||
+    (profile?.userRoles?.isPartner && !listingId) ||
     leasingAgentInListingsIds?.includes(listingId)
 
   if (hasPrivileges) {

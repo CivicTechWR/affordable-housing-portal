@@ -116,6 +116,7 @@ export default function ListingsList() {
     profile?.userRoles?.isJurisdictionalAdmin ||
     profile?.userRoles?.isLimitedJurisdictionalAdmin ||
     false
+  const canAddListing = isAdmin || profile?.userRoles?.isPartner || false
   const { onExport, csvExportLoading } = useListingExport()
   const router = useRouter()
   const tableOptions = useAgTable()
@@ -372,7 +373,7 @@ export default function ListingsList() {
             }}
             headerContent={
               <div className="flex gap-2 items-center">
-                {isAdmin && (
+                {canAddListing && (
                   <>
                     <Button
                       size="sm"
@@ -391,22 +392,24 @@ export default function ListingsList() {
                     >
                       {t("listings.addListing")}
                     </Button>
-                    <Button
-                      id="export-listings"
-                      variant="primary-outlined"
-                      onClick={() => onExport()}
-                      leadIcon={
-                        !csvExportLoading ? (
-                          <Icon>
-                            <DocumentArrowDownIcon />
-                          </Icon>
-                        ) : null
-                      }
-                      size="sm"
-                      loadingMessage={csvExportLoading && t("t.formSubmitted")}
-                    >
-                      {t("t.exportToCSV")}
-                    </Button>
+                    {isAdmin && (
+                      <Button
+                        id="export-listings"
+                        variant="primary-outlined"
+                        onClick={() => onExport()}
+                        leadIcon={
+                          !csvExportLoading ? (
+                            <Icon>
+                              <DocumentArrowDownIcon />
+                            </Icon>
+                          ) : null
+                        }
+                        size="sm"
+                        loadingMessage={csvExportLoading && t("t.formSubmitted")}
+                      >
+                        {t("t.exportToCSV")}
+                      </Button>
+                    )}
                   </>
                 )}
               </div>

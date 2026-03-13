@@ -1678,6 +1678,13 @@ export class ListingService implements OnModuleInit {
               },
             }
           : undefined,
+        userAccounts: requestingUser?.userRoles?.isPartner
+          ? {
+              connect: {
+                id: requestingUser.id,
+              },
+            }
+          : undefined,
         section8Acceptance: !!dto.section8Acceptance,
         copyOf: copyOfId
           ? {
@@ -1696,6 +1703,7 @@ export class ListingService implements OnModuleInit {
           : undefined,
       },
     });
+
     const mappedListing = mapTo(Listing, rawListing);
 
     if (mappedListing.status === ListingsStatusEnum.pendingReview) {

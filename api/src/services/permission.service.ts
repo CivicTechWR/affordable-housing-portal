@@ -138,6 +138,17 @@ export class PermissionService {
       await enforcer.addRoleForUser(user.id, UserRoleEnum.partner);
 
       await Promise.all(
+        user.jurisdictions.map(async (jurisdiction: Jurisdiction) => {
+          await enforcer.addPermissionForUser(
+            user.id,
+            'listing',
+            `r.obj.jurisdictionId == '${jurisdiction.id}'`,
+            `(${permissionActions.create})`,
+          );
+        }),
+      );
+
+      await Promise.all(
         user?.listings.map(async (listing: Listing) => {
           await enforcer.addPermissionForUser(
             user.id,

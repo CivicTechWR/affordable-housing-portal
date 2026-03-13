@@ -89,6 +89,7 @@ describe('Testing Permissioning of endpoints as partner with correct listing', (
   let applicationFlaggedSetService: ApplicationFlaggedSetService;
   let cookies = '';
   let jurisdictionId = '';
+  let partnerUserId = '';
   let userListingId = '';
   let closedUserListingId = '';
   let closedUserListingId2 = '';
@@ -179,6 +180,7 @@ describe('Testing Permissioning of endpoints as partner with correct listing', (
         confirmedAt: new Date(),
       }),
     });
+    partnerUserId = storedUser.id;
     const resLogIn = await request(app.getHttpServer())
       .post('/auth/login')
       .set({ passkey: process.env.API_PASS_KEY || '' })
@@ -1166,12 +1168,51 @@ describe('Testing Permissioning of endpoints as partner with correct listing', (
       expect(activityLogResult).not.toBeNull();
     });
 
-    it('should error as forbidden for create endpoint', async () => {
+    it('should succeed for create endpoint and allow editing the created listing', async () => {
       const val = await constructFullListingData(
         prisma,
         undefined,
         jurisdictionId,
       );
+
+      const createResponse = await request(app.getHttpServer())
+        .post('/listings')
+        .set({ passkey: process.env.API_PASS_KEY || '' })
+        .send(val)
+        .set('Cookie', cookies)
+        .expect(201);
+
+      expect(createResponse.body.status).toEqual(ListingsStatusEnum.active);
+
+      const createdListing = await prisma.listings.findUnique({
+        where: {
+          id: createResponse.body.id,
+        },
+        include: {
+          userAccounts: true,
+        },
+      });
+
+      expect(createdListing?.userAccounts.map((user) => user.id)).toContain(
+        partnerUserId,
+      );
+
+      const updatedListing = await constructFullListingData(
+        prisma,
+        createResponse.body.id,
+        jurisdictionId,
+      );
+
+      await request(app.getHttpServer())
+        .put(`/listings/${createResponse.body.id}`)
+        .set({ passkey: process.env.API_PASS_KEY || '' })
+        .send(updatedListing)
+        .set('Cookie', cookies)
+        .expect(200);
+    });
+
+    it('should error as forbidden for create endpoint in another jurisdiction', async () => {
+      const val = await constructFullListingData(prisma);
 
       await request(app.getHttpServer())
         .post('/listings')
