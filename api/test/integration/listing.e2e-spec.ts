@@ -409,8 +409,10 @@ describe('Listing Controller Tests', () => {
       unitAmenities: 'unit amenity string',
       servicesOffered: 'services offered string',
       yearBuilt: 2023,
-      applicationDueDate: new Date(),
-      applicationOpenDate: new Date(),
+      // Keep the default test listing in an explicitly open window so status
+      // assertions don't race against "due now" timestamps.
+      applicationDueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      applicationOpenDate: new Date(Date.now() - 24 * 60 * 60 * 1000),
       applicationOrganization: 'app organization string',
       applicationPickUpAddressOfficeHours: 'pick up office hours string',
       applicationPickUpAddressType: ApplicationAddressTypeEnum.leasingAgent,
