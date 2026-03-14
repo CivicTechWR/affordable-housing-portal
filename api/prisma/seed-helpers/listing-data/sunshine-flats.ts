@@ -5,7 +5,7 @@ import {
   ApplicationMethodsTypeEnum,
 } from '@prisma/client';
 import dayjs from 'dayjs';
-import { glacierAddress } from '../address-factory';
+import { jaspAddress } from '../address-factory';
 
 export const sunshineFlats: Prisma.ListingsCreateInput = {
   additionalApplicationSubmissionNotes: null,
@@ -76,7 +76,7 @@ export const sunshineFlats: Prisma.ListingsCreateInput = {
   contentUpdatedAt: new Date(),
   publishedAt: new Date(),
   listingsBuildingAddress: {
-    create: glacierAddress,
+    create: jaspAddress,
   },
   listingsApplicationPickUpAddress: undefined,
   listingsLeasingAgentAddress: undefined,
