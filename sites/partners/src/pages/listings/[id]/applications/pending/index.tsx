@@ -189,11 +189,7 @@ const ApplicationsList = () => {
                 <div className="w-full">
                   {isListingOpen && (
                     <AlertBox type="notice" className="mb-3" customIcon={"lock"} closeable>
-                      {listingDto?.applicationDueDate
-                        ? t("applications.duplicatesAlertDate", {
-                            date: formatDateTime(listingDto.applicationDueDate, true),
-                          })
-                        : t("applications.duplicatesAlert")}
+                      {t("applications.duplicatesAlert")}
                     </AlertBox>
                   )}
                   <AgTable

@@ -234,15 +234,6 @@ export default function ListingsList() {
         resizable: true,
         valueFormatter: ({ value }) => (value ? dayjs(value).format("MM/DD/YYYY") : t("t.none")),
         maxWidth: 150,
-      },
-      {
-        headerName: t("listings.applicationDueDate"),
-        field: "applicationDueDate",
-        sortable: false,
-        filter: false,
-        resizable: true,
-        valueFormatter: ({ value }) => (value ? dayjs(value).format("MM/DD/YYYY") : t("t.none")),
-        maxWidth: 120,
       }
     )
 
