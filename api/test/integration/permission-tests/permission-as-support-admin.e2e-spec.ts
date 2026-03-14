@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -1407,7 +1408,7 @@ describe('Testing Permissioning of endpoints as Support Admin User', () => {
 
     it('should error as forbiddens for create endpoint', async () => {
       const body = {
-        name: 'new name',
+        name: `feature-flag-${randomUUID()}`,
         description: 'new description',
         active: true,
       };
