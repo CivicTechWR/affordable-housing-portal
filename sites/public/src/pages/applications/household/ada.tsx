@@ -32,12 +32,15 @@ const ApplicationAda = () => {
     Record<string, any>
   >({
     defaultValues: {
-      none:
-        (application.accessibility.mobility === false &&
-          application.accessibility.vision === false &&
-          application.accessibility.hearing === false &&
-          !enableAdaOtherOption) ||
-        (enableAdaOtherOption && application.accessibility.other),
+      "app-accessibility-mobility": !!application.accessibility.mobility,
+      "app-accessibility-vision": !!application.accessibility.vision,
+      "app-accessibility-hearing": !!application.accessibility.hearing,
+      "app-accessibility-other": enableAdaOtherOption ? !!application.accessibility.other : false,
+      "app-accessibility-no-features":
+        application.accessibility.mobility === false &&
+        application.accessibility.vision === false &&
+        application.accessibility.hearing === false &&
+        !application.accessibility.other,
     },
     shouldFocusError: false,
   })

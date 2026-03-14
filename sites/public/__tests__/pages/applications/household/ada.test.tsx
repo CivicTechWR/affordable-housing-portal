@@ -3,6 +3,13 @@ import { setupServer } from "msw/lib/node"
 import { fireEvent } from "@testing-library/react"
 import { mockNextRouter, render } from "../../../testUtils"
 import ApplicationAda from "../../../../src/pages/applications/household/ada"
+import {
+  AppSubmissionContext,
+  retrieveApplicationConfig,
+} from "../../../../src/lib/applications/AppSubmissionContext"
+import ApplicationConductor from "../../../../src/lib/applications/ApplicationConductor"
+import { blankApplication } from "@bloom-housing/shared-helpers"
+import { Listing } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 
 window.scrollTo = jest.fn()
 
@@ -64,6 +71,40 @@ describe("applications pages", () => {
       expect(getByTestId("app-ada-vision")).not.toBeChecked()
       expect(getByTestId("app-ada-hearing")).not.toBeChecked()
       expect(getByTestId("app-ada-none")).toBeChecked()
+    })
+
+    it("should preload saved accessibility values for autofill flows", () => {
+      const application = JSON.parse(JSON.stringify(blankApplication))
+      application.accessibility.mobility = true
+      application.accessibility.vision = true
+      application.accessibility.hearing = true
+
+      const listing = {} as Listing
+      const conductor = new ApplicationConductor(application, listing)
+      conductor.config = retrieveApplicationConfig(listing, [])
+
+      const { getByTestId } = render(
+        <AppSubmissionContext.Provider
+          value={{
+            conductor,
+            application,
+            listing,
+            syncApplication: () => {
+              return
+            },
+            syncListing: () => {
+              return
+            },
+          }}
+        >
+          <ApplicationAda />
+        </AppSubmissionContext.Provider>
+      )
+
+      expect(getByTestId("app-ada-mobility")).toBeChecked()
+      expect(getByTestId("app-ada-vision")).toBeChecked()
+      expect(getByTestId("app-ada-hearing")).toBeChecked()
+      expect(getByTestId("app-ada-none")).not.toBeChecked()
     })
   })
 })
