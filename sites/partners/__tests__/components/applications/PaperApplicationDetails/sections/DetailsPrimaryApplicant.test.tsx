@@ -75,11 +75,11 @@ describe("DetailsPrimaryApplicant", () => {
       within(screen.getByTestId("residenceAddress.city")).getByText("Yellowstone National Park")
     ).toBeInTheDocument()
     expect(
-      within(screen.getByTestId("residenceAddress.state")).getByText("State")
+      within(screen.getByTestId("residenceAddress.state")).getByText("Province")
     ).toBeInTheDocument()
     expect(within(screen.getByTestId("residenceAddress.state")).getByText("WY")).toBeInTheDocument()
     expect(
-      within(screen.getByTestId("residenceAddress.zipCode")).getByText("Zip code")
+      within(screen.getByTestId("residenceAddress.zipCode")).getByText("Postal code")
     ).toBeInTheDocument()
     expect(
       within(screen.getByTestId("residenceAddress.zipCode")).getByText("82190")
@@ -103,11 +103,11 @@ describe("DetailsPrimaryApplicant", () => {
       within(screen.getByTestId("mailingAddress.city")).getByText("Estes Park")
     ).toBeInTheDocument()
     expect(
-      within(screen.getByTestId("mailingAddress.state")).getByText("State")
+      within(screen.getByTestId("mailingAddress.state")).getByText("Province")
     ).toBeInTheDocument()
     expect(within(screen.getByTestId("mailingAddress.state")).getByText("CO")).toBeInTheDocument()
     expect(
-      within(screen.getByTestId("mailingAddress.zipCode")).getByText("Zip code")
+      within(screen.getByTestId("mailingAddress.zipCode")).getByText("Postal code")
     ).toBeInTheDocument()
     expect(
       within(screen.getByTestId("mailingAddress.zipCode")).getByText("80517")
@@ -128,10 +128,10 @@ describe("DetailsPrimaryApplicant", () => {
     expect(
       within(screen.getByTestId("workAddress.city")).getByText("Yosemite Valley")
     ).toBeInTheDocument()
-    expect(within(screen.getByTestId("workAddress.state")).getByText("State")).toBeInTheDocument()
+    expect(within(screen.getByTestId("workAddress.state")).getByText("Province")).toBeInTheDocument()
     expect(within(screen.getByTestId("workAddress.state")).getByText("CA")).toBeInTheDocument()
     expect(
-      within(screen.getByTestId("workAddress.zipCode")).getByText("Zip code")
+      within(screen.getByTestId("workAddress.zipCode")).getByText("Postal code")
     ).toBeInTheDocument()
     expect(within(screen.getByTestId("workAddress.zipCode")).getByText("95389")).toBeInTheDocument()
 
