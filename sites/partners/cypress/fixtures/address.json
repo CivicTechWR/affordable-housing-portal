@@ -1,6 +1,6 @@
 {
   "type": "FeatureCollection",
-  "query": ["600", "mongomery", "st", "san", "francisco", "ca", "94112"],
+  "query": ["1", "wellington", "st", "ottawa", "on", "k1a"],
   "features": [
     {
       "id": "address.4226420775908864",
@@ -11,43 +11,43 @@
         "accuracy": "rooftop",
         "mapbox_id": "dXJuOm1ieGFkcjo3ODFjNjQxYi1mMzI2LTQxMTYtOTg3My1lOWNiNDJmNjg1ZWQ="
       },
-      "text": "Montgomery Street",
-      "place_name": "600 Montgomery Street, San Francisco, California 94111, United States",
-      "center": [-122.40273, 37.79516],
-      "geometry": { "type": "Point", "coordinates": [-122.40273, 37.79516] },
-      "address": "600",
+      "text": "Wellington Street",
+      "place_name": "1 Wellington Street, Ottawa, Ontario K1A 0A9, Canada",
+      "center": [-75.7009, 45.4236],
+      "geometry": { "type": "Point", "coordinates": [-75.7009, 45.4236] },
+      "address": "1",
       "context": [
         {
           "id": "neighborhood.214314220",
           "mapbox_id": "dXJuOm1ieHBsYzpETVlzN0E",
-          "text": "Financial District"
+          "text": "Parliament Hill"
         },
-        { "id": "postcode.312487660", "mapbox_id": "dXJuOm1ieHBsYzpFcUF1N0E", "text": "94111" },
+        { "id": "postcode.312487660", "mapbox_id": "dXJuOm1ieHBsYzpFcUF1N0E", "text": "K1A 0A9" },
         {
           "id": "place.292358380",
-          "wikidata": "Q62",
+          "wikidata": "Q1930",
           "mapbox_id": "dXJuOm1ieHBsYzpFVzBJN0E",
-          "text": "San Francisco"
+          "text": "Ottawa"
         },
         {
           "id": "district.20547308",
-          "wikidata": "Q62",
+          "wikidata": "Q1930",
           "mapbox_id": "dXJuOm1ieHBsYzpBVG1HN0E",
-          "text": "San Francisco County"
+          "text": "Ottawa"
         },
         {
           "id": "region.419052",
-          "short_code": "US-CA",
-          "wikidata": "Q99",
+          "short_code": "CA-ON",
+          "wikidata": "Q1904",
           "mapbox_id": "dXJuOm1ieHBsYzpCbVRz",
-          "text": "California"
+          "text": "Ontario"
         },
         {
           "id": "country.8940",
-          "short_code": "us",
-          "wikidata": "Q30",
+          "short_code": "ca",
+          "wikidata": "Q16",
           "mapbox_id": "dXJuOm1ieHBsYzpJdXc",
-          "text": "United States"
+          "text": "Canada"
         }
       ]
     }

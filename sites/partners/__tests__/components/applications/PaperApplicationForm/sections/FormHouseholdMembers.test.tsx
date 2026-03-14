@@ -81,8 +81,8 @@ describe("<FormHouseholdMembers>", () => {
     expect(screen.queryAllByLabelText(/street address/i)).toHaveLength(0)
     expect(screen.queryAllByLabelText(/apt or unit #/i)).toHaveLength(0)
     expect(screen.queryAllByLabelText(/city/i)).toHaveLength(0)
-    expect(screen.queryAllByLabelText(/state/i)).toHaveLength(0)
-    expect(screen.queryAllByLabelText(/zip code/i)).toHaveLength(0)
+    expect(screen.queryAllByLabelText(/province/i)).toHaveLength(0)
+    expect(screen.queryAllByLabelText(/postal code/i)).toHaveLength(0)
   })
 
   it("show residance address fields when same address as primary is set to no", async () => {
@@ -113,8 +113,8 @@ describe("<FormHouseholdMembers>", () => {
     expect(screen.getAllByLabelText(/street address/i)).toHaveLength(1)
     expect(screen.getAllByLabelText(/apt or unit #/i)).toHaveLength(1)
     expect(screen.getAllByLabelText(/city/i)).toHaveLength(1)
-    expect(screen.getAllByLabelText(/state/i)).toHaveLength(1)
-    expect(screen.getAllByLabelText(/zip code/i)).toHaveLength(1)
+    expect(screen.getAllByLabelText(/province/i)).toHaveLength(1)
+    expect(screen.getAllByLabelText(/postal code/i)).toHaveLength(1)
   })
 
   it("show word address fields when does not work in the region", async () => {
@@ -145,8 +145,8 @@ describe("<FormHouseholdMembers>", () => {
     expect(screen.getAllByLabelText(/street address/i)).toHaveLength(1)
     expect(screen.getAllByLabelText(/apt or unit #/i)).toHaveLength(1)
     expect(screen.getAllByLabelText(/city/i)).toHaveLength(1)
-    expect(screen.getAllByLabelText(/state/i)).toHaveLength(1)
-    expect(screen.getAllByLabelText(/zip code/i)).toHaveLength(1)
+    expect(screen.getAllByLabelText(/province/i)).toHaveLength(1)
+    expect(screen.getAllByLabelText(/postal code/i)).toHaveLength(1)
   })
 
   it("should show both address section if required", async () => {
@@ -185,8 +185,8 @@ describe("<FormHouseholdMembers>", () => {
     expect(screen.getAllByLabelText(/street address/i)).toHaveLength(2)
     expect(screen.getAllByLabelText(/apt or unit #/i)).toHaveLength(2)
     expect(screen.getAllByLabelText(/city/i)).toHaveLength(2)
-    expect(screen.getAllByLabelText(/state/i)).toHaveLength(2)
-    expect(screen.getAllByLabelText(/zip code/i)).toHaveLength(2)
+    expect(screen.getAllByLabelText(/province/i)).toHaveLength(2)
+    expect(screen.getAllByLabelText(/postal code/i)).toHaveLength(2)
   })
 
   it("should render hosuehold members table", () => {
