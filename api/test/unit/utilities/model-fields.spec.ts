@@ -1,4 +1,5 @@
 import { fillModelStringFields } from '../../../src/utilities/model-fields';
+
 describe('Testing access to model fields', () => {
   describe('Testing fillModelStringFields', () => {
     it("should fill all the fields which weren't filled out with null", () => {
@@ -11,6 +12,17 @@ describe('Testing access to model fields', () => {
         schools: 'Schools',
         healthCareResources: null,
         groceryStores: null,
+      });
+    });
+
+    it('should exclude string primary keys that are not named id', () => {
+      expect(fillModelStringFields('UserRoles', {})).toEqual({});
+      expect(
+        fillModelStringFields('UserPreferences', {
+          favoriteIds: 'listing-1',
+        }),
+      ).toEqual({
+        favoriteIds: 'listing-1',
       });
     });
   });
