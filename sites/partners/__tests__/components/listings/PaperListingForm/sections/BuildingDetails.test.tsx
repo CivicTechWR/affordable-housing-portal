@@ -48,13 +48,13 @@ describe("BuildingDetails", () => {
     expect(screen.getByRole("textbox", { name: "Street address" })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: "City" })).toBeInTheDocument()
     expect(screen.getByLabelText("City")).toBeInTheDocument()
-    const stateSelector = screen.getByRole("combobox", { name: "State" })
+    const stateSelector = screen.getByRole("combobox", { name: "Province" })
     expect(stateSelector).toBeInTheDocument()
-    // Blank, 50 states, and DC = 52
-    expect(within(stateSelector).getAllByRole("option")).toHaveLength(52)
-    expect(within(stateSelector).getByRole("option", { name: "Alabama" })).toBeInTheDocument()
-    expect(within(stateSelector).getByRole("option", { name: "Wyoming" })).toBeInTheDocument()
-    expect(screen.getByRole("textbox", { name: "Zip code" })).toBeInTheDocument()
+    // Blank + 13 provinces/territories = 14
+    expect(within(stateSelector).getAllByRole("option")).toHaveLength(14)
+    expect(within(stateSelector).getByRole("option", { name: "Alberta" })).toBeInTheDocument()
+    expect(within(stateSelector).getByRole("option", { name: "Yukon" })).toBeInTheDocument()
+    expect(screen.getByRole("textbox", { name: "Postal code" })).toBeInTheDocument()
     // Neighborhood should be a text box instead of a selector
     expect(screen.getByRole("textbox", { name: "Neighborhood" })).toBeInTheDocument()
     expect(screen.queryAllByRole("combobox", { name: "Neighborhood" })).toHaveLength(0)

@@ -54,8 +54,8 @@ describe("<FormPrimaryApplicant>", () => {
     expect(screen.getAllByLabelText(/street address/i)).toHaveLength(1)
     expect(screen.getAllByLabelText(/apt or unit #/i)).toHaveLength(1)
     expect(screen.getAllByLabelText(/city/i)).toHaveLength(1)
-    expect(screen.getAllByLabelText(/state/i)).toHaveLength(1)
-    expect(screen.getAllByLabelText(/zip code/i)).toHaveLength(1)
+    expect(screen.getAllByLabelText(/province/i)).toHaveLength(1)
+    expect(screen.getAllByLabelText(/postal code/i)).toHaveLength(1)
 
     expect(screen.getByLabelText(/send my mail to a different address/i))
 
@@ -124,8 +124,8 @@ describe("<FormPrimaryApplicant>", () => {
     expect(screen.getAllByLabelText(/street address/i)).toHaveLength(2)
     expect(screen.getAllByLabelText(/apt or unit #/i)).toHaveLength(2)
     expect(screen.getAllByLabelText(/city/i)).toHaveLength(2)
-    expect(screen.getAllByLabelText(/state/i)).toHaveLength(2)
-    expect(screen.getAllByLabelText(/zip code/i)).toHaveLength(2)
+    expect(screen.getAllByLabelText(/province/i)).toHaveLength(2)
+    expect(screen.getAllByLabelText(/postal code/i)).toHaveLength(2)
   })
 
   it("show mailing address fields an send my mail to a different address is checked", async () => {
@@ -147,8 +147,8 @@ describe("<FormPrimaryApplicant>", () => {
     expect(screen.getAllByLabelText(/street address/i)).toHaveLength(2)
     expect(screen.getAllByLabelText(/apt or unit #/i)).toHaveLength(2)
     expect(screen.getAllByLabelText(/city/i)).toHaveLength(2)
-    expect(screen.getAllByLabelText(/state/i)).toHaveLength(2)
-    expect(screen.getAllByLabelText(/zip code/i)).toHaveLength(2)
+    expect(screen.getAllByLabelText(/province/i)).toHaveLength(2)
+    expect(screen.getAllByLabelText(/postal code/i)).toHaveLength(2)
   })
 
   it("should render the full time student question", () => {
