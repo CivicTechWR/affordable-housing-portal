@@ -10,7 +10,7 @@ export const addressFactory =
       halifaxAddress,
       charlottetownAddress,
       niagaraAddress,
-      jaspAddress,
+      jasperAddress,
       quebecCityAddress,
     ][randomInt(8)];
 
@@ -80,7 +80,7 @@ export const niagaraAddress = {
   longitude: -79.0849,
 };
 
-export const jaspAddress = {
+export const jasperAddress = {
   placeName: 'Jasper National Park',
   city: 'Jasper',
   county: 'Division No. 13',
