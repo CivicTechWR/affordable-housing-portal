@@ -13,7 +13,7 @@ export const HomeRegions = ({ regions }: { regions: string[] }) => {
                 <img src={"/images/listing-fallback.png"} alt={region} />
               </div>
               <Link
-                href={`/listings?configurableRegions=${region}`}
+                href={`/listings?configurableRegions=${encodeURIComponent(region)}`}
                 className={styles["region-card-name"]}
               >
                 {region}
