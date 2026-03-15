@@ -79,9 +79,9 @@ export const ElmVillageApplication: Application = {
     workInRegion: YesNoEnum.yes,
     applicantAddress: {
       ...idDefaults,
-      street: "600 Montgomery St",
+      street: "1 Wellington St",
       street2: "Unit",
-      city: "San Francisco",
+      city: "Ottawa",
       state: "ON",
       zipCode: "K1A 0A9",
       county: "",
@@ -217,7 +217,7 @@ export const ElmVillageApplication: Application = {
           extraData: [],
           address: {
             street: "1600 pennsylvania ave",
-            city: "Washington",
+            city: "Ottawa",
             state: "ON",
             zipCode: "K1A 0B6",
           },
@@ -232,7 +232,7 @@ export const ElmVillageApplication: Application = {
           extraData: [],
           address: {
             street: "1600 pennsylvania ave",
-            city: "Washington",
+            city: "Ottawa",
             state: "ON",
             zipCode: "K1A 0B6",
           },

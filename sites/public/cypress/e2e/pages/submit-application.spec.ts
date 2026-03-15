@@ -2,10 +2,10 @@ import { ElmVillageApplication, autofillBlueSkyApplication } from "../../mockDat
 
 describe("Submit", function () {
   it("should submit an application for the Elm Village listing, then autofill and submit an application for Blue Sky Apartments", function () {
-    // Generic intercept for applicant address (600 Montgomery St)
+    // Generic intercept for applicant address (1 Wellington St)
     cy.intercept("GET", "https://photon.komoot.io/api/*", { fixture: "address" })
 
-    // Specific intercept for preference address (1600 pennsylvania ave)
+    // Specific intercept for preference address (1600 Pennsylvania Ave, Ottawa)
     cy.intercept("GET", "https://photon.komoot.io/api/?q=1600%20pennsylvania%20ave*", {
       features: [
         {
