@@ -26,7 +26,6 @@ describe("<Neighborhood>", () => {
           longitude: 2,
         }}
         name={"Listing name"}
-        neighborhood={"Westend"}
         region={"Downtown"}
         neighborhoodAmenities={{
           groceryStores: "Market",
@@ -46,10 +45,8 @@ describe("<Neighborhood>", () => {
       />
     )
     expect(screen.getAllByRole("heading", { name: "Neighborhood", level: 2 }).length).toBe(1)
-    expect(screen.getByRole("heading", { name: "Neighborhood", level: 3 })).toBeDefined()
     expect(screen.getAllByText("Location and transportation").length).toBe(2)
     expect(screen.getByRole("link", { name: "Get directions (opens in a new tab)" })).toBeDefined()
-    expect(screen.getByText("Westend")).toBeDefined()
     expect(screen.getByRole("heading", { name: "Region", level: 3 })).toBeDefined()
     expect(screen.getByText("Downtown")).toBeDefined()
     expect(screen.getByRole("heading", { name: "Within 2 miles", level: 3 })).toBeDefined()
@@ -99,7 +96,6 @@ describe("<Neighborhood>", () => {
           longitude: 2,
         }}
         name={"Listing name"}
-        neighborhood={"Westend"}
         region={"Downtown"}
         neighborhoodAmenities={{
           groceryStores: "Market",
@@ -142,7 +138,6 @@ describe("<Neighborhood>", () => {
           longitude: 2,
         }}
         name={"Listing name"}
-        neighborhood={"Westend"}
         region={"Downtown"}
         neighborhoodAmenities={{
           groceryStores: "Four blocks",

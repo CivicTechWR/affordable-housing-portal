@@ -25,7 +25,6 @@ import {
   HomeTypeEnum,
   ListingsStatusEnum,
   LotteryStatusEnum,
-  RegionEnum,
   MarketingSeasonEnum,
   MarketingTypeEnum,
   MonthEnum,
@@ -155,25 +154,6 @@ class Listing extends AbstractDTO {
   @IsNumber({}, { groups: [ValidationsGroupsEnum.default] })
   @ApiPropertyOptional()
   householdSizeMin?: number;
-
-  @Expose()
-  @ValidateListingPublish('neighborhood', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  neighborhood?: string;
-
-  @Expose()
-  @ValidateListingPublish('region', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional({
-    enum: RegionEnum,
-    enumName: 'RegionEnum',
-  })
-  region?: RegionEnum;
 
   @Expose()
   @ValidateListingPublish('configurableRegion', {

@@ -31,7 +31,6 @@ export const elmVillage: Prisma.ListingsCreateInput = {
   developer: 'Johnson Realtors',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'Hyde Park',
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,

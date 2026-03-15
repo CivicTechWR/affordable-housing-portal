@@ -953,19 +953,6 @@ export class ListingService implements OnModuleInit {
             OR: builtFilter.map((filt) => ({ [ListingFilterKeys.name]: filt })),
           });
         }
-        if (filter[ListingFilterKeys.neighborhood]) {
-          const builtFilter = buildFilter({
-            $comparison: filter.$comparison,
-            $include_nulls: false,
-            value: filter[ListingFilterKeys.neighborhood],
-            key: ListingFilterKeys.neighborhood,
-          });
-          filters.push({
-            OR: builtFilter.map((filt) => ({
-              [ListingFilterKeys.neighborhood]: filt,
-            })),
-          });
-        }
         if (filter[ListingFilterKeys.multiselectQuestions]) {
           const builtFilter = buildFilter({
             $comparison: filter.$comparison,
@@ -979,20 +966,6 @@ export class ListingService implements OnModuleInit {
               listingMultiselectQuestions: {
                 some: { multiselectQuestionId: filt },
               },
-            })),
-          });
-        }
-        if (filter[ListingFilterKeys.regions]) {
-          const builtFilter = buildFilter({
-            $comparison: filter.$comparison,
-            $include_nulls: false,
-            value: filter[ListingFilterKeys.regions],
-            key: ListingFilterKeys.regions,
-            caseSensitive: true,
-          });
-          filters.push({
-            OR: builtFilter.map((filt) => ({
-              region: filt,
             })),
           });
         }

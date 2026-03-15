@@ -67,10 +67,11 @@ describe("FilterDrawer", () => {
         filterState={{}}
         multiselectData={mockMultiselect}
         activeFeatureFlags={[
-          FeatureFlagEnum.enableRegions,
+          FeatureFlagEnum.enableConfigurableRegions,
           FeatureFlagEnum.enableAccessibilityFeatures,
         ]}
         listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+        regions={["North", "South", "East", "West"]}
       />
     )
     expect(screen.getByLabelText("Close")).toBeInTheDocument()
@@ -129,14 +130,14 @@ describe("FilterDrawer", () => {
     ).not.toBeChecked()
 
     expect(screen.getByRole("group", { name: "Region" })).toBeInTheDocument()
-    expect(screen.getByLabelText("Greater Downtown")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Greater Downtown" })).not.toBeChecked()
-    expect(screen.getByLabelText("Eastside")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Eastside" })).not.toBeChecked()
-    expect(screen.getByLabelText("Southwest")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Southwest" })).not.toBeChecked()
-    expect(screen.getByLabelText("Westside")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Westside" })).not.toBeChecked()
+    expect(screen.getByLabelText("North")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "North" })).not.toBeChecked()
+    expect(screen.getByLabelText("South")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "South" })).not.toBeChecked()
+    expect(screen.getByLabelText("East")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "East" })).not.toBeChecked()
+    expect(screen.getByLabelText("West")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "West" })).not.toBeChecked()
 
     expect(screen.getByRole("checkbox", { name: "Wheelchair ramp" })).not.toBeChecked()
     expect(screen.getByLabelText("Wheelchair ramp")).toBeInTheDocument()
@@ -238,10 +239,11 @@ describe("FilterDrawer", () => {
         filterState={filterState}
         multiselectData={mockMultiselect}
         activeFeatureFlags={[
-          FeatureFlagEnum.enableRegions,
+          FeatureFlagEnum.enableConfigurableRegions,
           FeatureFlagEnum.enableAccessibilityFeatures,
         ]}
         listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+        regions={["North", "South", "East", "West"]}
       />
     )
     expect(screen.getByLabelText("Close")).toBeInTheDocument()
@@ -300,14 +302,14 @@ describe("FilterDrawer", () => {
     ).toBeChecked()
 
     expect(screen.getByRole("group", { name: "Region" })).toBeInTheDocument()
-    expect(screen.getByLabelText("Greater Downtown")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Greater Downtown" })).not.toBeChecked()
-    expect(screen.getByLabelText("Eastside")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Eastside" })).not.toBeChecked()
-    expect(screen.getByLabelText("Southwest")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Southwest" })).not.toBeChecked()
-    expect(screen.getByLabelText("Westside")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Westside" })).not.toBeChecked()
+    expect(screen.getByLabelText("North")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "North" })).not.toBeChecked()
+    expect(screen.getByLabelText("South")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "South" })).not.toBeChecked()
+    expect(screen.getByLabelText("East")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "East" })).not.toBeChecked()
+    expect(screen.getByLabelText("West")).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "West" })).not.toBeChecked()
 
     expect(screen.getByRole("checkbox", { name: "Wheelchair ramp" })).not.toBeChecked()
     expect(screen.getByLabelText("Wheelchair ramp")).toBeInTheDocument()
@@ -432,23 +434,6 @@ describe("FilterDrawer", () => {
     )
 
     expect(screen.queryByRole("group", { name: "Region" })).not.toBeInTheDocument()
-  })
-
-  it("should show regions if region toggle is on", () => {
-    render(
-      <FilterDrawer
-        isOpen={true}
-        onClose={() => {}}
-        onSubmit={() => {}}
-        onClear={() => {}}
-        filterState={{}}
-        multiselectData={mockMultiselect}
-        activeFeatureFlags={[FeatureFlagEnum.enableRegions]}
-        listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
-      />
-    )
-
-    expect(screen.getByRole("group", { name: "Region" })).toBeInTheDocument()
   })
 
   it("should show regions if configurable region toggle is on", () => {

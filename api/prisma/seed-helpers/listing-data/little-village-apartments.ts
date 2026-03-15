@@ -19,7 +19,6 @@ export const littleVillageApartments: Prisma.ListingsCreateInput = {
   developer: 'La Villita Listings',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'Koreatown',
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,

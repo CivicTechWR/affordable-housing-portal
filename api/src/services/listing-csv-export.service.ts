@@ -562,21 +562,6 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         path: 'listingsBuildingAddress.zipCode',
         label: 'Building Zip',
       },
-      {
-        path: 'neighborhood',
-        label: 'Building Neighborhood',
-      },
-      ...(doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
-        FeatureFlagEnum.enableRegions,
-      )
-        ? [
-            {
-              path: 'region',
-              label: 'Building Region',
-            },
-          ]
-        : []),
       ...(doAnyJurisdictionHaveFeatureFlagSet(
         user.jurisdictions,
         FeatureFlagEnum.enableConfigurableRegions,

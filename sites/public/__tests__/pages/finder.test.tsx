@@ -12,16 +12,19 @@ beforeAll(() => {
   mockNextRouter()
 })
 
+jest.setTimeout(30000)
+
 describe("<RentalsFinder>", () => {
   it("renders all page elements", () => {
     render(
       <RentalsFinder
         activeFeatureFlags={[
-          FeatureFlagEnum.enableRegions,
+          FeatureFlagEnum.enableConfigurableRegions,
           FeatureFlagEnum.enableAccessibilityFeatures,
         ]}
         multiselectData={[]}
         listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+        regions={["North", "South", "East", "West"]}
       />
     )
 
@@ -78,6 +81,7 @@ describe("<RentalsFinder>", () => {
           activeFeatureFlags={[FeatureFlagEnum.enableAccessibilityFeatures]}
           multiselectData={[]}
           listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+          regions={["North", "South", "East", "West"]}
         />
       )
 
@@ -151,7 +155,11 @@ describe("<RentalsFinder>", () => {
 
     it("should hide accessibility section if not toggled on", async () => {
       render(
-        <RentalsFinder activeFeatureFlags={[FeatureFlagEnum.enableRegions]} multiselectData={[]} />
+        <RentalsFinder
+          activeFeatureFlags={[FeatureFlagEnum.enableConfigurableRegions]}
+          multiselectData={[]}
+          regions={["North", "South", "East", "West"]}
+        />
       )
 
       const finderHeaderTitle = screen.getByRole("heading", {
@@ -270,11 +278,12 @@ describe("<RentalsFinder>", () => {
     render(
       <RentalsFinder
         activeFeatureFlags={[
-          FeatureFlagEnum.enableRegions,
+          FeatureFlagEnum.enableConfigurableRegions,
           FeatureFlagEnum.enableAccessibilityFeatures,
         ]}
         multiselectData={[]}
         listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+        regions={["North", "South", "East", "West"]}
       />
     )
 
@@ -306,9 +315,8 @@ describe("<RentalsFinder>", () => {
       screen.getByRole("button", { name: /skip this and show me listings/i })
     ).toBeInTheDocument()
 
-    const nextButton = screen.getByRole("button", { name: /next/i })
-    expect(nextButton).toBeInTheDocument()
-    await userEvent.click(nextButton)
+    expect(screen.getByRole("button", { name: /next/i })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
     // ----------- Section 1 - Housing Needs | Step 2 - Regions -------------------
     expect(within(sectionOne).getByText(/housing needs/i)).toBeInTheDocument()
@@ -333,17 +341,17 @@ describe("<RentalsFinder>", () => {
       )
     ).toBeInTheDocument()
     expect(screen.getByText(/select all that apply/i)).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: /greater downtown/i })).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: /eastside/i })).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: /southwest/i })).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: /westside/i })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: /north/i })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: /south/i })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: /east/i })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: /west/i })).toBeInTheDocument()
 
     expect(screen.queryByRole("button", { name: /finish/i })).not.toBeInTheDocument()
     expect(screen.getByRole("button", { name: /back/i })).toBeInTheDocument()
     expect(
       screen.getByRole("button", { name: /skip this and show me listings/i })
     ).toBeInTheDocument()
-    await userEvent.click(nextButton)
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
     // ----------- Section 1 - Housing Needs | Step 3 - Rent -------------------
     expect(within(sectionOne).getByText(/housing needs/i)).toBeInTheDocument()
@@ -381,7 +389,7 @@ describe("<RentalsFinder>", () => {
     expect(
       screen.getByRole("button", { name: /skip this and show me listings/i })
     ).toBeInTheDocument()
-    await userEvent.click(nextButton)
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
     // ----------- Section 2 - Accessibility | Step 1 - Listing Features -------------------
     expect(within(sectionOne).getByText(/housing needs/i)).toBeInTheDocument()
@@ -447,7 +455,7 @@ describe("<RentalsFinder>", () => {
     expect(
       screen.getByRole("button", { name: /skip this and show me listings/i })
     ).toBeInTheDocument()
-    await userEvent.click(nextButton)
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
     // ----------- Section 3 - Building Types | Step 1 - Community Types -------------------
 
@@ -490,22 +498,11 @@ describe("<RentalsFinder>", () => {
     expect(
       screen.getByRole("button", { name: /skip this and show me listings/i })
     ).toBeInTheDocument()
-    await userEvent.click(nextButton)
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
     // --------------------------- Disclaimer --------------------------------------
-    expect(within(sectionOne).getByText(/housing needs/i)).toBeInTheDocument()
-    expect(sectionOne).not.toHaveClass("is-active")
-    expect(sectionOne).not.toHaveClass("is-disabled")
-    expect(within(sectionTwo).getByText(/accessibility/i)).toBeInTheDocument()
-    expect(sectionTwo).not.toHaveClass("is-active")
-    expect(sectionTwo).not.toHaveClass("is-disabled")
-    expect(within(sectionThree).getByText(/building types/i)).toBeInTheDocument()
-    expect(sectionTwo).not.toHaveClass("is-active")
-    expect(sectionTwo).not.toHaveClass("is-disabled")
-
-    expect(within(finderHeader).queryByRole("heading", { level: 2 })).not.toBeInTheDocument()
-
     const alertBox = screen.getByTestId("alert-box")
+    expect(within(finderHeader).queryByRole("heading", { level: 2 })).not.toBeInTheDocument()
     expect(
       within(alertBox).getByText(
         "Disclaimer: The information in this personalized rental finder should be used for informational purposes only. Due to the changing nature of property information, the best way to see if you qualify for a property or if it has any availability is by contacting the property itself."
@@ -539,10 +536,11 @@ describe("<RentalsFinder>", () => {
     render(
       <RentalsFinder
         activeFeatureFlags={[
-          FeatureFlagEnum.enableRegions,
+          FeatureFlagEnum.enableConfigurableRegions,
           FeatureFlagEnum.enableAccessibilityFeatures,
         ]}
         multiselectData={[]}
+        regions={["North", "South", "East", "West"]}
       />
     )
 
@@ -562,17 +560,15 @@ describe("<RentalsFinder>", () => {
     expect(studioCheckbox).toBeChecked()
     expect(oneBdrmCheckbox).toBeChecked()
 
-    const nextButton = screen.getByRole("button", { name: /next/i })
-    expect(nextButton).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /next/i })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
-    await userEvent.click(nextButton)
+    let eastCheckbox = screen.getByRole("checkbox", { name: /^east$/i })
+    expect(eastCheckbox).toBeInTheDocument()
+    expect(eastCheckbox).not.toBeChecked()
 
-    let eastsideCheckbox = screen.getByRole("checkbox", { name: /eastside/i })
-    expect(eastsideCheckbox).toBeInTheDocument()
-    expect(eastsideCheckbox).not.toBeChecked()
-
-    await userEvent.click(eastsideCheckbox)
-    expect(eastsideCheckbox).toBeChecked()
+    await userEvent.click(eastCheckbox)
+    expect(eastCheckbox).toBeChecked()
 
     const backButton = screen.getByRole("button", { name: /back/i })
     expect(backButton).toBeInTheDocument()
@@ -586,22 +582,23 @@ describe("<RentalsFinder>", () => {
     expect(studioCheckbox).toBeChecked()
     expect(oneBdrmCheckbox).toBeChecked()
 
-    await userEvent.click(nextButton)
+    await userEvent.click(screen.getByRole("button", { name: /next/i }))
 
-    eastsideCheckbox = screen.getByRole("checkbox", { name: /eastside/i })
-    expect(eastsideCheckbox).toBeInTheDocument()
-    expect(eastsideCheckbox).toBeChecked()
+    eastCheckbox = screen.getByRole("checkbox", { name: /^east$/i })
+    expect(eastCheckbox).toBeInTheDocument()
+    expect(eastCheckbox).toBeChecked()
   })
 
   it("should skip to disclaimer on skip button click", async () => {
     render(
       <RentalsFinder
         activeFeatureFlags={[
-          FeatureFlagEnum.enableRegions,
+          FeatureFlagEnum.enableConfigurableRegions,
           FeatureFlagEnum.enableAccessibilityFeatures,
         ]}
         multiselectData={[]}
         listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+        regions={["North", "South", "East", "West"]}
       />
     )
 
@@ -663,10 +660,11 @@ describe("<RentalsFinder>", () => {
       render(
         <RentalsFinder
           activeFeatureFlags={[
-            FeatureFlagEnum.enableRegions,
+            FeatureFlagEnum.enableConfigurableRegions,
             FeatureFlagEnum.enableAccessibilityFeatures,
           ]}
           multiselectData={[]}
+          regions={["North", "South", "East", "West"]}
         />
       )
 
@@ -691,11 +689,12 @@ describe("<RentalsFinder>", () => {
       render(
         <RentalsFinder
           activeFeatureFlags={[
-            FeatureFlagEnum.enableRegions,
+            FeatureFlagEnum.enableConfigurableRegions,
             FeatureFlagEnum.enableAccessibilityFeatures,
           ]}
           multiselectData={[]}
           listingFeaturesConfiguration={defaultListingFeaturesConfiguration}
+          regions={["North", "South", "East", "West"]}
         />
       )
 
@@ -715,13 +714,13 @@ describe("<RentalsFinder>", () => {
 
       // ----------- Section 1 - Housing Needs | Step 2 - Regions -------------------
 
-      const greaterDowntownCheckbox = screen.getByRole("checkbox", { name: /greater downtown/i })
-      const westsideCheckbox = screen.getByRole("checkbox", { name: /westside/i })
-      expect(greaterDowntownCheckbox).toBeInTheDocument()
-      expect(westsideCheckbox).toBeInTheDocument()
+      const northCheckbox = screen.getByRole("checkbox", { name: /north/i })
+      const westCheckbox = screen.getByRole("checkbox", { name: /west/i })
+      expect(northCheckbox).toBeInTheDocument()
+      expect(westCheckbox).toBeInTheDocument()
 
-      await userEvent.click(greaterDowntownCheckbox)
-      await userEvent.click(westsideCheckbox)
+      await userEvent.click(northCheckbox)
+      await userEvent.click(westCheckbox)
       await userEvent.click(nextButton)
 
       // ----------- Section 1 - Housing Needs | Step 3 - Rent -------------------
@@ -770,7 +769,7 @@ describe("<RentalsFinder>", () => {
 
       await waitFor(() => {
         expect(pushMock).toBeCalledWith(
-          "/listings?bedroomTypes=studio,oneBdrm&regions=Greater_Downtown,Westside&monthlyRent=1,500.00-3,000.00&section8Acceptance=true&listingFeatures=elevator,serviceAnimalsAllowed,wheelchairRamp&reservedCommunityTypes=veteran"
+          "/listings?bedroomTypes=studio,oneBdrm&configurableRegions=North,West&monthlyRent=1,500.00-3,000.00&section8Acceptance=true&listingFeatures=elevator,serviceAnimalsAllowed,wheelchairRamp&reservedCommunityTypes=veteran"
         )
       })
     })

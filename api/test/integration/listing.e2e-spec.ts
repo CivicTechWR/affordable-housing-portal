@@ -13,7 +13,6 @@ import {
   MultiselectQuestionsApplicationSectionEnum,
   MultiselectQuestionsStatusEnum,
   Prisma,
-  RegionEnum,
   RentTypeEnum,
   ReviewOrderTypeEnum,
   UnitTypeEnum,
@@ -402,7 +401,6 @@ describe('Listing Controller Tests', () => {
       buildingTotalUnits: 5,
       householdSizeMax: 9,
       householdSizeMin: 1,
-      neighborhood: 'neighborhood string',
       petPolicy: 'we love pets',
       smokingPolicy: 'smokeing policy string',
       unitsAvailable: 15,
@@ -673,8 +671,7 @@ describe('Listing Controller Tests', () => {
         listing: {
           homeType: HomeTypeEnum.apartment,
           isVerified: true,
-          neighborhood: 'SoHo',
-          region: RegionEnum.Eastside,
+          configurableRegion: 'North',
           section8Acceptance: false,
         } as Prisma.ListingsCreateInput,
         multiselectQuestions: [multiselectQuestionPreference],
@@ -703,8 +700,7 @@ describe('Listing Controller Tests', () => {
         listing: {
           homeType: HomeTypeEnum.duplex,
           isVerified: false,
-          neighborhood: 'Downtown',
-          region: RegionEnum.Southwest,
+          configurableRegion: 'South',
           section8Acceptance: true,
         } as Prisma.ListingsCreateInput,
         multiselectQuestions: [multiselectQuestionProgram],
@@ -1754,43 +1750,14 @@ describe('Listing Controller Tests', () => {
       expect(res.body.items[0].name).toEqual(orderedNames[0]);
       expect(res.body.items[1].name).toEqual(orderedNames[1]);
     });
-    it('should return a listing based on filter neighborhood', async () => {
-      const query: ListingsQueryBody = {
-        page: 1,
-        view: ListingViews.base,
-        filter: [
-          {
-            $comparison: Compare['='],
-            neighborhood: listing1WithUnits.neighborhood,
-          },
-          {
-            $comparison: Compare['='],
-            jurisdiction: jurisdictionB.id,
-          },
-        ],
-      };
-
-      const res = await request(app.getHttpServer())
-        .post(`/listings/list`)
-        .send(query)
-        .set({ passkey: process.env.API_PASS_KEY || '' })
-        .expect(201);
-
-      expect(res.body.items.length).toBeGreaterThanOrEqual(1);
-
-      const foundId = res.body.items.some(
-        (elem) => elem.id === listing1WithUnits.id,
-      );
-      expect(foundId).toEqual(true);
-    });
-    it('should return a listing based on filter regions', async () => {
+    it('should return a listing based on configurable region filter', async () => {
       const query: ListingsQueryBody = {
         page: 1,
         view: ListingViews.base,
         filter: [
           {
             $comparison: Compare.IN,
-            regions: [RegionEnum.Eastside],
+            configurableRegions: ['North'],
           },
           {
             $comparison: Compare['='],
