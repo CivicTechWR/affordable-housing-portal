@@ -71,7 +71,6 @@ export const bloomingtonListing: CypressListing = {
     abbreviatedState: "CA",
     zipCode: "94104",
   } as CypressAddress,
-  neighborhood: "Basic Test Neighborhood",
   yearBuilt: 2021,
   reservedCommunityTypes: {
     id: "Seniors",

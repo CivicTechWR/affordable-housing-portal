@@ -4,7 +4,6 @@ import {
   FilterAvailabilityEnum,
   HomeTypeEnum,
   ListingFilterKeys,
-  RegionEnum,
   UnitTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import {
@@ -55,12 +54,6 @@ describe("filter drawer helpers", () => {
       maxRent: "",
     },
     [ListingFilterKeys.section8Acceptance]: false,
-    regions: {
-      [RegionEnum.Greater_Downtown]: false,
-      [RegionEnum.Eastside]: false,
-      [RegionEnum.Southwest]: false,
-      [RegionEnum.Westside]: false,
-    },
     [ListingFilterKeys.listingFeatures]: {
       wheelchairRamp: false,
       elevator: false,
@@ -581,12 +574,6 @@ describe("filter drawer helpers", () => {
           maxRent: "",
         },
         section8Acceptance: false,
-        regions: {
-          Greater_Downtown: false,
-          Eastside: false,
-          Southwest: false,
-          Westside: false,
-        },
         listingFeatures: {
           wheelchairRamp: false,
           elevator: false,

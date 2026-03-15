@@ -31,7 +31,9 @@ describe("<Home>", () => {
         underConstructionListings={[]}
         jurisdiction={{
           ...jurisdiction,
-          featureFlags: [{ name: FeatureFlagEnum.enableRegions, active: false } as FeatureFlag],
+          featureFlags: [
+            { name: FeatureFlagEnum.enableConfigurableRegions, active: false } as FeatureFlag,
+          ],
         }}
       />
     )
@@ -57,7 +59,10 @@ describe("<Home>", () => {
         underConstructionListings={[]}
         jurisdiction={{
           ...jurisdiction,
-          featureFlags: [{ name: FeatureFlagEnum.enableRegions, active: true } as FeatureFlag],
+          featureFlags: [
+            { name: FeatureFlagEnum.enableConfigurableRegions, active: true } as FeatureFlag,
+          ],
+          regions: ["North"],
         }}
       />
     )

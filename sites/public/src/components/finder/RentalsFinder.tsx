@@ -7,7 +7,6 @@ import {
   ListingFeaturesConfiguration,
   ListingFilterKeys,
   MultiselectQuestion,
-  RegionEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { Form, ProgressNav, StepHeader, t } from "@bloom-housing/ui-components"
 import { Button, Heading, Icon } from "@bloom-housing/ui-seeds"
@@ -43,6 +42,7 @@ export type RentalsFinderProps = {
   activeFeatureFlags: FeatureFlagEnum[]
   listingFeaturesConfiguration?: ListingFeaturesConfiguration
   multiselectData: MultiselectQuestion[]
+  regions?: string[]
 }
 
 const setFocusToTitle = () => {
@@ -54,6 +54,7 @@ export default function RentalsFinder({
   activeFeatureFlags,
   listingFeaturesConfiguration,
   multiselectData,
+  regions,
 }: RentalsFinderProps) {
   const router = useRouter()
   const [stepIndex, setStepIndex] = useState<number>(0)
@@ -92,7 +93,9 @@ export default function RentalsFinder({
               />
             ),
           },
-          ...(activeFeatureFlags.some((flag) => flag == FeatureFlagEnum.enableRegions)
+          ...(activeFeatureFlags.some(
+            (flag) => flag == FeatureFlagEnum.enableConfigurableRegions
+          ) && regions?.length
             ? [
                 {
                   question: t("finder.region.question"),
@@ -100,10 +103,10 @@ export default function RentalsFinder({
                   content: (
                     <FinderMultiselectQuestion
                       legend={t("finder.multiselectLegend")}
-                      fieldGroupName={ListingFilterKeys.regions}
-                      options={Object.keys(RegionEnum).map((region) => ({
-                        key: `${ListingFilterKeys.regions}.${region}`,
-                        label: region.replace("_", " "),
+                      fieldGroupName={ListingFilterKeys.configurableRegions}
+                      options={regions.map((region) => ({
+                        key: `${ListingFilterKeys.configurableRegions}.${region}`,
+                        label: region,
                         defaultChecked: false,
                       }))}
                     />
@@ -188,7 +191,7 @@ export default function RentalsFinder({
         ],
       },
     ],
-    [activeFeatureFlags, multiselectData]
+    [activeFeatureFlags, listingFeaturesConfiguration, multiselectData, regions]
   )
 
   const sectionLabels = useMemo(
