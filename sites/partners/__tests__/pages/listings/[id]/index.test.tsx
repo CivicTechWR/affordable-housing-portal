@@ -80,7 +80,6 @@ function mockJurisdictionsHaveFeatureFlagOn(
     enableIsVerified?: boolean
     enableMarketingStatus?: boolean
     enableAccessibilityFeatures?: boolean
-    enableRegions?: boolean
   }
 ) {
   switch (featureFlag) {
@@ -96,8 +95,6 @@ function mockJurisdictionsHaveFeatureFlagOn(
       return overrides?.enableMarketingStatus ?? false
     case FeatureFlagEnum.enableAccessibilityFeatures:
       return overrides?.enableAccessibilityFeatures ?? true
-    case FeatureFlagEnum.enableRegions:
-      return overrides?.enableRegions ?? true
     default:
       return false
   }

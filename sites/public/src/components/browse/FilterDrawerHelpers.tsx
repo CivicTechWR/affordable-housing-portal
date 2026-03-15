@@ -6,7 +6,6 @@ import {
   ListingFeaturesConfiguration,
   ListingFilterKeys,
   ListingFilterParams,
-  RegionEnum,
   UnitTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { UseFormMethods } from "react-hook-form"
@@ -34,8 +33,7 @@ export interface FilterData {
   isVerified?: BooleanOrBooleanString
   listingFeatures?: { [K in keyof ListingFeatures]?: BooleanOrBooleanString }
   monthlyRent?: { [K in "maxRent" | "minRent"]?: string }
-  regions?: { [K in RegionEnum]: BooleanOrBooleanString }
-  configurableRegions?: string
+  configurableRegions?: Record<string, BooleanOrBooleanString>
   section8Acceptance?: BooleanOrBooleanString
   reservedCommunityTypes?: { [K in ReservedCommunityTypes]?: BooleanOrBooleanString }
   multiselectQuestions?: Record<string, BooleanOrBooleanString>
@@ -75,7 +73,6 @@ const arrayFilters: ListingFilterKeys[] = [
   ListingFilterKeys.counties,
   ListingFilterKeys.homeTypes,
   ListingFilterKeys.listingFeatures,
-  ListingFilterKeys.regions,
   ListingFilterKeys.configurableRegions,
   ListingFilterKeys.reservedCommunityTypes,
   ListingFilterKeys.availabilities,

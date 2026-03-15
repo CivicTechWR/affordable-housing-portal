@@ -63,11 +63,6 @@ export default function ListingDetail(props: ListingProps) {
     listing.jurisdictions.id
   )
 
-  const enableRegions = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableRegions,
-    listing.jurisdictions.id
-  )
-
   return (
     <ListingContext.Provider value={listing}>
       <ListingGuard>
@@ -125,10 +120,7 @@ export default function ListingDetail(props: ListingProps) {
                     <DetailListingNotes />
                     <DetailListingIntro />
                     <DetailListingPhotos />
-                    <DetailBuildingDetails
-                      enableRegions={enableRegions}
-                      enableConfigurableRegions={enableConfigurableRegions}
-                    />
+                    <DetailBuildingDetails enableConfigurableRegions={enableConfigurableRegions} />
                     <DetailCommunityType />
                     <DetailUnits setUnitDrawer={setUnitDrawer} />
                     <DetailPreferences />

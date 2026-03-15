@@ -26,7 +26,6 @@ export const blueSkyApartments: Prisma.ListingsCreateInput = {
   developer: 'Cielo Housing',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'North End',
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,

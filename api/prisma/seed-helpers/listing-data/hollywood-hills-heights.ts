@@ -20,7 +20,6 @@ export const hollywoodHillsHeights: Prisma.ListingsCreateInput = {
   developer: 'Example Developer',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'Hollywood',
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,

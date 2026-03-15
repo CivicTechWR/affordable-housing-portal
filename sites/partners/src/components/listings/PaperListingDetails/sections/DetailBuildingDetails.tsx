@@ -8,16 +8,12 @@ import { EnumListingListingType } from "@bloom-housing/shared-helpers/src/types/
 
 type DetailBuildingDetailsProps = {
   enableConfigurableRegions: boolean
-  enableRegions: boolean
 }
 
-const DetailBuildingDetails = ({
-  enableConfigurableRegions,
-  enableRegions,
-}: DetailBuildingDetailsProps) => {
+const DetailBuildingDetails = ({ enableConfigurableRegions }: DetailBuildingDetailsProps) => {
   const listing = useContext(ListingContext)
 
-  const showInitialRegion = enableRegions || enableConfigurableRegions
+  const showInitialRegion = enableConfigurableRegions
   const isNonRegulated = listing.listingType === EnumListingListingType.nonRegulated
 
   return (
@@ -35,11 +31,6 @@ const DetailBuildingDetails = ({
                 label={t("application.contact.streetAddress")}
               >
                 {listing.listingsBuildingAddress?.street}
-              </FieldValue>
-            </Grid.Cell>
-            <Grid.Cell>
-              <FieldValue id="neighborhood" label={t("t.neighborhood")}>
-                {listing?.neighborhood || t("t.n/a")}
               </FieldValue>
             </Grid.Cell>
           </Grid.Row>
@@ -60,21 +51,11 @@ const DetailBuildingDetails = ({
               </FieldValue>
             </Grid.Cell>
             {showInitialRegion ? (
-              <>
-                {enableRegions ? (
-                  <Grid.Cell className="seeds-grid-span-2">
-                    <FieldValue id="buildingAddress.region" label={t("t.region")}>
-                      {listing.region ? listing.region.toString().replace("_", " ") : t("t.n/a")}
-                    </FieldValue>
-                  </Grid.Cell>
-                ) : (
-                  <Grid.Cell className="seeds-grid-span-2">
-                    <FieldValue id="buildingAddress.configurableRegion" label={t("t.region")}>
-                      {listing.configurableRegion ? listing.configurableRegion : t("t.n/a")}
-                    </FieldValue>
-                  </Grid.Cell>
-                )}
-              </>
+              <Grid.Cell className="seeds-grid-span-2">
+                <FieldValue id="buildingAddress.configurableRegion" label={t("t.region")}>
+                  {listing.configurableRegion ? listing.configurableRegion : t("t.n/a")}
+                </FieldValue>
+              </Grid.Cell>
             ) : (
               <>
                 {!isNonRegulated ? (

@@ -147,7 +147,6 @@ export const stagingSeed = async (
         FeatureFlagEnum.enableNonRegulatedListings,
         FeatureFlagEnum.enablePartnerDemographics,
         FeatureFlagEnum.enablePartnerSettings,
-        FeatureFlagEnum.enableRegions,
         FeatureFlagEnum.enableResources,
         FeatureFlagEnum.enableSection8Question,
         FeatureFlagEnum.enableSingleUseCode,
