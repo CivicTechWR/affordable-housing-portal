@@ -274,4 +274,10 @@ export class ListingUpdate extends OmitType(Listing, [
   @Type(() => ListingNeighborhoodAmenitiesUpdate)
   @ApiPropertyOptional({ type: ListingNeighborhoodAmenitiesUpdate })
   listingNeighborhoodAmenities?: ListingNeighborhoodAmenitiesUpdate;
+
+  @Expose()
+  @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
+  @Type(() => IdDTO)
+  @ApiPropertyOptional({ type: IdDTO, isArray: true })
+  customListingFeatures?: IdDTO[];
 }
