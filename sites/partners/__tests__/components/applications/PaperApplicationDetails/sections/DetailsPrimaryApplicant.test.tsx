@@ -131,15 +131,11 @@ describe("DetailsPrimaryApplicant", () => {
     expect(
       within(screen.getByTestId("workAddress.state")).getByText("Province")
     ).toBeInTheDocument()
-    expect(
-      within(screen.getByTestId("workAddress.state")).getByText("CA")
-    ).toBeInTheDocument()
+    expect(within(screen.getByTestId("workAddress.state")).getByText("CA")).toBeInTheDocument()
     expect(
       within(screen.getByTestId("workAddress.zipCode")).getByText("Postal code")
     ).toBeInTheDocument()
-    expect(
-      within(screen.getByTestId("workAddress.zipCode")).getByText("95389")
-    ).toBeInTheDocument()
+    expect(within(screen.getByTestId("workAddress.zipCode")).getByText("95389")).toBeInTheDocument()
 
     expect(screen.queryAllByText("Full-time student")).toHaveLength(0)
   })

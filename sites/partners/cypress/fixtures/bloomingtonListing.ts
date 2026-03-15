@@ -65,8 +65,8 @@ export const bloomingtonListing: CypressListing = {
   name: "Basic Test Listing Bloomington",
   developer: "Basic Test Developer",
   listingsBuildingAddress: {
-    street: "548 Market St. #59930",
-    city: "San Francisco",
+    street: "1 Wellington St",
+    city: "Ottawa",
     state: "Ontario",
     abbreviatedState: "ON",
     zipCode: "K1A 0A6",
@@ -136,9 +136,9 @@ export const bloomingtonListing: CypressListing = {
   leasingAgentTitle: "Basic Agent Title",
   leasingAgentOfficeHours: "Basic Agent Office Hours",
   listingsLeasingAgentAddress: {
-    street: "548 Market St.",
-    street2: "#59930",
-    city: "San Francisco",
+    street: "1 Wellington St.",
+    street2: "#100",
+    city: "Ottawa",
     zipCode: "K1A 0A6",
     state: "Ontario",
     abbreviatedState: "ON",

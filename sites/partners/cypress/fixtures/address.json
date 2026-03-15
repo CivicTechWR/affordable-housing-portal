@@ -1,56 +1,21 @@
 {
   "type": "FeatureCollection",
-  "query": ["1", "wellington", "st", "ottawa", "on", "k1a"],
   "features": [
     {
-      "id": "address.4226420775908864",
-      "type": "Feature",
-      "place_type": ["address"],
-      "relevance": 0.797326,
-      "properties": {
-        "accuracy": "rooftop",
-        "mapbox_id": "dXJuOm1ieGFkcjo3ODFjNjQxYi1mMzI2LTQxMTYtOTg3My1lOWNiNDJmNjg1ZWQ="
+      "geometry": {
+        "coordinates": [-75.7009, 45.4236],
+        "type": "Point"
       },
-      "text": "Wellington Street",
-      "place_name": "1 Wellington Street, Ottawa, Ontario K1A 0A9, Canada",
-      "center": [-75.7009, 45.4236],
-      "geometry": { "type": "Point", "coordinates": [-75.7009, 45.4236] },
-      "address": "1",
-      "context": [
-        {
-          "id": "neighborhood.214314220",
-          "mapbox_id": "dXJuOm1ieHBsYzpETVlzN0E",
-          "text": "Parliament Hill"
-        },
-        { "id": "postcode.312487660", "mapbox_id": "dXJuOm1ieHBsYzpFcUF1N0E", "text": "K1A 0A9" },
-        {
-          "id": "place.292358380",
-          "wikidata": "Q1930",
-          "mapbox_id": "dXJuOm1ieHBsYzpFVzBJN0E",
-          "text": "Ottawa"
-        },
-        {
-          "id": "district.20547308",
-          "wikidata": "Q1930",
-          "mapbox_id": "dXJuOm1ieHBsYzpBVG1HN0E",
-          "text": "Ottawa"
-        },
-        {
-          "id": "region.419052",
-          "short_code": "CA-ON",
-          "wikidata": "Q1904",
-          "mapbox_id": "dXJuOm1ieHBsYzpCbVRz",
-          "text": "Ontario"
-        },
-        {
-          "id": "country.8940",
-          "short_code": "ca",
-          "wikidata": "Q16",
-          "mapbox_id": "dXJuOm1ieHBsYzpJdXc",
-          "text": "Canada"
-        }
-      ]
+      "type": "Feature",
+      "properties": {
+        "street": "Wellington St",
+        "housenumber": "1",
+        "city": "Ottawa",
+        "state": "ON",
+        "postcode": "K1A 0A9",
+        "countrycode": "ca",
+        "country": "Canada"
+      }
     }
-  ],
-  "attribution": "NOTICE: © 2023 Mapbox and its suppliers. All rights reserved. Use of this data is subject to the Mapbox Terms of Service (https://www.mapbox.com/about/maps/). This response and the information it contains may not be retained. POI(s) provided by Foursquare."
+  ]
 }
