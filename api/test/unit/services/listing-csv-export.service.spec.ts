@@ -273,7 +273,9 @@ describe('Testing listing csv export service', () => {
       const firstRow = getFirstDataRow(content);
       expect(firstRow).toContain('"listing1-ID"');
       expect(firstRow).toContain('"Under Construction","Summer","2025"');
-      expect(firstRow).toContain('https://www.example.com/building-criteria.pdf');
+      expect(firstRow).toContain(
+        'https://www.example.com/building-criteria.pdf',
+      );
       expect(firstRow).toContain('"userFirst userLast"');
     });
     it('should create the listing csv with marketing type months', async () => {
