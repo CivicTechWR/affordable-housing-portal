@@ -19,7 +19,6 @@ export const valleyHeightsSeniorCommunity: Prisma.ListingsCreateInput = {
   developer: 'ABS Housing',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: null,
   petPolicy: null,
   smokingPolicy: 'No smoking is allowed on the property.',
   unitAmenities: null,

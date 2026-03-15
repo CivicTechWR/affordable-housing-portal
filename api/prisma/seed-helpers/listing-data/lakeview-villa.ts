@@ -2,7 +2,6 @@ import {
   ListingsStatusEnum,
   ReviewOrderTypeEnum,
   Prisma,
-  RegionEnum,
   ApplicationMethodsTypeEnum,
 } from '@prisma/client';
 import dayjs from 'dayjs';
@@ -27,8 +26,6 @@ export const lakeviewVilla: Prisma.ListingsCreateInput = {
   developer: 'Example Developer',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'Greater Downtown area',
-  region: RegionEnum.Greater_Downtown,
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,

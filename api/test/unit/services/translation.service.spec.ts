@@ -64,7 +64,6 @@ const mockListing = (): Listing => {
     rentalAssistance: 'untranslated rental assistance',
     programRules: 'untranslated program rules',
     petPolicy: 'untranslated pet policy',
-    neighborhood: 'untranslated neighborhood',
     leasingAgentOfficeHours: 'untranslated leasing agent office hours',
     depositMin: 'untranslated deposit minimum',
     depositMax: 'untranslated deposit maximum',
@@ -128,7 +127,6 @@ const translatedStrings = [
   'translated deposit maximum',
   'translated deposit minimum',
   'translated leasing agent office hours',
-  'translated neighborhood',
   'translated pet policy',
   'translated program rules',
   'translated rental assistance',
@@ -360,7 +358,6 @@ const validateTranslatedFields = (listing: Listing) => {
   expect(listing.leasingAgentOfficeHours).toEqual(
     'translated leasing agent office hours',
   );
-  expect(listing.neighborhood).toEqual('translated neighborhood');
   expect(listing.petPolicy).toEqual('translated pet policy');
   expect(listing.programRules).toEqual('translated program rules');
   expect(listing.rentalAssistance).toEqual('translated rental assistance');

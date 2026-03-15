@@ -2,7 +2,6 @@ import { Form, t } from "@bloom-housing/ui-components"
 import { Button, Drawer } from "@bloom-housing/ui-seeds"
 import { useForm } from "react-hook-form"
 import {
-  RegionEnum,
   HomeTypeEnum,
   ListingFilterKeys,
   MultiselectQuestion,
@@ -52,10 +51,6 @@ const FilterDrawer = (props: FilterDrawerProps) => {
 
   const enableUnitGroups = props.activeFeatureFlags?.some(
     (entry) => entry === FeatureFlagEnum.enableUnitGroups
-  )
-
-  const enableRegions = props.activeFeatureFlags?.some(
-    (entry) => entry === FeatureFlagEnum.enableRegions
   )
 
   const enableConfigurableRegions = props.activeFeatureFlags?.some(
@@ -136,19 +131,6 @@ const FilterDrawer = (props: FilterDrawerProps) => {
             clearErrors={clearErrors}
             errors={errors}
           />
-          {enableRegions && (
-            <CheckboxGroup
-              groupLabel={t("t.region")}
-              fields={Object.keys(RegionEnum).map((region) => {
-                return {
-                  key: `${ListingFilterKeys.regions}.${region}`,
-                  label: region.replace("_", " "),
-                  defaultChecked: isTrue(props.filterState?.[ListingFilterKeys.regions]?.[region]),
-                }
-              })}
-              register={register}
-            />
-          )}
           {enableConfigurableRegions && (
             <CheckboxGroup
               groupLabel={t("t.region")}

@@ -617,10 +617,6 @@ const ListingForm = ({
                               jurisdictionId
                             )}
                             enableNonRegulatedListings={enableNonRegulatedListings}
-                            enableRegions={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableRegions,
-                              jurisdictionId
-                            )}
                             regions={selectedJurisdictionData?.regions}
                             latLong={latLong}
                             listing={listing}

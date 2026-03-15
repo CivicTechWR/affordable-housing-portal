@@ -20,8 +20,6 @@ export const sunshineFlats: Prisma.ListingsCreateInput = {
   developer: 'Sunny side realtors',
   householdSizeMax: 4,
   householdSizeMin: 1,
-  neighborhood: 'West End area',
-  region: 'Eastside',
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,

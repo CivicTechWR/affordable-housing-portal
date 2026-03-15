@@ -104,7 +104,6 @@ export const angelopolisListing: CypressListing = {
       { name: FeatureFlagEnum.enableParkingFee, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableListingFileNumber, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.disableBuildingSelectionCriteria, active: true } as FeatureFlag,
-      { name: FeatureFlagEnum.enableRegions, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableConfigurableRegions, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableMarketingFlyer, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableListingImageAltText, active: true } as FeatureFlag,
@@ -114,7 +113,6 @@ export const angelopolisListing: CypressListing = {
     listingFeaturesConfiguration: listingFeaturesConfiguration,
   } as Jurisdiction,
   jurisdictions: { id: "Angelopolis" },
-  region: undefined,
   configurableRegion: "Harbor Area",
   name: "Basic Test Listing Angelopolis",
   developer: "Basic Test Developer",
@@ -125,7 +123,6 @@ export const angelopolisListing: CypressListing = {
     abbreviatedState: "ON",
     zipCode: "K1A 0A6",
   } as CypressAddress,
-  neighborhood: "Basic Test Neighborhood",
   yearBuilt: 2021,
   reservedCommunityTypes: {
     id: "Seniors",

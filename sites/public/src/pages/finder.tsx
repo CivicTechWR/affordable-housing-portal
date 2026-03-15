@@ -27,6 +27,7 @@ export default function Finder(props: FinderProps) {
         activeFeatureFlags={activeFeatureFlags}
         multiselectData={props.multiselectData}
         listingFeaturesConfiguration={props.jurisdiction?.listingFeaturesConfiguration}
+        regions={props.jurisdiction?.regions}
       />
     </Layout>
   )

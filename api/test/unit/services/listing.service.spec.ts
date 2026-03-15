@@ -9,7 +9,6 @@ import {
   MarketingTypeEnum,
   MonthlyRentDeterminationTypeEnum,
   MultiselectQuestionsStatusEnum,
-  RegionEnum,
   ReviewOrderTypeEnum,
   UnitTypeEnum,
   UserRoleEnum,
@@ -51,7 +50,6 @@ import { GeocodingService } from '../../../src/services/geocoding.service';
 import { FilterAvailabilityEnum } from '../../../src/enums/listings/filter-availability-enum';
 import { CronJobService } from '../../../src/services/cron-job.service';
 import { MultiselectQuestionService } from '../../../src/services/multiselect-question.service';
-import { create } from 'domain';
 
 /*
   generates a super simple mock listing for us to test logic with
@@ -506,7 +504,6 @@ describe('Testing listing service', () => {
       buildingTotalUnits: 5,
       householdSizeMax: 9,
       householdSizeMin: 1,
-      neighborhood: 'neighborhood string',
       petPolicy: 'we love pets',
       smokingPolicy: 'smokeing policy string',
       unitsAvailable: 15,
@@ -2144,10 +2141,13 @@ describe('Testing listing service', () => {
       });
     });
 
-    it('should return a where clause for filter neighborhood', () => {
-      const neighborhood = 'neighborhoodName';
+    it('should return a where clause for configurable region filters', () => {
+      const regions = ['North', 'South'];
       const filter = [
-        { $comparison: '=', neighborhood: neighborhood } as ListingFilterParams,
+        {
+          $comparison: 'IN',
+          configurableRegions: regions,
+        } as ListingFilterParams,
       ];
       const whereClause = service.buildWhereClause(filter, '');
 
@@ -2156,30 +2156,7 @@ describe('Testing listing service', () => {
           {
             OR: [
               {
-                neighborhood: {
-                  equals: neighborhood,
-                  mode: 'insensitive',
-                },
-              },
-            ],
-          },
-        ],
-      });
-    });
-
-    it('should return a where clause for filter regions', () => {
-      const regions = [RegionEnum.Eastside, RegionEnum.Greater_Downtown];
-      const filter = [
-        { $comparison: 'IN', regions: regions } as ListingFilterParams,
-      ];
-      const whereClause = service.buildWhereClause(filter, '');
-
-      expect(whereClause).toStrictEqual({
-        AND: [
-          {
-            OR: [
-              {
-                region: {
+                configurableRegion: {
                   in: regions,
                 },
               },

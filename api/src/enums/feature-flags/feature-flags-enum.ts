@@ -41,7 +41,6 @@ export enum FeatureFlagEnum {
   enablePetPolicyCheckbox = 'enablePetPolicyCheckbox',
   enableProperties = 'enableProperties',
   enableReferralQuestionUnits = 'enableReferralQuestionUnits',
-  enableRegions = 'enableRegions',
   enableResources = 'enableResources',
   enableSection8Question = 'enableSection8Question',
   enableSingleUseCode = 'enableSingleUseCode',
@@ -251,11 +250,6 @@ export const featureFlagMap: {
   {
     name: FeatureFlagEnum.enableReferralQuestionUnits,
     description: 'when true, updates the the referral details question labels',
-  },
-  {
-    name: FeatureFlagEnum.enableRegions,
-    description:
-      'When true, the region can be defined for the building address',
   },
   {
     name: FeatureFlagEnum.enableResources,

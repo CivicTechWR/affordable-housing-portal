@@ -15,8 +15,6 @@ export enum ListingFilterKeys {
   monthlyRent = 'monthlyRent',
   multiselectQuestions = 'multiselectQuestions',
   name = 'name',
-  neighborhood = 'neighborhood',
-  regions = 'regions',
   configurableRegions = 'configurableRegions',
   reservedCommunityTypes = 'reservedCommunityTypes',
   section8Acceptance = 'section8Acceptance',

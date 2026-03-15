@@ -27,7 +27,6 @@ describe("BuildingDetails", () => {
           customMapPositionChosen={false}
           enableConfigurableRegions={false}
           enableNonRegulatedListings={false}
-          enableRegions={false}
           latLong={undefined}
           listing={undefined}
           regions={undefined}
@@ -55,8 +54,7 @@ describe("BuildingDetails", () => {
     expect(within(stateSelector).getByRole("option", { name: "Alberta" })).toBeInTheDocument()
     expect(within(stateSelector).getByRole("option", { name: "Yukon" })).toBeInTheDocument()
     expect(screen.getByRole("textbox", { name: "Postal code" })).toBeInTheDocument()
-    // Neighborhood should be a text box instead of a selector
-    expect(screen.getByRole("textbox", { name: "Neighborhood" })).toBeInTheDocument()
+    expect(screen.queryByRole("textbox", { name: "Neighborhood" })).not.toBeInTheDocument()
     expect(screen.queryAllByRole("combobox", { name: "Neighborhood" })).toHaveLength(0)
     expect(screen.getByRole("spinbutton", { name: "Year built" })).toBeInTheDocument()
     expect(screen.getByText("Map preview")).toBeInTheDocument()
@@ -68,51 +66,6 @@ describe("BuildingDetails", () => {
     expect(screen.queryByRole("combobox", { name: "Region" })).not.toBeInTheDocument()
   })
 
-  it("should render region field with region flag enabled", () => {
-    render(
-      <FormProviderWrapper>
-        <BuildingDetails
-          customMapPositionChosen={false}
-          enableConfigurableRegions={false}
-          enableNonRegulatedListings={false}
-          enableRegions={true}
-          latLong={undefined}
-          listing={undefined}
-          regions={undefined}
-          requiredFields={[]}
-          setCustomMapPositionChosen={() => {
-            return
-          }}
-          setLatLong={() => {
-            return
-          }}
-        />
-      </FormProviderWrapper>
-    )
-
-    const regionSelector = screen.getByRole("combobox", { name: "Region" })
-    expect(regionSelector).toBeInTheDocument()
-    expect(
-      within(regionSelector).getByRole("option", { name: "Greater Downtown" })
-    ).toBeInTheDocument()
-    expect(within(regionSelector).getByRole("option", { name: "Eastside" })).toBeInTheDocument()
-    expect(within(regionSelector).getByRole("option", { name: "Southwest" })).toBeInTheDocument()
-    expect(within(regionSelector).getByRole("option", { name: "Westside" })).toBeInTheDocument()
-    // Neighborhood field should be a select rather than input field
-    const neighborhoodSelector = screen.getByRole("combobox", { name: "Neighborhood" })
-    expect(neighborhoodSelector).toBeInTheDocument()
-    expect(within(neighborhoodSelector).getAllByRole("option")).toHaveLength(24)
-    expect(
-      within(neighborhoodSelector).getByRole("option", { name: "Boynton" })
-    ).toBeInTheDocument()
-    expect(
-      within(neighborhoodSelector).getByRole("option", { name: "Palmer Park area" })
-    ).toBeInTheDocument()
-    expect(screen.queryAllByRole("textbox", { name: "Neighborhood" })).toHaveLength(0)
-  })
-
-  it.todo("should change the region when selecting a different neighborhood")
-
   it("should render region field with configurable region flag enabled", () => {
     render(
       <FormProviderWrapper>
@@ -120,7 +73,6 @@ describe("BuildingDetails", () => {
           customMapPositionChosen={false}
           enableConfigurableRegions={true}
           enableNonRegulatedListings={false}
-          enableRegions={false}
           latLong={undefined}
           listing={undefined}
           regions={["North", "South", "Northeast"]}
@@ -148,7 +100,6 @@ describe("BuildingDetails", () => {
           customMapPositionChosen={false}
           enableConfigurableRegions={true}
           enableNonRegulatedListings={true}
-          enableRegions={false}
           latLong={undefined}
           listing={undefined}
           regions={undefined}
