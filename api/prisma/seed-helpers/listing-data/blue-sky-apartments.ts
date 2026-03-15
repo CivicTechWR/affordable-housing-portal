@@ -8,9 +8,9 @@ import {
 } from '@prisma/client';
 import dayjs from 'dayjs';
 import {
-  rockyMountainAddress,
-  yellowstoneAddress,
-  yosemiteAddress,
+  ottawaAddress,
+  banffAddress,
+  whistlerAddress,
 } from '../address-factory';
 
 export const blueSkyApartments: Prisma.ListingsCreateInput = {
@@ -82,19 +82,19 @@ export const blueSkyApartments: Prisma.ListingsCreateInput = {
   contentUpdatedAt: new Date(),
   publishedAt: new Date(),
   listingsBuildingAddress: {
-    create: yellowstoneAddress,
+    create: banffAddress,
   },
   listingsApplicationMailingAddress: {
-    create: rockyMountainAddress,
+    create: ottawaAddress,
   },
   listingsApplicationPickUpAddress: {
-    create: yosemiteAddress,
+    create: whistlerAddress,
   },
   listingsLeasingAgentAddress: {
-    create: rockyMountainAddress,
+    create: ottawaAddress,
   },
   listingsApplicationDropOffAddress: {
-    create: yosemiteAddress,
+    create: whistlerAddress,
   },
   reservedCommunityTypes: undefined,
   listingImages: {

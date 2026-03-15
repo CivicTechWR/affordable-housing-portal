@@ -3,18 +3,18 @@
   "features": [
     {
       "geometry": {
-        "coordinates": [-122.40273, 37.79516],
+        "coordinates": [-75.7009, 45.4236],
         "type": "Point"
       },
       "type": "Feature",
       "properties": {
-        "street": "Montgomery St",
-        "housenumber": "600",
-        "city": "San Francisco",
-        "state": "CA",
-        "postcode": "94111",
-        "countrycode": "us",
-        "country": "United States"
+        "street": "Wellington St",
+        "housenumber": "1",
+        "city": "Ottawa",
+        "state": "ON",
+        "postcode": "K1A 0A9",
+        "countrycode": "ca",
+        "country": "Canada"
       }
     }
   ]

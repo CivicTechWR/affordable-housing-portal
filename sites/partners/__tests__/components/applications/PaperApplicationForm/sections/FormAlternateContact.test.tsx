@@ -24,8 +24,8 @@ describe("<FormAlternateContact>", () => {
     expect(screen.getByLabelText(/street address/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/apt or unit #/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/city/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/state/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/zip code/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/province/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/postal code/i)).toBeInTheDocument()
 
     expect(screen.queryByLabelText(/other relationship/i)).not.toBeInTheDocument()
   })

@@ -208,7 +208,7 @@ describe("Listing Management Tests", () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function fillOutListing(cy: Cypress.cy, listing: CypressListing): void {
-    cy.intercept("GET", "/geocoding/v5/**", { fixture: "address" })
+    cy.intercept("GET", "https://photon.komoot.io/api/*", { fixture: "address" })
     cy.intercept("POST", "https://api.cloudinary.com/v1_1/exygy/upload", {
       fixture: "cypressUpload",
     })
