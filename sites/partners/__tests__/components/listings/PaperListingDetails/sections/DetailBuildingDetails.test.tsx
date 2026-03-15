@@ -1,7 +1,10 @@
 import React from "react"
 import { render, screen } from "@testing-library/react"
 import { listing } from "@bloom-housing/shared-helpers/__tests__/testHelpers"
-import { EnumListingListingType, ReviewOrderTypeEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import {
+  EnumListingListingType,
+  ReviewOrderTypeEnum,
+} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { ListingContext } from "../../../../../src/components/listings/ListingContext"
 import DetailBuildingDetails from "../../../../../src/components/listings/PaperListingDetails/sections/DetailBuildingDetails"
 
