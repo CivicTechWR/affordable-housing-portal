@@ -1126,7 +1126,7 @@ describe('Testing Permissioning of endpoints as partner with wrong listing', () 
         .expect(403);
     });
 
-    it('should error as forbidden for create endpoint', async () => {
+    it('should succeed for create endpoint in the partner jurisdiction', async () => {
       const val = await constructFullListingData(
         prisma,
         undefined,
@@ -1138,7 +1138,7 @@ describe('Testing Permissioning of endpoints as partner with wrong listing', () 
         .set({ passkey: process.env.API_PASS_KEY || '' })
         .send(val)
         .set('Cookie', cookies)
-        .expect(403);
+        .expect(201);
     });
 
     it('should error as forbidden for duplicate endpoint', async () => {

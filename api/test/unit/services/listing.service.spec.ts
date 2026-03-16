@@ -4560,6 +4560,10 @@ describe('Testing listing service', () => {
   describe('Test duplicate endpoint', () => {
     it('should duplicate a listing, including units', async () => {
       const listing = mockListing(1, { numberToMake: 2, date: new Date() });
+      const adminUser = {
+        ...user,
+        userRoles: { isAdmin: true },
+      } as User;
 
       const newName = 'duplicate name';
 
@@ -4588,7 +4592,7 @@ describe('Testing listing service', () => {
             id: listing.id.toString(),
           },
         },
-        user,
+        adminUser,
       );
 
       expect(newListing.name).toBe(newName);
@@ -4676,6 +4680,10 @@ describe('Testing listing service', () => {
 
     it('should duplicate a listing, excluding units', async () => {
       const listing = mockListing(1, { numberToMake: 2, date: new Date() });
+      const adminUser = {
+        ...user,
+        userRoles: { isAdmin: true },
+      } as User;
 
       const newName = 'duplicate name';
 
@@ -4705,7 +4713,7 @@ describe('Testing listing service', () => {
             id: listing.id.toString(),
           },
         },
-        user,
+        adminUser,
       );
 
       expect(newListing.name).toBe(newName);

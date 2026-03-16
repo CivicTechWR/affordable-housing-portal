@@ -14,7 +14,7 @@ const TermsPage = () => {
       body: { ...profile, agreedToTermsOfService: true },
     })
 
-    loadProfile?.("/")
+    void loadProfile?.("/")
   }, [loadProfile, profile, userService])
 
   const jurisdictionTerms = useMemo(() => {

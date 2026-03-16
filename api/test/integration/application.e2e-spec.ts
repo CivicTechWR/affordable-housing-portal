@@ -2200,7 +2200,7 @@ describe('Application Controller Tests', () => {
     it('should run the removePII cron job for expired applications', async () => {
       process.env.APPLICATION_DAYS_TILL_EXPIRY = '90';
       const juris = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
+        data: jurisdictionFactory(`removePIICronJob ${randomUUID()}`),
       });
       await reservedCommunityTypeFactoryAll(juris.id, prisma);
       const listing = await prisma.listings.create({
