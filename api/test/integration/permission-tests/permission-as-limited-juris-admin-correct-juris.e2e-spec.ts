@@ -1000,21 +1000,15 @@ describe('Testing Permissioning of endpoints as Limited Jurisdictional Admin in 
         .expect(200);
     });
 
-    it('should succeed for public create endpoint', async () => {
+    it('should error as forbidden for public create endpoint', async () => {
       const juris = await generateJurisdiction(prisma, 'permission juris 82');
-
-      const data = await applicationFactory();
-      data.applicant.create.emailAddress = 'publicuser@email.com';
-      await prisma.applications.create({
-        data,
-      });
 
       await request(app.getHttpServer())
         .post(`/user/`)
         .set({ passkey: process.env.API_PASS_KEY || '' })
         .send(buildUserCreateMock(juris, 'publicUser2+jurisCorrect@email.com'))
         .set('Cookie', cookies)
-        .expect(201);
+        .expect(403);
     });
 
     it('should error as forbidden for partner create endpoint', async () => {

@@ -1024,24 +1024,18 @@ describe('Testing Permissioning of endpoints as partner with wrong listing', () 
         .expect(200);
     });
 
-    it('should succeed for public create endpoint', async () => {
+    it('should error as forbidden for public create endpoint', async () => {
       const juris = await generateJurisdiction(
         prisma,
         'wrong partner permission juris create success',
       );
-
-      const data = await applicationFactory();
-      data.applicant.create.emailAddress = 'publicuser@email.com';
-      await prisma.applications.create({
-        data,
-      });
 
       await request(app.getHttpServer())
         .post(`/user/`)
         .set({ passkey: process.env.API_PASS_KEY || '' })
         .send(buildUserCreateMock(juris, 'publicUser+partnerWrong@email.com'))
         .set('Cookie', cookies)
-        .expect(201);
+        .expect(403);
     });
 
     it('should error as forbidden for partner create endpoint', async () => {
