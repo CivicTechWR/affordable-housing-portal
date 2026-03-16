@@ -61,6 +61,7 @@ import {
   buildMultiselectQuestionUpdateMock,
   buildUserCreateMock,
   buildUserInviteMock,
+  buildPartnerUserInviteMock,
   buildApplicationCreateMock,
   buildApplicationUpdateMock,
   constructFullListingData,
@@ -1075,6 +1076,20 @@ describe('Testing Permissioning of endpoints as Jurisdictional Admin in the corr
         .set({ passkey: process.env.API_PASS_KEY || '' })
         .send(buildUserCreateMock(juris, 'publicUser+jurisCorrect@email.com'))
         .set('Cookie', cookies)
+        .expect(201);
+    });
+
+    it('should succeed for partner create endpoint', async () => {
+      await request(app.getHttpServer())
+        .post(`/user/invite`)
+        .send(
+          buildPartnerUserInviteMock(
+            jurisdictionId,
+            'partnerUser+jurisPartnerCorrect@email.com',
+          ),
+        )
+        .set('Cookie', cookies)
+        .set({ passkey: process.env.API_PASS_KEY || '' })
         .expect(201);
     });
 

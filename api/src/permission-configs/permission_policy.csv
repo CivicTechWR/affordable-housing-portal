@@ -8,7 +8,7 @@ p, admin, user, true, .*
 p, admin, userProfile, true, .*
 p, user, user, r.sub == r.obj.id, (read|update)
 p, user, userProfile, r.sub == r.obj.id, (read|update)
-p, admin, user, true, create
+p, anonymous, user, true, create
 
 p, admin, asset, true, .*
 p, supportAdmin, asset, true, .*

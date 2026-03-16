@@ -60,6 +60,7 @@ import {
   buildMultiselectQuestionUpdateMock,
   buildUserCreateMock,
   buildUserInviteMock,
+  buildPartnerUserInviteMock,
   buildApplicationCreateMock,
   buildApplicationUpdateMock,
   constructFullListingData,
@@ -1044,7 +1045,12 @@ describe('Testing Permissioning of endpoints as Jurisdictional Admin in the wron
       await request(app.getHttpServer())
         .post(`/user/invite`)
         .set({ passkey: process.env.API_PASS_KEY || '' })
-        .send(buildUserInviteMock(juris, 'partnerUser+jurisWrong@email.com'))
+        .send(
+          buildPartnerUserInviteMock(
+            juris,
+            'partnerUser+jurisWrong@email.com',
+          ),
+        )
         .set('Cookie', cookies)
         .expect(403);
     });
