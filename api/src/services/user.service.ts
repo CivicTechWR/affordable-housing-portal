@@ -127,6 +127,17 @@ export class UserService {
     );
   }
 
+  private hasAnyAssignedRole(userRoles?: Partial<UserRole>) {
+    return !!(
+      userRoles?.isAdmin ||
+      userRoles?.isJurisdictionalAdmin ||
+      userRoles?.isLimitedJurisdictionalAdmin ||
+      userRoles?.isPartner ||
+      userRoles?.isSupportAdmin ||
+      userRoles?.isSuperAdmin
+    );
+  }
+
   private getJurisdictionPublicUrl(user: {
     jurisdictions?: Array<{ publicUrl?: string }>;
   }) {
@@ -279,14 +290,22 @@ export class UserService {
         this.isUserRoleChangeAllowed(requestingUser, dto.userRoles) &&
         !this.userRolesMatch(dto.userRoles, storedUser.userRoles)
       ) {
-        await this.prisma.userRoles.update({
-          data: {
-            ...dto.userRoles,
-          },
-          where: {
-            userId: storedUser.id,
-          },
-        });
+        if (this.hasAnyAssignedRole(dto.userRoles)) {
+          await this.prisma.userRoles.update({
+            data: {
+              ...dto.userRoles,
+            },
+            where: {
+              userId: storedUser.id,
+            },
+          });
+        } else {
+          await this.prisma.userRoles.delete({
+            where: {
+              userId: storedUser.id,
+            },
+          });
+        }
       }
     }
 
@@ -572,6 +591,27 @@ export class UserService {
         permissionActions.confirm,
       );
     }
+    const incomingUserRoles = 'userRoles' in dto ? dto.userRoles : undefined;
+    const isPartnerPortalInvite =
+      forPartners && this.isPartnerPortalUser(incomingUserRoles);
+    const isPublicUserInvite = forPartners && !isPartnerPortalInvite;
+    const publicInviteJurisdiction =
+      isPublicUserInvite && dto.jurisdictions?.[0]
+        ? await this.prisma.jurisdictions.findUnique({
+            select: {
+              name: true,
+              publicUrl: true,
+            },
+            where: {
+              id: dto.jurisdictions[0].id,
+            },
+          })
+        : null;
+
+    if (isPublicUserInvite && !publicInviteJurisdiction?.publicUrl) {
+      throw new BadRequestException('jurisdictionPublicUrlMissing');
+    }
+
     const existingUser = await this.prisma.userAccounts.findUnique({
       include: views.full,
       where: {
@@ -581,14 +621,14 @@ export class UserService {
 
     if (existingUser) {
       // if attempting to recreate an existing user
-      if (!existingUser.userRoles && 'userRoles' in dto) {
+      if (!existingUser.userRoles && isPartnerPortalInvite) {
         // existing user && public user && user will get roles -> trying to grant partner access to a public user
         const res = await this.prisma.userAccounts.update({
           include: views.full,
           data: {
             userRoles: {
               create: {
-                ...dto.userRoles,
+                ...incomingUserRoles,
               },
             },
             listings: {
@@ -604,6 +644,53 @@ export class UserService {
           },
         });
         return mapTo(User, res);
+      } else if (!existingUser.userRoles && isPublicUserInvite) {
+        const existingJurisdictionIds = new Set(
+          existingUser.jurisdictions.map((jurisdiction) => jurisdiction.id),
+        );
+        const connectedJurisdictions = existingUser.jurisdictions
+          .map((jurisdiction) => ({ id: jurisdiction.id }))
+          .concat(
+            dto.jurisdictions.filter(
+              (jurisdiction) => !existingJurisdictionIds.has(jurisdiction.id),
+            ),
+          );
+        const confirmationToken =
+          existingUser.confirmationToken ||
+          this.createConfirmationToken(existingUser.id, existingUser.email);
+
+        const invitedUser = await this.prisma.userAccounts.update({
+          include: views.full,
+          data: {
+            jurisdictions: {
+              connect: connectedJurisdictions.map((jurisdiction) => ({
+                id: jurisdiction.id,
+              })),
+            },
+            confirmationToken,
+            confirmedAt: null,
+          },
+          where: {
+            id: existingUser.id,
+          },
+        });
+
+        const confirmationUrl = this.getPublicConfirmationUrl(
+          publicInviteJurisdiction.publicUrl,
+          confirmationToken,
+        );
+        await this.emailService.welcome(
+          publicInviteJurisdiction.name || null,
+          mapTo(User, invitedUser),
+          publicInviteJurisdiction.publicUrl,
+          confirmationUrl,
+        );
+        await this.connectUserWithExistingApplications(
+          invitedUser.email,
+          invitedUser.id,
+        );
+
+        return mapTo(User, invitedUser);
       } else if (
         existingUser?.userRoles?.isPartner &&
         'userRoles' in dto &&
@@ -638,28 +725,6 @@ export class UserService {
       } else {
         // existing user && ((partner user -> trying to recreate user) || (public user -> trying to recreate a public user))
         throw new ConflictException('emailInUse');
-      }
-    }
-
-    const isPartnerPortalInvite =
-      forPartners &&
-      this.isPartnerPortalUser('userRoles' in dto ? dto.userRoles : undefined);
-    const isPublicUserInvite = forPartners && !isPartnerPortalInvite;
-
-    if (isPublicUserInvite) {
-      const publicInviteJurisdiction = dto.jurisdictions?.[0]
-        ? await this.prisma.jurisdictions.findUnique({
-            select: {
-              publicUrl: true,
-            },
-            where: {
-              id: dto.jurisdictions[0].id,
-            },
-          })
-        : null;
-
-      if (!publicInviteJurisdiction?.publicUrl) {
-        throw new BadRequestException('jurisdictionPublicUrlMissing');
       }
     }
 
@@ -708,14 +773,13 @@ export class UserService {
         language: dto.language,
         mfaEnabled: isPartnerPortalInvite,
         ...jurisdictions,
-        userRoles:
-          'userRoles' in dto
-            ? {
-                create: {
-                  ...dto.userRoles,
-                },
-              }
-            : undefined,
+        userRoles: incomingUserRoles
+          ? {
+              create: {
+                ...incomingUserRoles,
+              },
+            }
+          : undefined,
         listings: dto.listings
           ? {
               connect: dto.listings.map((listing) => ({
@@ -790,7 +854,7 @@ export class UserService {
       }
     }
 
-    if (!forPartners) {
+    if (!forPartners || isPublicUserInvite) {
       await this.connectUserWithExistingApplications(newUser.email, newUser.id);
     }
 

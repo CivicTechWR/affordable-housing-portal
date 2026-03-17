@@ -216,13 +216,17 @@ const FormUserManage = ({
 
     const roles = (() => {
       if (selectedRole === RoleOption.User) {
-        return {
-          isAdmin: false,
-          isSupportAdmin: false,
-          isPartner: false,
-          isJurisdictionalAdmin: false,
-          isLimitedJurisdictionalAdmin: false,
+        if (mode === "edit" && user?.userRoles) {
+          return {
+            isAdmin: false,
+            isSupportAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+          }
         }
+
+        return undefined
       }
 
       return {
@@ -259,14 +263,14 @@ const FormUserManage = ({
       firstName,
       lastName,
       email,
-      userRoles: roles,
       listings: leasingAgentInListings,
       jurisdictions: selectedJurisdictions,
       agreedToTermsOfService: user?.agreedToTermsOfService ?? false,
+      ...(roles ? { userRoles: roles } : {}),
     }
 
     return body
-  }, [getValues, trigger, user?.agreedToTermsOfService, jurisdictionOptions])
+  }, [getValues, trigger, mode, user?.agreedToTermsOfService, user?.userRoles, jurisdictionOptions])
 
   const onInvite = async () => {
     const body = await createUserBody()
