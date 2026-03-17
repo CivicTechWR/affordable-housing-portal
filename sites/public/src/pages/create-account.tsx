@@ -5,7 +5,10 @@ const CreateAccount = () => {
   const router = useRouter()
 
   useEffect(() => {
-    void router.replace("/sign-in")
+    void router.replace({
+      pathname: "/sign-in",
+      query: router.query,
+    })
   }, [router])
 
   return null
