@@ -128,10 +128,16 @@ export class UserService {
   }
 
   private getJurisdictionPublicUrl(
-    user: Pick<User, 'jurisdictions'> | { jurisdictions?: Array<{ publicUrl?: string }> },
+    user:
+      | Pick<User, 'jurisdictions'>
+      | { jurisdictions?: Array<{ publicUrl?: string }> },
+    fallbackPublicUrl?: string,
   ) {
     const publicUrl = user.jurisdictions?.[0]?.publicUrl;
     if (!publicUrl) {
+      if (fallbackPublicUrl) {
+        return fallbackPublicUrl;
+      }
       throw new BadRequestException('jurisdictionPublicUrlMissing');
     }
     return publicUrl;
@@ -391,7 +397,7 @@ export class UserService {
       if (forPublic || !this.isPartnerPortalUser(storedUser.userRoles)) {
         const appUrl = forPublic
           ? dto.appUrl
-          : this.getJurisdictionPublicUrl(storedUser);
+          : this.getJurisdictionPublicUrl(storedUser, dto.appUrl);
         const confirmationUrl = this.getPublicConfirmationUrl(
           appUrl,
           confirmationToken,

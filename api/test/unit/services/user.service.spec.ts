@@ -1147,7 +1147,10 @@ describe('Testing user service', () => {
 
       emailService.invitePartnerUser = jest.fn();
 
-      await service.resendConfirmation({ email, appUrl: 'http://partners.example.com' }, false);
+      await service.resendConfirmation(
+        { email, appUrl: 'http://partners.example.com' },
+        false,
+      );
       expect(emailService.invitePartnerUser).toHaveBeenCalledTimes(1);
     });
 

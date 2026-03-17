@@ -1225,6 +1225,7 @@
   "users.confirmationSent": "Đã gửi xác nhận",
   "users.inviteSent": "Đã gửi thư mời",
   "users.jurisdictionalAdmin": "Quản trị viên có thẩm quyền",
+  "users.user": "Người dùng",
   "users.userDeleted": "Người dùng đã xóa",
   "users.userUpdated": "Đã cập nhật người dùng",
   "welcome.allApplicationClosed": "Hiện đang không nhận tất cả các đơn ghi danh, nhưng quý vị có thể xem danh sách đã đóng.",

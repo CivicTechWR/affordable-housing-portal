@@ -58,7 +58,10 @@ afterEach(() => {
 
 afterAll(() => server.close())
 
-const renderForm = (profile: User, props: Partial<React.ComponentProps<typeof FormUserManage>> = {}) => {
+const renderForm = (
+  profile: User,
+  props: Partial<React.ComponentProps<typeof FormUserManage>> = {}
+) => {
   server.use(
     rest.get("http://localhost/api/adapter/user", (_req, res, ctx) => {
       return res(ctx.json(profile))
@@ -99,9 +102,7 @@ describe("<FormUserManage>", () => {
     expect(screen.getByRole("option", { name: "Administrator" })).toBeInTheDocument()
     expect(screen.getByRole("option", { name: "Partner" })).toBeInTheDocument()
     expect(screen.getByRole("option", { name: "User" })).toBeInTheDocument()
-    expect(
-      screen.queryByRole("option", { name: "Jurisdictional admin" })
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole("option", { name: "Jurisdictional admin" })).not.toBeInTheDocument()
     expect(screen.queryByRole("option", { name: "Admin (support)" })).not.toBeInTheDocument()
 
     await userEvent.type(screen.getByRole("textbox", { name: "First name" }), "firstName")
@@ -112,9 +113,7 @@ describe("<FormUserManage>", () => {
       screen.getByRole("option", { name: "User" })
     )
 
-    expect(
-      screen.queryByRole("checkbox", { name: "Jurisdiction One" })
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole("checkbox", { name: "Jurisdiction One" })).not.toBeInTheDocument()
     expect(screen.queryByRole("checkbox", { name: "Listing One" })).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole("button", { name: "Invite" }))
@@ -226,9 +225,7 @@ describe("<FormUserManage>", () => {
     await waitFor(() => screen.getByRole("option", { name: "User" }))
 
     expect(screen.getByRole("combobox", { name: "Role" })).toHaveValue("user")
-    expect(
-      screen.queryByRole("checkbox", { name: "Jurisdiction One" })
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole("checkbox", { name: "Jurisdiction One" })).not.toBeInTheDocument()
     expect(screen.queryByRole("checkbox", { name: "Listing One" })).not.toBeInTheDocument()
   })
 

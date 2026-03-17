@@ -42,6 +42,8 @@ const determineUserRole = (roles: UserRole) => {
     return RoleOption.JurisdictionalAdmin
   } else if (roles?.isLimitedJurisdictionalAdmin) {
     return RoleOption.LimitedJurisdictionalAdmin
+  } else if (roles?.isPartner) {
+    return RoleOption.Partner
   }
   return RoleOption.User
 }

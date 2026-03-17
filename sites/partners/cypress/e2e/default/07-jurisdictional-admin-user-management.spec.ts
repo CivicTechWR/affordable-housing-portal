@@ -9,8 +9,8 @@ describe("Jurisdictional Admin User Mangement Tests", () => {
     cy.signOutApi()
   })
 
-  it("as jurisdictional admin user, should only see partners/jurisdictional admins on the same jurisdiction", () => {
-    const rolesArray = ["Partner", "Jurisdictional admin", "Jurisdictional admin - No PII"]
+  it("as jurisdictional admin user, should only see supported roles on the same jurisdiction", () => {
+    const rolesArray = ["Partner", "Jurisdictional admin", "Jurisdictional admin - No PII", "User"]
     cy.getByTestId("ag-page-size").select("100", { force: true })
 
     const regex = new RegExp(`${rolesArray.join("|")}`, "g")
@@ -20,7 +20,7 @@ describe("Jurisdictional Admin User Mangement Tests", () => {
     })
   })
 
-  it("as jurisdictional admin user, should be able to create new jurisidictional admin", () => {
+  it("as jurisdictional admin user, should be able to create new user", () => {
     cy.getByID("add-user").click()
     cy.fixture("createJurisdictionalAdminUser2").then((obj) => {
       cy.fillFields(
