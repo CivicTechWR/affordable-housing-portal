@@ -63,9 +63,13 @@ const FormUserManage = ({
 
   const [isDeleteModalActive, setDeleteModalActive] = useState<boolean>(false)
 
+  const currentUserRole = mode === "edit" ? determineUserRole(user.userRoles) : undefined
   const possibleUserRoles = [RoleOption.Partner, RoleOption.User]
   if (profile?.userRoles?.isAdmin) {
     possibleUserRoles.push(RoleOption.Administrator)
+  }
+  if (currentUserRole && !possibleUserRoles.includes(currentUserRole)) {
+    possibleUserRoles.push(currentUserRole)
   }
 
   let defaultValues: FormUserManageValues = {}
@@ -74,10 +78,13 @@ const FormUserManage = ({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      userRoles: determineUserRole(user.userRoles),
+      userRoles: currentUserRole,
       user_listings: user.listings?.map((item) => item.id) ?? [],
       jurisdiction_all: jurisdictionList?.length === user.jurisdictions.length,
-      jurisdictions: user.jurisdictions.map((elem) => elem.id),
+      jurisdictions:
+        currentUserRole === RoleOption.Partner
+          ? user.jurisdictions.map((elem) => elem.id)
+          : user.jurisdictions[0]?.id,
     }
   } else if (profile?.userRoles?.isJurisdictionalAdmin) {
     defaultValues = {
@@ -201,7 +208,6 @@ const FormUserManage = ({
           isPartner: false,
           isJurisdictionalAdmin: false,
           isLimitedJurisdictionalAdmin: false,
-          userId: undefined,
         }
       }
 
@@ -211,7 +217,6 @@ const FormUserManage = ({
         isPartner: selectedRole === RoleOption.Partner,
         isJurisdictionalAdmin: selectedRole === RoleOption.JurisdictionalAdmin,
         isLimitedJurisdictionalAdmin: selectedRole === RoleOption.LimitedJurisdictionalAdmin,
-        userId: undefined,
       }
     })()
 
@@ -219,7 +224,13 @@ const FormUserManage = ({
 
     let selectedJurisdictions = []
     if (selectedRole === RoleOption.User) {
-      selectedJurisdictions = jurisdictionOptions.slice(0, 1).map((elem) => ({ id: elem.id }))
+      if (Array.isArray(jurisdictions)) {
+        selectedJurisdictions = jurisdictions.slice(0, 1).map((elem) => ({ id: elem }))
+      } else if (jurisdictions) {
+        selectedJurisdictions = [{ id: jurisdictions }]
+      } else {
+        selectedJurisdictions = jurisdictionOptions.slice(0, 1).map((elem) => ({ id: elem.id }))
+      }
     } else if (Array.isArray(jurisdictions)) {
       selectedJurisdictions = jurisdictions.map((elem) => ({
         id: elem,

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { t, Field, FieldGroup, Select } from "@bloom-housing/ui-components"
 import { Grid } from "@bloom-housing/ui-seeds"
@@ -11,14 +11,24 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   const { register, errors, getValues, setValue, watch } = useFormContext()
   const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const selectedRoles = watch("userRoles")
-  const selectedJurisdictions = watch("jurisdictions") || []
+  const watchedJurisdictions = watch("jurisdictions")
+  const selectedJurisdictions = useMemo(() => {
+    if (Array.isArray(watchedJurisdictions)) {
+      return watchedJurisdictions
+    }
+    return watchedJurisdictions ? [watchedJurisdictions] : []
+  }, [watchedJurisdictions])
+  const showUserJurisdictionSelect =
+    selectedRoles === RoleOption.User &&
+    profile?.userRoles?.isAdmin &&
+    jurisdictionOptions.length > 1
 
   useEffect(() => {
     if (selectedRoles !== RoleOption.User) return
 
-    const defaultJurisdiction = jurisdictionOptions[0]?.id
+    const defaultJurisdiction = selectedJurisdictions[0] || jurisdictionOptions[0]?.id
     if (defaultJurisdiction) {
-      setValue("jurisdictions", [defaultJurisdiction])
+      setValue("jurisdictions", defaultJurisdiction)
     }
     setValue("jurisdiction_all", false)
     setValue("user_listings", [])
@@ -26,7 +36,7 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
     Object.keys(listingsOptions).forEach((key) => {
       setValue(`listings_all_${key}`, false)
     })
-  }, [jurisdictionOptions, listingsOptions, selectedRoles, setValue])
+  }, [jurisdictionOptions, listingsOptions, selectedJurisdictions, selectedRoles, setValue])
 
   /**
    * Control listing checkboxes on select/deselect all listings option
@@ -123,6 +133,30 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
         </Grid.Cell>
       )
     })
+  }
+
+  if (showUserJurisdictionSelect) {
+    return (
+      <SectionWithGrid heading={t("t.jurisdiction")}>
+        <Grid.Row columns={4}>
+          <Grid.Cell>
+            <Select
+              id="jurisdictions"
+              name="jurisdictions"
+              label={t("t.jurisdiction")}
+              placeholder={t("t.selectOne")}
+              register={register}
+              controlClassName="control"
+              keyPrefix="users"
+              options={jurisdictionOptions}
+              error={!!errors?.jurisdictions}
+              errorMessage={t("errors.requiredFieldError")}
+              validation={{ required: true }}
+            />
+          </Grid.Cell>
+        </Grid.Row>
+      </SectionWithGrid>
+    )
   }
 
   if (selectedRoles === RoleOption.User) {

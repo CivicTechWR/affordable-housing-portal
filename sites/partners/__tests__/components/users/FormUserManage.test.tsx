@@ -71,7 +71,9 @@ const renderForm = (
     addToast,
     ...render(
       <MessageContext.Provider value={{ addToast, toastMessagesRef: { current: [] } }}>
-        <AuthContext.Provider value={{ profile, userService }}>
+        <AuthContext.Provider
+          value={{ profile, userService, doJurisdictionsHaveFeatureFlagOn: jest.fn(() => false) }}
+        >
           <FormUserManage
             isOpen={true}
             title={t(props.mode === "edit" ? "users.editUser" : "users.addUser")}
@@ -107,6 +109,10 @@ describe("<FormUserManage>", () => {
       screen.getByRole("combobox", { name: "Role" }),
       screen.getByRole("option", { name: "User" })
     )
+    await userEvent.selectOptions(
+      screen.getByRole("combobox", { name: "Jurisdiction" }),
+      screen.getByRole("option", { name: "Jurisdiction Two" })
+    )
 
     expect(screen.queryByRole("checkbox", { name: "Jurisdiction One" })).not.toBeInTheDocument()
     expect(screen.queryByRole("checkbox", { name: "Listing One" })).not.toBeInTheDocument()
@@ -127,7 +133,7 @@ describe("<FormUserManage>", () => {
             isSupportAdmin: false,
           },
           listings: [],
-          jurisdictions: [{ id: "jurisdiction1" }],
+          jurisdictions: [{ id: "jurisdiction2" }],
           agreedToTermsOfService: false,
         },
       })
@@ -199,8 +205,113 @@ describe("<FormUserManage>", () => {
     })
 
     expect(screen.getByRole("combobox", { name: "Role" })).toHaveValue("user")
+    expect(screen.getByRole("combobox", { name: "Jurisdiction" })).toHaveValue("jurisdiction1")
     expect(screen.queryByRole("checkbox", { name: "Jurisdiction One" })).not.toBeInTheDocument()
     expect(screen.queryByRole("checkbox", { name: "Listing One" })).not.toBeInTheDocument()
+  })
+
+  it("preserves an existing User jurisdiction on save", async () => {
+    const onDrawerClose = jest.fn()
+    const update = jest.fn().mockResolvedValue({})
+
+    renderForm(
+      adminUserWithJurisdictions,
+      {
+        mode: "edit",
+        onDrawerClose,
+        user: {
+          ...mockUser,
+          id: "existing-user",
+          email: "existing@example.com",
+          firstName: "Existing",
+          lastName: "User",
+          jurisdictions: [{ id: "jurisdiction2", name: "Jurisdiction Two", featureFlags: [] }],
+        } as User,
+      },
+      { update }
+    )
+
+    expect(screen.getByRole("combobox", { name: "Role" })).toHaveValue("user")
+    expect(screen.getByRole("combobox", { name: "Jurisdiction" })).toHaveValue("jurisdiction2")
+
+    await userEvent.click(screen.getByRole("button", { name: "Save" }))
+
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledWith({
+        body: {
+          id: "existing-user",
+          firstName: "Existing",
+          lastName: "User",
+          email: "existing@example.com",
+          userRoles: {
+            isAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+            isSupportAdmin: false,
+          },
+          listings: [],
+          jurisdictions: [{ id: "jurisdiction2" }],
+          agreedToTermsOfService: true,
+        },
+      })
+    })
+
+    await waitFor(() => expect(onDrawerClose).toHaveBeenCalled())
+  })
+
+  it("keeps legacy limited jurisdiction admins selectable in edit mode", async () => {
+    const onDrawerClose = jest.fn()
+    const update = jest.fn().mockResolvedValue({})
+
+    renderForm(
+      adminUserWithJurisdictions,
+      {
+        mode: "edit",
+        onDrawerClose,
+        user: {
+          ...mockUser,
+          id: "limited-user",
+          email: "limited@example.com",
+          firstName: "Limited",
+          lastName: "Admin",
+          userRoles: { isLimitedJurisdictionalAdmin: true },
+          jurisdictions: [{ id: "jurisdiction2", name: "Jurisdiction Two", featureFlags: [] }],
+        } as User,
+      },
+      { update }
+    )
+
+    expect(screen.getByRole("combobox", { name: "Role" })).toHaveValue("limitedJurisdictionalAdmin")
+    expect(
+      screen.getByRole("option", { name: "Jurisdictional admin - No PII" })
+    ).toBeInTheDocument()
+    expect(screen.getByRole("combobox", { name: "Jurisdiction" })).toHaveValue("jurisdiction2")
+
+    await userEvent.click(screen.getByRole("button", { name: "Save" }))
+
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledWith({
+        body: {
+          id: "limited-user",
+          firstName: "Limited",
+          lastName: "Admin",
+          email: "limited@example.com",
+          userRoles: {
+            isAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: true,
+            isSupportAdmin: false,
+          },
+          listings: [],
+          jurisdictions: [{ id: "jurisdiction2" }],
+          agreedToTermsOfService: true,
+        },
+      })
+    })
+
+    await waitFor(() => expect(onDrawerClose).toHaveBeenCalled())
   })
 
   it("updates partner users without changing the simplified role behavior", async () => {
