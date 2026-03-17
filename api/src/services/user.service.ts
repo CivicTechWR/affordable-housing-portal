@@ -855,7 +855,7 @@ export class UserService {
     }
 
     if (!forPartners || isPublicUserInvite) {
-      await this.connectUserWithExistingApplications(newUser.email, newUser.id);
+      await this.connectUserWithExistingApplications(dto.email, newUser.id);
     }
 
     return mapTo(User, invitedUser);
