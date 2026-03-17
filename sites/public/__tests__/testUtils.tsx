@@ -75,7 +75,7 @@ export const mockNextRouter = (query?: any, overrides: Record<string, unknown> =
   const pushMock = jest.fn()
   const backMock = jest.fn()
   const replaceMock = jest.fn()
-  useRouter.mockImplementation(() => ({
+  const routerMock = {
     pathname: "/",
     query: query ?? {},
     isReady: true,
@@ -83,7 +83,8 @@ export const mockNextRouter = (query?: any, overrides: Record<string, unknown> =
     back: backMock,
     replace: replaceMock,
     ...overrides,
-  }))
+  }
+  useRouter.mockImplementation(() => routerMock)
 
-  return { useRouter, pushMock, backMock, replaceMock }
+  return { useRouter, pushMock, backMock, replaceMock, routerMock }
 }
