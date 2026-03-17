@@ -369,8 +369,13 @@ describe('User Controller Tests', () => {
 
   describe('resend confirmation partners endpoint', () => {
     it('should resend public confirmation when a no-role user is resent from the partners flow', async () => {
+      const jurisdiction = await prisma.jurisdictions.create({
+        data: await jurisdictionFactory(),
+      });
       const userA = await prisma.userAccounts.create({
-        data: await userFactory(),
+        data: await userFactory({
+          jurisdictionIds: [jurisdiction.id],
+        }),
       });
       const mockWelcome = jest.spyOn(testEmailService, 'welcome');
       const mockInvitePartnerUser = jest.spyOn(
