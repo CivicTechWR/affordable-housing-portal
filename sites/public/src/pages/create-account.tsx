@@ -2,14 +2,16 @@ import { useEffect } from "react"
 import { useRouter } from "next/router"
 
 const CreateAccount = () => {
-  const router = useRouter()
+  const { isReady, query, replace } = useRouter()
 
   useEffect(() => {
-    void router.replace({
+    if (!isReady) return
+
+    void replace({
       pathname: "/sign-in",
-      query: router.query,
+      query,
     })
-  }, [router])
+  }, [isReady, query, replace])
 
   return null
 }
