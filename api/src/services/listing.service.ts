@@ -1499,6 +1499,15 @@ export class ListingService implements OnModuleInit {
               },
             }
           : undefined,
+        customListingFeatures: dto.customListingFeatures
+          ? {
+            create: dto.customListingFeatures.map((feature) => ({
+              customListingFeature: {
+                connect: { id: feature.id },
+              },
+            })),
+          }
+          : undefined,
         listingFeatures: dto.listingFeatures
           ? {
               create: {
@@ -2519,6 +2528,21 @@ export class ListingService implements OnModuleInit {
                   },
                 },
               }
+            : undefined,
+          customListingFeatures: incomingDto.customListingFeatures
+            ? {
+              deleteMany: {
+                customListingFeatureId: {
+                  notIn: incomingDto.customListingFeatures.map((f) => f.id),
+                },
+              },
+              createMany: {
+                data: incomingDto.customListingFeatures.map((f) => ({
+                  customListingFeatureId: f.id,
+                })),
+                skipDuplicates: true,
+              },
+            }
             : undefined,
           jurisdictions: incomingDto.jurisdictions
             ? {

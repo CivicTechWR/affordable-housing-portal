@@ -358,76 +358,76 @@ describe('Testing listing service', () => {
       units: useUnitGroups
         ? []
         : [
-            {
-              amiPercentage: '1',
-              annualIncomeMin: '2',
-              monthlyIncomeMin: '3',
-              floor: 4,
-              annualIncomeMax: '5',
-              maxOccupancy: 6,
-              minOccupancy: 7,
-              monthlyRent: '8',
-              numBathrooms: 9,
-              numBedrooms: 10,
-              number: '11',
-              sqFeet: '12',
-              monthlyRentAsPercentOfIncome: '13',
-              bmrProgramChart: true,
-              unitTypes: {
-                id: randomUUID(),
-              },
-              amiChart: {
-                id: randomUUID(),
-              },
-              unitAccessibilityPriorityTypes: {
-                id: randomUUID(),
-              },
-              unitRentTypes: {
-                id: randomUUID(),
-              },
-              unitAmiChartOverrides: {
-                items: [
-                  {
-                    percentOfAmi: 10,
-                    householdSize: 20,
-                    income: 30,
-                  },
-                ],
-              },
+          {
+            amiPercentage: '1',
+            annualIncomeMin: '2',
+            monthlyIncomeMin: '3',
+            floor: 4,
+            annualIncomeMax: '5',
+            maxOccupancy: 6,
+            minOccupancy: 7,
+            monthlyRent: '8',
+            numBathrooms: 9,
+            numBedrooms: 10,
+            number: '11',
+            sqFeet: '12',
+            monthlyRentAsPercentOfIncome: '13',
+            bmrProgramChart: true,
+            unitTypes: {
+              id: randomUUID(),
             },
-          ],
+            amiChart: {
+              id: randomUUID(),
+            },
+            unitAccessibilityPriorityTypes: {
+              id: randomUUID(),
+            },
+            unitRentTypes: {
+              id: randomUUID(),
+            },
+            unitAmiChartOverrides: {
+              items: [
+                {
+                  percentOfAmi: 10,
+                  householdSize: 20,
+                  income: 30,
+                },
+              ],
+            },
+          },
+        ],
       unitGroups: useUnitGroups
         ? [
-            {
-              totalAvailable: 5,
-              totalCount: 10,
-              floorMin: 1,
-              floorMax: 5,
-              maxOccupancy: 3,
-              minOccupancy: 1,
-              sqFeetMin: 500,
-              sqFeetMax: 800,
-              bathroomMin: 1,
-              bathroomMax: 2,
-              openWaitlist: false,
-              unitTypes: [
-                {
+          {
+            totalAvailable: 5,
+            totalCount: 10,
+            floorMin: 1,
+            floorMax: 5,
+            maxOccupancy: 3,
+            minOccupancy: 1,
+            sqFeetMin: 500,
+            sqFeetMax: 800,
+            bathroomMin: 1,
+            bathroomMax: 2,
+            openWaitlist: false,
+            unitTypes: [
+              {
+                id: randomUUID(),
+              },
+            ],
+            unitGroupAmiLevels: [
+              {
+                amiPercentage: 10,
+                monthlyRentDeterminationType:
+                  MonthlyRentDeterminationTypeEnum.percentageOfIncome,
+                percentageOfIncomeValue: 10,
+                amiChart: {
                   id: randomUUID(),
                 },
-              ],
-              unitGroupAmiLevels: [
-                {
-                  amiPercentage: 10,
-                  monthlyRentDeterminationType:
-                    MonthlyRentDeterminationTypeEnum.percentageOfIncome,
-                  percentageOfIncomeValue: 10,
-                  amiChart: {
-                    id: randomUUID(),
-                  },
-                },
-              ],
-            },
-          ]
+              },
+            ],
+          },
+        ]
         : [],
       section8Acceptance: true,
       listingMultiselectQuestions: [
@@ -453,29 +453,29 @@ describe('Testing listing service', () => {
       ],
       unitsSummary: !useUnitGroups
         ? [
-            {
-              unitTypes: {
-                id: randomUUID(),
-              },
-              monthlyRentMin: 1,
-              monthlyRentMax: 2,
-              monthlyRentAsPercentOfIncome: '3',
-              amiPercentage: 4,
-              minimumIncomeMin: '5',
-              minimumIncomeMax: '6',
-              maxOccupancy: 7,
-              minOccupancy: 8,
-              floorMin: 9,
-              floorMax: 10,
-              sqFeetMin: '11',
-              sqFeetMax: '12',
-              unitAccessibilityPriorityTypes: {
-                id: randomUUID(),
-              },
-              totalCount: 13,
-              totalAvailable: 14,
+          {
+            unitTypes: {
+              id: randomUUID(),
             },
-          ]
+            monthlyRentMin: 1,
+            monthlyRentMax: 2,
+            monthlyRentAsPercentOfIncome: '3',
+            amiPercentage: 4,
+            minimumIncomeMin: '5',
+            minimumIncomeMax: '6',
+            maxOccupancy: 7,
+            minOccupancy: 8,
+            floorMin: 9,
+            floorMax: 10,
+            sqFeetMin: '11',
+            sqFeetMax: '12',
+            unitAccessibilityPriorityTypes: {
+              id: randomUUID(),
+            },
+            totalCount: 13,
+            totalAvailable: 14,
+          },
+        ]
         : [],
       listingsApplicationPickUpAddress: exampleAddress,
       listingsApplicationMailingAddress: exampleAddress,
@@ -579,6 +579,11 @@ describe('Testing listing service', () => {
         garage: false,
         carport: false,
       },
+      customListingFeatures: [
+        {
+          id: 'example-feature-id'
+        }
+      ],
       listingUtilities: {
         water: false,
         gas: true,
@@ -667,7 +672,6 @@ describe('Testing listing service', () => {
             },
           },
           listingsResult: true,
-          property: true,
           listingsLeasingAgentAddress: true,
           listingsApplicationPickUpAddress: true,
           listingsApplicationDropOffAddress: true,
@@ -3527,6 +3531,17 @@ describe('Testing listing service', () => {
               ...exampleAddress,
             },
           },
+          customListingFeatures: {
+            create: [
+              {
+                customListingFeature: {
+                  connect: {
+                    id: 'example-feature-id',
+                  },
+                },
+              },
+            ],
+          },
           listingFeatures: {
             create: {
               elevator: true,
@@ -4059,6 +4074,17 @@ describe('Testing listing service', () => {
               ...exampleAddress,
             },
           },
+          customListingFeatures: {
+            create: [
+              {
+                customListingFeature: {
+                  connect: {
+                    id: 'example-feature-id',
+                  },
+                },
+              },
+            ],
+          },
           listingFeatures: {
             create: {
               elevator: true,
@@ -4413,6 +4439,17 @@ describe('Testing listing service', () => {
             create: {
               ...exampleAddress,
             },
+          },
+          customListingFeatures: {
+            create: [
+              {
+                customListingFeature: {
+                  connect: {
+                    id: 'example-feature-id',
+                  },
+                },
+              },
+            ],
           },
           listingFeatures: {
             create: {
@@ -4996,6 +5033,15 @@ describe('Testing listing service', () => {
         wideDoorways: true,
         loweredCabinets: false,
       };
+      const nestedCustomFeaturesUpdate = [
+        {
+          customListingFeature: {
+            connect: {
+              id: 'example-feature-id'
+            }
+          }
+        }
+      ];
       const nestedNeighborhoodAmenities = {
         groceryStores: 'stores',
         pharmacies: 'pharmacies',
@@ -5054,6 +5100,21 @@ describe('Testing listing service', () => {
       expect(updateCall.data.listingFeatures.upsert.update).toEqual(
         nestedFeaturesUpdate,
       );
+      expect(updateCall.data.customListingFeatures).toEqual({
+        deleteMany: {
+          customListingFeatureId: {
+            notIn: ['example-feature-id'],
+          },
+        },
+        createMany: {
+          data: [
+            {
+              customListingFeatureId: 'example-feature-id',
+            },
+          ],
+          skipDuplicates: true,
+        },
+      });
       expect(
         updateCall.data.listingNeighborhoodAmenities.upsert.create,
       ).toEqual(nestedNeighborhoodAmenities);
