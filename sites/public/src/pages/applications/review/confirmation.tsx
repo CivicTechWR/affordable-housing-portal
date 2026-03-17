@@ -133,32 +133,6 @@ const ApplicationConfirmation = () => {
             </div>
           </CardSection>
 
-          {initialStateLoaded && !profile && (
-            <CardSection divider={"flush"} className={"border-none"}>
-              <div className="markdown markdown-informational">
-                <Markdown options={{ disableParsingRawHTML: true }}>
-                  {t("application.review.confirmation.createAccount")}
-                </Markdown>
-              </div>
-            </CardSection>
-          )}
-
-          {initialStateLoaded && !profile && (
-            <CardSection
-              className={`${styles["application-form-action-footer"]} border-none`}
-              divider={"flush"}
-            >
-              <Button
-                variant={"primary"}
-                onClick={() => {
-                  void router.push("/create-account")
-                }}
-                id={"app-confirmation-create-account"}
-              >
-                {t("account.createAccount")}
-              </Button>
-            </CardSection>
-          )}
 
           <CardSection divider={"flush"}>
             <Link href="/listings">{t("application.review.confirmation.browseMore")}</Link>
