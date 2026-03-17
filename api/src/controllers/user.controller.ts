@@ -13,6 +13,7 @@ import {
   Request,
   Res,
   StreamableFile,
+  UnauthorizedException,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -53,6 +54,7 @@ import { ExportLogInterceptor } from '../interceptors/export-log.interceptor';
 import { RequestSingleUseCode } from '../dtos/single-use-code/request-single-use-code.dto';
 import { ApiKeyGuard } from '../guards/api-key.guard';
 import { UserDeleteDTO } from '../dtos/users/user-delete.dto';
+import { PARTNERS_PORTAL_HEADER } from '../services/auth.service';
 
 @Controller('user')
 @ApiTags('user')
@@ -74,6 +76,12 @@ export class UserController {
     operationId: 'profile',
   })
   profile(@Request() req: ExpressRequest): User {
+    if (
+      req.headers[PARTNERS_PORTAL_HEADER] === 'true' &&
+      !this.userService.isPartnerPortalUser(req['user']?.userRoles)
+    ) {
+      throw new UnauthorizedException('partnerPortalAccessDenied');
+    }
     return mapTo(User, req['user']);
   }
 

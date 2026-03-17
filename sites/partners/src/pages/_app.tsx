@@ -53,7 +53,7 @@ function PartnersApp({ Component, router, pageProps }: AppProps) {
   }, [locale])
 
   const pageContent = (
-    <ConfigProvider apiUrl={process.env.backendApiBase}>
+    <ConfigProvider apiUrl={process.env.backendApiBase} appType="partners">
       <AuthProvider>
         <RequireLogin
           signInPath="/sign-in"

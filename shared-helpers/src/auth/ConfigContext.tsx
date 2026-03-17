@@ -4,6 +4,7 @@ type ConfigContextProps = {
   storageType: "local" | "session"
   apiUrl: string
   idleTimeout: number
+  appType: "partners" | "public"
 }
 
 const timeoutMinutes = parseInt(process.env.idleTimeout || process.env.IDLE_TIMEOUT || "5")
@@ -13,14 +14,22 @@ export const ConfigContext = createContext<ConfigContextProps>({
   storageType: "session",
   apiUrl: "",
   idleTimeout: defaultTimeout,
+  appType: "public",
 })
 
 export const ConfigProvider: FunctionComponent<{
   apiUrl: string
   storageType?: ConfigContextProps["storageType"]
   idleTimeout?: number
+  appType?: ConfigContextProps["appType"]
   children?: React.ReactNode
-}> = ({ apiUrl, storageType = "session", idleTimeout = defaultTimeout, children }) => {
+}> = ({
+  apiUrl,
+  storageType = "session",
+  idleTimeout = defaultTimeout,
+  appType = "public",
+  children,
+}) => {
   return createElement(
     ConfigContext.Provider,
     {
@@ -28,6 +37,7 @@ export const ConfigProvider: FunctionComponent<{
         apiUrl,
         storageType,
         idleTimeout,
+        appType,
       },
     },
     children

@@ -18,7 +18,11 @@ import {
 } from 'express';
 import { defaultValidationPipeOptions } from '../utilities/default-validation-pipe-options';
 import { SuccessDTO } from '../dtos/shared/success.dto';
-import { AuthService, REFRESH_COOKIE_NAME } from '../services/auth.service';
+import {
+  AuthService,
+  PARTNERS_PORTAL_HEADER,
+  REFRESH_COOKIE_NAME,
+} from '../services/auth.service';
 import { RequestMfaCode } from '../dtos/mfa/request-mfa-code.dto';
 import { RequestMfaCodeResponse } from '../dtos/mfa/request-mfa-code-response.dto';
 import { Confirm } from '../dtos/auth/confirm.dto';
@@ -58,6 +62,7 @@ export class AuthController {
       !!process.env.RECAPTCHA_KEY,
       !!dto.mfaCode,
       process.env.ENABLE_RECAPTCHA === 'TRUE',
+      req.headers[PARTNERS_PORTAL_HEADER] === 'true',
     );
   }
 
@@ -120,6 +125,11 @@ export class AuthController {
       res,
       mapTo(User, req['user']),
       req.cookies[REFRESH_COOKIE_NAME],
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      req.headers[PARTNERS_PORTAL_HEADER] === 'true',
     );
   }
 

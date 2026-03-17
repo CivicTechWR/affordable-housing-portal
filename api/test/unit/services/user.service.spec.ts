@@ -1122,6 +1122,36 @@ describe('Testing user service', () => {
       expect(emailService.welcome).toHaveBeenCalledTimes(1);
     });
 
+    it('should error when a no-role user is resent from partners without a jurisdiction public url', async () => {
+      const id = randomUUID();
+      const email = 'email@example.com';
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        email,
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: '',
+          },
+        ],
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        email,
+        confirmationToken: 'example confirmation token',
+      });
+      emailService.welcome = jest.fn();
+
+      await expect(
+        service.resendConfirmation(
+          { email, appUrl: 'http://partners.example.com' },
+          false,
+        ),
+      ).rejects.toThrowError('jurisdictionPublicUrlMissing');
+      expect(emailService.welcome).not.toHaveBeenCalled();
+    });
+
     it('should resend partner portal confirmation for partner users', async () => {
       const id = randomUUID();
       const email = 'email@example.com';
@@ -1948,6 +1978,9 @@ describe('Testing user service', () => {
       const id = randomUUID();
 
       prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        publicUrl: 'http://public.example.com',
+      });
       prisma.userAccounts.create = jest.fn().mockResolvedValue({
         id,
       });
@@ -2038,6 +2071,9 @@ describe('Testing user service', () => {
       const id = randomUUID();
 
       prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        publicUrl: 'http://public.example.com',
+      });
       prisma.userAccounts.create = jest.fn().mockResolvedValue({
         id,
       });
@@ -2085,8 +2121,68 @@ describe('Testing user service', () => {
         } as unknown as Request,
       );
 
+      expect(prisma.userAccounts.create).toHaveBeenCalledWith({
+        data: {
+          passwordHash: expect.anything(),
+          email: 'publicinvite@email.com',
+          firstName: 'Public Invite firstName',
+          lastName: 'Public Invite lastName',
+          mfaEnabled: false,
+          jurisdictions: {
+            connect: [{ id: jurisId }],
+          },
+          userRoles: {
+            create: {
+              isAdmin: false,
+              isPartner: false,
+              isJurisdictionalAdmin: false,
+              isLimitedJurisdictionalAdmin: false,
+              isSupportAdmin: false,
+            },
+          },
+        },
+      });
       expect(emailService.welcome).toHaveBeenCalledTimes(1);
       expect(emailService.invitePartnerUser).not.toHaveBeenCalled();
+    });
+
+    it('should error before creating an invited User when the jurisdiction public url is missing', async () => {
+      const jurisId = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        publicUrl: '',
+      });
+      prisma.userAccounts.create = jest.fn();
+
+      await expect(
+        service.create(
+          {
+            firstName: 'Public Invite firstName',
+            lastName: 'Public Invite lastName',
+            email: 'publicinvite@email.com',
+            jurisdictions: [{ id: jurisId }],
+            userRoles: {
+              isAdmin: false,
+              isPartner: false,
+              isJurisdictionalAdmin: false,
+              isLimitedJurisdictionalAdmin: false,
+              isSupportAdmin: false,
+            },
+          },
+          true,
+          undefined,
+          {
+            headers: { jurisdictionname: 'juris 1' },
+            user: {
+              id: 'requestingUser id',
+              userRoles: { isAdmin: true },
+            } as unknown as User,
+          } as unknown as Request,
+        ),
+      ).rejects.toThrowError('jurisdictionPublicUrlMissing');
+
+      expect(prisma.userAccounts.create).not.toHaveBeenCalled();
     });
 
     it('should create a partner user with existing public user present', async () => {

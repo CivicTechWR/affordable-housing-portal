@@ -209,6 +209,75 @@ describe('Testing auth service', () => {
     );
   });
 
+  it('should reject partner portal credentials for no-role users', async () => {
+    const id = randomUUID();
+    const response = {
+      cookie: jest.fn(),
+      clearCookie: jest.fn(),
+    };
+    prisma.userAccounts.update = jest.fn().mockResolvedValue({ id });
+
+    await expect(
+      async () =>
+        await authService.setCredentials(
+          response as unknown as Response,
+          {
+            passwordUpdatedAt: new Date(),
+            passwordValidForDays: 100,
+            email: 'example@exygy.com',
+            firstName: 'Exygy',
+            lastName: 'User',
+            jurisdictions: [
+              {
+                id: randomUUID(),
+              } as Jurisdiction,
+            ],
+            agreedToTermsOfService: false,
+            id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            userRoles: {
+              isAdmin: false,
+              isSupportAdmin: false,
+              isPartner: false,
+              isJurisdictionalAdmin: false,
+              isLimitedJurisdictionalAdmin: false,
+            },
+          },
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          true,
+        ),
+    ).rejects.toThrowError('partnerPortalAccessDenied');
+
+    expect(prisma.userAccounts.update).toHaveBeenCalledWith({
+      data: {
+        activeAccessToken: null,
+        activeRefreshToken: null,
+      },
+      where: {
+        id,
+      },
+    });
+
+    expect(response.cookie).not.toHaveBeenCalled();
+    expect(response.clearCookie).toHaveBeenCalledWith(
+      TOKEN_COOKIE_NAME,
+      AUTH_COOKIE_OPTIONS,
+    );
+    expect(response.clearCookie).toHaveBeenCalledWith(
+      REFRESH_COOKIE_NAME,
+      REFRESH_COOKIE_OPTIONS,
+    );
+    expect(response.clearCookie).toHaveBeenCalledWith(
+      ACCESS_TOKEN_AVAILABLE_NAME,
+      ACCESS_TOKEN_AVAILABLE_OPTIONS,
+    );
+  });
+
   it('should set credentials with incoming refresh token and user exists', async () => {
     const id = randomUUID();
     const response = {

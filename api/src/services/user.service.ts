@@ -117,7 +117,7 @@ export class UserService {
     );
   }
 
-  private isPartnerPortalUser(userRoles?: Partial<UserRole>) {
+  isPartnerPortalUser(userRoles?: Partial<UserRole>) {
     return !!(
       userRoles?.isAdmin ||
       userRoles?.isJurisdictionalAdmin ||
@@ -127,17 +127,11 @@ export class UserService {
     );
   }
 
-  private getJurisdictionPublicUrl(
-    user:
-      | Pick<User, 'jurisdictions'>
-      | { jurisdictions?: Array<{ publicUrl?: string }> },
-    fallbackPublicUrl?: string,
-  ) {
+  private getJurisdictionPublicUrl(user: {
+    jurisdictions?: Array<{ publicUrl?: string }>;
+  }) {
     const publicUrl = user.jurisdictions?.[0]?.publicUrl;
     if (!publicUrl) {
-      if (fallbackPublicUrl) {
-        return fallbackPublicUrl;
-      }
       throw new BadRequestException('jurisdictionPublicUrlMissing');
     }
     return publicUrl;
@@ -392,7 +386,7 @@ export class UserService {
       if (forPublic || !this.isPartnerPortalUser(storedUser.userRoles)) {
         const appUrl = forPublic
           ? dto.appUrl
-          : this.getJurisdictionPublicUrl(storedUser, dto.appUrl);
+          : this.getJurisdictionPublicUrl(storedUser);
         const confirmationUrl = this.getPublicConfirmationUrl(
           appUrl,
           confirmationToken,
@@ -647,6 +641,28 @@ export class UserService {
       }
     }
 
+    const isPartnerPortalInvite =
+      forPartners &&
+      this.isPartnerPortalUser('userRoles' in dto ? dto.userRoles : undefined);
+    const isPublicUserInvite = forPartners && !isPartnerPortalInvite;
+
+    if (isPublicUserInvite) {
+      const publicInviteJurisdiction = dto.jurisdictions?.[0]
+        ? await this.prisma.jurisdictions.findUnique({
+            select: {
+              publicUrl: true,
+            },
+            where: {
+              id: dto.jurisdictions[0].id,
+            },
+          })
+        : null;
+
+      if (!publicInviteJurisdiction?.publicUrl) {
+        throw new BadRequestException('jurisdictionPublicUrlMissing');
+      }
+    }
+
     let passwordHash = '';
     if (forPartners) {
       passwordHash = await passwordToHash(
@@ -690,7 +706,7 @@ export class UserService {
         dob: dto.dob,
         phoneNumber: dto.phoneNumber,
         language: dto.language,
-        mfaEnabled: forPartners,
+        mfaEnabled: isPartnerPortalInvite,
         ...jurisdictions,
         userRoles:
           'userRoles' in dto
@@ -747,7 +763,7 @@ export class UserService {
         );
       }
     } else if (forPartners) {
-      if (this.isPartnerPortalUser(invitedUser.userRoles)) {
+      if (isPartnerPortalInvite) {
         const partnersPortalUrl = this.configService.get('PARTNERS_PORTAL_URL');
         const confirmationUrl = this.getPartnersConfirmationUrl(
           partnersPortalUrl,
