@@ -951,13 +951,7 @@ describe('Testing Permissioning of endpoints as logged out user', () => {
         .expect(200);
     });
 
-    it('should succeed for public create endpoint', async () => {
-      const data = await applicationFactory();
-      data.applicant.create.emailAddress = 'publicuser@email.com';
-      await prisma.applications.create({
-        data,
-      });
-
+    it('should error as unauthorized for public create endpoint', async () => {
       await request(app.getHttpServer())
         .post(`/user/`)
         .set({ passkey: process.env.API_PASS_KEY || '' })
@@ -965,7 +959,7 @@ describe('Testing Permissioning of endpoints as logged out user', () => {
           buildUserCreateMock(jurisdictionId, 'publicUser+noUser@email.com'),
         )
         .set('Cookie', cookies)
-        .expect(201);
+        .expect(401);
     });
 
     it('should error as unauthorized for partner create endpoint', async () => {
