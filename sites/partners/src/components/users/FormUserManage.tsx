@@ -9,12 +9,7 @@ import {
   emailRegex,
   useMutate,
 } from "@bloom-housing/shared-helpers"
-import {
-  FeatureFlagEnum,
-  Listing,
-  User,
-  UserRole,
-} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import { Listing, User, UserRole } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import SectionWithGrid from "../shared/SectionWithGrid"
 import { JurisdictionAndListingSelection } from "./JurisdictionAndListingSelection"
 
@@ -48,7 +43,7 @@ const determineUserRole = (roles: UserRole) => {
   } else if (roles?.isLimitedJurisdictionalAdmin) {
     return RoleOption.LimitedJurisdictionalAdmin
   }
-  return RoleOption.Partner
+  return RoleOption.User
 }
 
 const FormUserManage = ({
@@ -60,27 +55,15 @@ const FormUserManage = ({
   onCancel,
   onDrawerClose,
 }: FormUserManageProps) => {
-  const { userService, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { userService, profile } = useContext(AuthContext)
   const { addToast } = useContext(MessageContext)
   const jurisdictionList = profile?.jurisdictions
 
   const [isDeleteModalActive, setDeleteModalActive] = useState<boolean>(false)
 
-  const possibleUserRoles = [RoleOption.Partner]
-  if (
-    !profile?.userRoles?.isPartner &&
-    !doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.disableJurisdictionalAdmin, undefined, true)
-  ) {
-    possibleUserRoles.push(RoleOption.JurisdictionalAdmin)
-    possibleUserRoles.push(RoleOption.LimitedJurisdictionalAdmin)
-  }
+  const possibleUserRoles = [RoleOption.Partner, RoleOption.User]
   if (profile?.userRoles?.isAdmin) {
     possibleUserRoles.push(RoleOption.Administrator)
-    // If any jurisdiction has enableSupportAdmin than admins can add an "Admin (support)" user
-    // This means that there can be a scenario where jurisdictions get access to this role when they don't have it enabled
-    if (doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableSupportAdmin)) {
-      possibleUserRoles.push(RoleOption.AdminSupport)
-    }
   }
 
   let defaultValues: FormUserManageValues = {}
@@ -179,6 +162,7 @@ const FormUserManage = ({
 
   const createUserBody = useCallback(async () => {
     const { firstName, lastName, email, userRoles, jurisdictions } = getValues()
+    const selectedRole = userRoles as RoleOption
 
     /**
      * react-hook form returns:
@@ -187,6 +171,10 @@ const FormUserManage = ({
      * - array of strings if multiple checkboxes are selected
      */
     const user_listings = (() => {
+      if (selectedRole === RoleOption.User) {
+        return []
+      }
+
       const value = getValues("user_listings") as string[] | boolean | string
       const valueInArray = Array.isArray(value)
 
@@ -204,12 +192,23 @@ const FormUserManage = ({
     if (!validation) return
 
     const roles = (() => {
+      if (selectedRole === RoleOption.User) {
+        return {
+          isAdmin: false,
+          isSupportAdmin: false,
+          isPartner: false,
+          isJurisdictionalAdmin: false,
+          isLimitedJurisdictionalAdmin: false,
+          userId: undefined,
+        }
+      }
+
       return {
-        isAdmin: userRoles.includes(RoleOption.Administrator),
-        isSupportAdmin: userRoles.includes(RoleOption.AdminSupport),
-        isPartner: userRoles.includes(RoleOption.Partner),
-        isJurisdictionalAdmin: userRoles.includes(RoleOption.JurisdictionalAdmin),
-        isLimitedJurisdictionalAdmin: userRoles.includes(RoleOption.LimitedJurisdictionalAdmin),
+        isAdmin: selectedRole === RoleOption.Administrator,
+        isSupportAdmin: selectedRole === RoleOption.AdminSupport,
+        isPartner: selectedRole === RoleOption.Partner,
+        isJurisdictionalAdmin: selectedRole === RoleOption.JurisdictionalAdmin,
+        isLimitedJurisdictionalAdmin: selectedRole === RoleOption.LimitedJurisdictionalAdmin,
         userId: undefined,
       }
     })()
@@ -217,7 +216,9 @@ const FormUserManage = ({
     const leasingAgentInListings = user_listings?.map((id) => ({ id })) || []
 
     let selectedJurisdictions = []
-    if (Array.isArray(jurisdictions)) {
+    if (selectedRole === RoleOption.User) {
+      selectedJurisdictions = jurisdictionOptions.slice(0, 1).map((elem) => ({ id: elem.id }))
+    } else if (Array.isArray(jurisdictions)) {
       selectedJurisdictions = jurisdictions.map((elem) => ({
         id: elem,
       }))
@@ -411,7 +412,7 @@ const FormUserManage = ({
                           register={register}
                           controlClassName="control"
                           keyPrefix="users"
-                          options={possibleUserRoles.sort((a, b) => (a < b ? -1 : 1))}
+                          options={possibleUserRoles}
                           error={!!errors?.userRoles}
                           errorMessage={t("errors.requiredFieldError")}
                           validation={{ required: true }}

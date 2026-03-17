@@ -368,11 +368,12 @@ describe('User Controller Tests', () => {
   });
 
   describe('resend confirmation partners endpoint', () => {
-    it('should resend partner confirmation when user exists', async () => {
+    it('should resend public confirmation when a no-role user is resent from the partners flow', async () => {
       const userA = await prisma.userAccounts.create({
         data: await userFactory(),
       });
-      const mockinvitePartnerUser = jest.spyOn(
+      const mockWelcome = jest.spyOn(testEmailService, 'welcome');
+      const mockInvitePartnerUser = jest.spyOn(
         testEmailService,
         'invitePartnerUser',
       );
@@ -396,14 +397,45 @@ describe('User Controller Tests', () => {
 
       expect(userPostResend.email).toBe(userA.email);
       expect(userPostResend.confirmationToken).not.toBeNull();
-      expect(mockinvitePartnerUser.mock.calls.length).toBe(1);
+      expect(mockWelcome.mock.calls.length).toBe(1);
+      expect(mockInvitePartnerUser.mock.calls.length).toBe(0);
     });
 
-    it('should succeed when trying to resend partner confirmation but not update record when user is already confirmed', async () => {
-      const mockinvitePartnerUser = jest.spyOn(
+    it('should resend partner confirmation when the user has a partner portal role', async () => {
+      const userA = await prisma.userAccounts.create({
+        data: await userFactory({
+          roles: { isPartner: true },
+        }),
+      });
+      const mockInvitePartnerUser = jest.spyOn(
         testEmailService,
         'invitePartnerUser',
       );
+      const res = await request(app.getHttpServer())
+        .post(`/user/resend-partner-confirmation/`)
+        .set({ passkey: process.env.API_PASS_KEY || '' })
+        .send({
+          email: userA.email,
+          appUrl: 'https://www.google.com',
+        } as EmailAndAppUrl)
+        .set('Cookie', cookies)
+        .expect(201);
+
+      expect(res.body.success).toEqual(true);
+
+      const userPostResend = await prisma.userAccounts.findUnique({
+        where: {
+          id: userA.id,
+        },
+      });
+
+      expect(userPostResend.email).toBe(userA.email);
+      expect(userPostResend.confirmationToken).not.toBeNull();
+      expect(mockInvitePartnerUser.mock.calls.length).toBe(1);
+    });
+
+    it('should succeed when trying to resend partner confirmation but not update record when user is already confirmed', async () => {
+      const mockWelcome = jest.spyOn(testEmailService, 'welcome');
       const userA = await prisma.userAccounts.create({
         data: {
           ...(await userFactory()),
@@ -431,7 +463,7 @@ describe('User Controller Tests', () => {
 
       expect(userPostResend.email).toBe(userA.email);
       expect(userPostResend.confirmationToken).toBeNull();
-      expect(mockinvitePartnerUser.mock.calls.length).toBe(0);
+      expect(mockWelcome.mock.calls.length).toBe(0);
     });
 
     it('should error trying to resend partner confirmation but no user exists', async () => {
@@ -772,6 +804,10 @@ describe('User Controller Tests', () => {
       const juris = await prisma.jurisdictions.create({
         data: jurisdictionFactory(),
       });
+      const mockInvitePartnerUser = jest.spyOn(
+        testEmailService,
+        'invitePartnerUser',
+      );
 
       const res = await request(app.getHttpServer())
         .post(`/user/invite`)
@@ -795,6 +831,46 @@ describe('User Controller Tests', () => {
         expect.objectContaining({ id: juris.id, name: juris.name }),
       ]);
       expect(res.body.email).toEqual('partneruser@email.com');
+      expect(mockInvitePartnerUser).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create a no-role User invite that routes to the public site email flow', async () => {
+      const juris = await prisma.jurisdictions.create({
+        data: jurisdictionFactory(),
+      });
+      const mockWelcome = jest.spyOn(testEmailService, 'welcome');
+      const mockInvitePartnerUser = jest.spyOn(
+        testEmailService,
+        'invitePartnerUser',
+      );
+
+      const res = await request(app.getHttpServer())
+        .post(`/user/invite`)
+        .set({ passkey: process.env.API_PASS_KEY || '' })
+        .send({
+          firstName: 'Searcher User firstName',
+          lastName: 'Searcher User lastName',
+          email: 'searcherUser@email.com',
+          jurisdictions: [{ id: juris.id }],
+          agreedToTermsOfService: true,
+          userRoles: {
+            isAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+            isSupportAdmin: false,
+          },
+        } as UserInvite)
+        .set('Cookie', cookies)
+        .expect(201);
+
+      expect(res.body.firstName).toEqual('Searcher User firstName');
+      expect(res.body.jurisdictions).toEqual([
+        expect.objectContaining({ id: juris.id, name: juris.name }),
+      ]);
+      expect(res.body.email).toEqual('searcheruser@email.com');
+      expect(mockWelcome).toHaveBeenCalledTimes(1);
+      expect(mockInvitePartnerUser).toHaveBeenCalledTimes(0);
     });
   });
 

@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import { useFormContext } from "react-hook-form"
 import { t, Field, FieldGroup, Select } from "@bloom-housing/ui-components"
 import { Grid } from "@bloom-housing/ui-seeds"
@@ -11,7 +11,22 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   const { register, errors, getValues, setValue, watch } = useFormContext()
   const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const selectedRoles = watch("userRoles")
-  const selectedJurisdictions = watch("jurisdictions")
+  const selectedJurisdictions = watch("jurisdictions") || []
+
+  useEffect(() => {
+    if (selectedRoles !== RoleOption.User) return
+
+    const defaultJurisdiction = jurisdictionOptions[0]?.id
+    if (defaultJurisdiction) {
+      setValue("jurisdictions", [defaultJurisdiction])
+    }
+    setValue("jurisdiction_all", false)
+    setValue("user_listings", [])
+
+    Object.keys(listingsOptions).forEach((key) => {
+      setValue(`listings_all_${key}`, false)
+    })
+  }, [jurisdictionOptions, listingsOptions, selectedRoles, setValue])
 
   /**
    * Control listing checkboxes on select/deselect all listings option
@@ -108,6 +123,10 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
         </Grid.Cell>
       )
     })
+  }
+
+  if (selectedRoles === RoleOption.User) {
+    return null
   }
 
   if (profile?.userRoles?.isAdmin) {

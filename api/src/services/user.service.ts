@@ -117,6 +117,26 @@ export class UserService {
     );
   }
 
+  private isPartnerPortalUser(userRoles?: Partial<UserRole>) {
+    return !!(
+      userRoles?.isAdmin ||
+      userRoles?.isJurisdictionalAdmin ||
+      userRoles?.isLimitedJurisdictionalAdmin ||
+      userRoles?.isPartner ||
+      userRoles?.isSupportAdmin
+    );
+  }
+
+  private getJurisdictionPublicUrl(
+    user: Pick<User, 'jurisdictions'> | { jurisdictions?: Array<{ publicUrl?: string }> },
+  ) {
+    const publicUrl = user.jurisdictions?.[0]?.publicUrl;
+    if (!publicUrl) {
+      throw new BadRequestException('jurisdictionPublicUrlMissing');
+    }
+    return publicUrl;
+  }
+
   /*
     this will get a set of users given the params passed in
     Only users with a user role of admin or jurisdictional admin can get the list of available users.
@@ -368,9 +388,12 @@ export class UserService {
         },
       });
 
-      if (forPublic) {
+      if (forPublic || !this.isPartnerPortalUser(storedUser.userRoles)) {
+        const appUrl = forPublic
+          ? dto.appUrl
+          : this.getJurisdictionPublicUrl(storedUser);
         const confirmationUrl = this.getPublicConfirmationUrl(
-          dto.appUrl,
+          appUrl,
           confirmationToken,
         );
         await this.emailService.welcome(
@@ -378,7 +401,7 @@ export class UserService {
             ? storedUser.jurisdictions[0].name
             : null,
           storedUser as unknown as User,
-          dto.appUrl,
+          appUrl,
           confirmationUrl,
         );
       } else {
@@ -409,12 +432,7 @@ export class UserService {
       UserViews.full,
     );
 
-    const isPartnerPortalUser =
-      storedUser.userRoles?.isAdmin ||
-      storedUser.userRoles?.isJurisdictionalAdmin ||
-      storedUser.userRoles?.isLimitedJurisdictionalAdmin ||
-      storedUser.userRoles?.isPartner ||
-      storedUser.userRoles?.isSupportAdmin;
+    const isPartnerPortalUser = this.isPartnerPortalUser(storedUser.userRoles);
     const isUserSiteMatch = async () => {
       if (isPartnerPortalUser) {
         return dto.appUrl === process.env.PARTNERS_PORTAL_URL;
@@ -661,7 +679,7 @@ export class UserService {
       };
     }
 
-    let newUser = await this.prisma.userAccounts.create({
+    const newUser = await this.prisma.userAccounts.create({
       data: {
         passwordHash: passwordHash,
         email: dto.email,
@@ -695,7 +713,7 @@ export class UserService {
       newUser.id,
       newUser.email,
     );
-    newUser = await this.prisma.userAccounts.update({
+    const invitedUser = await this.prisma.userAccounts.update({
       include: views.full,
       data: {
         confirmationToken: confirmationToken,
@@ -722,29 +740,44 @@ export class UserService {
         );
         await this.emailService.welcome(
           jurisdictionName,
-          mapTo(User, newUser),
+          mapTo(User, invitedUser),
           dto.appUrl,
           confirmationUrl,
         );
       }
     } else if (forPartners) {
-      const confirmationUrl = this.getPartnersConfirmationUrl(
-        this.configService.get('PARTNERS_PORTAL_URL'),
-        confirmationToken,
-      );
-      await this.emailService.invitePartnerUser(
-        dto.jurisdictions,
-        mapTo(User, newUser),
-        this.configService.get('PARTNERS_PORTAL_URL'),
-        confirmationUrl,
-      );
+      if (this.isPartnerPortalUser(invitedUser.userRoles)) {
+        const partnersPortalUrl = this.configService.get('PARTNERS_PORTAL_URL');
+        const confirmationUrl = this.getPartnersConfirmationUrl(
+          partnersPortalUrl,
+          confirmationToken,
+        );
+        await this.emailService.invitePartnerUser(
+          dto.jurisdictions,
+          mapTo(User, invitedUser),
+          partnersPortalUrl,
+          confirmationUrl,
+        );
+      } else {
+        const publicAppUrl = this.getJurisdictionPublicUrl(invitedUser);
+        const confirmationUrl = this.getPublicConfirmationUrl(
+          publicAppUrl,
+          confirmationToken,
+        );
+        await this.emailService.welcome(
+          invitedUser.jurisdictions?.[0]?.name || null,
+          mapTo(User, invitedUser),
+          publicAppUrl,
+          confirmationUrl,
+        );
+      }
     }
 
     if (!forPartners) {
       await this.connectUserWithExistingApplications(newUser.email, newUser.id);
     }
 
-    return mapTo(User, newUser);
+    return mapTo(User, invitedUser);
   }
 
   /*

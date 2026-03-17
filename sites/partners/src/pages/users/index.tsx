@@ -106,6 +106,10 @@ const Users = () => {
             roles.push(t("users.adminSupport"))
           }
 
+          if (!roles.length) {
+            roles.push(t("users.user"))
+          }
+
           return roles.join(", ")
         },
       },

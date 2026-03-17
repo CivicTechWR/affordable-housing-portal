@@ -1078,6 +1078,12 @@ describe('Testing user service', () => {
       prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
         id,
         email,
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
       });
       prisma.userAccounts.update = jest.fn().mockResolvedValue({
         id,
@@ -1085,7 +1091,7 @@ describe('Testing user service', () => {
         confirmationToken: 'example confirmation token',
       });
 
-      emailService.invitePartnerUser = jest.fn();
+      emailService.welcome = jest.fn();
 
       await service.resendConfirmation({ email }, false);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
@@ -1113,6 +1119,36 @@ describe('Testing user service', () => {
           id,
         },
       });
+      expect(emailService.welcome).toHaveBeenCalledTimes(1);
+    });
+
+    it('should resend partner portal confirmation for partner users', async () => {
+      const id = randomUUID();
+      const email = 'email@example.com';
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        email,
+        userRoles: {
+          isPartner: true,
+        },
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        email,
+        confirmationToken: 'example confirmation token',
+      });
+
+      emailService.invitePartnerUser = jest.fn();
+
+      await service.resendConfirmation({ email, appUrl: 'http://partners.example.com' }, false);
+      expect(emailService.invitePartnerUser).toHaveBeenCalledTimes(1);
     });
 
     it('should not update confirmationToken if user is confirmed', async () => {
@@ -1855,6 +1891,15 @@ describe('Testing user service', () => {
       });
       prisma.userAccounts.update = jest.fn().mockResolvedValue({
         id,
+        userRoles: {
+          isAdmin: true,
+        },
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
       });
       emailService.invitePartnerUser = jest.fn();
       await service.create(
@@ -1924,6 +1969,62 @@ describe('Testing user service', () => {
           id: undefined,
         },
       );
+    });
+
+    it('should create an invited User and send the public-site confirmation email', async () => {
+      const jurisId = randomUUID();
+      const id = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.userAccounts.create = jest.fn().mockResolvedValue({
+        id,
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        userRoles: {
+          isAdmin: false,
+          isPartner: false,
+          isJurisdictionalAdmin: false,
+          isLimitedJurisdictionalAdmin: false,
+          isSupportAdmin: false,
+        },
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
+      });
+      emailService.welcome = jest.fn();
+      emailService.invitePartnerUser = jest.fn();
+
+      await service.create(
+        {
+          firstName: 'Public Invite firstName',
+          lastName: 'Public Invite lastName',
+          email: 'publicinvite@email.com',
+          jurisdictions: [{ id: jurisId }],
+          userRoles: {
+            isAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+            isSupportAdmin: false,
+          },
+        },
+        true,
+        undefined,
+        {
+          headers: { jurisdictionname: 'juris 1' },
+          user: {
+            id: 'requestingUser id',
+            userRoles: { isAdmin: true },
+          } as unknown as User,
+        } as unknown as Request,
+      );
+
+      expect(emailService.welcome).toHaveBeenCalledTimes(1);
+      expect(emailService.invitePartnerUser).not.toHaveBeenCalled();
     });
 
     it('should create a partner user with existing public user present', async () => {
