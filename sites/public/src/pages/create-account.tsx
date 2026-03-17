@@ -1,19 +1,16 @@
-import { useEffect } from "react"
-import { useRouter } from "next/router"
+import { GetServerSidePropsContext } from "next"
 
-const CreateAccount = () => {
-  const { isReady, query, replace } = useRouter()
+export const getServerSideProps = ({ resolvedUrl }: GetServerSidePropsContext) => {
+  const { search } = new URL(resolvedUrl, "http://localhost")
 
-  useEffect(() => {
-    if (!isReady) return
-
-    void replace({
-      pathname: "/sign-in",
-      query,
-    })
-  }, [isReady, query, replace])
-
-  return null
+  return {
+    redirect: {
+      destination: `/sign-in${search}`,
+      permanent: false,
+    },
+  }
 }
+
+const CreateAccount = () => null
 
 export default CreateAccount

@@ -2,7 +2,7 @@
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white) ![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e) ![Testing-Library](https://img.shields.io/badge/-TestingLibrary-%23E33332?style=for-the-badge&logo=testing-library&logoColor=white) ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
 
-This is the applicant-facing portal available to the general public. It displays listings and allows users to apply for those listings. Users are also able to create accounts they can use to view submitted applications. See the [root README](../../README.md) for a full project overview.
+This is the applicant-facing portal available to the general public. It displays listings and allows users to apply for those listings. Users can also sign in to view submitted applications tied to their existing accounts. See the [root README](../../README.md) for a full project overview.
 
 ## Getting Started
 
