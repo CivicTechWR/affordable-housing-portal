@@ -1726,6 +1726,65 @@ describe('Testing user service', () => {
       );
     });
 
+    it('should update user roles when clearing a legacy support admin role', async () => {
+      const id = randomUUID();
+      const jurisId = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        userRoles: {
+          isAdmin: false,
+          isSupportAdmin: true,
+          isPartner: false,
+          isJurisdictionalAdmin: false,
+          isLimitedJurisdictionalAdmin: false,
+        },
+        jurisdictions: [{ id: jurisId }],
+        listings: [],
+      });
+      prisma.userRoles.update = jest.fn().mockResolvedValue({
+        userId: id,
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+      });
+
+      await service.update(
+        {
+          id,
+          firstName: 'first name',
+          lastName: 'last name',
+          jurisdictions: [{ id: jurisId }],
+          agreedToTermsOfService: true,
+          userRoles: {
+            isAdmin: false,
+            isSupportAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+          },
+        },
+        {
+          id: 'requestingUser id',
+          userRoles: { isAdmin: true },
+        } as unknown as User,
+        'jurisdictionName',
+      );
+
+      expect(prisma.userRoles.update).toHaveBeenCalledWith({
+        data: {
+          isAdmin: false,
+          isSupportAdmin: false,
+          isPartner: false,
+          isJurisdictionalAdmin: false,
+          isLimitedJurisdictionalAdmin: false,
+        },
+        where: {
+          userId: id,
+        },
+      });
+    });
+
     it('should update connected listings to a user', async () => {
       const id = randomUUID();
       const jurisId = randomUUID();

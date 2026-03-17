@@ -283,12 +283,7 @@ export class UserService {
     if (dto.userRoles && storedUser.userRoles) {
       if (
         this.isUserRoleChangeAllowed(requestingUser, dto.userRoles) &&
-        !(
-          dto.userRoles.isAdmin === storedUser.userRoles.isAdmin &&
-          dto.userRoles.isJurisdictionalAdmin ===
-            storedUser.userRoles.isJurisdictionalAdmin &&
-          dto.userRoles.isPartner === storedUser.userRoles.isPartner
-        )
+        !this.userRolesMatch(dto.userRoles, storedUser.userRoles)
       ) {
         await this.prisma.userRoles.update({
           data: {
@@ -941,6 +936,22 @@ export class UserService {
 
   containsInvalidCharacters(value: string): boolean {
     return value.includes('.') || value.includes('http');
+  }
+
+  private userRolesMatch(
+    incomingUserRoles?: Partial<UserRole>,
+    storedUserRoles?: Partial<UserRole>,
+  ): boolean {
+    return (
+      !!incomingUserRoles?.isAdmin === !!storedUserRoles?.isAdmin &&
+      !!incomingUserRoles?.isSupportAdmin ===
+        !!storedUserRoles?.isSupportAdmin &&
+      !!incomingUserRoles?.isPartner === !!storedUserRoles?.isPartner &&
+      !!incomingUserRoles?.isJurisdictionalAdmin ===
+        !!storedUserRoles?.isJurisdictionalAdmin &&
+      !!incomingUserRoles?.isLimitedJurisdictionalAdmin ===
+        !!storedUserRoles?.isLimitedJurisdictionalAdmin
+    );
   }
 
   isUserRoleChangeAllowed(

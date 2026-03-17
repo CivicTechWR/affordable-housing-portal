@@ -314,6 +314,61 @@ describe("<FormUserManage>", () => {
     await waitFor(() => expect(onDrawerClose).toHaveBeenCalled())
   })
 
+  it("preserves all jurisdictions for legacy support admins on save", async () => {
+    const onDrawerClose = jest.fn()
+    const update = jest.fn().mockResolvedValue({})
+
+    renderForm(
+      adminUserWithJurisdictions,
+      {
+        mode: "edit",
+        onDrawerClose,
+        user: {
+          ...mockUser,
+          id: "support-user",
+          email: "support@example.com",
+          firstName: "Support",
+          lastName: "Admin",
+          userRoles: { isSupportAdmin: true },
+          jurisdictions: [
+            { id: "jurisdiction1", name: "Jurisdiction One", featureFlags: [] },
+            { id: "jurisdiction2", name: "Jurisdiction Two", featureFlags: [] },
+          ],
+        } as User,
+      },
+      { update }
+    )
+
+    expect(screen.getByRole("combobox", { name: "Role" })).toHaveValue("adminSupport")
+    expect(screen.getByRole("option", { name: "Admin (support)" })).toBeInTheDocument()
+    expect(screen.queryByRole("combobox", { name: "Jurisdiction" })).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "Save" }))
+
+    await waitFor(() => {
+      expect(update).toHaveBeenCalledWith({
+        body: {
+          id: "support-user",
+          firstName: "Support",
+          lastName: "Admin",
+          email: "support@example.com",
+          userRoles: {
+            isAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+            isSupportAdmin: true,
+          },
+          listings: [],
+          jurisdictions: [{ id: "jurisdiction1" }, { id: "jurisdiction2" }],
+          agreedToTermsOfService: true,
+        },
+      })
+    })
+
+    await waitFor(() => expect(onDrawerClose).toHaveBeenCalled())
+  })
+
   it("updates partner users without changing the simplified role behavior", async () => {
     const onDrawerClose = jest.fn()
     const update = jest.fn().mockResolvedValue({})

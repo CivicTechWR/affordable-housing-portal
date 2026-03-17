@@ -48,6 +48,14 @@ const determineUserRole = (roles: UserRole) => {
   return RoleOption.User
 }
 
+const usesSingleJurisdictionValue = (role?: RoleOption) => {
+  return (
+    role === RoleOption.User ||
+    role === RoleOption.JurisdictionalAdmin ||
+    role === RoleOption.LimitedJurisdictionalAdmin
+  )
+}
+
 const FormUserManage = ({
   isOpen,
   title,
@@ -81,10 +89,9 @@ const FormUserManage = ({
       userRoles: currentUserRole,
       user_listings: user.listings?.map((item) => item.id) ?? [],
       jurisdiction_all: jurisdictionList?.length === user.jurisdictions.length,
-      jurisdictions:
-        currentUserRole === RoleOption.Partner
-          ? user.jurisdictions.map((elem) => elem.id)
-          : user.jurisdictions[0]?.id,
+      jurisdictions: usesSingleJurisdictionValue(currentUserRole)
+        ? user.jurisdictions[0]?.id
+        : user.jurisdictions.map((elem) => elem.id),
     }
   } else if (profile?.userRoles?.isJurisdictionalAdmin) {
     defaultValues = {
@@ -107,7 +114,14 @@ const FormUserManage = ({
           value: juris.id,
           inputProps: {
             onChange: () => {
-              if (getValues("jurisdictions").length === jurisdictionList.length) {
+              const selectedJurisdictions = getValues("jurisdictions")
+              const selectedJurisdictionCount = Array.isArray(selectedJurisdictions)
+                ? selectedJurisdictions.length
+                : selectedJurisdictions
+                ? 1
+                : 0
+
+              if (selectedJurisdictionCount === jurisdictionList.length) {
                 setValue("jurisdiction_all", true)
               } else {
                 setValue("jurisdiction_all", false)
