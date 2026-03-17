@@ -30,7 +30,7 @@ type FormUserManageValues = {
   userRoles?: string
   user_listings?: string[]
   jurisdiction_all?: boolean
-  jurisdictions?: string[]
+  jurisdictions?: string | string[]
 }
 
 const determineUserRole = (roles: UserRole) => {
