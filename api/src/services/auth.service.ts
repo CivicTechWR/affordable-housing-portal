@@ -78,6 +78,9 @@ export class AuthService {
     return sign(payload, process.env.APP_SECRET);
   }
 
+  /**
+   * Clears every auth cookie that can keep a browser session alive.
+   */
   private clearAuthCookies(res: Response): void {
     res.clearCookie(TOKEN_COOKIE_NAME, AUTH_COOKIE_OPTIONS);
     res.clearCookie(REFRESH_COOKIE_NAME, REFRESH_COOKIE_OPTIONS);
@@ -105,6 +108,7 @@ export class AuthService {
       throw new UnauthorizedException('no user found');
     }
 
+    // Reject public-only users before issuing or refreshing a partner-portal session.
     if (forPartners && !this.userService.isPartnerPortalUser(user.userRoles)) {
       await this.prisma.userAccounts.update({
         data: {

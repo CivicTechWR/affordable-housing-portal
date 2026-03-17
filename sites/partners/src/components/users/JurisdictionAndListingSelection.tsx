@@ -12,6 +12,7 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const selectedRoles = watch("userRoles")
   const watchedJurisdictions = watch("jurisdictions")
+  // Normalize React Hook Form's string-or-array jurisdiction value into a single array shape.
   const selectedJurisdictions = useMemo(() => {
     if (Array.isArray(watchedJurisdictions)) {
       return watchedJurisdictions
@@ -26,6 +27,7 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   useEffect(() => {
     if (selectedRoles !== RoleOption.User) return
 
+    // Keep no-role users on one jurisdiction and clear listing-only partner selections when the role flips.
     const defaultJurisdiction = selectedJurisdictions[0] || jurisdictionOptions[0]?.id
     if (defaultJurisdiction) {
       setValue("jurisdictions", defaultJurisdiction)
@@ -136,6 +138,7 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   }
 
   if (showUserJurisdictionSelect) {
+    // Admins still need a jurisdiction picker when inviting a public user across multiple jurisdictions.
     return (
       <SectionWithGrid heading={t("t.jurisdiction")}>
         <Grid.Row columns={4}>
@@ -160,6 +163,7 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   }
 
   if (selectedRoles === RoleOption.User) {
+    // Non-admin public-user flows do not need the jurisdiction or listing assignment UI at all.
     return null
   }
 

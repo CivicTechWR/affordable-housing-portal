@@ -106,6 +106,7 @@ const Users = () => {
             roles.push(t("users.adminSupport"))
           }
 
+          // Show the new fallback label when a managed user has no partner-portal role flags at all.
           if (!roles.length) {
             roles.push(t("users.user"))
           }

@@ -76,6 +76,7 @@ export class UserController {
     operationId: 'profile',
   })
   profile(@Request() req: ExpressRequest): User {
+    // Block cookie-backed profile fetches for public users on the partner portal.
     if (
       req.headers[PARTNERS_PORTAL_HEADER] === 'true' &&
       !this.userService.isPartnerPortalUser(req['user']?.userRoles)

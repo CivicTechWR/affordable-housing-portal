@@ -156,6 +156,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
 
   const userService = useMemo(() => new UserService(), [])
   const authService = useMemo(() => new AuthService(), [])
+  // Tag every partners-app auth/profile request so the API can enforce partner-only access server-side.
   const partnerPortalRequestOptions = useMemo(
     () => (appType === "partners" ? { headers: { "x-partners-portal": "true" } } : {}),
     [appType]
@@ -172,6 +173,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
           .split("; ")
           .some((cookie) => cookie.startsWith("access-token-available=True"))
       ) {
+        // Refresh partner sessions with the same portal marker used during initial login.
         authService
           .requestNewToken(partnerPortalRequestOptions)
           .then(() => {
@@ -195,7 +197,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
             .split("; ")
             .some((cookie) => cookie.startsWith("access-token-available=True"))
         ) {
-          // if we have an access token
+          // Load the profile through the portal-aware API path whenever a session cookie exists.
           profile = await userService?.profile(partnerPortalRequestOptions)
         } else {
           dispatch(saveProfile(null))
@@ -254,6 +256,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
     ) => {
       dispatch(startLoading())
       try {
+        // Send the portal header during login so the backend can reject public users before the session is set.
         const response = await authService?.login(
           {
             body: { email, password, mfaCode, mfaType, reCaptchaToken },

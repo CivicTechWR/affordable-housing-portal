@@ -54,6 +54,7 @@ export class AuthController {
     @Response({ passthrough: true }) res: ExpressResponse,
     @Body() dto: Login,
   ): Promise<SuccessDTO> {
+    // Enforce the stricter partner-portal login rules when the request originates there.
     return await this.authService.setCredentials(
       res,
       mapTo(User, req['user']),
@@ -121,6 +122,7 @@ export class AuthController {
     if (!req?.cookies[REFRESH_COOKIE_NAME]) {
       throw new BadRequestException('No refresh token sent with request');
     }
+    // Keep refresh-token logins aligned with the same partner-portal access gate.
     return await this.authService.setCredentials(
       res,
       mapTo(User, req['user']),

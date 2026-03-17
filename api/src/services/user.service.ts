@@ -117,6 +117,9 @@ export class UserService {
     );
   }
 
+  /**
+   * Determines whether a role set grants access to the partner portal.
+   */
   isPartnerPortalUser(userRoles?: Partial<UserRole>) {
     return !!(
       userRoles?.isAdmin ||
@@ -127,6 +130,9 @@ export class UserService {
     );
   }
 
+  /**
+   * Determines whether any persisted role flag is still enabled on the record.
+   */
   private hasAnyAssignedRole(userRoles?: Partial<UserRole>) {
     return !!(
       userRoles?.isAdmin ||
@@ -138,6 +144,9 @@ export class UserService {
     );
   }
 
+  /**
+   * Returns the public-site base URL for a user's first connected jurisdiction.
+   */
   private getJurisdictionPublicUrl(user: {
     jurisdictions?: Array<{ publicUrl?: string }>;
   }) {
@@ -290,6 +299,7 @@ export class UserService {
         this.isUserRoleChangeAllowed(requestingUser, dto.userRoles) &&
         !this.userRolesMatch(dto.userRoles, storedUser.userRoles)
       ) {
+        // Preserve the existing "public user = no userRoles row" model when a user is demoted.
         if (this.hasAnyAssignedRole(dto.userRoles)) {
           await this.prisma.userRoles.update({
             data: {
@@ -402,6 +412,7 @@ export class UserService {
         },
       });
 
+      // Route partner-initiated resends for no-role users back through the public-site flow.
       if (forPublic || !this.isPartnerPortalUser(storedUser.userRoles)) {
         const appUrl = forPublic
           ? dto.appUrl
@@ -591,6 +602,7 @@ export class UserService {
         permissionActions.confirm,
       );
     }
+    // Classify partner-created invites up front so validation, reuse, and email routing stay aligned.
     const incomingUserRoles = 'userRoles' in dto ? dto.userRoles : undefined;
     const isPartnerPortalInvite =
       forPartners && this.isPartnerPortalUser(incomingUserRoles);
@@ -645,6 +657,7 @@ export class UserService {
         });
         return mapTo(User, res);
       } else if (!existingUser.userRoles && isPublicUserInvite) {
+        // Re-invite existing public accounts through the same public confirmation flow as fresh invites.
         const existingJurisdictionIds = new Set(
           existingUser.jurisdictions.map((jurisdiction) => jurisdiction.id),
         );
@@ -827,6 +840,7 @@ export class UserService {
         );
       }
     } else if (forPartners) {
+      // Send partner invites to the partners portal and no-role invites to the public site.
       if (isPartnerPortalInvite) {
         const partnersPortalUrl = this.configService.get('PARTNERS_PORTAL_URL');
         const confirmationUrl = this.getPartnersConfirmationUrl(
@@ -854,6 +868,7 @@ export class UserService {
       }
     }
 
+    // Public accounts created from either portal still need their pre-existing paper/email applications attached.
     if (!forPartners || isPublicUserInvite) {
       await this.connectUserWithExistingApplications(dto.email, newUser.id);
     }
@@ -1018,6 +1033,9 @@ export class UserService {
     return value.includes('.') || value.includes('http');
   }
 
+  /**
+   * Compares persisted role flags while treating missing booleans as false.
+   */
   private userRolesMatch(
     incomingUserRoles?: Partial<UserRole>,
     storedUserRoles?: Partial<UserRole>,

@@ -17,6 +17,9 @@ export const ConfigContext = createContext<ConfigContextProps>({
   appType: "public",
 })
 
+/**
+ * Supplies runtime auth configuration that differs between the public and partners apps.
+ */
 export const ConfigProvider: FunctionComponent<{
   apiUrl: string
   storageType?: ConfigContextProps["storageType"]
@@ -34,6 +37,7 @@ export const ConfigProvider: FunctionComponent<{
     ConfigContext.Provider,
     {
       value: {
+        // Surface appType so downstream auth requests can opt into partner-only enforcement.
         apiUrl,
         storageType,
         idleTimeout,

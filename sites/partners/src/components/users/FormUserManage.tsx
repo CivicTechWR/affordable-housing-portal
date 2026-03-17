@@ -48,6 +48,9 @@ const determineUserRole = (roles: UserRole) => {
   return RoleOption.User
 }
 
+/**
+ * Identifies roles that should store only one jurisdiction value in the form state.
+ */
 const usesSingleJurisdictionValue = (role?: RoleOption) => {
   return (
     role === RoleOption.User ||
@@ -71,6 +74,7 @@ const FormUserManage = ({
 
   const [isDeleteModalActive, setDeleteModalActive] = useState<boolean>(false)
 
+  // Keep the simplified role picker while still allowing legacy roles to render in edit mode.
   const currentUserRole = mode === "edit" ? determineUserRole(user.userRoles) : undefined
   const possibleUserRoles = [RoleOption.Partner, RoleOption.User]
   if (profile?.userRoles?.isAdmin) {
@@ -82,6 +86,7 @@ const FormUserManage = ({
 
   let defaultValues: FormUserManageValues = {}
   if (mode === "edit") {
+    // Preserve the stored jurisdiction shape for legacy multi-jurisdiction roles during edit.
     defaultValues = {
       firstName: user.firstName,
       lastName: user.lastName,
@@ -214,6 +219,7 @@ const FormUserManage = ({
 
     if (!validation) return
 
+    // Omit userRoles entirely for true public users, but keep explicit false flags when demoting legacy roles.
     const roles = (() => {
       if (selectedRole === RoleOption.User) {
         if (mode === "edit" && user?.userRoles) {
@@ -240,6 +246,7 @@ const FormUserManage = ({
 
     const leasingAgentInListings = user_listings?.map((id) => ({ id })) || []
 
+    // Collapse public-user invites to a single jurisdiction while preserving multi-jurisdiction partner/admin edits.
     let selectedJurisdictions = []
     if (selectedRole === RoleOption.User) {
       if (Array.isArray(jurisdictions)) {
@@ -259,6 +266,7 @@ const FormUserManage = ({
       selectedJurisdictions = jurisdictionOptions.map((elem) => ({ id: elem.id }))
     }
 
+    // Build the smallest payload that still preserves the selected access model on the backend.
     const body = {
       firstName,
       lastName,

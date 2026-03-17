@@ -51,11 +51,15 @@ beforeAll(() => {
   mockNextRouter()
 })
 
+/**
+ * Renders the user management form with direct auth and toast context mocks.
+ */
 const renderForm = (
   profile: User,
   props: Partial<React.ComponentProps<typeof FormUserManage>> = {},
   userServiceOverrides: Partial<UserServiceApi> = {}
 ) => {
+  // Build a focused service double so each test can override only the endpoint it exercises.
   const userService = {
     invite: jest.fn().mockResolvedValue({}),
     update: jest.fn().mockResolvedValue({}),
@@ -69,6 +73,7 @@ const renderForm = (
   return {
     userService,
     addToast,
+    // Inject the providers directly to keep the tests focused on form behavior instead of network setup.
     ...render(
       <MessageContext.Provider value={{ addToast, toastMessagesRef: { current: [] } }}>
         <AuthContext.Provider
