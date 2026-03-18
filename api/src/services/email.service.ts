@@ -107,6 +107,10 @@ export class EmailService {
     return partials;
   }
 
+  /**
+   * Sends an email using the Resend transport while preserving the previous
+   * SendGrid behavior of delivering array recipients as separate messages.
+   */
   private async send(
     to: string | string[],
     from: string,
@@ -115,6 +119,7 @@ export class EmailService {
     retry = 3,
     attachment?: EmailAttachmentData,
   ) {
+    // Preserve recipient privacy by sending one message per address.
     if (Array.isArray(to)) {
       if (to.length === 0) return;
 
@@ -129,6 +134,9 @@ export class EmailService {
     await this.sendSingle(to, from, subject, body, retry, attachment);
   }
 
+  /**
+   * Sends a single Resend email request and retries failed delivery attempts.
+   */
   private async sendSingle(
     to: string,
     from: string,
@@ -137,12 +145,15 @@ export class EmailService {
     retry = 3,
     attachment?: EmailAttachmentData,
   ) {
+    // Build the base HTML payload expected by the Resend SDK.
     const emailParams: HtmlEmailPayload = {
       to,
       from,
       subject,
       html: body,
     };
+
+    // Convert text attachments to a Buffer so binary-safe delivery matches the old transport.
     if (attachment) {
       emailParams.attachments = [
         {
@@ -155,8 +166,10 @@ export class EmailService {
 
     let response;
     try {
+      // Attempt delivery through the provider wrapper.
       response = await this.resend.send(emailParams);
     } catch (error) {
+      // Network or SDK failures use the same retry path as API-level failures.
       this.logSendFailure(to, error, retry);
       if (retry > 0) {
         await this.sendSingle(to, from, subject, body, retry - 1, attachment);
@@ -164,8 +177,10 @@ export class EmailService {
       return;
     }
 
+    // Successful API responses with no provider error are complete.
     if (!response.error) return;
 
+    // Provider-declared delivery failures are logged and retried without aborting the caller flow.
     this.logSendFailure(to, response.error, retry);
     if (retry > 0) {
       await this.sendSingle(to, from, subject, body, retry - 1, attachment);
@@ -173,12 +188,18 @@ export class EmailService {
     return;
   }
 
+  /**
+   * Logs a delivery failure with normalized recipient and provider error details.
+   */
   private logSendFailure(
     to: string | string[],
     error: ErrorResponse | Error | unknown,
     retriesRemaining: number,
   ) {
+    // Collapse array recipients into a readable log line.
     const recipients = Array.isArray(to) ? to.join(', ') : to;
+
+    // Normalize the provider error into a single loggable string.
     const errorMessage = this.getSendErrorMessage(error);
 
     this.logger.error(
@@ -186,19 +207,29 @@ export class EmailService {
     );
   }
 
+  /**
+   * Converts Resend and runtime errors into a consistent log message format.
+   */
   private getSendErrorMessage(error: ErrorResponse | Error | unknown): string {
+    // Prefer structured provider metadata when Resend returns an API error object.
     if (this.isResendErrorResponse(error)) {
       return `${error.name}: ${error.message} (statusCode: ${
         error.statusCode ?? 'unknown'
       })`;
     }
 
+    // Fall back to the native error message for thrown runtime errors.
     if (error instanceof Error) {
       return error.message;
     }
 
+    // Keep logging resilient even for unexpected error shapes.
     return 'Unknown email delivery error';
   }
+
+  /**
+   * Detects whether an unknown value matches the Resend API error shape.
+   */
   private isResendErrorResponse(error: unknown): error is ErrorResponse {
     return (
       typeof error === 'object' &&

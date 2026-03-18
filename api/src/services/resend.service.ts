@@ -10,6 +10,9 @@ export class ResendService {
     this.resend = new Resend(configService.get<string>('EMAIL_API_KEY'));
   }
 
+  /**
+   * Forwards a fully constructed email payload to the Resend SDK.
+   */
   public async send(data: CreateEmailOptions): Promise<CreateEmailResponse> {
     return this.resend.emails.send(data);
   }
