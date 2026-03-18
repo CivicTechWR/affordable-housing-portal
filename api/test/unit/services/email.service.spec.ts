@@ -258,6 +258,28 @@ describe('Testing email service', () => {
     expect(loggerMock.error).toHaveBeenCalledTimes(2);
   });
 
+  it('logs and continues when retries are exhausted', async () => {
+    const resendError = {
+      message: 'API key is invalid',
+      name: 'validation_error',
+      statusCode: 401,
+    } satisfies ErrorResponse;
+
+    sendMock.mockResolvedValue({ data: null, error: resendError });
+
+    await expect(
+      service.welcome(
+        'test',
+        user as unknown as User,
+        'http://localhost:3000',
+        'http://localhost:3000/?token=',
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(sendMock).toHaveBeenCalledTimes(4);
+    expect(loggerMock.error).toHaveBeenCalledTimes(4);
+  });
+
   it('retries with attachments intact when the transport throws', async () => {
     sendMock
       .mockRejectedValueOnce(new Error('network failure'))
@@ -541,9 +563,9 @@ describe('Testing email service', () => {
         'http://localhost:3001',
       );
 
-      expect(sendMock).toHaveBeenCalled();
+      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
       const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('Listing approval requested');
       expect(emailMock.html).toMatch(
         `<img src="" alt="Affordable Housing Portal" height="137" width="auto" />`,
@@ -583,9 +605,9 @@ describe('Testing email service', () => {
         'http://localhost:3001',
       );
 
-      expect(sendMock).toHaveBeenCalled();
+      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
       const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('Listing changes requested');
       expect(emailMock.html).toMatch(
         `<img src="" alt="Affordable Housing Portal" height="137" width="auto" />`,
@@ -628,9 +650,9 @@ describe('Testing email service', () => {
         'http://localhost:3000',
       );
 
-      expect(sendMock).toHaveBeenCalled();
+      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
       const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('New published listing');
       expect(emailMock.html).toMatch(
         `<img src="" alt="Affordable Housing Portal" height="137" width="auto" />`,
@@ -717,9 +739,9 @@ describe('Testing email service', () => {
         { en: emailArr },
       );
 
-      expect(sendMock).toHaveBeenCalled();
+      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
       const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual(
         'New Housing Lottery Results Available',
       );

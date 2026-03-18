@@ -160,10 +160,8 @@ export class EmailService {
       this.logSendFailure(to, error, retry);
       if (retry > 0) {
         await this.sendSingle(to, from, subject, body, retry - 1, attachment);
-        return;
       }
-
-      throw this.toEmailSendError(error);
+      return;
     }
 
     if (!response.error) return;
@@ -171,10 +169,8 @@ export class EmailService {
     this.logSendFailure(to, response.error, retry);
     if (retry > 0) {
       await this.sendSingle(to, from, subject, body, retry - 1, attachment);
-      return;
     }
-
-    throw this.toEmailSendError(response.error);
+    return;
   }
 
   private logSendFailure(
@@ -203,15 +199,6 @@ export class EmailService {
 
     return 'Unknown email delivery error';
   }
-
-  private toEmailSendError(error: ErrorResponse | Error | unknown): Error {
-    if (error instanceof Error) {
-      return error;
-    }
-
-    return new Error(this.getSendErrorMessage(error));
-  }
-
   private isResendErrorResponse(error: unknown): error is ErrorResponse {
     return (
       typeof error === 'object' &&
