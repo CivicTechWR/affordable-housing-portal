@@ -156,14 +156,10 @@ const getHeaderLinks = (
           label: t("nav.myDashboard"),
           href: "/account/dashboard",
         },
-        ...(linksBehindFlags["applications"]
-          ? [
-              {
-                label: t("account.myApplications"),
-                href: "/account/applications",
-              },
-            ]
-          : []),
+        {
+          label: t("account.myApplications"),
+          href: "/account/applications",
+        },
         ...(linksBehindFlags["favorites"]
           ? [
               {
@@ -249,7 +245,6 @@ const Layout = (props: LayoutProps) => {
               }
             })}
             links={getHeaderLinks(router, profile, signOut, addToast, {
-              applications: true,
               favorites: showFavorites,
             })}
             titleLink={"/"}
