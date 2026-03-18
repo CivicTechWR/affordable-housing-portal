@@ -3,7 +3,6 @@
 // Keep alphabetized for readability.
 export enum FeatureFlagEnum {
   disableBuildingSelectionCriteria = 'disableBuildingSelectionCriteria',
-  disableCommonApplication = 'disableCommonApplication',
   disableJurisdictionalAdmin = 'disableJurisdictionalAdmin',
   disableListingPreferences = 'disableListingPreferences',
   disableWorkInRegion = 'disableWorkInRegion',
@@ -70,11 +69,6 @@ export const featureFlagMap: {
     name: FeatureFlagEnum.disableBuildingSelectionCriteria,
     description:
       'When true, building selection criteria is not displayed in the listing',
-  },
-  {
-    name: FeatureFlagEnum.disableCommonApplication,
-    description:
-      'When true, the digital common application is not an option for listings',
   },
   {
     name: FeatureFlagEnum.disableJurisdictionalAdmin,
