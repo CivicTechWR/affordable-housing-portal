@@ -229,7 +229,7 @@ describe('Testing email service', () => {
     expect(sendMock.mock.calls[0][0].attachments).toEqual([
       {
         contentType: 'text/csv',
-        content: 'csv data goes here',
+        content: Buffer.from('csv data goes here', 'utf8'),
         filename: expect.anything(),
       },
     ]);
@@ -274,18 +274,31 @@ describe('Testing email service', () => {
     expect(sendMock).toHaveBeenCalledTimes(2);
     expect(sendMock.mock.calls[0][0].attachments).toEqual([
       {
-        content: 'csv data goes here',
+        content: Buffer.from('csv data goes here', 'utf8'),
         contentType: 'text/csv',
         filename: expect.anything(),
       },
     ]);
     expect(sendMock.mock.calls[1][0].attachments).toEqual([
       {
-        content: 'csv data goes here',
+        content: Buffer.from('csv data goes here', 'utf8'),
         contentType: 'text/csv',
         filename: expect.anything(),
       },
     ]);
+  });
+
+  it('sends array recipients as individual emails', async () => {
+    await service.requestApproval(
+      { id: 'jurisdiction-id', name: 'Jurisdiction' },
+      { id: 'listing-id', name: 'Listing' },
+      ['first@example.com', 'second@example.com'],
+      'http://localhost:3001',
+    );
+
+    expect(sendMock).toHaveBeenCalledTimes(2);
+    expect(sendMock.mock.calls[0][0].to).toEqual('first@example.com');
+    expect(sendMock.mock.calls[1][0].to).toEqual('second@example.com');
   });
 
   describe('application confirmation', () => {

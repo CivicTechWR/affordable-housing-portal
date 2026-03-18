@@ -115,8 +115,28 @@ export class EmailService {
     retry = 3,
     attachment?: EmailAttachmentData,
   ) {
-    const isMultipleRecipients = Array.isArray(to);
-    if (isMultipleRecipients && to.length === 0) return;
+    if (Array.isArray(to)) {
+      if (to.length === 0) return;
+
+      await Promise.all(
+        to.map((recipient) =>
+          this.sendSingle(recipient, from, subject, body, retry, attachment),
+        ),
+      );
+      return;
+    }
+
+    await this.sendSingle(to, from, subject, body, retry, attachment);
+  }
+
+  private async sendSingle(
+    to: string,
+    from: string,
+    subject: string,
+    body: string,
+    retry = 3,
+    attachment?: EmailAttachmentData,
+  ) {
     const emailParams: HtmlEmailPayload = {
       to,
       from,
@@ -126,7 +146,7 @@ export class EmailService {
     if (attachment) {
       emailParams.attachments = [
         {
-          content: attachment.data,
+          content: Buffer.from(attachment.data, 'utf8'),
           filename: attachment.name,
           contentType: attachment.type,
         },
@@ -139,22 +159,22 @@ export class EmailService {
     } catch (error) {
       this.logSendFailure(to, error, retry);
       if (retry > 0) {
-        await this.send(to, from, subject, body, retry - 1, attachment);
+        await this.sendSingle(to, from, subject, body, retry - 1, attachment);
         return;
       }
 
-      throw error;
+      throw this.toEmailSendError(error);
     }
 
     if (!response.error) return;
 
     this.logSendFailure(to, response.error, retry);
     if (retry > 0) {
-      await this.send(to, from, subject, body, retry - 1, attachment);
+      await this.sendSingle(to, from, subject, body, retry - 1, attachment);
       return;
     }
 
-    throw new Error(response.error.message);
+    throw this.toEmailSendError(response.error);
   }
 
   private logSendFailure(
@@ -182,6 +202,14 @@ export class EmailService {
     }
 
     return 'Unknown email delivery error';
+  }
+
+  private toEmailSendError(error: ErrorResponse | Error | unknown): Error {
+    if (error instanceof Error) {
+      return error;
+    }
+
+    return new Error(this.getSendErrorMessage(error));
   }
 
   private isResendErrorResponse(error: unknown): error is ErrorResponse {

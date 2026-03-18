@@ -72,7 +72,9 @@ describe('Testing user service', () => {
   };
 
   const resendServiceMock = {
-    send: jest.fn(),
+    send: jest
+      .fn()
+      .mockResolvedValue({ data: { id: 'email-id' }, error: null }),
   };
   const googleTranslateServiceMock = {
     isConfigured: () => true,
