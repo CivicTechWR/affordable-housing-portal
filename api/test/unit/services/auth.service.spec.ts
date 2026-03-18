@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MailService } from '@sendgrid/mail';
 import { randomUUID } from 'crypto';
 import { Response } from 'express';
 import { sign } from 'jsonwebtoken';
@@ -26,7 +25,6 @@ import { GoogleTranslateService } from '../../../src/services/google-translate.s
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { PermissionService } from '../../../src/services/permission.service';
 import { PrismaService } from '../../../src/services/prisma.service';
-import { SendGridService } from '../../../src/services/sendgrid.service';
 import { SmsService } from '../../../src/services/sms.service';
 import { TranslationService } from '../../../src/services/translation.service';
 import { UserService } from '../../../src/services/user.service';
@@ -42,7 +40,7 @@ const mockedRecaptcha =
 
 describe('Testing auth service', () => {
   process.env.APP_SECRET = 'SOME-LONG-SECRET-KEY';
-  process.env.EMAIL_API_KEY = 'SG.SOME-LONG-SECRET-KEY';
+  process.env.EMAIL_API_KEY = 're_SOME-LONG-SECRET-KEY';
   process.env.TWILIO_ACCOUNT_SID = 'AC';
   process.env.TWILIO_AUTH_TOKEN = '842';
   process.env.MFA_CODE_LENGTH = '5';
@@ -72,11 +70,9 @@ describe('Testing auth service', () => {
         },
         ConfigService,
         PrismaService,
-        SendGridService,
         TranslationService,
         JurisdictionService,
         SmsService,
-        MailService,
         GoogleTranslateService,
         PermissionService,
       ],

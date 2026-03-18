@@ -1,6 +1,4 @@
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
-import { ResponseError } from '@sendgrid/helpers/classes';
-import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
 import fs from 'fs';
 import Handlebars from 'handlebars';
 import Polyglot from 'node-polyglot';
@@ -10,8 +8,9 @@ import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import advanced from 'dayjs/plugin/advancedFormat';
 import { LanguagesEnum, ReviewOrderTypeEnum } from '@prisma/client';
+import { CreateEmailOptions, ErrorResponse } from 'resend';
 import { JurisdictionService } from './jurisdiction.service';
-import { SendGridService } from './sendgrid.service';
+import { ResendService } from './resend.service';
 import { TranslationService } from './translation.service';
 import { Application } from '../dtos/applications/application.dto';
 import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
@@ -32,6 +31,8 @@ type EmailAttachmentData = {
   type: string;
 };
 
+type HtmlEmailPayload = Extract<CreateEmailOptions, { html: string }>;
+
 type listingInfo = {
   id: string;
   name: string;
@@ -43,7 +44,7 @@ export class EmailService {
   polyglot: Polyglot;
 
   constructor(
-    private readonly sendGrid: SendGridService,
+    private readonly resend: ResendService,
     private readonly translationService: TranslationService,
     private readonly jurisdictionService: JurisdictionService,
     @Inject(Logger)
@@ -116,7 +117,7 @@ export class EmailService {
   ) {
     const isMultipleRecipients = Array.isArray(to);
     if (isMultipleRecipients && to.length === 0) return;
-    const emailParams: MailDataRequired = {
+    const emailParams: HtmlEmailPayload = {
       to,
       from,
       subject,
@@ -125,29 +126,72 @@ export class EmailService {
     if (attachment) {
       emailParams.attachments = [
         {
-          content: Buffer.from(attachment.data).toString('base64'),
+          content: attachment.data,
           filename: attachment.name,
-          type: attachment.type,
-          disposition: 'attachment',
+          contentType: attachment.type,
         },
       ];
     }
-    const handleError = (error) => {
-      if (error instanceof ResponseError) {
-        const { response } = error;
-        const { body: errBody } = response;
-        console.error(
-          `Error sending email to: ${
-            isMultipleRecipients ? to.toString() : to
-          }! Error body:`,
-          errBody,
-        );
-        if (retry > 0) {
-          void this.send(to, from, subject, body, retry - 1);
-        }
+
+    let response;
+    try {
+      response = await this.resend.send(emailParams);
+    } catch (error) {
+      this.logSendFailure(to, error, retry);
+      if (retry > 0) {
+        await this.send(to, from, subject, body, retry - 1, attachment);
+        return;
       }
-    };
-    await this.sendGrid.send(emailParams, isMultipleRecipients, handleError);
+
+      throw error;
+    }
+
+    if (!response.error) return;
+
+    this.logSendFailure(to, response.error, retry);
+    if (retry > 0) {
+      await this.send(to, from, subject, body, retry - 1, attachment);
+      return;
+    }
+
+    throw new Error(response.error.message);
+  }
+
+  private logSendFailure(
+    to: string | string[],
+    error: ErrorResponse | Error | unknown,
+    retriesRemaining: number,
+  ) {
+    const recipients = Array.isArray(to) ? to.join(', ') : to;
+    const errorMessage = this.getSendErrorMessage(error);
+
+    this.logger.error(
+      `Error sending email to ${recipients}. Retries remaining: ${retriesRemaining}. ${errorMessage}`,
+    );
+  }
+
+  private getSendErrorMessage(error: ErrorResponse | Error | unknown): string {
+    if (this.isResendErrorResponse(error)) {
+      return `${error.name}: ${error.message} (statusCode: ${
+        error.statusCode ?? 'unknown'
+      })`;
+    }
+
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    return 'Unknown email delivery error';
+  }
+
+  private isResendErrorResponse(error: unknown): error is ErrorResponse {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      'name' in error &&
+      'statusCode' in error
+    );
   }
 
   // TODO: update this to be memoized based on jurisdiction and language

@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 import {
   ApplicationStatusEnum,
   LanguagesEnum,
   ListingsStatusEnum,
   ReviewOrderTypeEnum,
 } from '@prisma/client';
-import { MailService } from '@sendgrid/mail';
+import { ErrorResponse } from 'resend';
 import { EmailService } from '../../../src/services/email.service';
-import { SendGridService } from '../../../src/services/sendgrid.service';
+import { ResendService } from '../../../src/services/resend.service';
 import { TranslationService } from '../../../src/services/translation.service';
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { GoogleTranslateService } from '../../../src/services/google-translate.service';
@@ -17,11 +18,14 @@ import { banffAddress } from '../../../prisma/seed-helpers/address-factory';
 import { Application } from '../../../src/dtos/applications/application.dto';
 import { User } from '../../../src/dtos/users/user.dto';
 import { ApplicationCreate } from '../../../src/dtos/applications/application-create.dto';
-import { Logger } from '@nestjs/common';
 import { ApplicationStatusChangeItem } from 'src/utilities/applicationStatusChanges';
 import Listing from 'src/dtos/listings/listing.dto';
 
 let sendMock;
+const loggerMock = {
+  error: jest.fn(),
+  log: jest.fn(),
+};
 const translationServiceMock = {
   getMergedTranslations: () => {
     return translationFactory().translations;
@@ -41,16 +45,14 @@ const jurisdictionServiceMock = {
 describe('Testing email service', () => {
   let service: EmailService;
   let module: TestingModule;
-  let sendGridService: SendGridService;
+  let resendService: ResendService;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [ConfigModule],
       providers: [
         EmailService,
-        Logger,
-        SendGridService,
-        MailService,
+        ResendService,
         {
           provide: TranslationService,
           useValue: translationServiceMock,
@@ -59,6 +61,10 @@ describe('Testing email service', () => {
           provide: JurisdictionService,
           useValue: jurisdictionServiceMock,
         },
+        {
+          provide: Logger,
+          useValue: loggerMock,
+        },
         GoogleTranslateService,
       ],
     }).compile();
@@ -66,10 +72,16 @@ describe('Testing email service', () => {
 
   beforeEach(async () => {
     jest.useFakeTimers();
-    sendGridService = module.get<SendGridService>(SendGridService);
-    sendMock = jest.fn();
-    sendGridService.send = sendMock;
+    resendService = module.get<ResendService>(ResendService);
+    sendMock = jest
+      .fn()
+      .mockResolvedValue({ data: { id: 'email-id' }, error: null });
+    resendService.send = sendMock;
     service = await module.resolve(EmailService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   const user = {
@@ -198,6 +210,7 @@ describe('Testing email service', () => {
   });
 
   it('should send csv data email', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email-id' }, error: null });
     await service.sendCSV(
       [{ name: 'test', id: '1234' }],
       user,
@@ -215,9 +228,61 @@ describe('Testing email service', () => {
     expect(sendMock.mock.calls[0][0].html).toContain('User Export');
     expect(sendMock.mock.calls[0][0].attachments).toEqual([
       {
-        type: 'text/csv',
-        content: expect.anything(),
-        disposition: 'attachment',
+        contentType: 'text/csv',
+        content: 'csv data goes here',
+        filename: expect.anything(),
+      },
+    ]);
+  });
+
+  it('retries when Resend returns an API error', async () => {
+    const resendError = {
+      message: 'rate limited',
+      name: 'rate_limit_exceeded',
+      statusCode: 429,
+    } satisfies ErrorResponse;
+
+    sendMock
+      .mockResolvedValueOnce({ data: null, error: resendError })
+      .mockResolvedValueOnce({ data: null, error: resendError })
+      .mockResolvedValueOnce({ data: { id: 'email-id' }, error: null });
+
+    await service.welcome(
+      'test',
+      user as unknown as User,
+      'http://localhost:3000',
+      'http://localhost:3000/?token=',
+    );
+
+    expect(sendMock).toHaveBeenCalledTimes(3);
+    expect(loggerMock.error).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries with attachments intact when the transport throws', async () => {
+    sendMock
+      .mockRejectedValueOnce(new Error('network failure'))
+      .mockResolvedValueOnce({ data: { id: 'email-id' }, error: null });
+
+    await service.sendCSV(
+      [{ name: 'test', id: '1234' }],
+      user,
+      'csv data goes here',
+      'User Export',
+      'an export of all users',
+    );
+
+    expect(sendMock).toHaveBeenCalledTimes(2);
+    expect(sendMock.mock.calls[0][0].attachments).toEqual([
+      {
+        content: 'csv data goes here',
+        contentType: 'text/csv',
+        filename: expect.anything(),
+      },
+    ]);
+    expect(sendMock.mock.calls[1][0].attachments).toEqual([
+      {
+        content: 'csv data goes here',
+        contentType: 'text/csv',
         filename: expect.anything(),
       },
     ]);
