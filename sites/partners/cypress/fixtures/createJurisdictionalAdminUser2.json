@@ -1,6 +1,7 @@
 {
-  "firstName": "New",
-  "lastName": "User 2",
-  "email": "exampleUser2@example.com",
-  "role": "user"
+  "firstName": "New Juris 2",
+  "lastName": "Admin User 2",
+  "email": "exampleAdminUser+jurisAdmin2@example.com",
+  "role": "jurisdictionalAdmin",
+  "jurisdictions": "Bloomington"
 }

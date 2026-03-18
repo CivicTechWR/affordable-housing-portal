@@ -14,9 +14,8 @@ describe("Admin User Mangement Tests", () => {
       "Partner",
       "Administrator",
       "Jurisdictional admin",
-      "Jurisdictional admin - No PII",
+      "Limited Jurisdictional admin",
       "Admin \\(support\\)",
-      "User",
     ]
     cy.getByTestId("ag-page-size").select("100", { force: true })
 
@@ -81,7 +80,7 @@ describe("Admin User Mangement Tests", () => {
     cy.getByTestId("toast-alert").contains("Invite sent").should("have.text", "Invite sent")
   })
 
-  it("as admin user, should be able to create new user", () => {
+  it("as admin user, should be able to create new jurisidictional admin", () => {
     cy.visit("/")
     cy.getByTestId("Users-1").click()
     cy.getByID("add-user").click()
@@ -106,6 +105,10 @@ describe("Admin User Mangement Tests", () => {
           {
             id: "userRoles",
             fieldKey: "role",
+          },
+          {
+            id: "jurisdictions",
+            fieldKey: "jurisdictions",
           },
         ],
         [],

@@ -9,7 +9,12 @@ import {
   emailRegex,
   useMutate,
 } from "@bloom-housing/shared-helpers"
-import { Listing, User, UserRole } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import {
+  FeatureFlagEnum,
+  Listing,
+  User,
+  UserRole,
+} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import SectionWithGrid from "../shared/SectionWithGrid"
 import { JurisdictionAndListingSelection } from "./JurisdictionAndListingSelection"
 
@@ -68,25 +73,30 @@ const FormUserManage = ({
   onCancel,
   onDrawerClose,
 }: FormUserManageProps) => {
-  const { userService, profile } = useContext(AuthContext)
+  const { userService, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const { addToast } = useContext(MessageContext)
   const jurisdictionList = profile?.jurisdictions
 
   const [isDeleteModalActive, setDeleteModalActive] = useState<boolean>(false)
 
-  // Keep the simplified role picker while still allowing legacy roles to render in edit mode.
-  const currentUserRole = mode === "edit" ? determineUserRole(user.userRoles) : undefined
   const possibleUserRoles = [RoleOption.Partner, RoleOption.User]
+  if (
+    !profile?.userRoles?.isPartner &&
+    !doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.disableJurisdictionalAdmin, undefined, true)
+  ) {
+    possibleUserRoles.push(RoleOption.JurisdictionalAdmin)
+    possibleUserRoles.push(RoleOption.LimitedJurisdictionalAdmin)
+  }
   if (profile?.userRoles?.isAdmin) {
     possibleUserRoles.push(RoleOption.Administrator)
-  }
-  if (currentUserRole && !possibleUserRoles.includes(currentUserRole)) {
-    possibleUserRoles.push(currentUserRole)
+    if (doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableSupportAdmin)) {
+      possibleUserRoles.push(RoleOption.AdminSupport)
+    }
   }
 
   let defaultValues: FormUserManageValues = {}
   if (mode === "edit") {
-    // Preserve the stored jurisdiction shape for legacy multi-jurisdiction roles during edit.
+    const currentUserRole = determineUserRole(user.userRoles)
     defaultValues = {
       firstName: user.firstName,
       lastName: user.lastName,
