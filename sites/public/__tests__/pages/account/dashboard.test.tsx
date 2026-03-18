@@ -5,9 +5,7 @@ import Dashboard from "../../../src/pages/account/dashboard"
 import { jurisdiction, user } from "@bloom-housing/shared-helpers/__tests__/testHelpers"
 import { mockNextRouter } from "../../testUtils"
 import { AuthContext } from "@bloom-housing/shared-helpers"
-import {
-  FeatureFlagEnum,
-} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import { FeatureFlagEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 
 const server = setupServer()
 
@@ -134,5 +132,4 @@ describe("<Dashboard>", () => {
     expect(viewFavoritesButton).toBeInTheDocument()
     expect(viewFavoritesButton).toHaveAttribute("href", "/account/favorites")
   })
-
 })
