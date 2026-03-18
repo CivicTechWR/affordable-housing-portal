@@ -1,7 +1,7 @@
 import { AbstractDTO } from '../shared/abstract.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { CustomListingScope } from '@prisma/client'
+import { CustomListingScope } from '@prisma/client';
 import { IsDefined, IsEnum, IsString, MaxLength } from 'class-validator';
 
 export class CustomListingFeature extends AbstractDTO {

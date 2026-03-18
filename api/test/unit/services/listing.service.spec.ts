@@ -356,76 +356,76 @@ describe('Testing listing service', () => {
       units: useUnitGroups
         ? []
         : [
-          {
-            amiPercentage: '1',
-            annualIncomeMin: '2',
-            monthlyIncomeMin: '3',
-            floor: 4,
-            annualIncomeMax: '5',
-            maxOccupancy: 6,
-            minOccupancy: 7,
-            monthlyRent: '8',
-            numBathrooms: 9,
-            numBedrooms: 10,
-            number: '11',
-            sqFeet: '12',
-            monthlyRentAsPercentOfIncome: '13',
-            bmrProgramChart: true,
-            unitTypes: {
-              id: randomUUID(),
+            {
+              amiPercentage: '1',
+              annualIncomeMin: '2',
+              monthlyIncomeMin: '3',
+              floor: 4,
+              annualIncomeMax: '5',
+              maxOccupancy: 6,
+              minOccupancy: 7,
+              monthlyRent: '8',
+              numBathrooms: 9,
+              numBedrooms: 10,
+              number: '11',
+              sqFeet: '12',
+              monthlyRentAsPercentOfIncome: '13',
+              bmrProgramChart: true,
+              unitTypes: {
+                id: randomUUID(),
+              },
+              amiChart: {
+                id: randomUUID(),
+              },
+              unitAccessibilityPriorityTypes: {
+                id: randomUUID(),
+              },
+              unitRentTypes: {
+                id: randomUUID(),
+              },
+              unitAmiChartOverrides: {
+                items: [
+                  {
+                    percentOfAmi: 10,
+                    householdSize: 20,
+                    income: 30,
+                  },
+                ],
+              },
             },
-            amiChart: {
-              id: randomUUID(),
-            },
-            unitAccessibilityPriorityTypes: {
-              id: randomUUID(),
-            },
-            unitRentTypes: {
-              id: randomUUID(),
-            },
-            unitAmiChartOverrides: {
-              items: [
+          ],
+      unitGroups: useUnitGroups
+        ? [
+            {
+              totalAvailable: 5,
+              totalCount: 10,
+              floorMin: 1,
+              floorMax: 5,
+              maxOccupancy: 3,
+              minOccupancy: 1,
+              sqFeetMin: 500,
+              sqFeetMax: 800,
+              bathroomMin: 1,
+              bathroomMax: 2,
+              openWaitlist: false,
+              unitTypes: [
                 {
-                  percentOfAmi: 10,
-                  householdSize: 20,
-                  income: 30,
+                  id: randomUUID(),
+                },
+              ],
+              unitGroupAmiLevels: [
+                {
+                  amiPercentage: 10,
+                  monthlyRentDeterminationType:
+                    MonthlyRentDeterminationTypeEnum.percentageOfIncome,
+                  percentageOfIncomeValue: 10,
+                  amiChart: {
+                    id: randomUUID(),
+                  },
                 },
               ],
             },
-          },
-        ],
-      unitGroups: useUnitGroups
-        ? [
-          {
-            totalAvailable: 5,
-            totalCount: 10,
-            floorMin: 1,
-            floorMax: 5,
-            maxOccupancy: 3,
-            minOccupancy: 1,
-            sqFeetMin: 500,
-            sqFeetMax: 800,
-            bathroomMin: 1,
-            bathroomMax: 2,
-            openWaitlist: false,
-            unitTypes: [
-              {
-                id: randomUUID(),
-              },
-            ],
-            unitGroupAmiLevels: [
-              {
-                amiPercentage: 10,
-                monthlyRentDeterminationType:
-                  MonthlyRentDeterminationTypeEnum.percentageOfIncome,
-                percentageOfIncomeValue: 10,
-                amiChart: {
-                  id: randomUUID(),
-                },
-              },
-            ],
-          },
-        ]
+          ]
         : [],
       section8Acceptance: true,
       listingMultiselectQuestions: [
@@ -451,29 +451,29 @@ describe('Testing listing service', () => {
       ],
       unitsSummary: !useUnitGroups
         ? [
-          {
-            unitTypes: {
-              id: randomUUID(),
+            {
+              unitTypes: {
+                id: randomUUID(),
+              },
+              monthlyRentMin: 1,
+              monthlyRentMax: 2,
+              monthlyRentAsPercentOfIncome: '3',
+              amiPercentage: 4,
+              minimumIncomeMin: '5',
+              minimumIncomeMax: '6',
+              maxOccupancy: 7,
+              minOccupancy: 8,
+              floorMin: 9,
+              floorMax: 10,
+              sqFeetMin: '11',
+              sqFeetMax: '12',
+              unitAccessibilityPriorityTypes: {
+                id: randomUUID(),
+              },
+              totalCount: 13,
+              totalAvailable: 14,
             },
-            monthlyRentMin: 1,
-            monthlyRentMax: 2,
-            monthlyRentAsPercentOfIncome: '3',
-            amiPercentage: 4,
-            minimumIncomeMin: '5',
-            minimumIncomeMax: '6',
-            maxOccupancy: 7,
-            minOccupancy: 8,
-            floorMin: 9,
-            floorMax: 10,
-            sqFeetMin: '11',
-            sqFeetMax: '12',
-            unitAccessibilityPriorityTypes: {
-              id: randomUUID(),
-            },
-            totalCount: 13,
-            totalAvailable: 14,
-          },
-        ]
+          ]
         : [],
       listingsApplicationPickUpAddress: exampleAddress,
       listingsApplicationMailingAddress: exampleAddress,
@@ -578,8 +578,8 @@ describe('Testing listing service', () => {
       },
       customListingFeatures: [
         {
-          id: 'example-feature-id'
-        }
+          id: 'example-feature-id',
+        },
       ],
       listingUtilities: {
         water: false,
@@ -5022,10 +5022,10 @@ describe('Testing listing service', () => {
         {
           customListingFeature: {
             connect: {
-              id: 'example-feature-id'
-            }
-          }
-        }
+              id: 'example-feature-id',
+            },
+          },
+        },
       ];
       const nestedNeighborhoodAmenities = {
         groceryStores: 'stores',

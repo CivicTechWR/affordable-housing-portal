@@ -93,4 +93,4 @@ import { CustomFeatureModule } from './custom-feature.module';
     FeatureFlagModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
