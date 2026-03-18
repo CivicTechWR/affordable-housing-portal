@@ -211,12 +211,10 @@ const Layout = (props: LayoutProps) => {
   const router = useRouter()
 
   const [showFavorites, setShowFavorites] = useState(false)
-  const [showApplications, setShowApplications] = useState(true)
 
   useEffect(() => {
     setShowFavorites(window.localStorage.getItem("bloom-show-favorites-menu-item") === "true")
-    setShowApplications(window.localStorage.getItem("bloom-hide-applications-menu-item") !== "true")
-  }, [setShowFavorites, setShowApplications])
+  }, [setShowFavorites])
 
   const languages =
     router?.locales?.map((item) => ({
@@ -251,7 +249,7 @@ const Layout = (props: LayoutProps) => {
               }
             })}
             links={getHeaderLinks(router, profile, signOut, addToast, {
-              applications: showApplications,
+              applications: true,
               favorites: showFavorites,
             })}
             titleLink={"/"}
