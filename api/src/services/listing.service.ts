@@ -953,19 +953,6 @@ export class ListingService implements OnModuleInit {
             OR: builtFilter.map((filt) => ({ [ListingFilterKeys.name]: filt })),
           });
         }
-        if (filter[ListingFilterKeys.neighborhood]) {
-          const builtFilter = buildFilter({
-            $comparison: filter.$comparison,
-            $include_nulls: false,
-            value: filter[ListingFilterKeys.neighborhood],
-            key: ListingFilterKeys.neighborhood,
-          });
-          filters.push({
-            OR: builtFilter.map((filt) => ({
-              [ListingFilterKeys.neighborhood]: filt,
-            })),
-          });
-        }
         if (filter[ListingFilterKeys.multiselectQuestions]) {
           const builtFilter = buildFilter({
             $comparison: filter.$comparison,
@@ -979,20 +966,6 @@ export class ListingService implements OnModuleInit {
               listingMultiselectQuestions: {
                 some: { multiselectQuestionId: filt },
               },
-            })),
-          });
-        }
-        if (filter[ListingFilterKeys.regions]) {
-          const builtFilter = buildFilter({
-            $comparison: filter.$comparison,
-            $include_nulls: false,
-            value: filter[ListingFilterKeys.regions],
-            key: ListingFilterKeys.regions,
-            caseSensitive: true,
-          });
-          filters.push({
-            OR: builtFilter.map((filt) => ({
-              region: filt,
             })),
           });
         }
@@ -1687,6 +1660,13 @@ export class ListingService implements OnModuleInit {
               },
             }
           : undefined,
+        userAccounts: requestingUser?.userRoles?.isPartner
+          ? {
+              connect: {
+                id: requestingUser.id,
+              },
+            }
+          : undefined,
         section8Acceptance: !!dto.section8Acceptance,
         copyOf: copyOfId
           ? {
@@ -1705,6 +1685,7 @@ export class ListingService implements OnModuleInit {
           : undefined,
       },
     });
+
     const mappedListing = mapTo(Listing, rawListing);
 
     if (mappedListing.status === ListingsStatusEnum.pendingReview) {
@@ -1750,7 +1731,7 @@ export class ListingService implements OnModuleInit {
           )
     )?.duplicateListingPermissions;
 
-    const userRoles =
+    const canDuplicate =
       requestingUser?.userRoles?.isAdmin ||
       requestingUser?.userRoles?.isSupportAdmin ||
       (requestingUser?.userRoles?.isJurisdictionalAdmin &&
@@ -1762,15 +1743,16 @@ export class ListingService implements OnModuleInit {
           UserRoleEnum.limitedJurisdictionAdmin,
         )) ||
       (requestingUser?.userRoles?.isPartner &&
-        duplicateListingPermissions?.includes(UserRoleEnum.partner))
-        ? {
-            ...requestingUser.userRoles,
-            isAdmin: true,
-          }
-        : {
-            ...requestingUser?.userRoles,
-            isAdmin: false,
-          };
+        duplicateListingPermissions?.includes(UserRoleEnum.partner));
+
+    if (!canDuplicate) {
+      throw new ForbiddenException();
+    }
+
+    const userRoles = {
+      ...requestingUser.userRoles,
+      isAdmin: true,
+    };
 
     await this.permissionService.canOrThrow(
       { ...requestingUser, userRoles: userRoles },
@@ -1917,16 +1899,6 @@ export class ListingService implements OnModuleInit {
       requestingUser?.userRoles?.isPartner &&
       duplicateListingPermissions?.includes(UserRoleEnum.partner)
     ) {
-      await this.prisma.userAccounts.update({
-        data: {
-          listings: {
-            connect: { id: res.id },
-          },
-        },
-        where: {
-          id: requestingUser.id,
-        },
-      });
       await this.prisma.activityLog.create({
         data: {
           module: 'user',

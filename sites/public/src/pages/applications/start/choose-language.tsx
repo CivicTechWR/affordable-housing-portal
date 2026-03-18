@@ -219,19 +219,6 @@ const ApplicationChooseLanguage = () => {
                 {t("nav.signIn")}
               </Button>
             </CardSection>
-            <CardSection divider={"flush"} className={styles["application-form-action-footer"]}>
-              <Heading priority={2} size={"2xl"} className={"pb-4"}>
-                {t("authentication.createAccount.noAccount")}
-              </Heading>
-              <Button
-                variant="primary-outlined"
-                href={"/create-account"}
-                id={"app-choose-language-create-account-button"}
-                size="sm"
-              >
-                {t("account.createAccount")}
-              </Button>
-            </CardSection>
           </>
         )}
       </ApplicationFormLayout>

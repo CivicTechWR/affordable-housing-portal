@@ -41,6 +41,7 @@ export class PermissionService {
     );
 
     if (user) {
+      const userJurisdictions = user.jurisdictions ?? [];
       e = await this.addUserPermissions(e, user);
 
       if (type === 'user' && obj?.id) {
@@ -50,7 +51,7 @@ export class PermissionService {
             jurisdictions: {
               where: {
                 id: {
-                  in: user.jurisdictions.map((juris) => juris.id),
+                  in: userJurisdictions.map((juris) => juris.id),
                 },
               },
             },
@@ -75,6 +76,9 @@ export class PermissionService {
     Casbin doesn't support our permissioning requirements for jurisdictionalAdmin or partners so we custom build the permission set here
   */
   async addUserPermissions(enforcer: Enforcer, user: User): Promise<Enforcer> {
+    const userJurisdictions = user.jurisdictions ?? [];
+    const userListings = user.listings ?? [];
+
     await enforcer.addRoleForUser(user.id, UserRoleEnum.user);
 
     if (user.userRoles?.isAdmin) {
@@ -85,7 +89,7 @@ export class PermissionService {
       await enforcer.addRoleForUser(user.id, UserRoleEnum.jurisdictionAdmin);
 
       await Promise.all(
-        user.jurisdictions.map(async (adminInJurisdiction: Jurisdiction) => {
+        userJurisdictions.map(async (adminInJurisdiction: Jurisdiction) => {
           await enforcer.addPermissionForUser(
             user.id,
             'application',
@@ -125,7 +129,7 @@ export class PermissionService {
       );
 
       await Promise.all(
-        user.jurisdictions.map(async (adminInJurisdiction: Jurisdiction) => {
+        userJurisdictions.map(async (adminInJurisdiction: Jurisdiction) => {
           await enforcer.addPermissionForUser(
             user.id,
             'listing',
@@ -138,7 +142,18 @@ export class PermissionService {
       await enforcer.addRoleForUser(user.id, UserRoleEnum.partner);
 
       await Promise.all(
-        user?.listings.map(async (listing: Listing) => {
+        userJurisdictions.map(async (jurisdiction: Jurisdiction) => {
+          await enforcer.addPermissionForUser(
+            user.id,
+            'listing',
+            `r.obj.jurisdictionId == '${jurisdiction.id}'`,
+            `(${permissionActions.create})`,
+          );
+        }),
+      );
+
+      await Promise.all(
+        userListings.map(async (listing: Listing) => {
           await enforcer.addPermissionForUser(
             user.id,
             'application',

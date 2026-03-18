@@ -4,7 +4,7 @@ import {
   Prisma,
   ReviewOrderTypeEnum,
 } from '@prisma/client';
-import { yellowstoneAddress } from '../address-factory';
+import { banffAddress } from '../address-factory';
 
 export const hollywoodHillsHeights: Prisma.ListingsCreateInput = {
   additionalApplicationSubmissionNotes: null,
@@ -20,7 +20,6 @@ export const hollywoodHillsHeights: Prisma.ListingsCreateInput = {
   developer: 'Example Developer',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'Hollywood',
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,
@@ -76,7 +75,7 @@ export const hollywoodHillsHeights: Prisma.ListingsCreateInput = {
   contentUpdatedAt: new Date(),
   publishedAt: new Date(),
   listingsBuildingAddress: {
-    create: yellowstoneAddress,
+    create: banffAddress,
   },
   listingsApplicationPickUpAddress: undefined,
   listingsLeasingAgentAddress: undefined,

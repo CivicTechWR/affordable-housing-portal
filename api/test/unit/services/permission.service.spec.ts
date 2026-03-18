@@ -159,6 +159,11 @@ describe('Testing permission service', () => {
       userRoles: {
         isPartner: true,
       },
+      jurisdictions: [
+        {
+          id: 'juris id',
+        },
+      ],
       listings: [
         {
           id: 'listing id 1',
@@ -172,6 +177,15 @@ describe('Testing permission service', () => {
     const enforcer = await service.addUserPermissions(e, user);
     expect(
       await enforcer.hasRoleForUser('example id', UserRoleEnum.partner),
+    ).toEqual(true);
+
+    expect(
+      await enforcer.hasPermissionForUser(
+        'example id',
+        'listing',
+        `r.obj.jurisdictionId == 'juris id'`,
+        `(${permissionActions.create})`,
+      ),
     ).toEqual(true);
 
     expect(
@@ -209,6 +223,72 @@ describe('Testing permission service', () => {
         `(${permissionActions.read}|${permissionActions.update})`,
       ),
     ).toEqual(true);
+  });
+
+  it('should allow partner to create listings in each assigned jurisdiction', async () => {
+    const e = await newEnforcer(
+      path.join(
+        __dirname,
+        '../../../src/permission-configs',
+        'permission_model.conf',
+      ),
+      path.join(
+        __dirname,
+        '../../../src/permission-configs',
+        'permission_policy.csv',
+      ),
+    );
+
+    const user = {
+      id: 'multi-juris-partner',
+      userRoles: {
+        isPartner: true,
+      },
+      jurisdictions: [
+        {
+          id: 'juris id 1',
+        },
+        {
+          id: 'juris id 2',
+        },
+      ],
+      listings: [],
+    } as User;
+
+    const enforcer = await service.addUserPermissions(e, user);
+
+    expect(
+      await enforcer.enforce(
+        'multi-juris-partner',
+        'listing',
+        permissionActions.create,
+        {
+          jurisdictionId: 'juris id 1',
+        },
+      ),
+    ).toEqual(true);
+
+    expect(
+      await enforcer.enforce(
+        'multi-juris-partner',
+        'listing',
+        permissionActions.create,
+        {
+          jurisdictionId: 'juris id 2',
+        },
+      ),
+    ).toEqual(true);
+
+    expect(
+      await enforcer.enforce(
+        'multi-juris-partner',
+        'listing',
+        permissionActions.create,
+        {
+          jurisdictionId: 'juris id 3',
+        },
+      ),
+    ).toEqual(false);
   });
 
   it('should allow admin to write users', async () => {

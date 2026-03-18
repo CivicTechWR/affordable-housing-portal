@@ -3385,12 +3385,6 @@ export interface ListingFilterParams {
   name?: string
 
   /**  */
-  neighborhood?: string
-
-  /**  */
-  regions?: RegionEnum[]
-
-  /**  */
   configurableRegions?: []
 
   /**  */
@@ -4620,12 +4614,6 @@ export interface Listing {
   householdSizeMin?: number
 
   /**  */
-  neighborhood?: string
-
-  /**  */
-  region?: RegionEnum
-
-  /**  */
   configurableRegion?: string
 
   /**  */
@@ -5570,12 +5558,6 @@ export interface ListingCreate {
   householdSizeMin?: number
 
   /**  */
-  neighborhood?: string
-
-  /**  */
-  region?: RegionEnum
-
-  /**  */
   configurableRegion?: string
 
   /**  */
@@ -6418,12 +6400,6 @@ export interface ListingUpdate {
 
   /**  */
   householdSizeMin?: number
-
-  /**  */
-  neighborhood?: string
-
-  /**  */
-  region?: RegionEnum
 
   /**  */
   configurableRegion?: string
@@ -9188,13 +9164,6 @@ export enum HomeTypeEnum {
   "townhome" = "townhome",
 }
 
-export enum RegionEnum {
-  "Greater_Downtown" = "Greater_Downtown",
-  "Eastside" = "Eastside",
-  "Southwest" = "Southwest",
-  "Westside" = "Westside",
-}
-
 export enum ListingsStatusEnum {
   "active" = "active",
   "pending" = "pending",
@@ -9262,8 +9231,6 @@ export enum ListingFilterKeys {
   "monthlyRent" = "monthlyRent",
   "multiselectQuestions" = "multiselectQuestions",
   "name" = "name",
-  "neighborhood" = "neighborhood",
-  "regions" = "regions",
   "configurableRegions" = "configurableRegions",
   "reservedCommunityTypes" = "reservedCommunityTypes",
   "section8Acceptance" = "section8Acceptance",
@@ -9540,7 +9507,6 @@ export enum NeighborhoodAmenitiesEnum {
 
 export enum FeatureFlagEnum {
   "disableBuildingSelectionCriteria" = "disableBuildingSelectionCriteria",
-  "disableCommonApplication" = "disableCommonApplication",
   "disableJurisdictionalAdmin" = "disableJurisdictionalAdmin",
   "disableListingPreferences" = "disableListingPreferences",
   "disableWorkInRegion" = "disableWorkInRegion",
@@ -9578,7 +9544,6 @@ export enum FeatureFlagEnum {
   "enablePetPolicyCheckbox" = "enablePetPolicyCheckbox",
   "enableProperties" = "enableProperties",
   "enableReferralQuestionUnits" = "enableReferralQuestionUnits",
-  "enableRegions" = "enableRegions",
   "enableResources" = "enableResources",
   "enableSection8Question" = "enableSection8Question",
   "enableSingleUseCode" = "enableSingleUseCode",

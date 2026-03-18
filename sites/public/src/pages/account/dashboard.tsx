@@ -48,11 +48,6 @@ function Dashboard(props: DashboardProps) {
       FeatureFlagEnum.enableListingFavoriting,
       "show-favorites-menu-item"
     )
-    setFeatureFlagLocalStorage(
-      props.jurisdiction,
-      FeatureFlagEnum.disableCommonApplication,
-      "hide-applications-menu-item"
-    )
   }, [router, props.jurisdiction, profile])
 
   const closeAlert = () => {
@@ -73,32 +68,28 @@ function Dashboard(props: DashboardProps) {
             <h1 className={"sr-only"}>{t("nav.myDashboard")}</h1>
             <Grid spacing="lg" className={styles["account-card-container"]}>
               <Grid.Row columns={2}>
-                {isFeatureFlagOn(props.jurisdiction, FeatureFlagEnum.disableCommonApplication) ? (
-                  <></>
-                ) : (
-                  <Grid.Cell>
-                    <BloomCard
-                      iconSymbol="listBullet"
-                      iconClass={"card-icon"}
-                      title={t("account.myApplications")}
-                      subtitle={t("account.myApplicationsSubtitle")}
-                      headingClass={"seeds-large-heading"}
-                      variant={"block"}
-                      headingPriority={2}
-                    >
-                      <Card.Section>
-                        <Button
-                          size="sm"
-                          href={"/account/applications"}
-                          variant="primary-outlined"
-                          id="account-dashboard-applications"
-                        >
-                          {t("account.viewApplications")}
-                        </Button>
-                      </Card.Section>
-                    </BloomCard>
-                  </Grid.Cell>
-                )}
+                <Grid.Cell>
+                  <BloomCard
+                    iconSymbol="listBullet"
+                    iconClass={"card-icon"}
+                    title={t("account.myApplications")}
+                    subtitle={t("account.myApplicationsSubtitle")}
+                    headingClass={"seeds-large-heading"}
+                    variant={"block"}
+                    headingPriority={2}
+                  >
+                    <Card.Section>
+                      <Button
+                        size="sm"
+                        href={"/account/applications"}
+                        variant="primary-outlined"
+                        id="account-dashboard-applications"
+                      >
+                        {t("account.viewApplications")}
+                      </Button>
+                    </Card.Section>
+                  </BloomCard>
+                </Grid.Cell>
                 <Grid.Cell>
                   <BloomCard
                     iconSymbol="userCircle"

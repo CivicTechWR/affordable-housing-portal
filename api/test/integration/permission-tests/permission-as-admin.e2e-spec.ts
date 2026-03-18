@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -560,7 +561,7 @@ describe('Testing Permissioning of endpoints as Admin User', () => {
 
     it('should succeed for update endpoint', async () => {
       const newJurisdiction = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
+        data: jurisdictionFactory(`admin-rct-update-${randomUUID()}`),
       });
       await reservedCommunityTypeFactoryAll(newJurisdiction.id, prisma);
       const reservedCommunityTypeA = await reservedCommunityTypeFactoryGet(
@@ -578,7 +579,7 @@ describe('Testing Permissioning of endpoints as Admin User', () => {
 
     it('should succeed for delete endpoint', async () => {
       const newJurisdiction = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
+        data: jurisdictionFactory(`admin-rct-delete-${randomUUID()}`),
       });
       await reservedCommunityTypeFactoryAll(newJurisdiction.id, prisma);
       const reservedCommunityTypeA = await reservedCommunityTypeFactoryGet(
@@ -1499,7 +1500,7 @@ describe('Testing Permissioning of endpoints as Admin User', () => {
 
     it('should succeed for create endpoint', async () => {
       const body = {
-        name: 'new name',
+        name: `feature-flag-${randomUUID()}`,
         description: 'new description',
         active: true,
       };

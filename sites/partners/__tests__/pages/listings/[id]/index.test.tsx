@@ -80,7 +80,6 @@ function mockJurisdictionsHaveFeatureFlagOn(
     enableIsVerified?: boolean
     enableMarketingStatus?: boolean
     enableAccessibilityFeatures?: boolean
-    enableRegions?: boolean
   }
 ) {
   switch (featureFlag) {
@@ -96,8 +95,6 @@ function mockJurisdictionsHaveFeatureFlagOn(
       return overrides?.enableMarketingStatus ?? false
     case FeatureFlagEnum.enableAccessibilityFeatures:
       return overrides?.enableAccessibilityFeatures ?? true
-    case FeatureFlagEnum.enableRegions:
-      return overrides?.enableRegions ?? true
     default:
       return false
   }
@@ -1161,9 +1158,9 @@ describe("listing data", () => {
       expect(screen.getByText("#12")).toBeInTheDocument()
       expect(screen.getByText("City")).toBeInTheDocument()
       expect(screen.getByText("San Jose")).toBeInTheDocument()
-      expect(screen.getByText("State")).toBeInTheDocument()
+      expect(screen.getByText("Province")).toBeInTheDocument()
       expect(screen.getByText("CA")).toBeInTheDocument()
-      expect(screen.getByText("Zip code")).toBeInTheDocument()
+      expect(screen.getByText("Postal code")).toBeInTheDocument()
       expect(screen.getByText("95112")).toBeInTheDocument()
     })
 
@@ -1277,8 +1274,8 @@ describe("listing data", () => {
         expect(screen.getAllByText("Street address or PO box")).toHaveLength(3)
         expect(screen.getAllByText("Apt or unit #")).toHaveLength(3)
         expect(screen.getAllByText("City")).toHaveLength(3)
-        expect(screen.getAllByText("State")).toHaveLength(3)
-        expect(screen.getAllByText("Zip code")).toHaveLength(3)
+        expect(screen.getAllByText("Province")).toHaveLength(3)
+        expect(screen.getAllByText("Postal code")).toHaveLength(3)
         expect(screen.getAllByText("Office hours")).toHaveLength(2)
         expect(screen.getAllByText("Yes")).toHaveLength(4)
         expect(screen.getAllByText("Leasing agent address")).toHaveLength(3)

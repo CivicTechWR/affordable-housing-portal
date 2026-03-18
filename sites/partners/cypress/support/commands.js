@@ -429,7 +429,6 @@ Cypress.Commands.add("addMinimalListing", (listingName, isLottery, isApproval, j
       .should("include", "cypress-automated-image-upload-071e2ab9-5a52-4f34-85f0-e41f696f4b96")
     cy.getByID("listing-photo-uploaded").contains("Save").click()
     cy.getByID("listingsBuildingAddress.street").type(listing["buildingAddress.street"])
-    cy.getByID("neighborhood").type(listing["neighborhood"])
     cy.getByID("listingsBuildingAddress.city").type(listing["buildingAddress.city"])
     cy.getByID("listingsBuildingAddress.state").select(listing["buildingAddress.state"])
     cy.getByID("listingsBuildingAddress.zipCode").type(listing["buildingAddress.zipCode"])

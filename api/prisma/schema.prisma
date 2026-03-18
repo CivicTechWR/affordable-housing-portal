@@ -1262,7 +1262,6 @@ model Listings {
   marketingType                        MarketingTypeEnum           @default(marketing) @map("marketing_type")
   marketingYear                        Int?                        @map("marketing_year")
   name                                 String
-  neighborhood                         String?
   neighborhoodAmenitiesId              String?                     @unique() @map("neighborhood_amenities_id") @db.Uuid
   ownerCompany                         String?                     @map("owner_company")
   paperApplication                     Boolean?                    @map("paper_application")
@@ -1275,7 +1274,6 @@ model Listings {
   propertyId                           String?                     @map("property_id") @db.Uuid
   publishedAt                          DateTime?                   @map("published_at") @db.Timestamptz(6)
   referralOpportunity                  Boolean?                    @map("referral_opportunity")
-  region                               RegionEnum?
   rentalAssistance                     String?                     @map("rental_assistance")
   rentalHistory                        String?                     @map("rental_history")
   requestedChanges                     String?                     @map("requested_changes")
@@ -1449,7 +1447,6 @@ model ListingSnapshot {
   marketingType                           MarketingTypeEnum           @default(marketing) @map("marketing_type")
   marketingYear                           Int?                        @map("marketing_year")
   name                                    String
-  neighborhood                            String?
   neighborhoodAmenitySnapshotId           String?                     @unique() @map("neighborhood_amenity_snapshot_id") @db.Uuid
   ownerCompany                            String?                     @map("owner_company")
   paperApplication                        Boolean?                    @map("paper_application")
@@ -1461,7 +1458,6 @@ model ListingSnapshot {
   propertySnapshotId                      String?                     @map("property_snapshot_id") @db.Uuid
   publishedAt                             DateTime?                   @map("published_at") @db.Timestamptz(6)
   referralOpportunity                     Boolean?                    @map("referral_opportunity")
-  region                                  RegionEnum?
   rentalAssistance                        String?                     @map("rental_assistance")
   rentalHistory                           String?                     @map("rental_history")
   requestedChanges                        String?                     @map("requested_changes")
@@ -2440,15 +2436,6 @@ enum NeighborhoodAmenitiesEnum {
   busStops
 
   @@map("neighborhood_amenities_enum")
-}
-
-enum RegionEnum {
-  Greater_Downtown
-  Eastside
-  Southwest
-  Westside
-
-  @@map("property_region_enum")
 }
 
 enum RentTypeEnum {

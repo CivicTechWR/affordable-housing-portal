@@ -208,7 +208,7 @@ describe("Listing Management Tests", () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function fillOutListing(cy: Cypress.cy, listing: CypressListing): void {
-    cy.intercept("GET", "/geocoding/v5/**", { fixture: "address" })
+    cy.intercept("GET", "https://photon.komoot.io/api/*", { fixture: "address" })
     cy.intercept("POST", "https://api.cloudinary.com/v1_1/exygy/upload", {
       fixture: "cypressUpload",
     })
@@ -281,7 +281,6 @@ describe("Listing Management Tests", () => {
       listing.listingsBuildingAddress.street,
       "type"
     )
-    fillIfDataExists(cy, "neighborhood", listing.neighborhood, "type")
     fillIfDataExists(
       cy,
       "listingsBuildingAddress.city",
@@ -301,10 +300,6 @@ describe("Listing Management Tests", () => {
       "type"
     )
     fillIfDataExists(cy, "yearBuilt", listing.yearBuilt?.toString(), "type")
-
-    if (getFlagActive(listing, FeatureFlagEnum.enableRegions)) {
-      fillIfDataExists(cy, "region", listing.region, "select")
-    }
 
     if (getFlagActive(listing, FeatureFlagEnum.enableConfigurableRegions)) {
       fillIfDataExists(cy, "configurableRegion", listing.configurableRegion, "select")
@@ -883,7 +878,6 @@ describe("Listing Management Tests", () => {
     // ----------
     // Section - Building details
     verifyDetailDataIfExists(cy, "buildingAddress.street", listing.listingsBuildingAddress.street)
-    verifyDetailDataIfExists(cy, "neighborhood", listing.neighborhood)
     verifyDetailDataIfExists(cy, "buildingAddress.city", listing.listingsBuildingAddress.city)
     verifyDetailDataIfExists(
       cy,
@@ -893,16 +887,8 @@ describe("Listing Management Tests", () => {
     verifyDetailDataIfExists(cy, "buildingAddress.zipCode", listing.listingsBuildingAddress.zipCode)
     verifyDetailDataIfExists(cy, "yearBuilt", listing.yearBuilt?.toString())
 
-    if (getFlagActive(listing, FeatureFlagEnum.enableRegions)) {
-      if (getFlagActive(listing, FeatureFlagEnum.enableConfigurableRegions)) {
-        verifyDetailDataIfExists(
-          cy,
-          "buildingAddress.configurableRegion",
-          listing.configurableRegion
-        )
-      } else {
-        verifyDetailDataIfExists(cy, "region", listing.region)
-      }
+    if (getFlagActive(listing, FeatureFlagEnum.enableConfigurableRegions)) {
+      verifyDetailDataIfExists(cy, "buildingAddress.configurableRegion", listing.configurableRegion)
     }
 
     // ----------
@@ -1332,7 +1318,6 @@ describe("Listing Management Tests", () => {
       listing.listingsBuildingAddress.street,
       "type"
     )
-    verifyDataIfExists(cy, "neighborhood", listing.neighborhood, "type")
     verifyDataIfExists(
       cy,
       "listingsBuildingAddress.city",
@@ -1354,12 +1339,8 @@ describe("Listing Management Tests", () => {
     verifyDataIfExists(cy, "yearBuilt", listing.yearBuilt?.toString(), "type")
     cy.getByID("yearBuilt").should("have.value", listing.yearBuilt)
 
-    if (getFlagActive(listing, FeatureFlagEnum.enableRegions)) {
-      if (getFlagActive(listing, FeatureFlagEnum.enableConfigurableRegions)) {
-        verifyDataIfExists(cy, "configurableRegion", listing.configurableRegion, "select")
-      } else {
-        verifyDataIfExists(cy, "region", listing.region, "select")
-      }
+    if (getFlagActive(listing, FeatureFlagEnum.enableConfigurableRegions)) {
+      verifyDataIfExists(cy, "configurableRegion", listing.configurableRegion, "select")
     }
 
     // ----------

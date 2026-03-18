@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/react"
 import { listing } from "@bloom-housing/shared-helpers/__tests__/testHelpers"
 import {
   EnumListingListingType,
-  RegionEnum,
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { ListingContext } from "../../../../../src/components/listings/ListingContext"
@@ -22,7 +21,7 @@ describe("DetailBuildingDetails", () => {
           units: [],
         }}
       >
-        <DetailBuildingDetails enableConfigurableRegions={false} enableRegions={false} />
+        <DetailBuildingDetails enableConfigurableRegions={false} />
       </ListingContext.Provider>
     )
     expect(screen.getByRole("heading", { level: 2, name: "Building details" })).toBeInTheDocument()
@@ -32,42 +31,17 @@ describe("DetailBuildingDetails", () => {
     expect(screen.getByText(listing.listingsBuildingAddress.street)).toBeInTheDocument()
     expect(screen.getByText("City")).toBeInTheDocument()
     expect(screen.getByText(listing.listingsBuildingAddress.city)).toBeInTheDocument()
-    expect(screen.getByText("State")).toBeInTheDocument()
+    expect(screen.getByText("Province")).toBeInTheDocument()
     expect(screen.getByText(listing.listingsBuildingAddress.state)).toBeInTheDocument()
-    expect(screen.getByText("Zip code")).toBeInTheDocument()
+    expect(screen.getByText("Postal code")).toBeInTheDocument()
     expect(screen.getByText(listing.listingsBuildingAddress.zipCode)).toBeInTheDocument()
     expect(screen.getByText("Year built")).toBeInTheDocument()
     expect(screen.getByText(listing.yearBuilt)).toBeInTheDocument()
-    expect(screen.getByText("Neighborhood")).toBeInTheDocument()
-    expect(screen.getByText(listing.neighborhood)).toBeInTheDocument()
     expect(screen.getByText("Latitude")).toBeInTheDocument()
     expect(screen.getByText(listing.listingsBuildingAddress.latitude)).toBeInTheDocument()
     expect(screen.getByText("Longitude")).toBeInTheDocument()
     expect(screen.getByText(listing.listingsBuildingAddress.longitude)).toBeInTheDocument()
     expect(screen.queryByText("Region")).not.toBeInTheDocument()
-  })
-  it("should render region feature flag", () => {
-    render(
-      <ListingContext.Provider
-        value={{
-          ...listing,
-          createdAt: new Date("2023-01-01T10:00:00Z"),
-          jurisdictions: { name: "Bloomington", id: "1" },
-          id: "1234",
-          reviewOrderType: ReviewOrderTypeEnum.waitlist,
-          units: [],
-          region: RegionEnum.Eastside,
-        }}
-      >
-        <DetailBuildingDetails enableConfigurableRegions={false} enableRegions={true} />
-      </ListingContext.Provider>
-    )
-    expect(screen.getByRole("heading", { level: 2, name: "Building details" })).toBeInTheDocument()
-    expect(screen.getByRole("heading", { level: 3, name: "Building address" })).toBeInTheDocument()
-
-    expect(screen.getByText("Street address")).toBeInTheDocument()
-    expect(screen.getByText("Region")).toBeInTheDocument()
-    expect(screen.getByText("Eastside")).toBeInTheDocument()
   })
   it("should render configurable region feature flag", () => {
     render(
@@ -82,7 +56,7 @@ describe("DetailBuildingDetails", () => {
           configurableRegion: "Harbor Area",
         }}
       >
-        <DetailBuildingDetails enableConfigurableRegions={true} enableRegions={false} />
+        <DetailBuildingDetails enableConfigurableRegions={true} />
       </ListingContext.Provider>
     )
 
@@ -100,16 +74,14 @@ describe("DetailBuildingDetails", () => {
           id: "1234",
           reviewOrderType: ReviewOrderTypeEnum.waitlist,
           units: [],
-          neighborhood: null,
           yearBuilt: null,
         }}
       >
-        <DetailBuildingDetails enableConfigurableRegions={false} enableRegions={false} />
+        <DetailBuildingDetails enableConfigurableRegions={false} />
       </ListingContext.Provider>
     )
-    expect(screen.getByText("Neighborhood")).toBeInTheDocument()
     expect(screen.getByText("Year built")).toBeInTheDocument()
-    expect(screen.getAllByText("n/a", { exact: false })).toHaveLength(2)
+    expect(screen.getByText("n/a", { exact: false })).toBeInTheDocument()
   })
   it("should render with no address", () => {
     render(
@@ -121,19 +93,18 @@ describe("DetailBuildingDetails", () => {
           id: "1234",
           reviewOrderType: ReviewOrderTypeEnum.waitlist,
           units: [],
-          neighborhood: null,
           yearBuilt: null,
           listingsBuildingAddress: null,
         }}
       >
-        <DetailBuildingDetails enableConfigurableRegions={false} enableRegions={false} />
+        <DetailBuildingDetails enableConfigurableRegions={false} />
       </ListingContext.Provider>
     )
 
     expect(screen.getByText("Building address")).toBeInTheDocument()
     expect(screen.getByText("None")).toBeInTheDocument()
   })
-  it("should not render year built when non-regulated and regions", () => {
+  it("should not render year built when non-regulated and configurable regions", () => {
     render(
       <ListingContext.Provider
         value={{
@@ -143,11 +114,11 @@ describe("DetailBuildingDetails", () => {
           id: "1234",
           reviewOrderType: ReviewOrderTypeEnum.waitlist,
           unitGroups: [],
-          region: RegionEnum.Eastside,
+          configurableRegion: "Harbor Area",
           listingType: EnumListingListingType.nonRegulated,
         }}
       >
-        <DetailBuildingDetails enableConfigurableRegions={false} enableRegions={true} />
+        <DetailBuildingDetails enableConfigurableRegions={true} />
       </ListingContext.Provider>
     )
 
@@ -165,11 +136,10 @@ describe("DetailBuildingDetails", () => {
           id: "1234",
           reviewOrderType: ReviewOrderTypeEnum.waitlist,
           unitGroups: [],
-          region: RegionEnum.Eastside,
           listingType: EnumListingListingType.nonRegulated,
         }}
       >
-        <DetailBuildingDetails enableConfigurableRegions={false} enableRegions={false} />
+        <DetailBuildingDetails enableConfigurableRegions={false} />
       </ListingContext.Provider>
     )
 

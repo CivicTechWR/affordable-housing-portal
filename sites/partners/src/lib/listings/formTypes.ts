@@ -186,8 +186,6 @@ export const formDefaults: FormListing = {
   developer: null,
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: undefined,
-  region: undefined,
   petPolicy: "",
   allowsDogs: null,
   allowsCats: null,

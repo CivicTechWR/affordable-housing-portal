@@ -95,7 +95,6 @@ export class TranslationService {
       depositMax: listing.depositMax,
       depositMin: listing.depositMin,
       leasingAgentOfficeHours: listing.leasingAgentOfficeHours,
-      neighborhood: listing.neighborhood,
       petPolicy: listing.petPolicy,
       programRules: listing.programRules,
       rentalAssistance: listing.rentalAssistance,

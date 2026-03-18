@@ -88,11 +88,6 @@ const SignIn = (props: SignInProps) => {
         FeatureFlagEnum.enableListingFavoriting,
         "show-favorites-menu-item"
       )
-      setFeatureFlagLocalStorage(
-        props.jurisdiction,
-        FeatureFlagEnum.disableCommonApplication,
-        "hide-applications-menu-item"
-      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -102,11 +97,6 @@ const SignIn = (props: SignInProps) => {
       props.jurisdiction,
       FeatureFlagEnum.enableListingFavoriting,
       "show-favorites-menu-item"
-    )
-    setFeatureFlagLocalStorage(
-      props.jurisdiction,
-      FeatureFlagEnum.disableCommonApplication,
-      "hide-applications-menu-item"
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.jurisdiction])

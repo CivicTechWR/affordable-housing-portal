@@ -15,9 +15,9 @@
   "applicant.address.street": "123 e street avenue",
   "applicant.address.street2": "n/a",
   "applicant.address.city": "pheonix",
-  "applicant.address.state": "Arizona",
-  "applicant.address.stateCode": "AZ",
-  "applicant.address.zipCode": "85745",
+  "applicant.address.state": "Alberta",
+  "applicant.address.stateCode": "AB",
+  "applicant.address.zipCode": "T1L 1K2",
   "alternateContact.firstName": "n/a",
   "alternateContact.lastName": "n/a",
   "alternateContact.agency": "n/a",
@@ -70,7 +70,7 @@
   "mailingAddress.street": "123 e street avenue",
   "mailingAddress.street2": "n/a",
   "mailingAddress.city": "pheonix",
-  "mailingAddress.zipCode": "85745",
-  "mailingAddress.state": "Arizona",
-  "mailingAddress.stateCode": "AZ"
+  "mailingAddress.zipCode": "T1L 1K2",
+  "mailingAddress.state": "Alberta",
+  "mailingAddress.stateCode": "AB"
 }
