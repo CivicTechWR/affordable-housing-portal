@@ -38,7 +38,10 @@ export const Home = (props: HomeProps) => {
 
   const metaDescription = t("pageDescription.welcome", { regionName: t("region.name") })
 
-  const enableRegions = isFeatureFlagOn(props.jurisdiction, FeatureFlagEnum.enableRegions)
+  const enableConfigurableRegions = isFeatureFlagOn(
+    props.jurisdiction,
+    FeatureFlagEnum.enableConfigurableRegions
+  )
 
   const enableUnderConstruction = isFeatureFlagOn(
     props.jurisdiction,
@@ -69,22 +72,20 @@ export const Home = (props: HomeProps) => {
             />
           </HomeSection>
         )}
-        {enableRegions && (
+        {enableConfigurableRegions && props.jurisdiction?.regions?.length > 0 && (
           <HomeSection
             sectionTitle={t("welcome.cityRegions")}
             sectionIcon="mapPin"
             layoutClassName={`${styles["muted-background"]}`}
           >
-            <HomeRegions />
+            <HomeRegions regions={props.jurisdiction.regions} />
           </HomeSection>
         )}
         <HomeSection
           sectionTitle={t("welcome.resources")}
           sectionIcon="listBullet"
           layoutClassName={`${styles["resource-container"]} ${
-            !enableRegions && !enableRegions
-              ? styles["muted-background"]
-              : styles["surface-background"]
+            !enableConfigurableRegions ? styles["muted-background"] : styles["surface-background"]
           }`}
         >
           <HomeResources jurisdiction={props.jurisdiction} />

@@ -106,8 +106,8 @@ describe("partners_application_index", () => {
     expect(queryByText("Street address")).not.toBeInTheDocument()
     expect(queryByText("Apt or unit #")).not.toBeInTheDocument()
     expect(queryByText("City")).not.toBeInTheDocument()
-    expect(queryByText("State")).not.toBeInTheDocument()
-    expect(queryByText("Zip code")).not.toBeInTheDocument()
+    expect(queryByText("Province")).not.toBeInTheDocument()
+    expect(queryByText("Postal code")).not.toBeInTheDocument()
   })
 
   it("should display family member Alterante Contact sction info", () => {
@@ -149,9 +149,9 @@ describe("partners_application_index", () => {
     expect(getByText("25")).toBeInTheDocument()
     expect(getByText("City")).toBeInTheDocument()
     expect(getByText("Bay Harbor")).toBeInTheDocument()
-    expect(getByText("State")).toBeInTheDocument()
+    expect(getByText("Province")).toBeInTheDocument()
     expect(getByText("ME")).toBeInTheDocument()
-    expect(getByText("Zip code")).toBeInTheDocument()
+    expect(getByText("Postal code")).toBeInTheDocument()
   })
 
   it("should display Houshold Details info", () => {
@@ -418,9 +418,9 @@ describe("partners_application_index", () => {
     expect(within(householdMemberDetailsSection).getAllByText("n/a")).toHaveLength(2)
     expect(within(householdMemberDetailsSection).getByText("City")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("Moab")).toBeInTheDocument()
-    expect(within(householdMemberDetailsSection).getByText("State")).toBeInTheDocument()
+    expect(within(householdMemberDetailsSection).getByText("Province")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("UT")).toBeInTheDocument()
-    expect(within(householdMemberDetailsSection).getByText("Zip code")).toBeInTheDocument()
+    expect(within(householdMemberDetailsSection).getByText("Postal code")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("84532")).toBeInTheDocument()
 
     expect(
@@ -489,9 +489,9 @@ describe("partners_application_index", () => {
     expect(within(householdMemberDetailsSection).getByText("Suite 302")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("City")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("Grand Rapids")).toBeInTheDocument()
-    expect(within(householdMemberDetailsSection).getByText("State")).toBeInTheDocument()
+    expect(within(householdMemberDetailsSection).getByText("Province")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("MI")).toBeInTheDocument()
-    expect(within(householdMemberDetailsSection).getByText("Zip code")).toBeInTheDocument()
+    expect(within(householdMemberDetailsSection).getByText("Postal code")).toBeInTheDocument()
     expect(within(householdMemberDetailsSection).getByText("49546")).toBeInTheDocument()
 
     expect(

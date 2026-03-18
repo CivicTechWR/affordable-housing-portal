@@ -34,7 +34,7 @@ const CopyListingDialog = ({ isOpen, setOpen, listingInfo }: CopyListingDialogPr
         },
       })
       setOpen(false)
-      loadProfile(`/listings/${res.id}`)
+      void loadProfile(`/listings/${res.id}`)
       addToast(t("listings.copy.success"), { variant: "success" })
     } catch (err) {
       console.error(err)

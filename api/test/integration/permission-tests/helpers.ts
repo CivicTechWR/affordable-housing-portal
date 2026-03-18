@@ -261,6 +261,23 @@ export const buildUserInviteMock = (
   } as unknown as UserInvite;
 };
 
+export const buildPartnerUserInviteMock = (
+  jurisId: string,
+  email: string,
+): UserInvite => {
+  return {
+    firstName: 'Partner User firstName',
+    lastName: 'Partner User lastName',
+    password: 'Abcdef12345!',
+    email,
+    jurisdictions: [{ id: jurisId }],
+    agreedToTermsOfService: true,
+    userRoles: {
+      isPartner: true,
+    },
+  } as unknown as UserInvite;
+};
+
 export const buildApplicationCreateMock = (
   exampleAddress: AddressCreate,
   listingId: string,

@@ -1071,7 +1071,6 @@ export const listing: Listing = {
     latitude: 37.36537,
     longitude: -121.91071,
   },
-  neighborhood: "Rosemary Gardens Park",
   petPolicy:
     "No pets allowed. Accommodation animals may be granted to persons with disabilities via a reasonable accommodation request.",
   units: [

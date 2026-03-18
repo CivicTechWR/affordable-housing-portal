@@ -16,7 +16,6 @@ import styles from "../ListingViewSeeds.module.scss"
 type NeighborhoodProps = {
   address: Address
   name: string
-  neighborhood?: string
   neighborhoodAmenities?: ListingNeighborhoodAmenities
   region?: string
   visibleNeighborhoodAmenities?: NeighborhoodAmenitiesEnum[]
@@ -26,7 +25,6 @@ type NeighborhoodProps = {
 export const Neighborhood = ({
   address,
   name,
-  neighborhood,
   neighborhoodAmenities,
   region,
   visibleNeighborhoodAmenities = [],
@@ -51,7 +49,7 @@ export const Neighborhood = ({
       )
     : null
 
-  const showSection = address || neighborhood || region || hasNeighborhoodAmenities
+  const showSection = address || region || hasNeighborhoodAmenities
   if (!showSection) return null
 
   return (
@@ -68,14 +66,6 @@ export const Neighborhood = ({
               {t("t.getDirections")}
             </Link>
           </>
-        )}
-        {neighborhood && (
-          <HeadingGroup
-            heading={t("t.neighborhood")}
-            subheading={neighborhood}
-            headingProps={{ priority: 3, size: "lg" }}
-            className={`${styles["heading-group"]} seeds-m-bs-section`}
-          />
         )}
         {region && (
           <HeadingGroup

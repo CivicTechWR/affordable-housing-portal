@@ -2,11 +2,10 @@ import {
   ListingsStatusEnum,
   ReviewOrderTypeEnum,
   Prisma,
-  RegionEnum,
   ApplicationMethodsTypeEnum,
 } from '@prisma/client';
 import dayjs from 'dayjs';
-import { yellowstoneAddress } from '../address-factory';
+import { banffAddress } from '../address-factory';
 
 export const lakeviewVilla: Prisma.ListingsCreateInput = {
   additionalApplicationSubmissionNotes: null,
@@ -27,8 +26,6 @@ export const lakeviewVilla: Prisma.ListingsCreateInput = {
   developer: 'Example Developer',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: 'Greater Downtown area',
-  region: RegionEnum.Greater_Downtown,
   petPolicy: null,
   smokingPolicy: null,
   unitAmenities: null,
@@ -78,7 +75,7 @@ export const lakeviewVilla: Prisma.ListingsCreateInput = {
   contentUpdatedAt: new Date(),
   publishedAt: new Date(),
   listingsBuildingAddress: {
-    create: yellowstoneAddress,
+    create: banffAddress,
   },
   listingsApplicationPickUpAddress: undefined,
   listingsLeasingAgentAddress: undefined,

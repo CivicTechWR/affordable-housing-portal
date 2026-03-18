@@ -20,7 +20,7 @@ describe("<Applications>", () => {
         applicationPickUpAddressOfficeHours={"M-F 9am-5pm"}
         applicationPickUpAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Pick Up Address Street",
           zipCode: "90210",
@@ -52,7 +52,7 @@ describe("<Applications>", () => {
         applicationPickUpAddressOfficeHours={"M-F 9am-5pm"}
         applicationPickUpAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Pick Up Address Street",
           zipCode: "90210",
@@ -80,7 +80,7 @@ describe("<Applications>", () => {
         applicationPickUpAddressOfficeHours={"M-F 9am-5pm"}
         applicationPickUpAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Pick Up Address Street",
           zipCode: "90210",
@@ -108,7 +108,7 @@ describe("<Applications>", () => {
         applicationPickUpAddressOfficeHours={"M-F 9am-5pm"}
         applicationPickUpAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Pick Up Address Street",
           zipCode: "90210",
@@ -136,7 +136,7 @@ describe("<Applications>", () => {
         applicationPickUpAddressOfficeHours={"M-F 9am-5pm"}
         applicationPickUpAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Pick Up Address Street",
           zipCode: "90210",

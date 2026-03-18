@@ -70,8 +70,8 @@
   "incomeYear": "60000",
   "mailingAddress.street": "123 e delivery street",
   "mailingAddress.street2": "23",
-  "mailingAddress.city": "Tucson",
-  "mailingAddress.zipCode": "85748",
-  "mailingAddress.state": "Arizona",
-  "mailingAddress.stateCode": "AZ"
+  "mailingAddress.city": "Calgary",
+  "mailingAddress.zipCode": "T2P 1J9",
+  "mailingAddress.state": "Alberta",
+  "mailingAddress.stateCode": "AB"
 }

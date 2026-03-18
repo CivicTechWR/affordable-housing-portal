@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
-import { t, Field, Select, FieldGroup, GridCell } from "@bloom-housing/ui-components"
+import { t, Field, Select, FieldGroup } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
 import { stateKeys, Map, LatitudeLongitude, forwardGeocode } from "@bloom-housing/shared-helpers"
-import {
-  EnumListingListingType,
-  RegionEnum,
-} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import { EnumListingListingType } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { FormListing } from "../../../../lib/listings/formTypes"
 import {
   defaultFieldProps,
@@ -16,7 +13,6 @@ import {
   getAddressErrorMessage,
   getLabel,
 } from "../../../../lib/helpers"
-import { neighborhoodRegions } from "../../../../lib/listings/Neighborhoods"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
 import styles from "../ListingForm.module.scss"
 
@@ -24,7 +20,6 @@ type BuildingDetailsProps = {
   customMapPositionChosen?: boolean
   enableConfigurableRegions?: boolean
   enableNonRegulatedListings?: boolean
-  enableRegions?: boolean
   latLong?: LatitudeLongitude
   listing?: FormListing
   regions?: string[]
@@ -50,7 +45,6 @@ const hasValidCoordinates = (coordinates?: LatitudeLongitude) => {
 const BuildingDetails = ({
   customMapPositionChosen,
   enableNonRegulatedListings,
-  enableRegions,
   enableConfigurableRegions,
   latLong,
   listing,
@@ -63,7 +57,7 @@ const BuildingDetails = ({
   const [geocodingError, setGeocodingError] = useState(false)
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { register, watch, control, getValues, setValue, errors, clearErrors } = formMethods
+  const { register, control, getValues, setValue, errors, clearErrors } = formMethods
 
   interface BuildingAddress {
     city: string
@@ -93,7 +87,7 @@ const BuildingDetails = ({
       buildingAddress?.state &&
       buildingAddress?.street &&
       buildingAddress?.zipCode &&
-      buildingAddress?.zipCode.length >= 5
+      buildingAddress?.zipCode.length >= 3
     )
   }
 
@@ -146,19 +140,10 @@ const BuildingDetails = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapPinPosition])
 
-  const { neighborhood, region, configurableRegion } = watch([
-    "neighborhood",
-    "region",
-    "configurableRegion",
-  ])
-
-  useEffect(() => {
-    const matchingConfig = neighborhoodRegions.find((entry) => entry.name == neighborhood)
-    if (matchingConfig && matchingConfig.region !== region) {
-      setValue("region", matchingConfig.region)
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [neighborhood, setValue])
+  const configurableRegion = useWatch({
+    control,
+    name: "configurableRegion",
+  })
 
   useEffect(() => {
     if (regions && listing?.configurableRegion && configurableRegion === "") {
@@ -179,7 +164,7 @@ const BuildingDetails = ({
     )
   }
 
-  const eitherRegionEnabled = enableRegions || enableConfigurableRegions
+  const eitherRegionEnabled = enableConfigurableRegions
   const mapPreviewCoordinates =
     mapPinPosition === "custom" && !hasValidCoordinates(latLong) ? WATERLOO_ON_COORDINATES : latLong
 
@@ -214,39 +199,6 @@ const BuildingDetails = ({
               register={register}
             />
           </Grid.Cell>
-          <GridCell>
-            {enableRegions ? (
-              <Select
-                controlClassName="control"
-                register={register}
-                options={[
-                  { value: "", label: t("listings.sections.neighborhoodPlaceholder") },
-                  ...neighborhoodRegions.map((entry) => ({
-                    value: entry.name,
-                    label: entry.name,
-                  })),
-                ]}
-                {...defaultFieldProps(
-                  "neighborhood",
-                  t("t.neighborhood"),
-                  requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            ) : (
-              <Field
-                register={register}
-                {...defaultFieldProps(
-                  "neighborhood",
-                  t("t.neighborhood"),
-                  requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            )}
-          </GridCell>
         </Grid.Row>
         <Grid.Row columns={6}>
           <Grid.Cell className={"seeds-grid-span-2"}>
@@ -313,20 +265,6 @@ const BuildingDetails = ({
             />
           </Grid.Cell>
           <Grid.Cell className="seeds-grid-span-2">
-            {enableRegions && (
-              <Select
-                register={register}
-                controlClassName="control"
-                options={[
-                  { value: "", label: t("listings.sections.regionPlaceholder") },
-                  ...Object.keys(RegionEnum).map((entry) => ({
-                    value: entry,
-                    label: entry.toString().replace("_", " "),
-                  })),
-                ]}
-                {...defaultFieldProps("region", t("t.region"), requiredFields, errors, clearErrors)}
-              />
-            )}
             {enableConfigurableRegions && (
               <Select
                 register={register}

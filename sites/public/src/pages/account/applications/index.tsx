@@ -1,5 +1,4 @@
-import React, { useEffect } from "react"
-import { useRouter } from "next/router"
+import React from "react"
 import ApplicationsView, {
   ApplicationsIndexEnum,
 } from "../../../components/account/ApplicationsView"
@@ -11,15 +10,6 @@ import { isFeatureFlagOn } from "../../../lib/helpers"
 import { fetchJurisdictionByName } from "../../../lib/hooks"
 
 const AllApplications = ({ jurisdiction }: { jurisdiction: Jurisdiction }) => {
-  const router = useRouter()
-
-  useEffect(() => {
-    if (isFeatureFlagOn(jurisdiction, FeatureFlagEnum.disableCommonApplication)) {
-      console.warn("Page not available in this configuration")
-      void router.push("/")
-    }
-  })
-
   return (
     <ApplicationsView
       filterType={ApplicationsIndexEnum.all}

@@ -989,9 +989,6 @@ export const ListingView = (props: ListingProps) => {
         >
           <div className="listing-detail-panel">
             <dl className="column-definition-list">
-              {listing.neighborhood && (
-                <Description term={t("t.neighborhood")} description={listing.neighborhood} />
-              )}
               {listing.yearBuilt && (
                 <Description term={t("t.built")} description={listing.yearBuilt} />
               )}

@@ -3,7 +3,6 @@ import {
   HomeTypeEnum,
   ListingsStatusEnum,
   ListingTypeEnum,
-  RegionEnum,
 } from '@prisma/client';
 import { Expose, Type } from 'class-transformer';
 import {
@@ -165,25 +164,6 @@ export class ListingFilterParams extends BaseFilter {
   })
   @IsString({ groups: [ValidationsGroupsEnum.default] })
   [ListingFilterKeys.name]?: string;
-
-  @Expose()
-  @ApiPropertyOptional({
-    example: 'Fox Creek',
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  [ListingFilterKeys.neighborhood]?: string;
-
-  @Expose()
-  @ApiPropertyOptional({
-    enum: RegionEnum,
-    enumName: 'RegionEnum',
-    isArray: true,
-    example: ['Eastside'],
-    default: ['Eastside'],
-  })
-  @IsArray({ groups: [ValidationsGroupsEnum.default] })
-  @IsEnum(RegionEnum, { groups: [ValidationsGroupsEnum.default], each: true })
-  [ListingFilterKeys.regions]?: RegionEnum[];
 
   @Expose()
   @ApiPropertyOptional({

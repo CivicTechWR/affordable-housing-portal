@@ -74,7 +74,7 @@ const FormUserConfirm = () => {
       )
 
       if (response) {
-        loadProfile("/")
+        void loadProfile("/")
         addToast(t(`users.accountConfirmed`), { variant: "success" })
       }
     } catch (err) {
