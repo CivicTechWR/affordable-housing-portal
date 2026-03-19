@@ -119,6 +119,9 @@ export class UserService {
 
   /**
    * Determines whether a role set grants access to the partner portal.
+   *
+   * @param userRoles - The role flags to evaluate.
+   * @returns `true` if any partner-portal role flag is enabled.
    */
   isPartnerPortalUser(userRoles?: Partial<UserRole>) {
     return !!(
@@ -131,7 +134,10 @@ export class UserService {
   }
 
   /**
-   * Determines whether any persisted role flag is still enabled on the record.
+   * Determines whether any role flag is enabled, including isSuperAdmin.
+   *
+   * @param userRoles - The role flags to evaluate.
+   * @returns `true` if at least one role flag is set.
    */
   private hasAnyAssignedRole(userRoles?: Partial<UserRole>) {
     return !!(
@@ -146,6 +152,10 @@ export class UserService {
 
   /**
    * Returns the public-site base URL for a user's first connected jurisdiction.
+   *
+   * @param user - An object containing a jurisdictions array with optional publicUrl fields.
+   * @returns The publicUrl string of the first jurisdiction.
+   * @throws {BadRequestException} When no jurisdiction or publicUrl is present.
    */
   private getJurisdictionPublicUrl(user: {
     jurisdictions?: Array<{ publicUrl?: string }>;
@@ -1034,7 +1044,11 @@ export class UserService {
   }
 
   /**
-   * Compares persisted role flags while treating missing booleans as false.
+   * Compares role flags while treating missing or undefined booleans as false.
+   *
+   * @param incomingUserRoles - The proposed new role flags.
+   * @param storedUserRoles - The currently persisted role flags.
+   * @returns `true` if every compared flag is equivalent.
    */
   private userRolesMatch(
     incomingUserRoles?: Partial<UserRole>,

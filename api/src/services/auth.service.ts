@@ -89,6 +89,8 @@ export class AuthService {
 
   /**
    * Clears every auth cookie that can keep a browser session alive.
+   *
+   * @param res - Express response on which to clear the cookies.
    */
   private clearAuthCookies(res: Response): void {
     res.clearCookie(TOKEN_COOKIE_NAME, AUTH_COOKIE_OPTIONS);

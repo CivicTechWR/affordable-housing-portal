@@ -18,7 +18,13 @@ export const ConfigContext = createContext<ConfigContextProps>({
 })
 
 /**
- * Supplies runtime auth configuration that differs between the public and partners apps.
+ * Supplies runtime configuration to the app, including API URL, storage
+ * strategy, idle timeout, and which portal (public or partners) is active.
+ *
+ * @param apiUrl - Base URL for backend API requests.
+ * @param storageType - Whether to use "local" or "session" storage. Defaults to "session".
+ * @param idleTimeout - Inactivity timeout in milliseconds. Defaults to the IDLE_TIMEOUT env var.
+ * @param appType - Which portal is rendering: "public" or "partners". Defaults to "public".
  */
 export const ConfigProvider: FunctionComponent<{
   apiUrl: string

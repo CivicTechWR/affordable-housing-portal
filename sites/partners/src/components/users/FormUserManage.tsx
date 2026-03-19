@@ -54,7 +54,11 @@ const determineUserRole = (roles: UserRole) => {
 }
 
 /**
- * Identifies roles that should store only one jurisdiction value in the form state.
+ * Identifies roles that store a single jurisdiction value in the form state
+ * rather than a multi-select checkbox array.
+ *
+ * @param role - The currently selected role option.
+ * @returns `true` for User, JurisdictionalAdmin, and LimitedJurisdictionalAdmin.
  */
 const usesSingleJurisdictionValue = (role?: RoleOption) => {
   return (
