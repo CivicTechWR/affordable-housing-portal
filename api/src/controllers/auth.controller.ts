@@ -58,12 +58,13 @@ export class AuthController {
     return await this.authService.setCredentials(
       res,
       mapTo(User, req['user']),
-      undefined,
-      dto.reCaptchaToken,
-      !!process.env.RECAPTCHA_KEY,
-      !!dto.mfaCode,
-      process.env.ENABLE_RECAPTCHA === 'TRUE',
-      req.headers[PARTNERS_PORTAL_HEADER] === 'true',
+      {
+        reCaptchaToken: dto.reCaptchaToken,
+        reCaptchaConfigured: !!process.env.RECAPTCHA_KEY,
+        mfaCode: !!dto.mfaCode,
+        shouldReCaptchaBlockLogin: process.env.ENABLE_RECAPTCHA === 'TRUE',
+        forPartners: req.headers[PARTNERS_PORTAL_HEADER] === 'true',
+      },
     );
   }
 
@@ -126,12 +127,10 @@ export class AuthController {
     return await this.authService.setCredentials(
       res,
       mapTo(User, req['user']),
-      req.cookies[REFRESH_COOKIE_NAME],
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      req.headers[PARTNERS_PORTAL_HEADER] === 'true',
+      {
+        incomingRefreshToken: req.cookies[REFRESH_COOKIE_NAME],
+        forPartners: req.headers[PARTNERS_PORTAL_HEADER] === 'true',
+      },
     );
   }
 

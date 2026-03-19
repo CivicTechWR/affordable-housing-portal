@@ -244,12 +244,7 @@ describe('Testing auth service', () => {
               isLimitedJurisdictionalAdmin: false,
             },
           },
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          true,
+          { forPartners: true },
         ),
     ).rejects.toThrowError('partnerPortalAccessDenied');
 
@@ -304,7 +299,7 @@ describe('Testing auth service', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      'refreshToken',
+      { incomingRefreshToken: 'refreshToken' },
     );
 
     expect(prisma.userAccounts.update).toHaveBeenCalledWith({
@@ -372,7 +367,7 @@ describe('Testing auth service', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-          'refreshToken',
+          { incomingRefreshToken: 'refreshToken' },
         ),
     ).rejects.toThrowError(
       `User ${id} was attempting to use outdated token refreshToken to generate new tokens`,
@@ -440,7 +435,7 @@ describe('Testing auth service', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-          'refreshToken',
+          { incomingRefreshToken: 'refreshToken' },
         ),
     ).rejects.toThrowError(`no user found`);
 
@@ -510,11 +505,13 @@ describe('Testing auth service', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-          'refreshToken',
-          'invalidReCaptchaToken',
-          true,
-          false,
-          true,
+          {
+            incomingRefreshToken: 'refreshToken',
+            reCaptchaToken: 'invalidReCaptchaToken',
+            reCaptchaConfigured: true,
+            mfaCode: false,
+            shouldReCaptchaBlockLogin: true,
+          },
         ),
     ).rejects.toThrowError(
       `The ReCaptcha CreateAssessment call failed because the token was: Example invalid reason`,
@@ -581,11 +578,13 @@ describe('Testing auth service', () => {
             createdAt: new Date(),
             updatedAt: new Date(),
           },
-          'refreshToken',
-          'invalidReCaptchaToken',
-          true,
-          false,
-          true,
+          {
+            incomingRefreshToken: 'refreshToken',
+            reCaptchaToken: 'invalidReCaptchaToken',
+            reCaptchaConfigured: true,
+            mfaCode: false,
+            shouldReCaptchaBlockLogin: true,
+          },
         ),
     ).rejects.toThrowError(
       `ReCaptcha failed because the action didn't match, action was: Invalid action`,
@@ -650,11 +649,13 @@ describe('Testing auth service', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      'refreshToken',
-      'validToken',
-      true,
-      false,
-      true,
+      {
+        incomingRefreshToken: 'refreshToken',
+        reCaptchaToken: 'validToken',
+        reCaptchaConfigured: true,
+        mfaCode: false,
+        shouldReCaptchaBlockLogin: true,
+      },
     );
 
     expect(prisma.userAccounts.update).toHaveBeenCalledWith({

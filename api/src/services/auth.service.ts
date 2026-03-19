@@ -54,6 +54,15 @@ type IdAndEmail = {
   email: string;
 };
 
+export interface SetCredentialsOptions {
+  incomingRefreshToken?: string;
+  reCaptchaToken?: string;
+  reCaptchaConfigured?: boolean;
+  mfaCode?: boolean;
+  shouldReCaptchaBlockLogin?: boolean;
+  forPartners?: boolean;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -97,13 +106,17 @@ export class AuthService {
   async setCredentials(
     res: Response,
     user: User,
-    incomingRefreshToken?: string,
-    reCaptchaToken?: string,
-    reCaptchaConfigured?: boolean,
-    mfaCode?: boolean,
-    shouldReCaptchaBlockLogin?: boolean,
-    forPartners?: boolean,
+    options?: SetCredentialsOptions,
   ): Promise<SuccessDTO> {
+    const {
+      incomingRefreshToken,
+      reCaptchaToken,
+      reCaptchaConfigured,
+      mfaCode,
+      shouldReCaptchaBlockLogin,
+      forPartners,
+    } = options ?? {};
+
     if (!user?.id) {
       throw new UnauthorizedException('no user found');
     }
