@@ -55,7 +55,7 @@ module.exports = withBundleAnalyzer(
       cloudinarySignedPreset: process.env.CLOUDINARY_SIGNED_PRESET,
       mapBoxToken: MAPBOX_TOKEN,
       reCaptchaKey: process.env.RECAPTCHA_KEY,
-      showLottery: process.env.SHOW_LOTTERY === "TRUE" ? "TRUE" : "",
+      showLottery: "",
       lotteryDaysTillExpiry: process.env.LOTTERY_DAYS_TILL_EXPIRY,
       applicationExportAsSpreadsheet:
         process.env.APPLICATION_EXPORT_AS_SPREADSHEET === "TRUE" ? "TRUE" : "",
