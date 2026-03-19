@@ -1,0 +1,8 @@
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - INFISICAL_TOKEN=${INFISICAL_TOKEN}
+      - PORT=3100
