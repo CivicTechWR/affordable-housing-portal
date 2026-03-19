@@ -210,8 +210,9 @@ export class EmailService {
   private getSendErrorMessage(error: ErrorResponse | Error | unknown): string {
     // Prefer structured provider metadata when Resend returns an API error object.
     if (this.isResendErrorResponse(error)) {
-      return `${error.name}: ${error.message} (statusCode: ${error.statusCode ?? 'unknown'
-        })`;
+      return `${error.name}: ${error.message} (statusCode: ${
+        error.statusCode ?? 'unknown'
+      })`;
     }
 
     // Fall back to the native error message for thrown runtime errors.
@@ -453,9 +454,9 @@ export class EmailService {
       const unitsAvailable =
         listing.unitGroups?.length > 0
           ? listing.unitGroups.reduce(
-            (acc, curr) => acc + curr.totalAvailable,
-            0,
-          )
+              (acc, curr) => acc + curr.totalAvailable,
+              0,
+            )
           : listing.unitsAvailable;
 
       if (listing.reviewOrderType === ReviewOrderTypeEnum.lottery) {
