@@ -173,7 +173,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
           .split("; ")
           .some((cookie) => cookie.startsWith("access-token-available=True"))
       ) {
-        // Refresh partner sessions with the same portal marker used during initial login.
+        // Include the portal header (if any) so the backend applies the same access rules as login.
         authService
           .requestNewToken(partnerPortalRequestOptions)
           .then(() => {
@@ -197,7 +197,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
             .split("; ")
             .some((cookie) => cookie.startsWith("access-token-available=True"))
         ) {
-          // Load the profile through the portal-aware API path whenever a session cookie exists.
+          // Pass portal options so the backend can enforce access rules when loading the profile.
           profile = await userService?.profile(partnerPortalRequestOptions)
         } else {
           dispatch(saveProfile(null))
@@ -256,7 +256,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
     ) => {
       dispatch(startLoading())
       try {
-        // Send the portal header during login so the backend can reject public users before the session is set.
+        // Pass portal options so the backend can apply portal-specific access rules during login.
         const response = await authService?.login(
           {
             body: { email, password, mfaCode, mfaType, reCaptchaToken },

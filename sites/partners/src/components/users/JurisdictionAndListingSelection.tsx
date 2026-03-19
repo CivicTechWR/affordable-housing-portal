@@ -163,7 +163,7 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   }
 
   if (selectedRoles === RoleOption.User) {
-    // Non-admin public-user flows do not need the jurisdiction or listing assignment UI at all.
+    // Single-jurisdiction contexts (jurisdictional admins, or admins with only one jurisdiction) don't need a picker for User invites.
     return null
   }
 
