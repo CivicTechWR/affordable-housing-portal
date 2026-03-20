@@ -9,13 +9,12 @@ import SectionWithGrid from "../../../shared/SectionWithGrid"
 
 const DetailCommunityType = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
   const includeCommunityDisclaimer = listing.includeCommunityDisclaimer
 
-  const swapCommunityTypeWithPrograms = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.swapCommunityTypeWithPrograms,
-    listing.jurisdictions.id
+  const swapCommunityTypeWithPrograms = isFeatureFlagOn(
+    FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
 
   return !swapCommunityTypeWithPrograms ? (

@@ -9,11 +9,10 @@ import SectionWithGrid from "../../../shared/SectionWithGrid"
 
 const DetailAdditionalEligibility = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const disableBuildingSelectionCriteria = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableBuildingSelectionCriteria,
-    listing.jurisdictions.id
+  const disableBuildingSelectionCriteria = isFeatureFlagOn(
+    FeatureFlagEnum.disableBuildingSelectionCriteria
   )
 
   return (

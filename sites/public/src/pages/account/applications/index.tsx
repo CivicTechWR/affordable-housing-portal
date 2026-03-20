@@ -7,7 +7,7 @@ import {
   Jurisdiction,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { isFeatureFlagOn } from "../../../lib/helpers"
-import { fetchJurisdictionByName } from "../../../lib/hooks"
+import { fetchSiteConfig } from "../../../lib/hooks"
 
 const AllApplications = ({ jurisdiction }: { jurisdiction: Jurisdiction }) => {
   return (
@@ -25,7 +25,7 @@ export default AllApplications
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getStaticProps() {
-  const jurisdiction = await fetchJurisdictionByName()
+  const jurisdiction = await fetchSiteConfig()
 
   return {
     props: { jurisdiction },

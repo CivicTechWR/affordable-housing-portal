@@ -12,7 +12,6 @@ import { Prisma } from '@prisma/client';
 import { JurisdictionUpdate } from '../dtos/jurisdictions/jurisdiction-update.dto';
 
 const view: Prisma.JurisdictionsInclude = {
-  featureFlags: true,
   multiselectQuestions: true,
 };
 /**
@@ -24,13 +23,66 @@ export class JurisdictionService {
   constructor(private prisma: PrismaService) {}
 
   /**
+   * Attaches the global feature flag list to a single site configuration record.
+   *
+   * @param jurisdiction - The raw jurisdiction record to enrich for API consumers.
+   * @returns The jurisdiction record with the current global feature flags attached.
+   * @throws {Prisma.PrismaClientKnownRequestError} If the feature flag query fails.
+   */
+  private async attachFeatureFlags<T extends Record<string, unknown>>(
+    jurisdiction: T,
+  ): Promise<T & { featureFlags: Prisma.FeatureFlagsUncheckedCreateInput[] }> {
+    const featureFlags = await this.prisma.featureFlags.findMany();
+    return {
+      ...jurisdiction,
+      featureFlags,
+    };
+  }
+
+  /**
+   * Attaches the global feature flag list to each site configuration in a result set.
+   *
+   * @param jurisdictions - The raw jurisdiction records to enrich for API consumers.
+   * @returns The jurisdictions with the current global feature flags attached.
+   * @throws {Prisma.PrismaClientKnownRequestError} If the feature flag query fails.
+   */
+  private async attachFeatureFlagsList<T extends Record<string, unknown>>(
+    jurisdictions: T[],
+  ): Promise<Array<T & { featureFlags: Prisma.FeatureFlagsUncheckedCreateInput[] }>> {
+    const featureFlags = await this.prisma.featureFlags.findMany();
+    return jurisdictions.map((jurisdiction) => ({
+      ...jurisdiction,
+      featureFlags,
+    }));
+  }
+
+  /**
+   * Returns the singleton site configuration record.
+   *
+   * @returns The first jurisdiction row, enriched with global feature flags.
+   * @throws {NotFoundException} If no site configuration row exists.
+   */
+  async findSingleton(): Promise<Jurisdiction> {
+    const raw = await this.prisma.jurisdictions.findFirst({
+      include: view,
+    });
+    if (!raw) {
+      throw new NotFoundException('No site configuration found');
+    }
+    return mapTo(Jurisdiction, await this.attachFeatureFlags(raw));
+  }
+
+  /**
     this will get a set of jurisdictions given the params passed in
   */
   async list(): Promise<Jurisdiction[]> {
     const rawJurisdictions = await this.prisma.jurisdictions.findMany({
       include: view,
     });
-    return mapTo(Jurisdiction, rawJurisdictions);
+    return mapTo(
+      Jurisdiction,
+      await this.attachFeatureFlagsList(rawJurisdictions),
+    );
   }
 
   /*
@@ -82,7 +134,7 @@ export class JurisdictionService {
       );
     }
 
-    return mapTo(Jurisdiction, rawJurisdiction);
+    return mapTo(Jurisdiction, await this.attachFeatureFlags(rawJurisdiction));
   }
 
   /*
@@ -98,7 +150,7 @@ export class JurisdictionService {
       include: view,
     });
 
-    return mapTo(Jurisdiction, rawResult);
+    return mapTo(Jurisdiction, await this.attachFeatureFlags(rawResult));
   }
 
   /*
@@ -120,7 +172,7 @@ export class JurisdictionService {
       },
       include: view,
     });
-    return mapTo(Jurisdiction, rawResults);
+    return mapTo(Jurisdiction, await this.attachFeatureFlags(rawResults));
   }
 
   /*

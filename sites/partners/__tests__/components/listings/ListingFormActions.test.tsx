@@ -61,7 +61,7 @@ let partnerUser: User = {
   userRoles: { isPartner: true },
 }
 
-let doJurisdictionsHaveFeatureFlagOn = () => {
+let isFeatureFlagOn = () => {
   return false
 }
 
@@ -82,7 +82,7 @@ const ListingFormActionsComponent = ({
     <AuthContext.Provider
       value={{
         profile: user,
-        doJurisdictionsHaveFeatureFlagOn,
+        isFeatureFlagOn,
       }}
     >
       <ListingContext.Provider
@@ -861,7 +861,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -879,7 +879,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -897,7 +897,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -915,7 +915,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -936,7 +936,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -957,7 +957,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -978,7 +978,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -997,7 +997,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.active }}>
@@ -1015,7 +1015,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.active }}>
@@ -1034,7 +1034,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.closed }}>
@@ -1075,7 +1075,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -1093,7 +1093,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -1110,7 +1110,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -1128,7 +1128,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -1148,7 +1148,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -1169,7 +1169,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -1189,7 +1189,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider
@@ -1208,7 +1208,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.active }}>
@@ -1225,7 +1225,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.active }}>
@@ -1244,7 +1244,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.closed }}>
@@ -1261,7 +1261,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.closed }}>
@@ -1286,7 +1286,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: partnerUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -1475,7 +1475,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -1493,7 +1493,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.active }}>
@@ -1510,7 +1510,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: adminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.closed }}>
@@ -1536,7 +1536,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.pending }}>
@@ -1554,7 +1554,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.active }}>
@@ -1571,7 +1571,7 @@ describe("<ListingFormActions>", () => {
           <AuthContext.Provider
             value={{
               profile: jurisdictionAdminUser,
-              doJurisdictionsHaveFeatureFlagOn,
+              isFeatureFlagOn,
             }}
           >
             <ListingContext.Provider value={{ ...listing, status: ListingsStatusEnum.closed }}>
@@ -1785,7 +1785,7 @@ describe("<ListingFormActions>", () => {
 
   describe("with hideCloseListingButton flag enabled", () => {
     beforeAll(() => {
-      doJurisdictionsHaveFeatureFlagOn = () => true
+      isFeatureFlagOn = () => true
     })
     describe("as admin", () => {
       it("should not render the close button", () => {

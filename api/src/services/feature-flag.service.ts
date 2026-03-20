@@ -5,10 +5,8 @@ import {
   Logger,
   Inject,
 } from '@nestjs/common';
-import { JurisdictionService } from './jurisdiction.service';
 import { PrismaService } from './prisma.service';
 import { FeatureFlag } from '../dtos/feature-flags/feature-flag.dto';
-import { FeatureFlagAssociate } from '../dtos/feature-flags/feature-flag-associate.dto';
 import { FeatureFlagCreate } from '../dtos/feature-flags/feature-flag-create.dto';
 import { FeatureFlagUpdate } from '../dtos/feature-flags/feature-flag-update.dto';
 import { SuccessDTO } from '../dtos/shared/success.dto';
@@ -23,7 +21,6 @@ import { featureFlagMap } from '../enums/feature-flags/feature-flags-enum';
 export class FeatureFlagService {
   constructor(
     private prisma: PrismaService,
-    private jurisdictionService: JurisdictionService,
     @Inject(Logger)
     private readonly logger = new Logger(FeatureFlagService.name),
   ) {}
@@ -32,16 +29,7 @@ export class FeatureFlagService {
         this will get a set of feature flags
       */
   async list(): Promise<FeatureFlag[]> {
-    const rawfeatureFlags = await this.prisma.featureFlags.findMany({
-      include: {
-        jurisdictions: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-    });
+    const rawfeatureFlags = await this.prisma.featureFlags.findMany();
     return mapTo(FeatureFlag, rawfeatureFlags);
   }
 
@@ -54,14 +42,6 @@ export class FeatureFlagService {
     }
 
     const rawFeatureFlag = await this.prisma.featureFlags.findFirst({
-      include: {
-        jurisdictions: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
       where: {
         id: featureFlagId,
       },
@@ -84,14 +64,6 @@ export class FeatureFlagService {
       data: {
         ...dto,
       },
-      include: {
-        jurisdictions: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
     });
 
     return mapTo(FeatureFlag, rawResult);
@@ -108,14 +80,6 @@ export class FeatureFlagService {
       data: {
         ...dto,
         id: undefined,
-      },
-      include: {
-        jurisdictions: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
       where: {
         id: dto.id,
@@ -156,58 +120,6 @@ export class FeatureFlagService {
     }
 
     return true;
-  }
-
-  async associateJurisdictions(
-    dto: FeatureFlagAssociate,
-  ): Promise<FeatureFlag> {
-    await this.findOrThrow(dto.id);
-
-    const idsToAssociateSet = new Set(dto.associate);
-
-    dto.remove.forEach((id) => {
-      if (idsToAssociateSet.has(id)) {
-        // Remove the item from the set
-        idsToAssociateSet.delete(id);
-      }
-    });
-
-    const idsToAssociate = [...idsToAssociateSet];
-
-    for (const id of idsToAssociate) {
-      try {
-        await this.jurisdictionService.findOrThrow(id);
-      } catch (e) {
-        throw new BadRequestException(
-          `jurisdiction id ${id} was requested for association but not found`,
-        );
-      }
-    }
-
-    const rawResults = await this.prisma.featureFlags.update({
-      data: {
-        jurisdictions: {
-          connect: idsToAssociate.map((id) => {
-            return { id: id };
-          }),
-          disconnect: dto.remove.map((id) => {
-            return { id: id };
-          }),
-        },
-      },
-      include: {
-        jurisdictions: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
-      where: {
-        id: dto.id,
-      },
-    });
-    return mapTo(FeatureFlag, rawResults);
   }
 
   /*

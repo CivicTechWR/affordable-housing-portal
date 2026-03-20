@@ -12,25 +12,21 @@ import { AuthContext } from "@bloom-housing/shared-helpers"
 
 const DetailListingIntro = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableHousingDeveloperOwner = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableHousingDeveloperOwner,
-    listing.jurisdictions.id
+  const enableHousingDeveloperOwner = isFeatureFlagOn(
+    FeatureFlagEnum.enableHousingDeveloperOwner
   )
-  const enableListingFileNumber = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableListingFileNumber,
-    listing.jurisdictions.id
+  const enableListingFileNumber = isFeatureFlagOn(
+    FeatureFlagEnum.enableListingFileNumber
   )
 
-  const enableNonRegulatedListings = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings,
-    listing.jurisdictions.id
+  const enableNonRegulatedListings = isFeatureFlagOn(
+    FeatureFlagEnum.enableNonRegulatedListings
   )
 
-  const enableProperties = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableProperties,
-    listing.jurisdictions.id
+  const enableProperties = isFeatureFlagOn(
+    FeatureFlagEnum.enableProperties
   )
 
   let developerFieldTitle = t("listings.developer")

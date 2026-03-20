@@ -13,7 +13,7 @@ describe("<ListingView>", () => {
       const view = render(
         <AuthContext.Provider
           value={{
-            doJurisdictionsHaveFeatureFlagOn: () => true,
+            isFeatureFlagOn: () => true,
           }}
         >
           <ListingView
@@ -34,7 +34,7 @@ describe("<ListingView>", () => {
       const view = render(
         <AuthContext.Provider
           value={{
-            doJurisdictionsHaveFeatureFlagOn: () => true,
+            isFeatureFlagOn: () => true,
           }}
         >
           <ListingView
@@ -54,7 +54,7 @@ describe("<ListingView>", () => {
       const view = render(
         <AuthContext.Provider
           value={{
-            doJurisdictionsHaveFeatureFlagOn: () => true,
+            isFeatureFlagOn: () => true,
           }}
         >
           <ListingView

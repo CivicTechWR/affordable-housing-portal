@@ -88,15 +88,15 @@ const getUnhiddenMultiselectQuestions = (
 }
 
 export const ListingView = (props: ListingProps) => {
-  const { initialStateLoaded, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { initialStateLoaded, profile } = useContext(AuthContext)
   let buildingSelectionCriteria, preferencesSection, programsSection
   const { listing, jurisdiction } = props
 
   const statusContent = getListingApplicationStatus(listing)
 
-  const disableListingPreferences = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences,
-    listing?.jurisdictions?.id
+  const disableListingPreferences = isFeatureFlagOn(
+    props.jurisdiction,
+    FeatureFlagEnum.disableListingPreferences
   )
   const enableLeasingAgentAltText = isFeatureFlagOn(
     props.jurisdiction,

@@ -76,7 +76,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -120,7 +120,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) => {
+          isFeatureFlagOn: (featureFlag) => {
             if (featureFlag === FeatureFlagEnum.enableProperties) return true
             if (featureFlag === FeatureFlagEnum.disableListingPreferences) return true
             return false
@@ -160,7 +160,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -232,7 +232,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -279,7 +279,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -335,7 +335,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -403,7 +403,7 @@ describe("<SettingsProperties>", () => {
               listings: [],
             },
             propertiesService: new PropertiesService(),
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               featureFlag === FeatureFlagEnum.enableProperties,
           }}
         >
@@ -510,7 +510,7 @@ describe("<SettingsProperties>", () => {
             },
             listingsService: new ListingsService(),
             propertiesService: new PropertiesService(),
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               featureFlag === FeatureFlagEnum.enableProperties,
           }}
         >
@@ -583,7 +583,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -617,7 +617,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: () => false,
+          isFeatureFlagOn: () => false,
         }}
       >
         <SettingsProperties />
@@ -652,7 +652,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
@@ -696,7 +696,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >

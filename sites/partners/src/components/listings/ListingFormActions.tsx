@@ -46,7 +46,7 @@ const ListingFormActions = ({
   setErrorAlert,
 }: ListingFormActionsProps) => {
   const listing = useContext(ListingContext)
-  const { profile, listingsService, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { profile, siteConfig, listingsService, isFeatureFlagOn } = useContext(AuthContext)
   const { addToast } = useContext(MessageContext)
   const router = useRouter()
   const isSameEditingUser = profile?.id === listing?.lastUpdatedByUser?.id
@@ -54,11 +54,7 @@ const ListingFormActions = ({
     !!listing?.lastUpdatedByUser?.name && type !== ListingFormActionsType.add
   const showLastEdited = !showLastUpdatedByUser && type !== ListingFormActionsType.add
 
-  // single jurisdiction check covers jurisAdmin adding a listing (listing is undefined then)
-  const jurisdiction =
-    profile?.jurisdictions?.length === 1
-      ? profile?.jurisdictions[0]
-      : profile?.jurisdictions?.find((juris) => juris.id === listing?.jurisdictions?.id)
+  const jurisdiction = siteConfig
 
   const listingApprovalPermissions = jurisdiction?.listingApprovalPermissions
   const isListingApprovalEnabled = listingApprovalPermissions?.length > 0
@@ -80,13 +76,7 @@ const ListingFormActions = ({
 
   const listingId = listing?.id
 
-  const listingJurisdiction = profile?.jurisdictions?.find(
-    (jurisdiction) => jurisdiction.id === listing?.jurisdictions?.id
-  )
-  const hideCloseButton = doJurisdictionsHaveFeatureFlagOn(
-    "hideCloseListingButton",
-    listingJurisdiction?.id
-  )
+  const hideCloseButton = isFeatureFlagOn("hideCloseListingButton")
 
   const recordUpdated = useMemo(() => {
     if (!listing) return null
@@ -247,7 +237,7 @@ const ListingFormActions = ({
         <Button
           variant="primary-outlined"
           className="w-full"
-          href={`${listingJurisdiction?.publicUrl}/preview/listings/${listingId}`}
+          href={`${jurisdiction?.publicUrl}/preview/listings/${listingId}`}
         >
           {t("listings.actions.preview")}
         </Button>
@@ -529,7 +519,7 @@ const ListingFormActions = ({
     isListingCopier,
     listing,
     listingId,
-    listingJurisdiction?.publicUrl,
+    jurisdiction?.publicUrl,
     listingsService,
     profile?.userRoles.isAdmin,
     profile?.userRoles.isPartner,

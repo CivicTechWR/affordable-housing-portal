@@ -17,7 +17,7 @@ import Layout from "../../layouts/application"
 import { UserStatus } from "../../lib/constants"
 import MaxWidthLayout from "../../layouts/max-width"
 import { isFeatureFlagOn, setFeatureFlagLocalStorage } from "../../lib/helpers"
-import { fetchJurisdictionByName } from "../../lib/hooks"
+import { fetchSiteConfig } from "../../lib/hooks"
 
 import styles from "./account.module.scss"
 
@@ -154,7 +154,7 @@ export default Dashboard
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getStaticProps() {
-  const jurisdiction = await fetchJurisdictionByName()
+  const jurisdiction = await fetchSiteConfig()
 
   return {
     props: { jurisdiction },

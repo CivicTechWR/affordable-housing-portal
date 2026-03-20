@@ -8,6 +8,7 @@ import { PrismaService } from '../services/prisma.service';
 import { ListingUpdate } from '../dtos/listings/listing-update.dto';
 import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
 import { ListingsStatusEnum } from '@prisma/client';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 
 /*
   Validates if jurisdiction can handle either unit or unit group and 
@@ -30,14 +31,11 @@ export function ValidateOnlyUnitsOrUnitGroups(
           if (!jurisdictionId) return true;
 
           const prisma = new PrismaService();
-          const jurisdiction = await prisma.jurisdictions.findFirst({
-            where: { id: jurisdictionId },
-            include: { featureFlags: true },
-          });
+          const featureFlags = await prisma.featureFlags.findMany();
 
-          const hasUnitGroupsEnabled = jurisdiction?.featureFlags?.some(
-            (flag) =>
-              flag.name === FeatureFlagEnum.enableUnitGroups && flag.active,
+          const hasUnitGroupsEnabled = isFeatureFlagActive(
+            featureFlags,
+            FeatureFlagEnum.enableUnitGroups,
           );
 
           // Not valid to have units on unit group jurisdiction

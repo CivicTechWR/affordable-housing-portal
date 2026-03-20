@@ -5,5 +5,4 @@ export class FeatureFlagUpdate extends OmitType(FeatureFlag, [
   'createdAt',
   'updatedAt',
   'name',
-  'jurisdictions',
 ]) {}

@@ -42,7 +42,7 @@ type AlertErrorType = "api" | "form"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ApplicationForm = ({ listingId, editMode, application }: ApplicationFormProps) => {
   const { listingDto } = useSingleListingData(listingId)
-  const { doJurisdictionsHaveFeatureFlagOn, applicationsService } = useContext(AuthContext)
+  const { isFeatureFlagOn, applicationsService } = useContext(AuthContext)
 
   const preferences = listingSectionQuestions(
     listingDto,
@@ -54,40 +54,32 @@ const ApplicationForm = ({ listingId, editMode, application }: ApplicationFormPr
     MultiselectQuestionsApplicationSectionEnum.programs
   )
 
-  const enableApplicationStatus =
-    doJurisdictionsHaveFeatureFlagOn(
-      FeatureFlagEnum.enableApplicationStatus,
-      listingDto?.jurisdictions.id
-    ) && !!listingDto?.jurisdictions.id
-
-  const enableUnitGroups = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups,
-    listingDto?.jurisdictions.id
+  const enableApplicationStatus = isFeatureFlagOn(
+    FeatureFlagEnum.enableApplicationStatus
   )
 
-  const enableFullTimeStudentQuestion = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableFullTimeStudentQuestion,
-    listingDto?.jurisdictions.id
+  const enableUnitGroups = isFeatureFlagOn(
+    FeatureFlagEnum.enableUnitGroups
   )
 
-  const enableAdaOtherOption = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableAdaOtherOption,
-    listingDto?.jurisdictions.id
+  const enableFullTimeStudentQuestion = isFeatureFlagOn(
+    FeatureFlagEnum.enableFullTimeStudentQuestion
   )
 
-  const disableWorkInRegion = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableWorkInRegion,
-    listingDto?.jurisdictions.id
+  const enableAdaOtherOption = isFeatureFlagOn(
+    FeatureFlagEnum.enableAdaOtherOption
   )
 
-  const enableLimitedHowDidYouHear = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableLimitedHowDidYouHear,
-    listingDto?.jurisdictions.id
+  const disableWorkInRegion = isFeatureFlagOn(
+    FeatureFlagEnum.disableWorkInRegion
   )
 
-  const swapCommunityTypeWithPrograms = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.swapCommunityTypeWithPrograms,
-    listingDto?.jurisdictions.id
+  const enableLimitedHowDidYouHear = isFeatureFlagOn(
+    FeatureFlagEnum.enableLimitedHowDidYouHear
+  )
+
+  const swapCommunityTypeWithPrograms = isFeatureFlagOn(
+    FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
 
   const units = listingDto?.units

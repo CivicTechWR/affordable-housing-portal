@@ -4,7 +4,7 @@ import { GoogleReCaptcha } from "react-google-recaptcha-v3"
 import { t } from "@bloom-housing/ui-components"
 import { useRouter } from "next/router"
 import FormsLayout from "../layouts/forms"
-import { fetchJurisdictionByName, useRedirectToPrevPage } from "../lib/hooks"
+import { fetchSiteConfig, useRedirectToPrevPage } from "../lib/hooks"
 import {
   PageView,
   pushGtmEvent,
@@ -355,7 +355,7 @@ export { SignIn as default, SignIn }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getStaticProps() {
-  const jurisdiction = await fetchJurisdictionByName()
+  const jurisdiction = await fetchSiteConfig()
 
   return {
     props: { jurisdiction },

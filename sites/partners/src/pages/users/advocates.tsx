@@ -10,10 +10,10 @@ import TabView from "../../layouts/TabView"
 import { getUsersTabs, UsersIndexEnum } from "../../components/users/UsersViewHelpers"
 
 const Advocates = () => {
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
   const router = useRouter()
 
-  const enableHousingAdvocate = doJurisdictionsHaveFeatureFlagOn(
+  const enableHousingAdvocate = isFeatureFlagOn(
     FeatureFlagEnum.enableHousingAdvocate
   )
 

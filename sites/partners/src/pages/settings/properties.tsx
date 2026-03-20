@@ -31,14 +31,12 @@ const SettingsProperties = () => {
   const [editConfirmModalOpen, setEditConfirmModalOpen] = useState<Property | null>(null)
   const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState<Property | null>(null)
   const { addToast } = useContext(MessageContext)
-  const { profile, propertiesService, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
-  const enableProperties = doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableProperties)
-  const atLeastOneJurisdictionEnablesPreferences = !doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences,
-    null,
-    true
+  const { profile, siteConfig, propertiesService, isFeatureFlagOn } = useContext(AuthContext)
+  const enableProperties = isFeatureFlagOn(FeatureFlagEnum.enableProperties)
+  const atLeastOneJurisdictionEnablesPreferences = !isFeatureFlagOn(
+    FeatureFlagEnum.disableListingPreferences
   )
-  const v2Preferences = doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableV2MSQ)
+  const v2Preferences = isFeatureFlagOn(FeatureFlagEnum.enableV2MSQ)
 
   if (profile?.userRoles?.isPartner || profile?.userRoles?.isSupportAdmin || !enableProperties) {
     void router.push("/unauthorized")
@@ -52,7 +50,7 @@ const SettingsProperties = () => {
     page: tableOptions.pagination.currentPage,
     limit: tableOptions.pagination.itemsPerPage,
     search: tableOptions.filter.filterValue,
-    jurisdictions: profile?.jurisdictions?.map((jurisdiction) => jurisdiction.id).toString(),
+    jurisdictions: siteConfig?.id,
   })
 
   const columnDefs: (ColDef | ColGroupDef)[] = useMemo(
@@ -81,15 +79,6 @@ const SettingsProperties = () => {
           )
         },
       },
-      ...(profile.jurisdictions.length > 1
-        ? [
-            {
-              headerName: t("t.jurisdiction"),
-              field: "jurisdictions.name",
-              width: 130,
-            },
-          ]
-        : []),
       {
         headerName: t("t.updatedAt"),
         field: "updatedAt",
@@ -121,7 +110,7 @@ const SettingsProperties = () => {
         },
       },
     ],
-    [profile?.jurisdictions]
+    [siteConfig]
   )
 
   const handleSave = (propertyData: PropertyCreate) => {

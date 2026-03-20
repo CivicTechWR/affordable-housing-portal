@@ -10,7 +10,7 @@ import { ListingBrowse, TabsIndexEnum } from "../components/browse/ListingBrowse
 import { isFeatureFlagOn } from "../lib/helpers"
 import {
   fetchClosedListings,
-  fetchJurisdictionByName,
+  fetchSiteConfig,
   fetchMultiselectProgramData,
 } from "../lib/hooks"
 import { ListingsProps } from "./listings"
@@ -48,7 +48,7 @@ export async function getServerSideProps(context: { req: any; query: any }) {
   } else {
     closedListings = await fetchClosedListings(context.req, Number(context.query.page) || 1)
   }
-  const jurisdiction = await fetchJurisdictionByName(context.req)
+  const jurisdiction = await fetchSiteConfig(context.req)
   const multiselectData = isFeatureFlagOn(
     jurisdiction,
     FeatureFlagEnum.swapCommunityTypeWithPrograms

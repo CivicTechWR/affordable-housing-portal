@@ -22,7 +22,7 @@ type LeasingAgentProps = {
 const LeasingAgent = (props: LeasingAgentProps) => {
   const formMethods = useFormContext()
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, control, errors, clearErrors, watch, getValues } = formMethods
@@ -51,9 +51,8 @@ const LeasingAgent = (props: LeasingAgentProps) => {
     )
   }
 
-  const enableLeasingAgentAltText = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableLeasingAgentAltText,
-    listing?.jurisdictions?.id
+  const enableLeasingAgentAltText = isFeatureFlagOn(
+    FeatureFlagEnum.enableLeasingAgentAltText
   )
 
   const leasingAgentNameText = enableLeasingAgentAltText

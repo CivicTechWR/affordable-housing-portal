@@ -9,26 +9,22 @@ import { getDetailFieldString } from "./helpers"
 
 const DetailBuildingFeatures = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableParkingFee = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableParkingFee,
-    listing?.jurisdictions?.id
+  const enableParkingFee = isFeatureFlagOn(
+    FeatureFlagEnum.enableParkingFee
   )
 
-  const enableParkingType = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableParkingType,
-    listing.jurisdictions.id
+  const enableParkingType = isFeatureFlagOn(
+    FeatureFlagEnum.enableParkingType
   )
 
-  const enableSmokingPolicyRadio = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableSmokingPolicyRadio,
-    listing.jurisdictions.id
+  const enableSmokingPolicyRadio = isFeatureFlagOn(
+    FeatureFlagEnum.enableSmokingPolicyRadio
   )
 
-  const enablePetPolicyCheckbox = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enablePetPolicyCheckbox,
-    listing.jurisdictions.id
+  const enablePetPolicyCheckbox = isFeatureFlagOn(
+    FeatureFlagEnum.enablePetPolicyCheckbox
   )
 
   const getPetPolicy = () => {

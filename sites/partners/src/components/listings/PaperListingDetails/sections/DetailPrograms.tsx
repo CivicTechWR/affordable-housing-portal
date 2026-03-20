@@ -11,11 +11,10 @@ import SectionWithGrid from "../../../shared/SectionWithGrid"
 
 const DetailPrograms = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const swapCommunityTypeWithPrograms = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.swapCommunityTypeWithPrograms,
-    listing.jurisdictions.id
+  const swapCommunityTypeWithPrograms = isFeatureFlagOn(
+    FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
 
   const programsTableHeaders = {

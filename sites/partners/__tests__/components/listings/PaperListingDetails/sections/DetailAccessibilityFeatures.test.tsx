@@ -15,7 +15,7 @@ describe("DetailAccessibilityFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => false,
+          isFeatureFlagOn: () => false,
         }}
       >
         <ListingContext.Provider
@@ -46,7 +46,7 @@ describe("DetailAccessibilityFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableAccessibilityFeatures,
         }}
       >
@@ -84,7 +84,7 @@ describe("DetailAccessibilityFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableAccessibilityFeatures,
         }}
       >
@@ -179,7 +179,7 @@ describe("DetailAccessibilityFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableAccessibilityFeatures,
         }}
       >

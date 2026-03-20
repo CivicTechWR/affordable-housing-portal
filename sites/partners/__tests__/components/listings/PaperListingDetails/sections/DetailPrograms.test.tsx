@@ -31,7 +31,7 @@ describe("DetailPrograms", () => {
       const results = render(
         <AuthContext.Provider
           value={{
-            doJurisdictionsHaveFeatureFlagOn: () => {
+            isFeatureFlagOn: () => {
               return false
             },
           }}
@@ -73,7 +73,7 @@ describe("DetailPrograms", () => {
       const results = render(
         <AuthContext.Provider
           value={{
-            doJurisdictionsHaveFeatureFlagOn: () => {
+            isFeatureFlagOn: () => {
               return true
             },
           }}

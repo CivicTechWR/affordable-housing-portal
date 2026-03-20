@@ -30,7 +30,7 @@ const RequireLogin: FunctionComponent<RequireLoginProps> = ({
   ...rest
 }) => {
   const { router } = useContext(NavigationContext)
-  const { profile, initialStateLoaded } = useContext(AuthContext)
+  const { profile, initialStateLoaded, siteConfig } = useContext(AuthContext)
   const toastyRef = useToastyRef()
   const [hasTerms, setHasTerms] = useState(false)
 
@@ -50,10 +50,10 @@ const RequireLogin: FunctionComponent<RequireLoginProps> = ({
       : true)
 
   useEffect(() => {
-    if (profile?.jurisdictions?.some((jurisdiction) => jurisdiction.partnerTerms)) {
+    if (siteConfig?.partnerTerms) {
       setHasTerms(true)
     }
-  }, [profile])
+  }, [siteConfig])
 
   useEffect(() => {
     const { addToast } = toastyRef.current

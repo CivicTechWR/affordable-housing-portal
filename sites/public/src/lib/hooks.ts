@@ -136,6 +136,15 @@ export const useProfileFavoriteListings = () => {
   return [listings.items, loading] as [Listing[], boolean]
 }
 
+/**
+ * Fetches listings for the public site using the singleton site configuration as the
+ * source of the active jurisdiction id and site-level feature flags.
+ *
+ * @param options - Listing pagination, sorting, and extra filters to apply.
+ * @param req - The incoming server request, when available, for forwarding client IP data.
+ * @returns A base listing payload containing items and optional pagination metadata.
+ * Request failures are logged and result in an empty payload shape.
+ */
 export async function fetchBaseListingData(
   {
     page,
@@ -156,7 +165,10 @@ export async function fetchBaseListingData(
   let listings
   let pagination
   try {
-    const { id: jurisdictionId, featureFlags } = await fetchJurisdictionByName(req)
+    // The public site still scopes listings to the singleton site configuration record.
+    const currentSiteConfig = await fetchSiteConfig(req)
+    const jurisdictionId = currentSiteConfig?.id
+    const featureFlags = currentSiteConfig?.featureFlags ?? []
 
     if (!jurisdictionId) {
       return listings
@@ -184,6 +196,7 @@ export async function fetchBaseListingData(
       filter,
     }
 
+    // Pagination remains feature-flagged, so read it from site config rather than a user object.
     const enablePagination =
       featureFlags.find((flag) => flag.name === FeatureFlagEnum.enableListingPagination)?.active ||
       false
@@ -288,16 +301,21 @@ export async function fetchLimitedUnderConstructionListings(req?: any, limit?: n
   )
 }
 
-let jurisdiction: Jurisdiction | null = null
+let siteConfig: Jurisdiction | null = null
 
+/**
+ * Loads the singleton site configuration used by the public site.
+ *
+ * @param req - The incoming server request, when available, for forwarding client IP data.
+ * @returns The cached singleton site configuration or `null` if it cannot be loaded.
+ * Request failures are logged and return `null`.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function fetchJurisdictionByName(req?: any) {
+export async function fetchSiteConfig(req?: any) {
   try {
-    if (jurisdiction) {
-      return jurisdiction
+    if (siteConfig) {
+      return siteConfig
     }
-
-    const jurisdictionName = process.env.jurisdictionName
 
     const headers = {
       passkey: process.env.API_PASS_KEY,
@@ -305,18 +323,17 @@ export async function fetchJurisdictionByName(req?: any) {
     if (req) {
       headers["x-forwarded-for"] = req.headers["x-forwarded-for"] ?? req.socket.remoteAddress
     }
-    const jurisdictionRes = await axios.get(
-      `${process.env.backendApiBase}/jurisdictions/byName/${jurisdictionName}`,
-      {
-        headers,
-      }
-    )
-    jurisdiction = jurisdictionRes?.data
+
+    // The API still exposes jurisdictions, but the public site only consumes the singleton row.
+    const jurisdictionsRes = await axios.get(`${process.env.backendApiBase}/jurisdictions`, {
+      headers,
+    })
+    siteConfig = jurisdictionsRes?.data?.[0] ?? null
   } catch (error) {
     console.log("error = ", error)
   }
 
-  return jurisdiction
+  return siteConfig
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

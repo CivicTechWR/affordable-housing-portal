@@ -12,7 +12,6 @@ export const jurisdictionFactory = (
   optionalFields?: {
     listingApprovalPermissions?: UserRoleEnum[];
     duplicateListingPermissions?: UserRoleEnum[];
-    featureFlags?: string[];
     requiredListingFields?: string[];
     languages?: LanguagesEnum[];
     visibleNeighborhoodAmenities?: NeighborhoodAmenitiesEnum[];
@@ -48,13 +47,6 @@ export const jurisdictionFactory = (
     UserRoleEnum.limitedJurisdictionAdmin,
     UserRoleEnum.supportAdmin,
   ],
-  featureFlags: optionalFields?.featureFlags
-    ? {
-        connect: optionalFields.featureFlags.map((flag) => {
-          return { name: flag };
-        }),
-      }
-    : undefined,
   requiredListingFields: optionalFields?.requiredListingFields || [],
   visibleNeighborhoodAmenities: optionalFields?.visibleNeighborhoodAmenities,
   regions: optionalFields?.regions,

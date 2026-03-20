@@ -14,7 +14,7 @@ import { Toast } from "@bloom-housing/ui-seeds"
 import { FeatureFlagEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 
 const Layout = (props) => {
-  const { profile, signOut, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { profile, siteConfig, signOut, isFeatureFlagOn } = useContext(AuthContext)
   const { toastMessagesRef, addToast } = useContext(MessageContext)
   const router = useRouter()
   const currentYear = new Date().getFullYear()
@@ -31,15 +31,13 @@ const Layout = (props) => {
       href: "/users",
     })
   }
-  const enableProperties = doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableProperties)
-  const atLeastOneJurisdictionEnablesPreferences = !doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences,
-    null,
-    true
+  const enableProperties = isFeatureFlagOn(FeatureFlagEnum.enableProperties)
+  const atLeastOneJurisdictionEnablesPreferences = !isFeatureFlagOn(
+    FeatureFlagEnum.disableListingPreferences
   )
 
   if (
-    profile?.jurisdictions?.some((jurisdiction) => !!jurisdiction.enablePartnerSettings) &&
+    siteConfig?.enablePartnerSettings &&
     (profile?.userRoles?.isAdmin ||
       profile?.userRoles?.isJurisdictionalAdmin ||
       profile?.userRoles?.isLimitedJurisdictionalAdmin) &&

@@ -49,14 +49,10 @@ const Lottery = (props: { listing: Listing | undefined }) => {
   const [newApplicationsModal, setNewApplicationsModal] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const { lotteryService, profile } = useContext(AuthContext)
-
-  const listingJurisdiction = profile?.jurisdictions?.find(
-    (jurisdiction) => jurisdiction.id === listing?.jurisdictions.id
-  )
+  const { lotteryService, profile, siteConfig } = useContext(AuthContext)
 
   const includeDemographicsPartner =
-    profile?.userRoles?.isPartner && listingJurisdiction?.enablePartnerDemographics
+    profile?.userRoles?.isPartner && siteConfig?.enablePartnerDemographics
 
   const { onExport, exportLoading } = useZipExport(
     listing?.id,

@@ -248,7 +248,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [jurisdiction], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 featureFlag === FeatureFlagEnum.enableNonRegulatedListings,
             }}
           >
@@ -276,7 +276,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [jurisdiction], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 featureFlag === FeatureFlagEnum.enableNonRegulatedListings,
             }}
           >
@@ -530,7 +530,7 @@ describe("listing data", () => {
         <AuthContext.Provider
           value={{
             profile: { ...user, jurisdictions: [], listings: [] },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
@@ -831,7 +831,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, listings: [], jurisdictions: [jurisdiction] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 featureFlag === FeatureFlagEnum.enableNonRegulatedListings,
             }}
           >
@@ -907,7 +907,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, listings: [], jurisdictions: [jurisdiction] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 featureFlag === FeatureFlagEnum.enableNonRegulatedListings,
             }}
           >
@@ -1303,7 +1303,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 featureFlag === FeatureFlagEnum.enableMarketingFlyer,
             }}
           >
@@ -1342,7 +1342,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 featureFlag === FeatureFlagEnum.enableMarketingFlyer,
             }}
           >
@@ -1420,7 +1420,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 mockJurisdictionsHaveFeatureFlagOn(featureFlag, {
                   enableHomeType: true,
                   enableSection8Question: true,
@@ -1452,7 +1452,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [], listings: [] },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
@@ -1528,7 +1528,7 @@ describe("listing data", () => {
                 listings: [],
                 jurisdictions: [jurisdiction],
               },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
@@ -1570,7 +1570,7 @@ describe("listing data", () => {
               listings: [],
               jurisdictions: [jurisdiction],
             },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
@@ -1606,7 +1606,7 @@ describe("listing data", () => {
                 listings: [],
                 jurisdictions: [jurisdiction],
               },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
@@ -1665,7 +1665,7 @@ describe("listing data", () => {
                 listings: [],
                 jurisdictions: [jurisdiction],
               },
-              doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+              isFeatureFlagOn: (featureFlag) =>
                 mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
@@ -1716,7 +1716,7 @@ describe("listing data", () => {
               listings: [],
               jurisdictions: [{ ...jurisdiction, id: "id" }],
             },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
@@ -1752,7 +1752,7 @@ describe("listing data", () => {
             listings: [],
             jurisdictions: [jurisdiction],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -1856,7 +1856,7 @@ describe("listing data", () => {
             listings: [],
             jurisdictions: [jurisdiction],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -1886,7 +1886,7 @@ describe("listing data", () => {
             listings: [],
             jurisdictions: [jurisdiction],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >

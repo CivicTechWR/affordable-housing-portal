@@ -13,13 +13,12 @@ import { useJurisdiction } from "../../../../lib/hooks"
 
 const DetailNeighborhoodAmenities = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
   const { data: jurisdictionData } = useJurisdiction(listing.jurisdictions.id)
 
-  const enableNeighborhoodAmenities = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableNeighborhoodAmenities,
-    listing.jurisdictions.id
+  const enableNeighborhoodAmenities = isFeatureFlagOn(
+    FeatureFlagEnum.enableNeighborhoodAmenities
   )
 
   const visibleAmenities = useMemo(() => {

@@ -138,7 +138,7 @@ const ListingForm = ({
 
   const marketingTypeChoice = watch("marketingType")
 
-  const { listingsService, profile, doJurisdictionsHaveFeatureFlagOn, loadProfile } =
+  const { listingsService, profile, siteConfig, isFeatureFlagOn, loadProfile } =
     useContext(AuthContext)
 
   const { addToast } = useContext(MessageContext)
@@ -213,8 +213,8 @@ const ListingForm = ({
 
   useEffect(() => {
     if (profile) {
-      const jurisdiction = profile?.jurisdictions?.find((juris) => jurisdictionId === juris.id)
-      if (!jurisdiction) void router.replace("/")
+      const jurisdiction = siteConfig
+      if (!jurisdiction || jurisdiction.id !== jurisdictionId) void router.replace("/")
       setSelectedJurisdictionData(jurisdiction)
     }
   }, [profile, jurisdictionId, router])
@@ -258,30 +258,24 @@ const ListingForm = ({
     whatToExpectAdditionalDetailsEditor,
   ])
 
-  const enableUnitGroups = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups,
-    jurisdictionId
+  const enableUnitGroups = isFeatureFlagOn(
+    FeatureFlagEnum.enableUnitGroups
   )
 
-  const disableListingPreferences = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences,
-    jurisdictionId
+  const disableListingPreferences = isFeatureFlagOn(
+    FeatureFlagEnum.disableListingPreferences
   )
 
-  const swapCommunityTypeWithPrograms = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.swapCommunityTypeWithPrograms,
-    jurisdictionId,
-    !jurisdictionId
+  const swapCommunityTypeWithPrograms = isFeatureFlagOn(
+    FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
 
-  const enableNonRegulatedListings = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings,
-    jurisdictionId
+  const enableNonRegulatedListings = isFeatureFlagOn(
+    FeatureFlagEnum.enableNonRegulatedListings
   )
 
-  const enableListingImageAltText = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableListingImageAltText,
-    jurisdictionId
+  const enableListingImageAltText = isFeatureFlagOn(
+    FeatureFlagEnum.enableListingImageAltText
   )
 
   useEffect(() => {
@@ -395,9 +389,8 @@ const ListingForm = ({
           )
 
           if (
-            !doJurisdictionsHaveFeatureFlagOn(
-              FeatureFlagEnum.enableSection8Question,
-              jurisdictionId
+            !isFeatureFlagOn(
+              FeatureFlagEnum.enableSection8Question
             )
           ) {
             formData.listingSection8Acceptance = YesNoEnum.no
@@ -425,6 +418,7 @@ const ListingForm = ({
               unitGroups: enableUnitGroups ? unitGroups : [], // Clear existing unit groups if the unit groups flag has been disabled
               openHouseEvents,
               profile: profile,
+              siteConfig: siteConfig,
               latLong,
               customMapPositionChosen,
               enableUnitGroups,
@@ -569,37 +563,22 @@ const ListingForm = ({
                           </p>
                           <ListingData
                             createdAt={listing?.createdAt}
-                            jurisdictionName={
-                              profile?.jurisdictions?.length > 1
-                                ? selectedJurisdictionData?.name
-                                : null
-                            }
+                            jurisdictionName={null}
                             listingId={listing?.id}
                           />
                           <ListingIntro
                             enableNonRegulatedListings={enableNonRegulatedListings}
-                            enableHousingDeveloperOwner={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableHousingDeveloperOwner,
-                              jurisdictionId
+                            enableHousingDeveloperOwner={isFeatureFlagOn(
+                              FeatureFlagEnum.enableHousingDeveloperOwner
                             )}
-                            enableListingFileNumber={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableListingFileNumber,
-                              jurisdictionId
+                            enableListingFileNumber={isFeatureFlagOn(
+                              FeatureFlagEnum.enableListingFileNumber
                             )}
-                            enableProperties={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableProperties,
-                              jurisdictionId
+                            enableProperties={isFeatureFlagOn(
+                              FeatureFlagEnum.enableProperties
                             )}
-                            jurisdictionName={
-                              profile?.jurisdictions?.length > 1
-                                ? selectedJurisdictionData?.name
-                                : null
-                            }
-                            jurisdictionId={
-                              profile?.jurisdictions?.length > 1
-                                ? selectedJurisdictionData?.id
-                                : null
-                            }
+                            jurisdictionName={null}
+                            jurisdictionId={null}
                             listingId={listing?.id}
                             listingType={
                               listing?.listingType ||
@@ -618,9 +597,8 @@ const ListingForm = ({
                           <BuildingDetails
                             customMapPositionChosen={customMapPositionChosen}
                             requiredFields={requiredFields}
-                            enableConfigurableRegions={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableConfigurableRegions,
-                              jurisdictionId
+                            enableConfigurableRegions={isFeatureFlagOn(
+                              FeatureFlagEnum.enableConfigurableRegions
                             )}
                             enableNonRegulatedListings={enableNonRegulatedListings}
                             regions={selectedJurisdictionData?.regions}
@@ -655,18 +633,16 @@ const ListingForm = ({
                           />
                           <AdditionalFees
                             enableNonRegulatedListings={enableNonRegulatedListings}
-                            enableUtilitiesIncluded={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableUtilitiesIncluded,
-                              jurisdictionId
+                            enableUtilitiesIncluded={isFeatureFlagOn(
+                              FeatureFlagEnum.enableUtilitiesIncluded
                             )}
                             existingUtilities={listing?.listingUtilities}
                             requiredFields={requiredFields}
                           />
                           <AccessibilityFeatures
                             existingFeatures={accessibilityFeatures}
-                            enableAccessibilityFeatures={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableAccessibilityFeatures,
-                              jurisdictionId
+                            enableAccessibilityFeatures={isFeatureFlagOn(
+                              FeatureFlagEnum.enableAccessibilityFeatures
                             )}
                             setAccessibilityFeatures={setAccessibilityFeatures}
                             listingFeaturesConfiguration={
@@ -674,33 +650,27 @@ const ListingForm = ({
                             }
                           />
                           <BuildingFeatures
-                            enableSmokingPolicyRadio={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableSmokingPolicyRadio,
-                              jurisdictionId
+                            enableSmokingPolicyRadio={isFeatureFlagOn(
+                              FeatureFlagEnum.enableSmokingPolicyRadio
                             )}
-                            enableParkingFee={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableParkingFee,
-                              jurisdictionId
+                            enableParkingFee={isFeatureFlagOn(
+                              FeatureFlagEnum.enableParkingFee
                             )}
-                            enablePetPolicyCheckbox={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enablePetPolicyCheckbox,
-                              jurisdictionId
+                            enablePetPolicyCheckbox={isFeatureFlagOn(
+                              FeatureFlagEnum.enablePetPolicyCheckbox
                             )}
-                            enableParkingType={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableParkingType,
-                              jurisdictionId
+                            enableParkingType={isFeatureFlagOn(
+                              FeatureFlagEnum.enableParkingType
                             )}
                             existingParkingTypes={listing?.parkType}
                             requiredFields={requiredFields}
                           />
                           <NeighborhoodAmenities
-                            enableNeighborhoodAmenities={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableNeighborhoodAmenities,
-                              jurisdictionId
+                            enableNeighborhoodAmenities={isFeatureFlagOn(
+                              FeatureFlagEnum.enableNeighborhoodAmenities
                             )}
-                            enableNeighborhoodAmenitiesDropdown={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableNeighborhoodAmenitiesDropdown,
-                              jurisdictionId
+                            enableNeighborhoodAmenitiesDropdown={isFeatureFlagOn(
+                              FeatureFlagEnum.enableNeighborhoodAmenitiesDropdown
                             )}
                             visibleNeighborhoodAmenities={
                               selectedJurisdictionData?.visibleNeighborhoodAmenities
@@ -711,9 +681,8 @@ const ListingForm = ({
                             listing={listing}
                             requiredFields={requiredFields}
                           />
-                          {!doJurisdictionsHaveFeatureFlagOn(
-                            FeatureFlagEnum.disableBuildingSelectionCriteria,
-                            jurisdictionId
+                          {!isFeatureFlagOn(
+                            FeatureFlagEnum.disableBuildingSelectionCriteria
                           ) && <BuildingSelectionCriteria />}
                           <AdditionalDetails
                             enableNonRegulatedListings={enableNonRegulatedListings}
@@ -721,9 +690,8 @@ const ListingForm = ({
                             requiredFields={requiredFields}
                           />
                           <ListingVerification
-                            enableIsVerified={doJurisdictionsHaveFeatureFlagOn(
-                              "enableIsVerified",
-                              jurisdictionId
+                            enableIsVerified={isFeatureFlagOn(
+                              "enableIsVerified"
                             )}
                           />
                           <div className="text-right -mr-8 -mt-8 relative" style={{ top: "7rem" }}>
@@ -751,17 +719,14 @@ const ListingForm = ({
                           </p>
                           <RankingsAndResults
                             enableUnitGroups={enableUnitGroups}
-                            enableWaitlistAdditionalFields={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableWaitlistAdditionalFields,
-                              jurisdictionId
+                            enableWaitlistAdditionalFields={isFeatureFlagOn(
+                              FeatureFlagEnum.enableWaitlistAdditionalFields
                             )}
-                            enableWaitlistLottery={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableWaitlistLottery,
-                              jurisdictionId
+                            enableWaitlistLottery={isFeatureFlagOn(
+                              FeatureFlagEnum.enableWaitlistLottery
                             )}
-                            enableWhatToExpectAdditionalField={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableWhatToExpectAdditionalField,
-                              jurisdictionId
+                            enableWhatToExpectAdditionalField={isFeatureFlagOn(
+                              FeatureFlagEnum.enableWhatToExpectAdditionalField
                             )}
                             isAdmin={profile?.userRoles.isAdmin}
                             requiredFields={requiredFields}
@@ -770,25 +735,21 @@ const ListingForm = ({
                             listing={listing}
                           />
                           <LeasingAgent
-                            enableCompanyWebsite={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableCompanyWebsite,
-                              jurisdictionId
+                            enableCompanyWebsite={isFeatureFlagOn(
+                              FeatureFlagEnum.enableCompanyWebsite
                             )}
                             requiredFields={requiredFields}
                           />
                           <ApplicationAddress requiredFields={requiredFields} listing={listing} />
                           <ApplicationDates
-                            enableMarketingFlyer={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableMarketingFlyer,
-                              jurisdictionId
+                            enableMarketingFlyer={isFeatureFlagOn(
+                              FeatureFlagEnum.enableMarketingFlyer
                             )}
-                            enableMarketingStatus={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableMarketingStatus,
-                              jurisdictionId
+                            enableMarketingStatus={isFeatureFlagOn(
+                              FeatureFlagEnum.enableMarketingStatus
                             )}
-                            enableMarketingStatusMonths={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableMarketingStatusMonths,
-                              jurisdictionId
+                            enableMarketingStatusMonths={isFeatureFlagOn(
+                              FeatureFlagEnum.enableMarketingStatusMonths
                             )}
                             listing={listing}
                             openHouseEvents={openHouseEvents}

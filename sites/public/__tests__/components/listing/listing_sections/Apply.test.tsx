@@ -25,7 +25,7 @@ describe("<Apply>", () => {
     dob: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    jurisdictions: [],
+    featureFlags: [],
     mfaEnabled: false,
     passwordUpdatedAt: new Date(),
     passwordValidForDays: 180,

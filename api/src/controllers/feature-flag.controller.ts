@@ -19,7 +19,6 @@ import {
 } from '@nestjs/swagger';
 import { FeatureFlagService } from '../services/feature-flag.service';
 import { FeatureFlag } from '../dtos/feature-flags/feature-flag.dto';
-import { FeatureFlagAssociate } from '../dtos/feature-flags/feature-flag-associate.dto';
 import { FeatureFlagCreate } from '../dtos/feature-flags/feature-flag-create.dto';
 import { FeatureFlagUpdate } from '../dtos/feature-flags/feature-flag-update.dto';
 import { defaultValidationPipeOptions } from '../utilities/default-validation-pipe-options';
@@ -33,12 +32,7 @@ import { ApiKeyGuard } from '../guards/api-key.guard';
 @Controller('featureFlags')
 @ApiTags('featureFlags')
 @UsePipes(new ValidationPipe(defaultValidationPipeOptions))
-@ApiExtraModels(
-  FeatureFlagAssociate,
-  FeatureFlagCreate,
-  FeatureFlagUpdate,
-  IdDTO,
-)
+@ApiExtraModels(FeatureFlagCreate, FeatureFlagUpdate, IdDTO)
 @PermissionTypeDecorator('featureFlags')
 @UseGuards(ApiKeyGuard, OptionalAuthGuard, PermissionGuard)
 export class FeatureFlagController {
@@ -79,20 +73,6 @@ export class FeatureFlagController {
   @ApiOkResponse({ type: SuccessDTO })
   async delete(@Body() dto: IdDTO): Promise<SuccessDTO> {
     return await this.featureFlagService.delete(dto.id);
-  }
-
-  @Put(`associateJurisdictions`)
-  @ApiOperation({
-    summary: 'Associate and disassociate jurisdictions with a feature flag',
-    operationId: 'associateJurisdictions',
-  })
-  @ApiOkResponse({ type: FeatureFlag })
-  async associateJurisdictions(
-    @Body() featureFlagAssociate: FeatureFlagAssociate,
-  ): Promise<FeatureFlag> {
-    return await this.featureFlagService.associateJurisdictions(
-      featureFlagAssociate,
-    );
   }
 
   @Post(`/addAllNew`)

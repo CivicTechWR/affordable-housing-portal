@@ -17,7 +17,6 @@ import {
   ListingEventsTypeEnum,
   ListingTypeEnum,
   MarketingTypeEnum,
-  NeighborhoodAmenitiesEnum,
 } from '@prisma/client';
 import { includeViews } from './listing.service';
 import { PrismaService } from './prisma.service';
@@ -47,11 +46,7 @@ import {
   getRentTypes,
 } from '../utilities/unit-utilities';
 import { unitTypeToReadable } from '../utilities/application-export-helpers';
-import {
-  doAllJurisdictionHaveFeatureFlagSet,
-  doAnyJurisdictionHaveFalsyFeatureFlagValue,
-  doAnyJurisdictionHaveFeatureFlagSet,
-} from '../utilities/feature-flag-utilities';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 import { UnitGroupSummary } from '../dtos/unit-groups/unit-group-summary.dto';
 import { addUnitGroupsSummarized } from '../utilities/unit-groups-transformations';
 import { ListingDocuments } from '../dtos/listings/listing-documents.dto';
@@ -150,33 +145,16 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       this.timeZone = queryParams.timeZone;
     }
 
-    const whereClause = {
-      jurisdictions: {
-        OR: [],
-      },
-    };
-
-    user.jurisdictions?.forEach((jurisdiction) => {
-      whereClause.jurisdictions.OR.push({
-        id: jurisdiction.id,
-      });
-    });
-
-    const enableUnitGroups = doAnyJurisdictionHaveFeatureFlagSet(
-      user.jurisdictions,
+    const enableUnitGroups = isFeatureFlagActive(
+      user.featureFlags,
       FeatureFlagEnum.enableUnitGroups,
     );
 
-    const hasUnits =
-      !enableUnitGroups ||
-      doAnyJurisdictionHaveFalsyFeatureFlagValue(
-        user.jurisdictions,
-        FeatureFlagEnum.enableUnitGroups,
-      );
+    const hasUnits = !enableUnitGroups;
 
     const listings = await this.prisma.listings.findMany({
       include: includeViews.csv,
-      where: whereClause,
+      where: {},
     });
 
     // Add unit groups summarized to listings
@@ -449,8 +427,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
   }
 
   async getCsvHeaders(user: User): Promise<CsvHeader[]> {
-    const enableNonRegulatedListings = doAnyJurisdictionHaveFeatureFlagSet(
-      user.jurisdictions,
+    const enableNonRegulatedListings = isFeatureFlagActive(
+      user.featureFlags,
       FeatureFlagEnum.enableNonRegulatedListings,
     );
 
@@ -519,8 +497,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       },
       {
         path: 'developer',
-        label: doAnyJurisdictionHaveFeatureFlagSet(
-          user.jurisdictions,
+        label: isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.enableHousingDeveloperOwner,
         )
           ? 'Housing developer / owner'
@@ -535,8 +513,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
             },
           ]
         : []),
-      ...(doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      ...(isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableListingFileNumber,
       )
         ? [
@@ -562,8 +540,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         path: 'listingsBuildingAddress.zipCode',
         label: 'Building Zip',
       },
-      ...(doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      ...(isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableConfigurableRegions,
       )
         ? [
@@ -577,8 +555,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         path: 'yearBuilt',
         label: 'Building Year Built',
       },
-      ...(doAnyJurisdictionHaveFalsyFeatureFlagValue(
-        user.jurisdictions,
+      ...(!isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.swapCommunityTypeWithPrograms,
       )
         ? [
@@ -615,8 +593,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     ];
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableHomeType,
       )
     ) {
@@ -627,8 +605,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableUnitGroups,
       )
     ) {
@@ -638,8 +616,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       });
     }
     if (
-      doAnyJurisdictionHaveFalsyFeatureFlagValue(
-        user.jurisdictions,
+      !isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableUnitGroups,
       )
     ) {
@@ -650,8 +628,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableSection8Question,
       )
     ) {
@@ -662,8 +640,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       });
     }
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableUtilitiesIncluded,
       )
     ) {
@@ -674,8 +652,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       });
     }
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableAccessibilityFeatures,
       )
     ) {
@@ -775,8 +753,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
               .join(',');
           },
         },
-        ...(doAnyJurisdictionHaveFalsyFeatureFlagValue(
-          user.jurisdictions,
+        ...(!isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.swapCommunityTypeWithPrograms,
         )
           ? [
@@ -835,8 +813,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
           path: 'unitAmenities',
           label: 'Unit Amenities',
         },
-        ...(doAllJurisdictionHaveFeatureFlagSet(
-          user.jurisdictions,
+        ...(isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.enablePetPolicyCheckbox,
         )
           ? [
@@ -866,8 +844,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
           label: 'Smoking Policy',
           format: (val: string): string => {
             const enableSmokingPolicyRadio =
-              doAllJurisdictionHaveFeatureFlagSet(
-                user.jurisdictions,
+              isFeatureFlagActive(
+                user.featureFlags,
                 FeatureFlagEnum.enableSmokingPolicyRadio,
               );
             if (!val) return enableSmokingPolicyRadio ? 'Policy unknown' : '';
@@ -878,78 +856,66 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     );
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableNeighborhoodAmenities,
       )
     ) {
-      const visibleAmenities = new Set<string>(
-        (user.jurisdictions || [])
-          .flatMap((j) => j.visibleNeighborhoodAmenities || [])
-          .filter(Boolean),
-      );
-
-      const amenityHeaderMap: Record<string, CsvHeader> = {
-        [NeighborhoodAmenitiesEnum.groceryStores]: {
+      headers.push(
+        {
           path: 'listingNeighborhoodAmenities.groceryStores',
           label: 'Neighborhood Amenities - Grocery Stores',
         },
-        [NeighborhoodAmenitiesEnum.publicTransportation]: {
+        {
           path: 'listingNeighborhoodAmenities.publicTransportation',
           label: 'Neighborhood Amenities - Public Transportation',
         },
-        [NeighborhoodAmenitiesEnum.schools]: {
+        {
           path: 'listingNeighborhoodAmenities.schools',
           label: 'Neighborhood Amenities - Schools',
         },
-        [NeighborhoodAmenitiesEnum.parksAndCommunityCenters]: {
+        {
           path: 'listingNeighborhoodAmenities.parksAndCommunityCenters',
           label: 'Neighborhood Amenities - Parks and Community Centers',
         },
-        [NeighborhoodAmenitiesEnum.pharmacies]: {
+        {
           path: 'listingNeighborhoodAmenities.pharmacies',
           label: 'Neighborhood Amenities - Pharmacies',
         },
-        [NeighborhoodAmenitiesEnum.healthCareResources]: {
+        {
           path: 'listingNeighborhoodAmenities.healthCareResources',
           label: 'Neighborhood Amenities - Health Care Resources',
         },
-        [NeighborhoodAmenitiesEnum.shoppingVenues]: {
+        {
           path: 'listingNeighborhoodAmenities.shoppingVenues',
           label: 'Neighborhood Amenities - Shopping Venues',
         },
-        [NeighborhoodAmenitiesEnum.hospitals]: {
+        {
           path: 'listingNeighborhoodAmenities.hospitals',
           label: 'Neighborhood Amenities - Hospitals',
         },
-        [NeighborhoodAmenitiesEnum.seniorCenters]: {
+        {
           path: 'listingNeighborhoodAmenities.seniorCenters',
           label: 'Neighborhood Amenities - Senior Centers',
         },
-        [NeighborhoodAmenitiesEnum.recreationalFacilities]: {
+        {
           path: 'listingNeighborhoodAmenities.recreationalFacilities',
           label: 'Neighborhood Amenities - Recreational Facilities',
         },
-        [NeighborhoodAmenitiesEnum.playgrounds]: {
+        {
           path: 'listingNeighborhoodAmenities.playgrounds',
           label: 'Neighborhood Amenities - Playgrounds',
         },
-        [NeighborhoodAmenitiesEnum.busStops]: {
+        {
           path: 'listingNeighborhoodAmenities.busStops',
           label: 'Neighborhood Amenities - Bus Stops',
         },
-      };
-
-      Object.keys(amenityHeaderMap).forEach((key) => {
-        if (visibleAmenities.has(key)) {
-          headers.push(amenityHeaderMap[key]);
-        }
-      });
+      );
     }
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableParkingFee,
       )
     ) {
@@ -960,8 +926,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableParkingType,
       )
     ) {
@@ -994,8 +960,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
           path: 'rentalAssistance',
           label: 'Eligibility Rules - Rental Assistance',
         },
-        ...(doAnyJurisdictionHaveFalsyFeatureFlagValue(
-          user.jurisdictions,
+        ...(!isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.disableBuildingSelectionCriteria,
         )
           ? [
@@ -1010,8 +976,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
           path: 'programRules',
           label: 'Important Program Rules',
         },
-        ...(doAnyJurisdictionHaveFeatureFlagSet(
-          user.jurisdictions,
+        ...(isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.enableNonRegulatedListings,
         )
           ? [
@@ -1038,8 +1004,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       ],
     );
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableWaitlistAdditionalFields,
       )
     ) {
@@ -1058,8 +1024,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableMarketingStatus,
       )
     ) {
@@ -1075,8 +1041,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       });
 
       if (
-        doAnyJurisdictionHaveFeatureFlagSet(
-          user.jurisdictions,
+        isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.enableMarketingStatusMonths,
         )
       )
@@ -1090,8 +1056,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         });
 
       if (
-        doAnyJurisdictionHaveFalsyFeatureFlagValue(
-          user.jurisdictions,
+        !isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.enableMarketingStatusMonths,
         )
       )
@@ -1113,8 +1079,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       ...[
         {
           path: 'leasingAgentName',
-          label: doAnyJurisdictionHaveFeatureFlagSet(
-            user.jurisdictions,
+          label: isFeatureFlagActive(
+            user.featureFlags,
             FeatureFlagEnum.enableLeasingAgentAltText,
           )
             ? 'Leasing agent or property manager name'
@@ -1130,8 +1096,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         },
         {
           path: 'leasingAgentTitle',
-          label: doAnyJurisdictionHaveFeatureFlagSet(
-            user.jurisdictions,
+          label: isFeatureFlagActive(
+            user.featureFlags,
             FeatureFlagEnum.enableLeasingAgentAltText,
           )
             ? 'Leasing agent or property manager title'
@@ -1243,8 +1209,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
         },
         {
           path: 'referralOpportunity',
-          label: doAllJurisdictionHaveFeatureFlagSet(
-            user.jurisdictions,
+          label: isFeatureFlagActive(
+            user.featureFlags,
             FeatureFlagEnum.enableReferralQuestionUnits,
           )
             ? 'Referral Only Units'
@@ -1325,8 +1291,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
               .join(', ');
           },
         },
-        ...(doAnyJurisdictionHaveFeatureFlagSet(
-          user.jurisdictions,
+        ...(isFeatureFlagActive(
+          user.featureFlags,
           FeatureFlagEnum.enableMarketingFlyer,
         )
           ? [
@@ -1354,8 +1320,8 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     );
 
     if (
-      doAnyJurisdictionHaveFeatureFlagSet(
-        user.jurisdictions,
+      isFeatureFlagActive(
+        user.featureFlags,
         FeatureFlagEnum.enableIsVerified,
       )
     )

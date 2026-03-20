@@ -29,7 +29,7 @@ const SettingsPreferences = () => {
   const { mutate } = useSWRConfig()
   const router = useRouter()
 
-  const { profile, multiselectQuestionsService, doJurisdictionsHaveFeatureFlagOn } =
+  const { profile, siteConfig, multiselectQuestionsService, isFeatureFlagOn } =
     useContext(AuthContext)
   const { addToast } = useContext(MessageContext)
 
@@ -46,17 +46,15 @@ const SettingsPreferences = () => {
   const [editConfirmModalOpen, setEditConfirmModalOpen] = useState<MultiselectQuestion | null>(null)
 
   const { data, loading, cacheKey } = useJurisdictionalMultiselectQuestionList(
-    profile?.jurisdictions?.map((jurisdiction) => jurisdiction.id).toString(),
+    siteConfig?.id,
     MultiselectQuestionsApplicationSectionEnum.preferences
   )
 
-  const enableProperties = doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableProperties)
-  const atLeastOneJurisdictionEnablesPreferences = !doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences,
-    null,
-    true
+  const enableProperties = isFeatureFlagOn(FeatureFlagEnum.enableProperties)
+  const atLeastOneJurisdictionEnablesPreferences = !isFeatureFlagOn(
+    FeatureFlagEnum.disableListingPreferences
   )
-  const v2Preferences = doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableV2MSQ)
+  const v2Preferences = isFeatureFlagOn(FeatureFlagEnum.enableV2MSQ)
 
   const tableData = useMemo(() => {
     return data?.items

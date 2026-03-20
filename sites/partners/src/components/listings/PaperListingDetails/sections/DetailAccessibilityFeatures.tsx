@@ -54,11 +54,10 @@ type DetailAccessibilityFeaturesProps = {
 
 const DetailAccessibilityFeatures = (props: DetailAccessibilityFeaturesProps) => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableAccessibilityFeatures = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableAccessibilityFeatures,
-    listing.jurisdictions.id
+  const enableAccessibilityFeatures = isFeatureFlagOn(
+    FeatureFlagEnum.enableAccessibilityFeatures
   )
 
   const hasCategories = props?.listingFeaturesConfiguration?.categories?.length > 0

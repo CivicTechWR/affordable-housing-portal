@@ -26,7 +26,7 @@ import { NavigationHeader } from "../../../../components/shared/NavigationHeader
 import ListingGuard from "../../../../components/shared/ListingGuard"
 
 const ApplicationsList = () => {
-  const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { profile, siteConfig, isFeatureFlagOn } = useContext(AuthContext)
   const router = useRouter()
   const listingId = router.query.id as string
 
@@ -39,23 +39,17 @@ const ApplicationsList = () => {
   /* Data Fetching */
   const { listingDto } = useSingleListingData(listingId)
 
-  const listingJurisdiction = profile?.jurisdictions.find(
-    (jurisdiction) => jurisdiction.id === listingDto?.jurisdictions.id
+  const enableFullTimeStudentQuestion = isFeatureFlagOn(
+    FeatureFlagEnum.enableFullTimeStudentQuestion
   )
-  const enableFullTimeStudentQuestion = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableFullTimeStudentQuestion,
-    listingDto?.jurisdictions.id
+  const disableWorkInRegion = isFeatureFlagOn(
+    FeatureFlagEnum.disableWorkInRegion
   )
-  const disableWorkInRegion = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableWorkInRegion,
-    listingDto?.jurisdictions.id
-  )
-  const enableApplicationStatus = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableApplicationStatus,
-    listingDto?.jurisdictions.id
+  const enableApplicationStatus = isFeatureFlagOn(
+    FeatureFlagEnum.enableApplicationStatus
   )
   const includeDemographicsPartner =
-    profile?.userRoles?.isPartner && listingJurisdiction?.enablePartnerDemographics
+    profile?.userRoles?.isPartner && siteConfig?.enablePartnerDemographics
   const { onExport, exportLoading } = useZipExport(
     listingId,
     (profile?.userRoles?.isAdmin ||

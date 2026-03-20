@@ -41,7 +41,7 @@ describe("listing applications add page", () => {
       <AuthContext.Provider
         value={{
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -103,7 +103,7 @@ describe("listing applications add page", () => {
         value={{
           applicationsService: new ApplicationsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -133,7 +133,7 @@ describe("listing applications add page", () => {
         value={{
           applicationsService: new ApplicationsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >

@@ -13,43 +13,12 @@ export const createAllFeatureFlags = async (prismaClient: PrismaClient) => {
   });
 };
 
-export const attachJurisdictionToFlags = async (
-  jurisdiction: string,
-  featureFlags: string[],
-  prismaClient: PrismaClient,
-) => {
-  for (const flag of featureFlags) {
-    await prismaClient.featureFlags.update({
-      where: {
-        name: flag,
-      },
-      data: {
-        jurisdictions: {
-          connect: {
-            id: jurisdiction,
-          },
-        },
-      },
-    });
-  }
-};
-
 export const featureFlagFactory = (
   name = `feature-flag-${randomUUID()}`,
   active = randomBoolean(),
   description = `${randomAdjective()} feature flag`,
-  jurisdictionIds?: string[],
 ): Prisma.FeatureFlagsCreateInput => ({
   name: name,
   description: description,
   active: active,
-  jurisdictions: jurisdictionIds
-    ? {
-        connect: jurisdictionIds.map((jurisdiction) => {
-          return {
-            id: jurisdiction,
-          };
-        }),
-      }
-    : undefined,
 });

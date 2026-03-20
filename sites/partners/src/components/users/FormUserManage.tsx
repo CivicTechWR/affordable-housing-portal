@@ -34,10 +34,14 @@ type FormUserManageValues = {
   email?: string
   userRoles?: string
   user_listings?: string[]
-  jurisdiction_all?: boolean
-  jurisdictions?: string[]
 }
 
+/**
+ * Converts the backend role object into the single select value used by the form.
+ *
+ * @param roles - The persisted role flags for the user being edited.
+ * @returns The matching role option for the form.
+ */
 const determineUserRole = (roles: UserRole) => {
   if (roles?.isAdmin) {
     return RoleOption.Administrator
@@ -60,25 +64,23 @@ const FormUserManage = ({
   onCancel,
   onDrawerClose,
 }: FormUserManageProps) => {
-  const { userService, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { userService, profile, isFeatureFlagOn } = useContext(AuthContext)
   const { addToast } = useContext(MessageContext)
-  const jurisdictionList = profile?.jurisdictions
 
   const [isDeleteModalActive, setDeleteModalActive] = useState<boolean>(false)
 
   const possibleUserRoles = [RoleOption.Partner]
   if (
     !profile?.userRoles?.isPartner &&
-    !doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.disableJurisdictionalAdmin, undefined, true)
+    !isFeatureFlagOn(FeatureFlagEnum.disableJurisdictionalAdmin)
   ) {
+    // Jurisdictional admin roles still exist, but they no longer imply jurisdiction assignment in the form.
     possibleUserRoles.push(RoleOption.JurisdictionalAdmin)
     possibleUserRoles.push(RoleOption.LimitedJurisdictionalAdmin)
   }
   if (profile?.userRoles?.isAdmin) {
     possibleUserRoles.push(RoleOption.Administrator)
-    // If any jurisdiction has enableSupportAdmin than admins can add an "Admin (support)" user
-    // This means that there can be a scenario where jurisdictions get access to this role when they don't have it enabled
-    if (doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableSupportAdmin)) {
+    if (isFeatureFlagOn(FeatureFlagEnum.enableSupportAdmin)) {
       possibleUserRoles.push(RoleOption.AdminSupport)
     }
   }
@@ -91,13 +93,9 @@ const FormUserManage = ({
       email: user.email,
       userRoles: determineUserRole(user.userRoles),
       user_listings: user.listings?.map((item) => item.id) ?? [],
-      jurisdiction_all: jurisdictionList?.length === user.jurisdictions.length,
-      jurisdictions: user.jurisdictions.map((elem) => elem.id),
     }
-  } else if (profile?.userRoles?.isJurisdictionalAdmin) {
-    defaultValues = {
-      jurisdictions: [jurisdictionList[0].id],
-    }
+  } else {
+    defaultValues = {}
   }
 
   const methods = useForm<FormUserManageValues>({
@@ -106,79 +104,28 @@ const FormUserManage = ({
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, errors, getValues, trigger, setValue } = methods
 
-  const jurisdictionOptions = useMemo(() => {
-    return (
-      jurisdictionList
-        ?.map((juris) => ({
-          id: juris.id,
-          label: juris.name,
-          value: juris.id,
-          inputProps: {
-            onChange: () => {
-              if (getValues("jurisdictions").length === jurisdictionList.length) {
-                setValue("jurisdiction_all", true)
-              } else {
-                setValue("jurisdiction_all", false)
-              }
-            },
-          },
-        }))
-        .sort((a, b) => (a.label < b.label ? -1 : 1)) || []
-    )
-  }, [jurisdictionList, getValues, setValue])
-
   const listingsOptions = useMemo(() => {
-    const jurisdictionalizedListings = {}
-    jurisdictionList?.forEach((juris) => {
-      jurisdictionalizedListings[juris.id] = []
-    })
-    listings.sort((a, b) => a.name.localeCompare(b.name))
-    listings.forEach((listing) => {
-      if (jurisdictionalizedListings[listing.jurisdictions.id]) {
-        // if the user has access to the jurisdiction
-        jurisdictionalizedListings[listing.jurisdictions.id].push({
-          id: listing.id,
-          label: listing.name,
-          value: listing.id,
-        })
-      }
-    })
-
-    Object.keys(jurisdictionalizedListings).forEach((key) => {
-      const listingsInJurisdiction = jurisdictionalizedListings[key]
-      listingsInJurisdiction.forEach((listing) => {
-        listing.inputProps = {
-          onChange: () => {
-            let currValues = getValues("user_listings")
-            if (currValues && !Array.isArray(currValues)) {
-              currValues = [currValues]
-            } else if (!currValues) {
-              currValues = []
-            }
-
-            const temp = listingsInJurisdiction.every((elem) =>
-              currValues.some((search) => elem.id === search)
-            )
-
-            if (temp) {
-              setValue(`listings_all_${key}`, true)
-            } else {
-              setValue(`listings_all_${key}`, false)
-            }
-          },
-        }
-      })
-    })
-    return jurisdictionalizedListings
-  }, [getValues, listings, setValue, jurisdictionList])
+    return [...listings]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((listing) => ({
+        id: listing.id,
+        label: listing.name,
+        value: listing.id,
+      }))
+  }, [listings])
 
   const { mutate: sendInvite, isLoading: isSendInviteLoading } = useMutate()
   const { mutate: resendConfirmation, isLoading: isResendConfirmationLoading } = useMutate()
   const { mutate: updateUser, isLoading: isUpdateUserLoading } = useMutate()
   const { mutate: deleteUser, isLoading: isDeleteUserLoading } = useMutate()
 
+  /**
+   * Builds the payload for invite and update requests from the current form state.
+   *
+   * @returns The normalized request body, or `undefined` when validation fails.
+   */
   const createUserBody = useCallback(async () => {
-    const { firstName, lastName, email, userRoles, jurisdictions } = getValues()
+    const { firstName, lastName, email, userRoles } = getValues()
 
     /**
      * react-hook form returns:
@@ -214,18 +161,8 @@ const FormUserManage = ({
       }
     })()
 
+    // Partner assignments are now listing-only, so the request body no longer carries jurisdictions.
     const leasingAgentInListings = user_listings?.map((id) => ({ id })) || []
-
-    let selectedJurisdictions = []
-    if (Array.isArray(jurisdictions)) {
-      selectedJurisdictions = jurisdictions.map((elem) => ({
-        id: elem,
-      }))
-    } else if (jurisdictions) {
-      selectedJurisdictions = [{ id: jurisdictions }]
-    } else {
-      selectedJurisdictions = jurisdictionOptions.map((elem) => ({ id: elem.id }))
-    }
 
     const body = {
       firstName,
@@ -233,12 +170,11 @@ const FormUserManage = ({
       email,
       userRoles: roles,
       listings: leasingAgentInListings,
-      jurisdictions: selectedJurisdictions,
       agreedToTermsOfService: user?.agreedToTermsOfService ?? false,
     }
 
     return body
-  }, [getValues, trigger, user?.agreedToTermsOfService, jurisdictionOptions])
+  }, [getValues, trigger, user?.agreedToTermsOfService])
 
   const onInvite = async () => {
     const body = await createUserBody()
@@ -420,7 +356,6 @@ const FormUserManage = ({
                     </Grid.Row>
                   </SectionWithGrid>
                   <JurisdictionAndListingSelection
-                    jurisdictionOptions={jurisdictionOptions}
                     listingsOptions={listingsOptions}
                   />
                 </Card.Section>

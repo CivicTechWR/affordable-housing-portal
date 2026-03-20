@@ -208,7 +208,7 @@ describe("PreferencesAndPrograms", () => {
         render(
           <AuthContext.Provider
             value={{
-              doJurisdictionsHaveFeatureFlagOn: () => {
+              isFeatureFlagOn: () => {
                 return false
               },
             }}
@@ -255,7 +255,7 @@ describe("PreferencesAndPrograms", () => {
         render(
           <AuthContext.Provider
             value={{
-              doJurisdictionsHaveFeatureFlagOn: () => {
+              isFeatureFlagOn: () => {
                 return true
               },
             }}

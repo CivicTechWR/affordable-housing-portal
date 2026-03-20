@@ -5,9 +5,9 @@ import {
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import SectionWithGrid from "../../components/shared/SectionWithGrid"
 import { Button, Card, Drawer, Grid } from "@bloom-housing/ui-seeds"
-import { Field, Select, SelectOption, t, Textarea } from "@bloom-housing/ui-components"
+import { Field, t, Textarea } from "@bloom-housing/ui-components"
 import { useForm } from "react-hook-form"
-import { addAsterisk, defaultFieldProps, fieldHasError } from "../../lib/helpers"
+import { defaultFieldProps } from "../../lib/helpers"
 import { useCallback, useContext } from "react"
 import { AuthContext } from "@bloom-housing/shared-helpers"
 
@@ -25,9 +25,6 @@ type PropertyFormTypes = {
   description: string
   url: string
   urlTitle: string
-  jurisdictions: {
-    id: string
-  }
 }
 
 export const PropertyDrawer = ({
@@ -38,7 +35,7 @@ export const PropertyDrawer = ({
   onDrawerClose,
   saveQuestion,
 }: PropertyDrawerProps) => {
-  const { profile } = useContext(AuthContext)
+  const { profile, siteConfig } = useContext(AuthContext)
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, errors, clearErrors, trigger, getValues } = useForm<PropertyFormTypes>()
   const propretyHasListing = listings?.find(
@@ -49,25 +46,12 @@ export const PropertyDrawer = ({
     const validated = await trigger()
     if (!validated) return
 
-    saveQuestion(getValues())
-  }, [trigger, getValues, saveQuestion])
-
-  const jurisdictionOptions: SelectOption[] =
-    profile.jurisdictions.length !== 0
-      ? [
-          { label: "", value: "" },
-          ...profile.jurisdictions.map((jurisdiction) => ({
-            label: jurisdiction.name,
-            value: jurisdiction.id,
-          })),
-        ]
-      : []
-
-  const defaultJurisdiction = editedProperty?.jurisdictions
-    ? editedProperty.jurisdictions.id
-    : jurisdictionOptions.length !== 0
-    ? jurisdictionOptions[0].value
-    : null
+    const values = getValues()
+    saveQuestion({
+      ...values,
+      jurisdictions: { id: siteConfig?.id },
+    } as PropertyCreate)
+  }, [trigger, getValues, saveQuestion, profile])
 
   return (
     <Drawer isOpen={drawerOpen && !propretyHasListing} onClose={onDrawerClose}>
@@ -151,33 +135,6 @@ export const PropertyDrawer = ({
                   />
                 </Grid.Cell>
               </Grid.Row>
-              {profile.jurisdictions.length > 1 && (
-                <Grid.Row columns={3}>
-                  <Grid.Cell>
-                    <Select
-                      id={"jurisdiction"}
-                      defaultValue={defaultJurisdiction}
-                      disabled={!!editedProperty}
-                      name={"jurisdictions.id"}
-                      label={addAsterisk(t("t.jurisdiction"))}
-                      register={register}
-                      error={fieldHasError(errors?.jurisdictions?.id)}
-                      controlClassName={"control"}
-                      errorMessage={t("errors.requiredFieldError")}
-                      keyPrefix={"jurisdictions"}
-                      options={jurisdictionOptions}
-                      validation={{ required: true }}
-                      inputProps={{
-                        onChange: () => {
-                          clearErrors("jurisdictions.id")
-                        },
-                        "aria-required": true,
-                        "aria-hidden": !!defaultJurisdiction,
-                      }}
-                    />
-                  </Grid.Cell>
-                </Grid.Row>
-              )}
             </SectionWithGrid>
           </Card.Section>
         </Card>

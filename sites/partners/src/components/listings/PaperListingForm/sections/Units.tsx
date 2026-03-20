@@ -75,7 +75,7 @@ const FormUnits = ({
   jurisdiction,
 }: UnitProps) => {
   const { addToast } = useContext(MessageContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
   const [unitDrawerOpen, setUnitDrawerOpen] = useState(false)
   const [unitDeleteModal, setUnitDeleteModal] = useState<number | null>(null)
   const [defaultUnit, setDefaultUnit] = useState<TempUnit | null>(null)
@@ -86,27 +86,20 @@ const FormUnits = ({
   const { register, errors, clearErrors, getValues, control, setValue } = formMethods
   const listing = getValues()
 
-  const homeTypeEnabled = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableHomeType,
-    jurisdiction,
-    true
+  const homeTypeEnabled = isFeatureFlagOn(
+    FeatureFlagEnum.enableHomeType
   )
 
-  const enableSection8Question = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableSection8Question,
-    jurisdiction,
-    true
+  const enableSection8Question = isFeatureFlagOn(
+    FeatureFlagEnum.enableSection8Question
   )
 
-  const enableUnitGroups = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups,
-    jurisdiction,
-    true
+  const enableUnitGroups = isFeatureFlagOn(
+    FeatureFlagEnum.enableUnitGroups
   )
 
-  const enableNonRegulatedListings = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings,
-    jurisdiction
+  const enableNonRegulatedListings = isFeatureFlagOn(
+    FeatureFlagEnum.enableNonRegulatedListings
   )
 
   const listingAvailability = useWatch({

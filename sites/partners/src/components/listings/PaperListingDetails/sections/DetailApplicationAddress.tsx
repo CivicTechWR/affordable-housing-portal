@@ -15,11 +15,10 @@ const DetailApplicationAddress = () => {
     return date ? dayjs(new Date(date)).format("MM/DD/YYYY") : t("t.none")
   }
 
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableLeasingAgentAltText = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableLeasingAgentAltText,
-    listing.jurisdictions.id
+  const enableLeasingAgentAltText = isFeatureFlagOn(
+    FeatureFlagEnum.enableLeasingAgentAltText
   )
   const leasingAgentAddressText = enableLeasingAgentAltText
     ? t("listings.leasingAgentAddressManagerProp")

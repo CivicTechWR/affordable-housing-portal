@@ -14,7 +14,6 @@ import {
 import { CronJobService } from './cron-job.service';
 import { PermissionService } from './permission.service';
 import { PrismaService } from './prisma.service';
-import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import { MultiselectQuestion } from '../dtos/multiselect-questions/multiselect-question.dto';
 import { MultiselectQuestionCreate } from '../dtos/multiselect-questions/multiselect-question-create.dto';
 import { MultiselectQuestionUpdate } from '../dtos/multiselect-questions/multiselect-question-update.dto';
@@ -28,7 +27,7 @@ import { MultiselectQuestionViews } from '../enums/multiselect-questions/view-en
 import { permissionActions } from '../enums/permissions/permission-actions-enum';
 import { buildFilter } from '../utilities/build-filter';
 import { buildOrderByForMultiselectQuestions } from '../utilities/build-order-by';
-import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 import { mapTo } from '../utilities/mapTo';
 import {
   buildPaginationMetaInfo,
@@ -257,7 +256,6 @@ export class MultiselectQuestionService {
 
     const rawJurisdiction = await this.prisma.jurisdictions.findFirstOrThrow({
       select: {
-        featureFlags: true,
         id: true,
       },
       where: {
@@ -277,9 +275,10 @@ export class MultiselectQuestionService {
         jurisdictionId: rawJurisdiction.id,
       },
     );
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as Jurisdiction,
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 
@@ -372,7 +371,6 @@ export class MultiselectQuestionService {
 
     const rawJurisdiction = await this.prisma.jurisdictions.findFirstOrThrow({
       select: {
-        featureFlags: true,
         id: true,
       },
       where: {
@@ -393,9 +391,10 @@ export class MultiselectQuestionService {
         jurisdictionId: rawJurisdiction.id,
       },
     );
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as Jurisdiction,
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 
@@ -485,9 +484,10 @@ export class MultiselectQuestionService {
     const currentMultiselectQuestion = await this.findOne(
       multiselectQuestionId,
     );
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      currentMultiselectQuestion.jurisdiction as Jurisdiction,
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 

@@ -15,7 +15,7 @@ import { ListingBrowseDeprecated } from "../components/browse/ListingBrowseDepre
 import { isFeatureFlagOn } from "../lib/helpers"
 import {
   fetchClosedListings,
-  fetchJurisdictionByName,
+  fetchSiteConfig,
   fetchMultiselectProgramData,
   fetchOpenListings,
 } from "../lib/hooks"
@@ -72,7 +72,7 @@ export async function getServerSideProps(context: { req: any; query: any }) {
     openListings = await fetchOpenListings(context.req, Number(context.query.page) || 1)
     closedListings = await fetchClosedListings(context.req, Number(context.query.page) || 1)
   }
-  const jurisdiction = await fetchJurisdictionByName(context.req)
+  const jurisdiction = await fetchSiteConfig(context.req)
   const multiselectData = isFeatureFlagOn(
     jurisdiction,
     FeatureFlagEnum.swapCommunityTypeWithPrograms

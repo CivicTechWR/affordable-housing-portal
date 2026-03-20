@@ -49,7 +49,7 @@ interface ListingProps {
 
 export default function ListingDetail(props: ListingProps) {
   const { listing } = props
-  const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { profile, isFeatureFlagOn } = useContext(AuthContext)
   const [errorAlert, setErrorAlert] = useState<string>(null)
   const [unitDrawer, setUnitDrawer] = useState<UnitDrawer>(null)
   const [copyListingDialog, setCopyListingDialog] = useState(false)
@@ -58,9 +58,8 @@ export default function ListingDetail(props: ListingProps) {
 
   if (!listing) return null
 
-  const enableConfigurableRegions = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableConfigurableRegions,
-    listing.jurisdictions.id
+  const enableConfigurableRegions = isFeatureFlagOn(
+    FeatureFlagEnum.enableConfigurableRegions
   )
 
   return (
@@ -116,7 +115,7 @@ export default function ListingDetail(props: ListingProps) {
 
                 <div className="flex flex-row flex-wrap ">
                   <div className="info-card md:w-9/12 overflow-hidden">
-                    <DetailListingData showJurisdictionName={profile?.jurisdictions?.length > 1} />
+                    <DetailListingData showJurisdictionName={false} />
                     <DetailListingNotes />
                     <DetailListingIntro />
                     <DetailListingPhotos />

@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
-  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsDate,
@@ -19,7 +18,7 @@ import { AbstractDTO } from '../shared/abstract.dto';
 import { LanguagesEnum } from '@prisma/client';
 import { IdDTO } from '../shared/id.dto';
 import { UserRole } from './user-role.dto';
-import { Jurisdiction } from '../jurisdictions/jurisdiction.dto';
+import { FeatureFlag } from '../feature-flags/feature-flag.dto';
 
 export class User extends AbstractDTO {
   @Expose()
@@ -93,12 +92,11 @@ export class User extends AbstractDTO {
   language?: LanguagesEnum;
 
   @Expose()
-  @Type(() => Jurisdiction)
   @IsArray({ groups: [ValidationsGroupsEnum.default] })
-  @ArrayMinSize(1, { groups: [ValidationsGroupsEnum.default] })
   @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
-  @ApiProperty({ type: Jurisdiction, isArray: true })
-  jurisdictions: Jurisdiction[];
+  @Type(() => FeatureFlag)
+  @ApiPropertyOptional({ type: FeatureFlag, isArray: true })
+  featureFlags?: FeatureFlag[];
 
   @Expose()
   @IsBoolean({ groups: [ValidationsGroupsEnum.default] })

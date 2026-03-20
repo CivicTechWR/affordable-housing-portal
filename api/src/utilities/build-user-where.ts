@@ -121,15 +121,6 @@ export const buildWhereClause = (
             },
           ],
         });
-        filters.push({
-          jurisdictions: {
-            some: {
-              id: {
-                in: user?.jurisdictions?.map((juris) => juris.id),
-              },
-            },
-          },
-        });
       }
     } else if ('isPortalUser' in filter) {
       filters.push({

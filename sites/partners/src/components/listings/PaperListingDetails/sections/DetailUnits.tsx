@@ -21,26 +21,22 @@ type DetailUnitsProps = {
 
 const DetailUnits = ({ setUnitDrawer }: DetailUnitsProps) => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableHomeType = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableHomeType,
-    listing.jurisdictions.id
+  const enableHomeType = isFeatureFlagOn(
+    FeatureFlagEnum.enableHomeType
   )
 
-  const enableSection8Question = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableSection8Question,
-    listing.jurisdictions.id
+  const enableSection8Question = isFeatureFlagOn(
+    FeatureFlagEnum.enableSection8Question
   )
 
-  const enableUnitGroups = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups,
-    listing.jurisdictions.id
+  const enableUnitGroups = isFeatureFlagOn(
+    FeatureFlagEnum.enableUnitGroups
   )
 
-  const enableNonRegulatedListings = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings,
-    listing.jurisdictions.id
+  const enableNonRegulatedListings = isFeatureFlagOn(
+    FeatureFlagEnum.enableNonRegulatedListings
   )
 
   const showNonRegulated =

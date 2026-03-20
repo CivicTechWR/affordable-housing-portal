@@ -206,7 +206,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -257,7 +257,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag, false, true, false),
         }}
       >
@@ -309,7 +309,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag, true, false, true),
         }}
       >
@@ -361,7 +361,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag, true),
         }}
       >
@@ -412,7 +412,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag, false, false),
         }}
       >
@@ -463,7 +463,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >

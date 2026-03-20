@@ -15,21 +15,18 @@ import { getDetailFieldNumber, getDetailBoolean, getDetailFieldRichText } from "
 
 const DetailRankingsAndResults = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableWaitlistAdditionalFields = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableWaitlistAdditionalFields,
-    listing.jurisdictions.id
+  const enableWaitlistAdditionalFields = isFeatureFlagOn(
+    FeatureFlagEnum.enableWaitlistAdditionalFields
   )
 
-  const enableUnitGroups = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups,
-    listing.jurisdictions.id
+  const enableUnitGroups = isFeatureFlagOn(
+    FeatureFlagEnum.enableUnitGroups
   )
 
-  const enableWhatToExpectAdditionalField = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableWhatToExpectAdditionalField,
-    listing.jurisdictions.id
+  const enableWhatToExpectAdditionalField = isFeatureFlagOn(
+    FeatureFlagEnum.enableWhatToExpectAdditionalField
   )
 
   const lotteryEvent = getLotteryEvent(listing)

@@ -106,7 +106,6 @@ export class PropertyService {
 
     const rawJurisdiction = await this.prisma.jurisdictions.findFirst({
       select: {
-        featureFlags: true,
         id: true,
       },
       where: {

@@ -26,7 +26,7 @@ type UserDrawerValue = {
 
 const Users = () => {
   const router = useRouter()
-  const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { profile, isFeatureFlagOn } = useContext(AuthContext)
   const { mutate } = useSWRConfig()
   const [userDrawer, setUserDrawer] = useState<UserDrawerValue | null>(null)
   const [errorAlert, setErrorAlert] = useState(false)
@@ -138,7 +138,7 @@ const Users = () => {
     view: ListingViews.name,
   })
 
-  const enableHousingAdvocate = doJurisdictionsHaveFeatureFlagOn(
+  const enableHousingAdvocate = isFeatureFlagOn(
     FeatureFlagEnum.enableHousingAdvocate
   )
 

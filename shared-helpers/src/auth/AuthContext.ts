@@ -18,6 +18,7 @@ import {
   ApplicationFlaggedSetsService,
   ApplicationsService,
   AuthService,
+  Jurisdiction,
   JurisdictionsService,
   ListingsService,
   MapLayersService,
@@ -86,12 +87,9 @@ type ContextProps = {
   ) => Promise<RequestMfaCodeResponse | undefined>
   requestSingleUseCode: (email: string) => Promise<SuccessDTO | undefined>
   loginViaSingleUseCode: (email: string, singleUseCode: string) => Promise<User | undefined>
-  doJurisdictionsHaveFeatureFlagOn: (
-    featureFlag: string,
-    jurisdiction?: string,
-    onlyIfAllJurisdictionsHaveItEnabled?: boolean
-  ) => boolean
-  getJurisdictionLanguages: (jurisdictionId: string) => LanguagesEnum[]
+  isFeatureFlagOn: (featureFlag: string) => boolean
+  siteConfig?: Jurisdiction
+  getJurisdictionLanguages: () => LanguagesEnum[]
 }
 
 // Internal Provider State
@@ -100,10 +98,12 @@ type AuthState = {
   language?: string
   loading: boolean
   profile?: User
+  siteConfig?: Jurisdiction
   refreshTimer?: number
 }
 
 const saveProfile = createAction("SAVE_PROFILE")<User | null>()
+const saveSiteConfig = createAction("SAVE_SITE_CONFIG")<Jurisdiction | null>()
 const startLoading = createAction("START_LOADING")()
 const stopLoading = createAction("STOP_LOADING")()
 const signOut = createAction("SIGN_OUT")()
@@ -123,6 +123,12 @@ const reducer = createReducer(
         initialStateLoaded: true,
       }
     },
+    SAVE_SITE_CONFIG: (state, { payload: siteConfig }) => {
+      return {
+        ...state,
+        siteConfig,
+      }
+    },
     START_LOADING: (state) => ({ ...state, loading: true }),
     END_LOADING: (state) => ({ ...state, loading: false }),
     SIGN_OUT: () => ({ loading: false, initialStateLoaded: true }),
@@ -135,7 +141,6 @@ const axiosConfig = (router: GenericRouter) => {
     withCredentials: true,
     headers: {
       language: router.locale,
-      jurisdictionName: process.env.jurisdictionName,
       appUrl: window.location.origin,
     },
     paramsSerializer: (params) => {
@@ -156,6 +161,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
 
   const userService = useMemo(() => new UserService(), [])
   const authService = new AuthService()
+  const jurisdictionsService = useMemo(() => new JurisdictionsService(), [])
 
   useEffect(() => {
     serviceOptions.axios = axiosConfig(router)
@@ -219,6 +225,23 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
       void loadProfile()
     }
   }, [state.profile, apiUrl, userService, state.loading, loadProfile, state.initialStateLoaded])
+
+  // Load singleton jurisdiction as site config
+  useEffect(() => {
+    if (!state.siteConfig) {
+      jurisdictionsService
+        .list()
+        .then((jurisdictions) => {
+          // The app now treats the first jurisdiction row as the single site configuration.
+          if (jurisdictions?.length) {
+            dispatch(saveSiteConfig(jurisdictions[0]))
+          }
+        })
+        .catch((e) => {
+          console.error("Failed to load site config", e)
+        })
+    }
+  }, [jurisdictionsService, state.siteConfig])
 
   const contextValues: ContextProps = {
     amiChartsService: new AmiChartsService(),
@@ -395,29 +418,14 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
         dispatch(stopLoading())
       }
     },
-    doJurisdictionsHaveFeatureFlagOn: (
-      featureFlag: string,
-      jurisdictionId?: string,
-      onlyIfAllJurisdictionsHaveItEnabled?: boolean
-    ) => {
-      let jurisdictions = state.profile?.jurisdictions || []
-      if (jurisdictionId) {
-        jurisdictions = jurisdictions?.filter((j) => j.id === jurisdictionId)
-      }
-      // Return true only if all jurisdictions have the flag turned on
-      if (onlyIfAllJurisdictionsHaveItEnabled) {
-        return jurisdictions.every(
-          (j) => j.featureFlags?.find((flag) => flag.name === featureFlag)?.active || false
-        )
-      }
-      // Otherwise return true if at least one jurisdiction has the flag turned on
-      return jurisdictions.some(
-        (j) => j.featureFlags?.find((flag) => flag.name === featureFlag)?.active || false
-      )
+    isFeatureFlagOn: (featureFlag: string) => {
+      const flags = state.profile?.featureFlags
+      if (!flags) return false
+      return flags.find((flag) => flag.name === featureFlag)?.active || false
     },
-    getJurisdictionLanguages: (jurisdictionId: string) => {
-      const jurisdictions = state.profile?.jurisdictions || []
-      return jurisdictions.find((j) => j.id === jurisdictionId)?.languages || []
+    siteConfig: state.siteConfig,
+    getJurisdictionLanguages: () => {
+      return state.siteConfig?.languages || []
     },
   }
   return createElement(AuthContext.Provider, { value: contextValues }, children)

@@ -5,7 +5,7 @@ import {
   FeatureFlagEnum,
   Jurisdiction,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
-import { fetchJurisdictionByName } from "../../../lib/hooks"
+import { fetchSiteConfig } from "../../../lib/hooks"
 import { isFeatureFlagOn } from "../../../lib/helpers"
 
 interface FavoritesProps {
@@ -29,7 +29,7 @@ export default Favorites
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getStaticProps() {
-  const jurisdiction = await fetchJurisdictionByName()
+  const jurisdiction = await fetchSiteConfig()
 
   return {
     props: { jurisdiction },

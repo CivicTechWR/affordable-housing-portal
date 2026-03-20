@@ -56,7 +56,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -94,7 +94,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -216,7 +216,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
@@ -258,7 +258,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+          isFeatureFlagOn: (featureFlag) =>
             mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >

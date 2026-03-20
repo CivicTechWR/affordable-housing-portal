@@ -1,44 +1,13 @@
-import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
+import { FeatureFlag } from '../dtos/feature-flags/feature-flag.dto';
 import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
 
-export const doAnyJurisdictionHaveFeatureFlagSet = (
-  jurisdictions: Jurisdiction[],
+export const isFeatureFlagActive = (
+  featureFlags: FeatureFlag[],
   featureFlagName: FeatureFlagEnum,
-) => {
-  return jurisdictions.some((juris) => {
-    return juris.featureFlags.some(
+): boolean => {
+  return (
+    featureFlags?.some(
       (flag) => flag.name === featureFlagName && flag.active,
-    );
-  });
-};
-
-export const doAllJurisdictionHaveFeatureFlagSet = (
-  jurisdictions: Jurisdiction[],
-  featureFlagName: FeatureFlagEnum,
-) => {
-  return jurisdictions.every((juris) => {
-    return juris.featureFlags.some(
-      (flag) => flag.name === featureFlagName && flag.active,
-    );
-  });
-};
-
-export const doJurisdictionHaveFeatureFlagSet = (
-  jurisdiction: Jurisdiction,
-  featureFlagName: FeatureFlagEnum,
-) => {
-  return jurisdiction?.featureFlags?.some(
-    (flag) => flag.name === featureFlagName && flag.active,
+    ) ?? false
   );
-};
-
-export const doAnyJurisdictionHaveFalsyFeatureFlagValue = (
-  jurisdictions: Jurisdiction[],
-  featureFlagName: FeatureFlagEnum,
-) => {
-  return jurisdictions.some((juris) => {
-    return !juris.featureFlags.some(
-      (flag) => flag.name === featureFlagName && flag.active,
-    );
-  });
 };

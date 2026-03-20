@@ -25,7 +25,7 @@ const SubmittedApplicationView = ({
   listing,
   backHref,
 }: SubmittedApplicationViewProps) => {
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
   const confirmationDate = useMemo(() => {
     return dayjs(application.submissionDate).format(DATE_FORMAT)
   }, [application.submissionDate])
@@ -103,21 +103,17 @@ const SubmittedApplicationView = ({
               ?.length === 0
           }
           editMode={false}
-          enableUnitGroups={doJurisdictionsHaveFeatureFlagOn(
-            FeatureFlagEnum.enableUnitGroups,
-            listing?.jurisdictions.id
+          enableUnitGroups={isFeatureFlagOn(
+            FeatureFlagEnum.enableUnitGroups
           )}
-          enableFullTimeStudentQuestion={doJurisdictionsHaveFeatureFlagOn(
-            FeatureFlagEnum.enableFullTimeStudentQuestion,
-            listing?.jurisdictions.id
+          enableFullTimeStudentQuestion={isFeatureFlagOn(
+            FeatureFlagEnum.enableFullTimeStudentQuestion
           )}
-          enableAdaOtherOption={doJurisdictionsHaveFeatureFlagOn(
-            FeatureFlagEnum.enableAdaOtherOption,
-            listing?.jurisdictions.id
+          enableAdaOtherOption={isFeatureFlagOn(
+            FeatureFlagEnum.enableAdaOtherOption
           )}
-          swapCommunityTypeWithPrograms={doJurisdictionsHaveFeatureFlagOn(
-            FeatureFlagEnum.swapCommunityTypeWithPrograms,
-            listing?.jurisdictions.id
+          swapCommunityTypeWithPrograms={isFeatureFlagOn(
+            FeatureFlagEnum.swapCommunityTypeWithPrograms
           )}
         />
         <Card.Section>

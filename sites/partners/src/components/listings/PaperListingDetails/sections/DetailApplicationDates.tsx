@@ -16,22 +16,19 @@ import { getDetailFieldDate, getDetailFieldString, getDetailFieldTime } from "./
 
 const DetailApplicationDates = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
   const [drawer, setDrawer] = useState<ListingEvent | null>(null)
 
-  const enableMarketingStatus = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableMarketingStatus,
-    listing?.jurisdictions?.id
+  const enableMarketingStatus = isFeatureFlagOn(
+    FeatureFlagEnum.enableMarketingStatus
   )
 
-  const enableMarketingStatusMonths = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableMarketingStatusMonths,
-    listing?.jurisdictions?.id
+  const enableMarketingStatusMonths = isFeatureFlagOn(
+    FeatureFlagEnum.enableMarketingStatusMonths
   )
 
-  const enableMarketingFlyer = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableMarketingFlyer,
-    listing?.jurisdictions?.id
+  const enableMarketingFlyer = isFeatureFlagOn(
+    FeatureFlagEnum.enableMarketingFlyer
   )
 
   const openHouseHeaders = {

@@ -12,7 +12,7 @@ import {
 
 const DetailAdditionalDetails = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
   const getRequiredDocuments = () => {
     let documentsExist = false
@@ -31,9 +31,8 @@ const DetailAdditionalDetails = () => {
     return documentsExist ? <ul className={"flex flex-wrap"}>{documents}</ul> : <>{t("t.none")}</>
   }
 
-  const enableNonRegulatedListings = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings,
-    listing.jurisdictions.id
+  const enableNonRegulatedListings = isFeatureFlagOn(
+    FeatureFlagEnum.enableNonRegulatedListings
   )
 
   const showRequiredDocumentsListField =

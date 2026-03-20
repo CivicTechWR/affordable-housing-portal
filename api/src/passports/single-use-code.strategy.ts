@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
   ValidationPipe,
 } from '@nestjs/common';
@@ -32,10 +33,14 @@ export class SingleUseCodeStrategy extends PassportStrategy(
     });
   }
 
-  /*
-    verifies that the incoming log in information is valid
-    returns the verified user
-  */
+  /**
+   * Verifies a single-use-code login attempt against the singleton site configuration.
+   *
+   * @param req - The incoming authentication request containing the email and single-use code.
+   * @returns The authenticated user when the single-use code is valid.
+   * @throws {InternalServerErrorException} If the singleton site configuration cannot be found.
+   * @throws {UnauthorizedException} If the user does not exist or the code is missing/invalid.
+   */
   async validate(req: Request): Promise<User> {
     const validationPipe = new ValidationPipe(defaultValidationPipeOptions);
     const dto: LoginViaSingleUseCode = await validationPipe.transform(
@@ -45,36 +50,24 @@ export class SingleUseCodeStrategy extends PassportStrategy(
         metatype: LoginViaSingleUseCode,
       },
     );
-    const jurisName = req?.headers?.jurisdictionname;
-    if (!jurisName) {
-      throw new BadRequestException(
-        'jurisdictionname is missing from the request headers',
-      );
-    }
-
+    // Single-use-code login is now controlled by the singleton site configuration.
     const juris = await this.prisma.jurisdictions.findFirst({
       select: {
         id: true,
         allowSingleUseCodeLogin: true,
-      },
-      where: {
-        name: jurisName as string,
       },
       orderBy: {
         allowSingleUseCodeLogin: OrderByEnum.DESC,
       },
     });
     if (!juris) {
-      throw new BadRequestException(
-        `Jurisidiction ${jurisName} does not exists`,
-      );
+      throw new InternalServerErrorException('Site configuration missing');
     }
 
     const rawUser = await this.prisma.userAccounts.findFirst({
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: true,
       },
       where: {
         email: dto.email,

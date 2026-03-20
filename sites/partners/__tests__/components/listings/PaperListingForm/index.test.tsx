@@ -119,7 +119,7 @@ describe("add listing", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
+          isFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
               case FeatureFlagEnum.swapCommunityTypeWithPrograms:
                 return false
@@ -188,7 +188,7 @@ describe("add listing", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
+          isFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
               case FeatureFlagEnum.enableConfigurableRegions:
                 return true
@@ -359,7 +359,7 @@ describe("add listing", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
+          isFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
               case FeatureFlagEnum.enableConfigurableRegions:
                 return true
@@ -464,7 +464,7 @@ describe("add listing", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
+          isFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
               case FeatureFlagEnum.enableConfigurableRegions:
                 return true

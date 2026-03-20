@@ -17,7 +17,7 @@ describe("<LeasingAgent>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <LeasingAgent listing={listing} />

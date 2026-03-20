@@ -9,10 +9,9 @@ import SectionWithGrid from "../../../shared/SectionWithGrid"
 const DetailListingPhotos = () => {
   const listing = useContext(ListingContext)
   const jurisdictionId = listing.jurisdictions.id
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
-  const enableListingImageAltText = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableListingImageAltText,
-    jurisdictionId
+  const { isFeatureFlagOn } = useContext(AuthContext)
+  const enableListingImageAltText = isFeatureFlagOn(
+    FeatureFlagEnum.enableListingImageAltText
   )
 
   const photoTableHeaders = {

@@ -5,7 +5,7 @@ import FormsLayout from "../../layouts/forms"
 import { FormTerms } from "../../components/users/FormTerms"
 
 const TermsPage = () => {
-  const { profile, userService, loadProfile } = useContext(AuthContext)
+  const { profile, siteConfig, userService, loadProfile } = useContext(AuthContext)
 
   const onSubmit = useCallback(async () => {
     if (!profile) return
@@ -18,9 +18,8 @@ const TermsPage = () => {
   }, [loadProfile, profile, userService])
 
   const jurisdictionTerms = useMemo(() => {
-    const jurisdiction = profile?.jurisdictions.find((jurisdiction) => jurisdiction.partnerTerms)
-    return jurisdiction ? jurisdiction.partnerTerms : ""
-  }, [profile])
+    return siteConfig?.partnerTerms || ""
+  }, [siteConfig])
 
   return (
     <FormsLayout title={`Accept Terms - ${t("nav.siteTitlePartners")}`}>

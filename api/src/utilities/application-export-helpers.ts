@@ -9,7 +9,7 @@ import { UnitType } from '../dtos/unit-types/unit-type.dto';
 import { CsvHeader } from '../types/CsvExportInterface';
 import { formatLocalDate } from '../utilities/format-local-date';
 import { User } from '../dtos/users/user.dto';
-import { doAnyJurisdictionHaveFeatureFlagSet } from './feature-flag-utilities';
+import { isFeatureFlagActive } from './feature-flag-utilities';
 /**
  *
  * @param maxHouseholdMembers the max number of household members on an application
@@ -30,20 +30,20 @@ export const getExportHeaders = (
   dateFormat = 'MM-DD-YYYY hh:mm:ssA z',
   swapCommunityTypeWithPrograms?: boolean,
 ): CsvHeader[] => {
-  const enableAdaOtherOption = doAnyJurisdictionHaveFeatureFlagSet(
-    user.jurisdictions,
+  const enableAdaOtherOption = isFeatureFlagActive(
+    user.featureFlags,
     FeatureFlagEnum.enableAdaOtherOption,
   );
-  const enableFullTimeStudentQuestion = doAnyJurisdictionHaveFeatureFlagSet(
-    user.jurisdictions,
+  const enableFullTimeStudentQuestion = isFeatureFlagActive(
+    user.featureFlags,
     FeatureFlagEnum.enableFullTimeStudentQuestion,
   );
-  const disableWorkInRegion = doAnyJurisdictionHaveFeatureFlagSet(
-    user.jurisdictions,
+  const disableWorkInRegion = isFeatureFlagActive(
+    user.featureFlags,
     FeatureFlagEnum.disableWorkInRegion,
   );
-  const enableApplicationStatus = doAnyJurisdictionHaveFeatureFlagSet(
-    user.jurisdictions,
+  const enableApplicationStatus = isFeatureFlagActive(
+    user.featureFlags,
     FeatureFlagEnum.enableApplicationStatus,
   );
 

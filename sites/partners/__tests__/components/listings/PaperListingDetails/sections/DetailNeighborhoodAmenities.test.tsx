@@ -47,7 +47,7 @@ describe("DetailNeighborhoodAmenities", () => {
     const { container } = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => false,
+          isFeatureFlagOn: () => false,
         }}
       >
         <ListingContext.Provider value={{ ...listing }}>
@@ -69,7 +69,7 @@ describe("DetailNeighborhoodAmenities", () => {
     const { container } = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableNeighborhoodAmenities,
         }}
       >
@@ -95,7 +95,7 @@ describe("DetailNeighborhoodAmenities", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableNeighborhoodAmenities,
         }}
       >
@@ -127,7 +127,7 @@ describe("DetailNeighborhoodAmenities", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableNeighborhoodAmenities,
         }}
       >
@@ -163,7 +163,7 @@ describe("DetailNeighborhoodAmenities", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableNeighborhoodAmenities,
         }}
       >
@@ -205,7 +205,7 @@ describe("DetailNeighborhoodAmenities", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enableNeighborhoodAmenities,
         }}
       >

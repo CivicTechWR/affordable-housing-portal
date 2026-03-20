@@ -32,7 +32,6 @@ import { MostRecentApplicationQueryParams } from '../dtos/applications/most-rece
 import { PaginatedApplicationDto } from '../dtos/applications/paginated-application.dto';
 import { PublicAppsViewQueryParams } from '../dtos/applications/public-apps-view-params.dto';
 import { PublicAppsViewResponse } from '../dtos/applications/public-apps-view-response.dto';
-import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import Listing from '../dtos/listings/listing.dto';
 import { IdDTO } from '../dtos/shared/id.dto';
 import { SuccessDTO } from '../dtos/shared/success.dto';
@@ -44,7 +43,7 @@ import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
 import { permissionActions } from '../enums/permissions/permission-actions-enum';
 import { buildOrderByForApplications } from '../utilities/build-order-by';
 import { buildPaginationInfo } from '../utilities/build-pagination-meta';
-import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 import { mapTo } from '../utilities/mapTo';
 import { calculateSkip, calculateTake } from '../utilities/pagination-helpers';
 import { buildApplicationStatusChanges } from '../utilities/applicationStatusChanges';
@@ -765,7 +764,7 @@ export class ApplicationService {
         id: dto.listings.id,
       },
       include: {
-        jurisdictions: { include: { featureFlags: true } },
+        jurisdictions: true,
         // address is needed for geocoding
         listingsBuildingAddress: true,
         listingMultiselectQuestions: {
@@ -778,8 +777,9 @@ export class ApplicationService {
       },
     });
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      listing?.jurisdictions as unknown as Jurisdiction,
+    const featureFlags = await this.prisma.featureFlags.findMany();
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 
@@ -1071,7 +1071,7 @@ export class ApplicationService {
         id: dto.listings.id,
       },
       include: {
-        jurisdictions: { include: { featureFlags: true } },
+        jurisdictions: true,
         listingMultiselectQuestions: {
           include: {
             multiselectQuestions: { include: { multiselectOptions: true } },
@@ -1079,6 +1079,11 @@ export class ApplicationService {
         },
       },
     });
+    const featureFlags = await this.prisma.featureFlags.findMany();
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
+      FeatureFlagEnum.enableV2MSQ,
+    );
 
     const transactions = [];
 

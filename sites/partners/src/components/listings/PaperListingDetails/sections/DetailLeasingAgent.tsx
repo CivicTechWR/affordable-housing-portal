@@ -9,16 +9,14 @@ import { FeatureFlagEnum } from "@bloom-housing/shared-helpers/src/types/backend
 
 const DetailLeasingAgent = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableCompanyWebsite = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableCompanyWebsite,
-    listing.jurisdictions.id
+  const enableCompanyWebsite = isFeatureFlagOn(
+    FeatureFlagEnum.enableCompanyWebsite
   )
 
-  const enableLeasingAgentAltText = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableLeasingAgentAltText,
-    listing.jurisdictions.id
+  const enableLeasingAgentAltText = isFeatureFlagOn(
+    FeatureFlagEnum.enableLeasingAgentAltText
   )
 
   const leasingAgentNameText = enableLeasingAgentAltText

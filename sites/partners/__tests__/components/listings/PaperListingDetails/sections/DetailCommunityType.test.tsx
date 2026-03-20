@@ -10,7 +10,7 @@ describe("DetailCommunityType", () => {
     const results = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => {
+          isFeatureFlagOn: () => {
             return true
           },
         }}
@@ -32,7 +32,7 @@ describe("DetailCommunityType", () => {
     const results = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => {
+          isFeatureFlagOn: () => {
             return false
           },
         }}
@@ -62,7 +62,7 @@ describe("DetailCommunityType", () => {
     const results = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => {
+          isFeatureFlagOn: () => {
             return false
           },
         }}

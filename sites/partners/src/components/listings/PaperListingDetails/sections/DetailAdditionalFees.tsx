@@ -13,11 +13,10 @@ import {
 
 const DetailAdditionalFees = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableUtilitiesIncluded = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableUtilitiesIncluded,
-    listing.jurisdictions.id
+  const enableUtilitiesIncluded = isFeatureFlagOn(
+    FeatureFlagEnum.enableUtilitiesIncluded
   )
 
   const getUtilitiesIncluded = () => {

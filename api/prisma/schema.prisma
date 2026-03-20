@@ -687,8 +687,6 @@ model FeatureFlags {
   description String
   name        String  @unique()
 
-  jurisdictions Jurisdictions[]
-
   @@map("feature_flags")
 }
 
@@ -798,7 +796,6 @@ model Jurisdictions {
 
   agency                 Agency[]
   amiCharts              AmiChart[]
-  featureFlags           FeatureFlags[]
   listings               Listings[]
   listingSnapshots       ListingSnapshot[]
   multiselectQuestions   MultiselectQuestions[]
@@ -806,7 +803,6 @@ model Jurisdictions {
   propertySnapshots      PropertySnapshot[]
   reservedCommunityTypes ReservedCommunityTypes[]
   translations           Translations[]
-  user_accounts          UserAccounts[]
   userAccountSnapshot    UserAccountSnapshot[]
 
   @@map("jurisdictions")
@@ -2070,7 +2066,6 @@ model UserAccounts {
   applicationFlaggedSet     ApplicationFlaggedSet[]
   applications              Applications[]
   favoriteListings          Listings[]              @relation("favorite_listings")
-  jurisdictions             Jurisdictions[]
   lastUpdatedListingsByUser Listings[]              @relation("last_updated_by_user")
   listings                  Listings[]
   requestedChangesListings  Listings[]              @relation("requested_changes_user")

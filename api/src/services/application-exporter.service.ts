@@ -8,7 +8,6 @@ import fs, { createReadStream, ReadStream } from 'fs';
 import { generatePresignedGetURL, uploadToS3 } from '../utilities/s3-helpers';
 import { getExportHeaders } from '../utilities/application-export-helpers';
 import { IdDTO } from '../dtos/shared/id.dto';
-import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import { ForbiddenException, Injectable, StreamableFile } from '@nestjs/common';
 import { join } from 'path';
 import { ListingService } from './listing.service';
@@ -25,7 +24,7 @@ import { User } from '../dtos/users/user.dto';
 import { view } from './application.service';
 import { zipExport, zipExportSecure } from '../utilities/zip-export';
 import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
-import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 
 view.csv = {
   ...view.details,
@@ -204,21 +203,10 @@ export class ApplicationExporterService {
       },
     });
 
-    const jurisdiction = await this.prisma.jurisdictions.findFirst({
-      select: {
-        featureFlags: true,
-      },
-      where: {
-        listings: {
-          some: {
-            id: queryParams.id,
-          },
-        },
-      },
-    });
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const swapCommunityTypeWithPrograms = doJurisdictionHaveFeatureFlagSet(
-      jurisdiction as Jurisdiction,
+    const swapCommunityTypeWithPrograms = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.swapCommunityTypeWithPrograms,
     );
 
@@ -551,21 +539,10 @@ export class ApplicationExporterService {
       },
     });
 
-    const jurisdiction = await this.prisma.jurisdictions.findFirst({
-      select: {
-        featureFlags: true,
-      },
-      where: {
-        listings: {
-          some: {
-            id: queryParams.id,
-          },
-        },
-      },
-    });
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const swapCommunityTypeWithPrograms = doJurisdictionHaveFeatureFlagSet(
-      jurisdiction as Jurisdiction,
+    const swapCommunityTypeWithPrograms = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.swapCommunityTypeWithPrograms,
     );
 

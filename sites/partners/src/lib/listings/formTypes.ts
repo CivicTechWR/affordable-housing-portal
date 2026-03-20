@@ -4,6 +4,7 @@ import {
   ApplicationAddressTypeEnum,
   ApplicationMethodsTypeEnum,
   EnumListingDepositType,
+  Jurisdiction,
   Listing,
   ListingEvent,
   ListingFeaturesCreate,
@@ -238,6 +239,7 @@ export type FormMetadata = {
   unitGroups: TempUnitGroup[]
   openHouseEvents: TempEvent[]
   profile: User
+  siteConfig: Jurisdiction
   latLong: LatitudeLongitude
   customMapPositionChosen: boolean
   enableUnitGroups: boolean

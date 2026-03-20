@@ -11,7 +11,7 @@ describe("DetailBuildingFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => false,
+          isFeatureFlagOn: () => false,
         }}
       >
         <ListingContext.Provider
@@ -56,7 +56,7 @@ describe("DetailBuildingFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) =>
+          isFeatureFlagOn: (flag) =>
             flag === FeatureFlagEnum.enablePetPolicyCheckbox,
         }}
       >
@@ -85,7 +85,7 @@ describe("DetailBuildingFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) => flag === FeatureFlagEnum.enableParkingType,
+          isFeatureFlagOn: (flag) => flag === FeatureFlagEnum.enableParkingType,
         }}
       >
         <ListingContext.Provider
@@ -120,7 +120,7 @@ describe("DetailBuildingFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: (flag) => flag === FeatureFlagEnum.enableParkingType,
+          isFeatureFlagOn: (flag) => flag === FeatureFlagEnum.enableParkingType,
         }}
       >
         <ListingContext.Provider

@@ -42,7 +42,7 @@ describe("Partners Sign In Page", () => {
           value={{
             initialStateLoaded: true,
             profile: undefined,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -64,7 +64,7 @@ describe("Partners Sign In Page", () => {
           value={{
             initialStateLoaded: true,
             profile: undefined,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -93,7 +93,7 @@ describe("Partners Sign In Page", () => {
             initialStateLoaded: true,
             profile: undefined,
             login: mockLogin,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -131,7 +131,7 @@ describe("Partners Sign In Page", () => {
             initialStateLoaded: true,
             profile: undefined,
             login: mockLogin,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -162,7 +162,7 @@ describe("Partners Sign In Page", () => {
           value={{
             initialStateLoaded: true,
             profile: undefined,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -188,7 +188,7 @@ describe("Partners Sign In Page", () => {
           value={{
             initialStateLoaded: true,
             profile: undefined,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -212,7 +212,7 @@ describe("Partners Sign In Page", () => {
           value={{
             initialStateLoaded: true,
             profile: undefined,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -236,7 +236,7 @@ describe("Partners Sign In Page", () => {
           value={{
             initialStateLoaded: true,
             profile: undefined,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -274,7 +274,7 @@ describe("Partners Sign In Page", () => {
             initialStateLoaded: true,
             profile: undefined,
             login: mockLogin,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -318,7 +318,7 @@ describe("Partners Sign In Page", () => {
             profile: undefined,
             login: mockLogin,
             requestMfaCode: mockRequestMfaCode,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -391,7 +391,7 @@ describe("Partners Sign In Page", () => {
             profile: undefined,
             login: mockLogin,
             requestMfaCode: mockRequestMfaCode,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -445,7 +445,7 @@ describe("Partners Sign In Page", () => {
             profile: undefined,
             login: mockLogin,
             requestMfaCode: mockRequestMfaCode,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -496,7 +496,7 @@ describe("Partners Sign In Page", () => {
             profile: undefined,
             login: mockLogin,
             requestMfaCode: mockRequestMfaCode,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -546,7 +546,7 @@ describe("Partners Sign In Page", () => {
             initialStateLoaded: true,
             profile: undefined,
             login: mockLogin,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -596,7 +596,7 @@ describe("Partners Sign In Page", () => {
             profile: undefined,
             login: mockLogin,
             requestMfaCode: mockRequestMfaCode,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -643,7 +643,7 @@ describe("Partners Sign In Page", () => {
             profile: undefined,
             login: mockLogin,
             requestMfaCode: mockRequestMfaCode,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -686,7 +686,7 @@ describe("Partners Sign In Page", () => {
             initialStateLoaded: true,
             profile: undefined,
             login: mockLogin,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -724,7 +724,7 @@ describe("Partners Sign In Page", () => {
             userService: {
               resendPartnerConfirmation: mockResendPartnerConfirmation,
             } as unknown as UserService,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>
@@ -771,7 +771,7 @@ describe("Partners Sign In Page", () => {
             initialStateLoaded: true,
             profile: undefined,
             login: mockLogin,
-            doJurisdictionsHaveFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
+            isFeatureFlagOn: mockDoJurisdictionsHaveFeatureFlagOn,
           }}
         >
           <MessageContext.Provider value={TOAST_MESSAGE}>

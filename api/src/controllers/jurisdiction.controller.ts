@@ -59,21 +59,6 @@ export class JurisdictionController {
     return this.jurisdictionService.findOne({ jurisdictionId });
   }
 
-  @Get(`byName/:jurisdictionName`)
-  @ApiOperation({
-    summary: 'Get jurisdiction by name',
-    operationId: 'retrieveByName',
-  })
-  @ApiOkResponse({ type: Jurisdiction })
-  @UseGuards(ApiKeyGuard)
-  async retrieveByName(
-    @Param('jurisdictionName') jurisdictionName: string,
-  ): Promise<Jurisdiction> {
-    return await this.jurisdictionService.findOne({
-      jurisdictionName,
-    });
-  }
-
   @Post()
   @ApiOperation({
     summary: 'Create jurisdiction',

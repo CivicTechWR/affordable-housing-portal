@@ -30,7 +30,6 @@ import { PermissionService } from './permission.service';
 import { PrismaService } from './prisma.service';
 import { TranslationService } from './translation.service';
 import { AmiChart } from '../dtos/ami-charts/ami-chart.dto';
-import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import { Listing } from '../dtos/listings/listing.dto';
 import { ListingCreate } from '../dtos/listings/listing-create.dto';
 import { ListingDuplicate } from '../dtos/listings/listing-duplicate.dto';
@@ -61,7 +60,7 @@ import {
   summarizeUnits,
 } from '../utilities/unit-utilities';
 import { fillModelStringFields } from '../utilities/model-fields';
-import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 import { addUnitGroupsSummarized } from '../utilities/unit-groups-transformations';
 import { ListingMultiselectQuestion } from '../dtos/listings/listing-multiselect-question.dto';
 
@@ -305,27 +304,27 @@ export class ListingService implements OnModuleInit {
     listingId?: string,
     jurisId?: string,
   ): Promise<{ emails: string[] }> {
+    const normalizedUserRoles = Array.isArray(userRoles) ? userRoles : [userRoles];
+
     // determine where clause(s)
     const userRolesWhere: Prisma.UserAccountsWhereInput[] = [];
-    if (userRoles.includes(UserRoleEnum.admin))
+    if (normalizedUserRoles.includes(UserRoleEnum.admin))
       userRolesWhere.push({ userRoles: { isAdmin: true } });
-    if (userRoles.includes(UserRoleEnum.supportAdmin))
+    if (normalizedUserRoles.includes(UserRoleEnum.supportAdmin))
       userRolesWhere.push({ userRoles: { isSupportAdmin: true } });
-    if (userRoles.includes(UserRoleEnum.partner))
+    if (normalizedUserRoles.includes(UserRoleEnum.partner))
       userRolesWhere.push({
         userRoles: { isPartner: true },
         listings: { some: { id: listingId } },
       });
-    if (userRoles.includes(UserRoleEnum.jurisdictionAdmin)) {
+    if (normalizedUserRoles.includes(UserRoleEnum.jurisdictionAdmin)) {
       userRolesWhere.push({
         userRoles: { isJurisdictionalAdmin: true },
-        jurisdictions: { some: { id: jurisId } },
       });
     }
-    if (userRoles.includes(UserRoleEnum.limitedJurisdictionAdmin)) {
+    if (normalizedUserRoles.includes(UserRoleEnum.limitedJurisdictionAdmin)) {
       userRolesWhere.push({
         userRoles: { isLimitedJurisdictionalAdmin: true },
-        jurisdictions: { some: { id: jurisId } },
       });
     }
 
@@ -1267,21 +1266,21 @@ export class ListingService implements OnModuleInit {
     const rawJurisdiction = await this.prisma.jurisdictions.findUnique({
       select: {
         id: true,
-        featureFlags: true,
         listingApprovalPermissions: true,
       },
       where: {
         id: dto.jurisdictions.id,
       },
     });
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const enableUnitGroups = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as unknown as Jurisdiction,
+    const enableUnitGroups = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableUnitGroups,
     );
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as unknown as Jurisdiction,
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 
@@ -1714,13 +1713,8 @@ export class ListingService implements OnModuleInit {
       throw new BadRequestException('New listing name must be unique');
     }
 
-    const duplicateListingPermissions = (
-      requestingUser?.jurisdictions?.length === 1
-        ? requestingUser?.jurisdictions[0]
-        : requestingUser?.jurisdictions?.find(
-            (juris) => juris.id === storedListing?.jurisdictions?.id,
-          )
-    )?.duplicateListingPermissions;
+    const duplicateListingPermissions =
+      storedListing?.jurisdictions?.duplicateListingPermissions;
 
     const canDuplicate =
       requestingUser?.userRoles?.isAdmin ||
@@ -1754,17 +1748,11 @@ export class ListingService implements OnModuleInit {
       },
     );
 
-    //manually check for juris/listing mismatch since logic above is forcing admin permissioning
     if (
-      ((requestingUser?.userRoles?.isJurisdictionalAdmin ||
-        requestingUser?.userRoles?.isLimitedJurisdictionalAdmin) &&
-        !requestingUser?.jurisdictions?.some(
-          (juris) => juris.id === storedListing.jurisdictionId,
-        )) ||
-      (requestingUser?.userRoles?.isPartner &&
+      requestingUser?.userRoles?.isPartner &&
         !requestingUser?.listings?.some(
           (listing) => listing.id === storedListing.id,
-        ))
+        )
     ) {
       throw new ForbiddenException();
     }
@@ -1773,13 +1761,11 @@ export class ListingService implements OnModuleInit {
       where: {
         id: storedListing.jurisdictions.id,
       },
-      include: {
-        featureFlags: true,
-      },
     });
+    const featureFlags = await this.prisma.featureFlags.findMany();
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as unknown as Jurisdiction,
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 
@@ -2086,7 +2072,6 @@ export class ListingService implements OnModuleInit {
 
     const rawJurisdiction = await this.prisma.jurisdictions.findUnique({
       select: {
-        featureFlags: true,
         listingApprovalPermissions: true,
         id: true,
       },
@@ -2094,13 +2079,14 @@ export class ListingService implements OnModuleInit {
         id: incomingDto.jurisdictions.id,
       },
     });
-    const enableUnitGroups = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as Jurisdiction,
+    const featureFlags = await this.prisma.featureFlags.findMany();
+    const enableUnitGroups = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableUnitGroups,
     );
 
-    const enableV2MSQ = doJurisdictionHaveFeatureFlagSet(
-      rawJurisdiction as Jurisdiction,
+    const enableV2MSQ = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableV2MSQ,
     );
 

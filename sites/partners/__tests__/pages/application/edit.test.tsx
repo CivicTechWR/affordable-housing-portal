@@ -34,7 +34,7 @@ describe("application edit page", () => {
         <AuthContext.Provider
           value={{
             profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               featureFlag === FeatureFlagEnum.enableApplicationStatus,
           }}
         >
@@ -80,7 +80,7 @@ describe("application edit page", () => {
         <AuthContext.Provider
           value={{
             profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               featureFlag === FeatureFlagEnum.enableApplicationStatus,
           }}
         >
@@ -125,7 +125,7 @@ describe("application edit page", () => {
         <AuthContext.Provider
           value={{
             profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               featureFlag === FeatureFlagEnum.enableApplicationStatus,
           }}
         >
@@ -173,7 +173,7 @@ describe("application edit page", () => {
         <AuthContext.Provider
           value={{
             profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-            doJurisdictionsHaveFeatureFlagOn: (featureFlag) =>
+            isFeatureFlagOn: (featureFlag) =>
               featureFlag === FeatureFlagEnum.enableApplicationStatus,
           }}
         >

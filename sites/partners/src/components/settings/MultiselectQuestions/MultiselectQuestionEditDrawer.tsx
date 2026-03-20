@@ -83,26 +83,21 @@ const MultiselectQuestionEditDrawer = ({
   const [optionData, setOptionData] = useState<MultiselectOption>(null)
   const [dragOrder, setDragOrder] = useState([])
 
-  const { profile } = useContext(AuthContext)
+  const { siteConfig } = useContext(AuthContext)
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { register, getValues, trigger, errors, clearErrors, setError, watch, formState } =
     useForm()
 
   const jurisdictionId = watch("jurisdictionId")
   const { mapLayers } = useMapLayersList(jurisdictionId)
-  const isAdditionalDetailsEnabled = profile?.jurisdictions?.some(
-    (jurisdiction) => jurisdiction.enableGeocodingPreferences
-  )
+  const isAdditionalDetailsEnabled = !!siteConfig?.enableGeocodingPreferences
   const shouldCollectAddress = watch("shouldCollectAddress")
   const validationMethod = watch("validationMethod")
   const shouldCollectAddressExpand =
     ((optionData?.shouldCollectAddress && shouldCollectAddress === undefined) ||
       shouldCollectAddress === YesNoEnum.yes) &&
     isAdditionalDetailsEnabled
-  const isValidationRadiusVisible =
-    profile?.jurisdictions.find((juris) => juris.id === jurisdictionId)
-      ?.enableGeocodingRadiusMethod ||
-    profile?.jurisdictions.every((juris) => juris.enableGeocodingRadiusMethod)
+  const isValidationRadiusVisible = !!siteConfig?.enableGeocodingRadiusMethod
   const radiusExpand =
     (optionData?.validationMethod === ValidationMethodEnum.radius &&
       validationMethod === undefined) ||
@@ -271,7 +266,7 @@ const MultiselectQuestionEditDrawer = ({
       description: formValues.description.trim(),
       hideFromListing: formValues.showOnListingQuestion === YesNoEnum.no,
       jurisdictions: [], // TODO: remove this when V2 schema is default
-      jurisdiction: profile.jurisdictions.find((juris) => juris.id === formValues.jurisdictionId),
+      jurisdiction: siteConfig,
       links: formValues.preferenceUrl
         ? [{ title: formValues.preferenceLinkTitle.trim(), url: formValues.preferenceUrl.trim() }]
         : [],
@@ -561,13 +556,13 @@ const MultiselectQuestionEditDrawer = ({
                       controlClassName={"control"}
                       keyPrefix={"jurisdictions"}
                       options={
-                        profile
+                        siteConfig
                           ? [
                               { label: "", value: "" },
-                              ...(profile?.jurisdictions || []).map((jurisdiction) => ({
-                                label: jurisdiction.name,
-                                value: jurisdiction.id,
-                              })),
+                              {
+                                label: siteConfig.name,
+                                value: siteConfig.id,
+                              },
                             ]
                           : [{ label: "", value: "" }]
                       }

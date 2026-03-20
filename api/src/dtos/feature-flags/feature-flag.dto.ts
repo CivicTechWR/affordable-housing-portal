@@ -1,14 +1,12 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import {
   IsBoolean,
   IsDefined,
   IsString,
   MaxLength,
-  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDTO } from '../shared/abstract.dto';
-import { IdDTO } from '../shared/id.dto';
 import { ValidationsGroupsEnum } from '../../enums/shared/validation-groups-enum';
 import { FeatureFlagEnum } from '../../enums/feature-flags/feature-flags-enum';
 
@@ -35,10 +33,4 @@ export class FeatureFlag extends AbstractDTO {
   @IsDefined({ groups: [ValidationsGroupsEnum.default] })
   @ApiProperty()
   active: boolean;
-
-  @Expose()
-  @ValidateNested({ groups: [ValidationsGroupsEnum.default], each: true })
-  @Type(() => IdDTO)
-  @ApiProperty({ type: IdDTO, isArray: true })
-  jurisdictions: IdDTO[];
 }

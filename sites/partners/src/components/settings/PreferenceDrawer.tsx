@@ -68,7 +68,7 @@ const PreferenceDrawer = ({
   const [optionData, setOptionData] = useState<MultiselectOption>(null)
   const [dragOrder, setDragOrder] = useState([])
 
-  const { profile } = useContext(AuthContext)
+  const { siteConfig } = useContext(AuthContext)
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const {
     register,
@@ -100,18 +100,13 @@ const PreferenceDrawer = ({
     questionData === null || questionData?.optOutText !== null ? YesNoEnum.yes : undefined
   )
 
-  const isAdditionalDetailsEnabled = profile?.jurisdictions?.some(
-    (jurisdiction) => jurisdiction.enableGeocodingPreferences
-  )
+  const isAdditionalDetailsEnabled = !!siteConfig?.enableGeocodingPreferences
 
   const collectAddressExpand =
     ((optionData?.collectAddress && watch("collectAddress") === undefined) ||
       watch("collectAddress") === YesNoEnum.yes) &&
     isAdditionalDetailsEnabled
-  const isValidationRadiusVisible =
-    profile?.jurisdictions.find((juris) => juris.id === watch("jurisdictionId"))
-      ?.enableGeocodingRadiusMethod ||
-    profile?.jurisdictions.every((juris) => juris.enableGeocodingRadiusMethod)
+  const isValidationRadiusVisible = !!siteConfig?.enableGeocodingRadiusMethod
   const readiusExpand =
     (optionData?.validationMethod === ValidationMethodEnum.radius &&
       watch("validationMethod") === undefined) ||
@@ -439,13 +434,13 @@ const PreferenceDrawer = ({
                       controlClassName={"control"}
                       keyPrefix={"jurisdictions"}
                       options={
-                        profile
+                        siteConfig
                           ? [
                               { label: "", value: "" },
-                              ...(profile?.jurisdictions || []).map((jurisdiction) => ({
-                                label: jurisdiction.name,
-                                value: jurisdiction.id,
-                              })),
+                              {
+                                label: siteConfig.name,
+                                value: siteConfig.id,
+                              },
                             ]
                           : [{ label: "", value: "" }]
                       }
@@ -497,9 +492,7 @@ const PreferenceDrawer = ({
                 applicationSection: MultiselectQuestionsApplicationSectionEnum.preferences,
                 description: formValues.description,
                 hideFromListing: formValues.showOnListingQuestion === YesNoEnum.no,
-                jurisdictions: [
-                  profile.jurisdictions.find((juris) => juris.id === formValues.jurisdictionId),
-                ],
+                jurisdictions: [siteConfig],
                 links: formValues.preferenceUrl
                   ? [{ title: formValues.preferenceLinkTitle, url: formValues.preferenceUrl }]
                   : [],

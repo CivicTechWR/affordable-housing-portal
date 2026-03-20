@@ -7,9 +7,13 @@ import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3"
 import {
   addTranslation,
   GenericRouter,
+  LinkProps as UICLinkProps,
   NavigationContext as UICNavigationContext,
 } from "@bloom-housing/ui-components"
-import { NavigationContext } from "@bloom-housing/ui-seeds/src/global/NavigationContext"
+import {
+  LinkProps as SeedsLinkProps,
+  NavigationContext,
+} from "@bloom-housing/ui-seeds/src/global/NavigationContext"
 import {
   blankApplication,
   LoggedInUserIdleTimeout,
@@ -121,11 +125,14 @@ function PublicApp({ Component, router, pageProps }: AppProps) {
     </ConfigProvider>
   )
 
+  const seedsLinkComponent = LinkComponent as React.FunctionComponent<SeedsLinkProps>
+  const uiComponentsLinkComponent = LinkComponent as React.FunctionComponent<UICLinkProps>
+
   return (
-    <NavigationContext.Provider value={{ LinkComponent }}>
+    <NavigationContext.Provider value={{ LinkComponent: seedsLinkComponent }}>
       <UICNavigationContext.Provider
         value={{
-          LinkComponent,
+          LinkComponent: uiComponentsLinkComponent,
           router: router as GenericRouter,
         }}
       >

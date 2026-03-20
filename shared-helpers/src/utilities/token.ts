@@ -1,4 +1,4 @@
-import jwtDecode from "jwt-decode"
+import { jwtDecode } from "jwt-decode"
 
 export const ACCESS_TOKEN_LOCAL_STORAGE_KEY = "@bht"
 

@@ -7,7 +7,7 @@ import {
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import Resources from "../components/resources/Resources"
 import { UserStatus } from "../lib/constants"
-import { fetchJurisdictionByName } from "../lib/hooks"
+import { fetchSiteConfig } from "../lib/hooks"
 import { isFeatureFlagOn } from "../lib/helpers"
 
 const AdditionalResources = ({ jurisdiction }: { jurisdiction: Jurisdiction }) => {
@@ -37,7 +37,7 @@ export default AdditionalResources
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getStaticProps() {
-  const jurisdiction = await fetchJurisdictionByName()
+  const jurisdiction = await fetchSiteConfig()
 
   return {
     props: { jurisdiction },

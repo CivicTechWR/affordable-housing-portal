@@ -25,10 +25,10 @@ import { useJurisdictionalMultiselectQuestionList } from "../../../lib/hooks"
 import styles from "./preferences.module.scss"
 
 const MultiselectQuestionsPreferences = () => {
-  const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { profile, siteConfig, isFeatureFlagOn } = useContext(AuthContext)
   const router = useRouter()
   const tableOptions = useAgTable()
-  const enableProperties = doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableProperties)
+  const enableProperties = isFeatureFlagOn(FeatureFlagEnum.enableProperties)
 
   const [multiselectQuestionDrawerOpen, setMultiselectQuestionDrawerOpen] =
     useState<DrawerType | null>(null)
@@ -101,7 +101,7 @@ const MultiselectQuestionsPreferences = () => {
   }, [])
 
   const { data, loading, cacheKey } = useJurisdictionalMultiselectQuestionList(
-    profile?.jurisdictions?.map((jurisdiction) => jurisdiction.id).toString(),
+    siteConfig?.id,
     MultiselectQuestionsApplicationSectionEnum.preferences,
     [
       MultiselectQuestionsStatusEnum.draft,

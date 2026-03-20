@@ -7,11 +7,10 @@ import { AuthContext } from "@bloom-housing/shared-helpers"
 
 const DetailListingVerification = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableIsVerified = doJurisdictionsHaveFeatureFlagOn(
-    "enableIsVerified",
-    listing.jurisdictions.id
+  const enableIsVerified = isFeatureFlagOn(
+    "enableIsVerified"
   )
 
   if (!enableIsVerified) {

@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
   Logger,
@@ -61,7 +62,6 @@ import { ApplicationService } from './application.service';
 
 const views: Partial<Record<UserViews, Prisma.UserAccountsInclude>> = {
   base: {
-    jurisdictions: true,
     userRoles: true,
   },
 };
@@ -175,39 +175,20 @@ export class UserService {
   async update(
     dto: UserUpdate,
     requestingUser: User,
-    jurisdictionName: string,
   ): Promise<User> {
     const storedUser = await this.findUserOrError(
       { userId: dto.id },
       UserViews.full,
     );
 
-    if (dto.jurisdictions?.length) {
-      // if the incoming dto has jurisdictions make sure the user has access to update users in that jurisdiction
-      await Promise.all(
-        dto.jurisdictions.map(async (jurisdiction) => {
-          await this.permissionService.canOrThrow(
-            requestingUser,
-            'user',
-            permissionActions.update,
-            {
-              id: dto.id,
-              jurisdictionId: jurisdiction.id,
-            },
-          );
-        }),
-      );
-    } else {
-      // if the incoming dto has no jurisdictions make sure the user has access to update the user
-      await this.permissionService.canOrThrow(
-        requestingUser,
-        'userProfile',
-        permissionActions.update,
-        {
-          id: dto.id,
-        },
-      );
-    }
+    await this.permissionService.canOrThrow(
+      requestingUser,
+      'user',
+      permissionActions.update,
+      {
+        id: dto.id,
+      },
+    );
 
     let passwordHash: string;
     let passwordUpdatedAt: Date;
@@ -243,9 +224,6 @@ export class UserService {
       );
 
       await this.emailService.changeEmail(
-        dto.jurisdictions && dto.jurisdictions[0]
-          ? dto.jurisdictions[0].name
-          : jurisdictionName,
         mapTo(User, storedUser),
         dto.appUrl,
         confirmationUrl,
@@ -275,27 +253,13 @@ export class UserService {
       }
     }
 
-    // disconnect existing connected listings/jurisdictions
+    // disconnect existing connected listings
     if (storedUser.listings?.length) {
       await this.prisma.userAccounts.update({
         data: {
           listings: {
             disconnect: storedUser.listings.map((listing) => ({
               id: listing.id,
-            })),
-          },
-        },
-        where: {
-          id: dto.id,
-        },
-      });
-    }
-    if (storedUser.jurisdictions?.length) {
-      await this.prisma.userAccounts.update({
-        data: {
-          jurisdictions: {
-            disconnect: storedUser.jurisdictions.map((jurisdiction) => ({
-              id: jurisdiction.id,
             })),
           },
         },
@@ -322,13 +286,6 @@ export class UserService {
         listings: dto.listings
           ? {
               connect: dto.listings.map((listing) => ({ id: listing.id })),
-            }
-          : undefined,
-        jurisdictions: dto.jurisdictions
-          ? {
-              connect: dto.jurisdictions.map((jurisdiction) => ({
-                id: jurisdiction.id,
-              })),
             }
           : undefined,
       },
@@ -374,9 +331,6 @@ export class UserService {
           confirmationToken,
         );
         await this.emailService.welcome(
-          storedUser.jurisdictions && storedUser.jurisdictions.length
-            ? storedUser.jurisdictions[0].name
-            : null,
           storedUser as unknown as User,
           dto.appUrl,
           confirmationUrl,
@@ -387,7 +341,7 @@ export class UserService {
           confirmationToken,
         );
         await this.emailService.invitePartnerUser(
-          storedUser.jurisdictions,
+          null,
           storedUser as unknown as User,
           dto.appUrl,
           confirmationUrl,
@@ -448,7 +402,7 @@ export class UserService {
       },
     });
     await this.emailService.forgotPassword(
-      storedUser.jurisdictions,
+      null,
       mapTo(User, storedUser),
       dto.appUrl,
       resetToken,
@@ -541,7 +495,9 @@ export class UserService {
     req: Request,
   ): Promise<User> {
     const requestingUser = mapTo(User, req['user']);
-    const jurisdictionName = (req.headers['jurisdictionname'] as string) || '';
+    // Public-user flows now resolve email behavior from the singleton site configuration
+    // instead of a request-scoped jurisdiction header.
+    const siteJurisdiction = await this.prisma.jurisdictions.findFirst();
 
     if (
       this.containsInvalidCharacters(dto.firstName) ||
@@ -591,37 +547,6 @@ export class UserService {
           },
         });
         return mapTo(User, res);
-      } else if (
-        existingUser?.userRoles?.isPartner &&
-        'userRoles' in dto &&
-        dto?.userRoles?.isPartner &&
-        this.jurisdictionMismatch(dto.jurisdictions, existingUser.jurisdictions)
-      ) {
-        // recreating a partner with jurisdiction mismatch -> giving partner a new jurisdiction
-        const jursidictions = existingUser.jurisdictions
-          .map((juris) => ({ id: juris.id }))
-          .concat(dto.jurisdictions);
-
-        const listings = existingUser.listings
-          .map((juris) => ({ id: juris.id }))
-          .concat(dto.listings);
-
-        const res = await this.prisma.userAccounts.update({
-          include: views.full,
-          data: {
-            jurisdictions: {
-              connect: jursidictions.map((juris) => ({ id: juris.id })),
-            },
-            listings: {
-              connect: listings.map((listing) => ({ id: listing.id })),
-            },
-          },
-          where: {
-            id: existingUser.id,
-          },
-        });
-
-        return mapTo(User, res);
       } else {
         // existing user && ((partner user -> trying to recreate user) || (public user -> trying to recreate a public user))
         throw new ConflictException('emailInUse');
@@ -637,30 +562,6 @@ export class UserService {
       passwordHash = await passwordToHash((dto as UserCreate).password);
     }
 
-    let jurisdictions:
-      | {
-          jurisdictions: Prisma.JurisdictionsCreateNestedManyWithoutUser_accountsInput;
-        }
-      | Record<string, never> = dto.jurisdictions
-      ? {
-          jurisdictions: {
-            connect: dto.jurisdictions.map((juris) => ({
-              id: juris.id,
-            })),
-          },
-        }
-      : {};
-
-    if (!forPartners && jurisdictionName) {
-      jurisdictions = {
-        jurisdictions: {
-          connect: {
-            name: jurisdictionName,
-          },
-        },
-      };
-    }
-
     let newUser = await this.prisma.userAccounts.create({
       data: {
         passwordHash: passwordHash,
@@ -672,7 +573,6 @@ export class UserService {
         phoneNumber: dto.phoneNumber,
         language: dto.language,
         mfaEnabled: forPartners,
-        ...jurisdictions,
         userRoles:
           'userRoles' in dto
             ? {
@@ -707,13 +607,8 @@ export class UserService {
 
     // Public user that needs email
     if (!forPartners && sendWelcomeEmail) {
-      const fullJurisdiction = await this.prisma.jurisdictions.findFirst({
-        where: {
-          name: jurisdictionName as string,
-        },
-      });
-
-      if (fullJurisdiction?.allowSingleUseCodeLogin) {
+      // Single-use-code login remains a site-level setting, so read it from the singleton config.
+      if (siteJurisdiction?.allowSingleUseCodeLogin) {
         this.requestSingleUseCode(dto, req);
       } else {
         const confirmationUrl = this.getPublicConfirmationUrl(
@@ -721,7 +616,6 @@ export class UserService {
           confirmationToken,
         );
         await this.emailService.welcome(
-          jurisdictionName,
           mapTo(User, newUser),
           dto.appUrl,
           confirmationUrl,
@@ -733,7 +627,7 @@ export class UserService {
         confirmationToken,
       );
       await this.emailService.invitePartnerUser(
-        dto.jurisdictions,
+        null,
         mapTo(User, newUser),
         this.configService.get('PARTNERS_PORTAL_URL'),
         confirmationUrl,
@@ -822,35 +716,19 @@ export class UserService {
       );
     }
 
-    if (!requestingUser.userRoles?.isJurisdictionalAdmin) {
-      // if its an admin, partner, or a user without roles
-      await this.permissionService.canOrThrow(requestingUser, 'user', action, {
-        id: targetUser.id,
-      });
-    } else if (targetUser.userRoles?.isAdmin) {
-      // if its a jurisdictional admin trying to perform an action on an admin user
+    if (
+      requestingUser.userRoles?.isJurisdictionalAdmin &&
+      targetUser.userRoles?.isAdmin
+    ) {
+      // jurisdictional admins cannot act on admin users
       throw new ForbiddenException(
         `a jurisdictional admin is attempting to ${action} an admin user`,
       );
-    } else {
-      // jurisdictional admins should only be allowed to perform an action on a user if they share a jurisdiction
-      const requesterJurisdictions = requestingUser.jurisdictions?.map(
-        (juris) => juris.id,
-      );
-      const targetJurisdictions = targetUser.jurisdictions?.map(
-        (juris) => juris.id,
-      );
-
-      if (
-        !requesterJurisdictions.some((juris) =>
-          targetJurisdictions.includes(juris),
-        )
-      ) {
-        throw new ForbiddenException(
-          `a jurisdictional admin is attempting to ${action} a user they do not share a jurisdiction with`,
-        );
-      }
     }
+
+    await this.permissionService.canOrThrow(requestingUser, 'user', action, {
+      id: targetUser.id,
+    });
   }
 
   /*
@@ -877,27 +755,6 @@ export class UserService {
   */
   getPartnersConfirmationUrl(appUrl: string, confirmationToken: string) {
     return `${appUrl}/users/confirm?token=${confirmationToken}`;
-  }
-
-  /*
-    verify that there is a jurisdictional difference between the incoming user and the existing user
-  */
-  jurisdictionMismatch(
-    incomingJurisdictions: IdDTO[],
-    existingJurisdictions: IdDTO[],
-  ): boolean {
-    return (
-      incomingJurisdictions.reduce((misMatched, jurisdiction) => {
-        if (
-          !existingJurisdictions?.some(
-            (existingJuris) => existingJuris.id === jurisdiction.id,
-          )
-        ) {
-          misMatched.push(jurisdiction.id);
-        }
-        return misMatched;
-      }, []).length > 0
-    );
   }
 
   containsInvalidCharacters(value: string): boolean {
@@ -931,9 +788,6 @@ export class UserService {
   ): Promise<SuccessDTO> {
     const user = await this.prisma.userAccounts.findFirst({
       where: { email: dto.email },
-      include: {
-        jurisdictions: true,
-      },
     });
     if (!user) {
       return { success: true };
@@ -945,21 +799,11 @@ export class UserService {
       );
     }
 
-    const jurisdictionName = req?.headers?.jurisdictionname;
-    if (!jurisdictionName) {
-      throw new BadRequestException(
-        'jurisdictionname is missing from the request headers',
-      );
-    }
-
     const juris = await this.prisma.jurisdictions.findFirst({
       select: {
         id: true,
         allowSingleUseCodeLogin: true,
         name: true,
-      },
-      where: {
-        name: jurisdictionName as string,
       },
       orderBy: {
         allowSingleUseCodeLogin: OrderByEnum.DESC,
@@ -967,9 +811,7 @@ export class UserService {
     });
 
     if (!juris) {
-      throw new BadRequestException(
-        `Jurisidiction ${jurisdictionName} does not exists`,
-      );
+      throw new InternalServerErrorException('Site configuration missing');
     }
 
     const singleUseCode = getSingleUseCode(
@@ -1162,9 +1004,6 @@ export class UserService {
         .subtract(warnDateNumber, 'days')
         .toDate();
       const users = await this.prisma.userAccounts.findMany({
-        include: {
-          jurisdictions: true,
-        },
         where: {
           lastLoginAt: { lte: warnDate },
           userRoles: null,

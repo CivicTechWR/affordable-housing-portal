@@ -1456,27 +1456,6 @@ export class JurisdictionsService {
       axios(configs, resolve, reject)
     })
   }
-  /**
-   * Get jurisdiction by name
-   */
-  retrieveByName(
-    params: {
-      /**  */
-      jurisdictionName: string
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<Jurisdiction> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + "/jurisdictions/byName/{jurisdictionName}"
-      url = url.replace("{jurisdictionName}", params["jurisdictionName"] + "")
-
-      const configs: IRequestConfig = getConfigs("get", "application/json", url, options)
-
-      /** 适配ios13，get请求不允许带body */
-
-      axios(configs, resolve, reject)
-    })
-  }
 }
 
 export class ApplicationsService {
@@ -2801,28 +2780,6 @@ export class FeatureFlagsService {
       let url = basePath + "/featureFlags"
 
       const configs: IRequestConfig = getConfigs("delete", "application/json", url, options)
-
-      let data = params.body
-
-      configs.data = data
-
-      axios(configs, resolve, reject)
-    })
-  }
-  /**
-   * Associate and disassociate jurisdictions with a feature flag
-   */
-  associateJurisdictions(
-    params: {
-      /** requestBody */
-      body?: FeatureFlagAssociate
-    } = {} as any,
-    options: IRequestOptions = {}
-  ): Promise<FeatureFlag> {
-    return new Promise((resolve, reject) => {
-      let url = basePath + "/featureFlags/associateJurisdictions"
-
-      const configs: IRequestConfig = getConfigs("put", "application/json", url, options)
 
       let data = params.body
 
@@ -7780,9 +7737,6 @@ export interface FeatureFlag {
 
   /**  */
   active: boolean
-
-  /**  */
-  jurisdictions: IdDTO[]
 }
 
 export interface Jurisdiction {
@@ -8597,7 +8551,7 @@ export interface User {
   language?: LanguagesEnum
 
   /**  */
-  jurisdictions: Jurisdiction[]
+  featureFlags?: FeatureFlag[]
 
   /**  */
   mfaEnabled?: boolean
@@ -8685,9 +8639,6 @@ export interface UserCreate {
 
   /**  */
   emailConfirmation?: string
-
-  /**  */
-  jurisdictions?: IdDTO[]
 }
 
 export interface UserDeleteDTO {
@@ -8734,9 +8685,6 @@ export interface UserInvite {
 
   /**  */
   email: string
-
-  /**  */
-  jurisdictions: IdDTO[]
 }
 
 export interface RequestSingleUseCode {
@@ -8805,9 +8753,6 @@ export interface UserUpdate {
 
   /**  */
   appUrl?: string
-
-  /**  */
-  jurisdictions?: IdDTO[]
 }
 
 export interface Login {
@@ -8931,17 +8876,6 @@ export interface PaginationDTO {
 
   /**  */
   pageSize?: number
-}
-
-export interface FeatureFlagAssociate {
-  /**  */
-  id: string
-
-  /**  */
-  associate: string[]
-
-  /**  */
-  remove: string[]
 }
 
 export interface FeatureFlagCreate {

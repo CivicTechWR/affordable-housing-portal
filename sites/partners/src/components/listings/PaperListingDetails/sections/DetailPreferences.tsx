@@ -11,11 +11,10 @@ import SectionWithGrid from "../../../shared/SectionWithGrid"
 
 const DetailPreferences = () => {
   const listing = useContext(ListingContext)
-  const { doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const disableListingPreferences = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences,
-    listing.jurisdictions.id
+  const disableListingPreferences = isFeatureFlagOn(
+    FeatureFlagEnum.disableListingPreferences
   )
 
   const preferencesTableHeaders = {

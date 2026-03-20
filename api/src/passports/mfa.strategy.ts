@@ -46,7 +46,6 @@ export class MfaStrategy extends PassportStrategy(Strategy, 'mfa') {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: true,
       },
       where: {
         email: dto.email,

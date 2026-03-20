@@ -10,6 +10,7 @@ import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import advanced from 'dayjs/plugin/advancedFormat';
 import { LanguagesEnum, ReviewOrderTypeEnum } from '@prisma/client';
+import { FeatureFlagService } from './feature-flag.service';
 import { JurisdictionService } from './jurisdiction.service';
 import { SendGridService } from './sendgrid.service';
 import { TranslationService } from './translation.service';
@@ -19,7 +20,7 @@ import { Listing } from '../dtos/listings/listing.dto';
 import { IdDTO } from '../dtos/shared/id.dto';
 import { User } from '../dtos/users/user.dto';
 import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
-import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
+import { isFeatureFlagActive } from '../utilities/feature-flag-utilities';
 import { getPublicEmailURL } from '../utilities/get-public-email-url';
 import type { ApplicationStatusChangeItem } from '../utilities/applicationStatusChanges';
 dayjs.extend(utc);
@@ -46,6 +47,7 @@ export class EmailService {
     private readonly sendGrid: SendGridService,
     private readonly translationService: TranslationService,
     private readonly jurisdictionService: JurisdictionService,
+    private readonly featureFlagService: FeatureFlagService,
     @Inject(Logger)
     private logger = new Logger(EmailService.name),
   ) {
@@ -164,49 +166,42 @@ export class EmailService {
   }
 
   private async getJurisdiction(
-    jurisdictionIds: IdDTO[] | null,
+    jurisdictionId?: string,
     jurisdictionName?: string,
   ): Promise<Jurisdiction | null> {
-    // Only return the jurisdiction if there is one jurisdiction passed in.
-    // For example if the user is tied to more than one jurisdiction the user should received the generic translations
-    if (jurisdictionIds?.length === 1) {
+    if (jurisdictionId) {
       return await this.jurisdictionService.findOne({
-        jurisdictionId: jurisdictionIds[0]?.id,
+        jurisdictionId,
       });
     } else if (jurisdictionName) {
       return await this.jurisdictionService.findOne({
         jurisdictionName: jurisdictionName,
       });
     }
-    return null;
+    return this.getSiteJurisdiction();
   }
 
-  private async getEmailToSendFrom(
-    jurisdictionIds: IdDTO[],
-    jurisdiction: Jurisdiction,
-  ): Promise<string> {
-    if (jurisdiction) {
-      return jurisdiction.emailFromAddress;
-    }
-    // An admin will be attached to more than one jurisdiction so we want generic translations
-    // but still need an email to send from
-    if (jurisdictionIds.length > 1) {
-      const firstJurisdiction = await this.jurisdictionService.findOne({
-        jurisdictionId: jurisdictionIds[0].id,
-      });
-      return firstJurisdiction?.emailFromAddress || '';
-    }
-    return '';
+  /**
+   * Loads the singleton site configuration used for system-generated emails.
+   *
+   * @returns The singleton jurisdiction record acting as site configuration.
+   * @throws {NotFoundException} If no site configuration row exists.
+   */
+  private async getSiteJurisdiction(): Promise<Jurisdiction> {
+    return this.jurisdictionService.findSingleton();
+  }
+
+  private getEmailToSendFrom(jurisdiction: Jurisdiction): string {
+    return jurisdiction?.emailFromAddress || '';
   }
 
   /* Send welcome email to new public users */
   public async welcome(
-    jurisdictionName: string,
     user: User,
     appUrl: string,
     confirmationUrl: string,
   ) {
-    const jurisdiction = await this.getJurisdiction(null, jurisdictionName);
+    const jurisdiction = await this.getJurisdiction();
     const baseUrl = appUrl ? new URL(appUrl).origin : undefined;
     await this.loadTranslations(jurisdiction, user.language);
     await this.send(
@@ -223,17 +218,14 @@ export class EmailService {
 
   /* Send invite email to partner users */
   async invitePartnerUser(
-    jurisdictionIds: IdDTO[],
+    jurisdictionId: string,
     user: User,
     appUrl: string,
     confirmationUrl: string,
   ) {
-    const jurisdiction = await this.getJurisdiction(jurisdictionIds);
+    const jurisdiction = await this.getJurisdiction(jurisdictionId);
     void (await this.loadTranslations(jurisdiction, user.language));
-    const emailFromAddress = await this.getEmailToSendFrom(
-      jurisdictionIds,
-      jurisdiction,
-    );
+    const emailFromAddress = this.getEmailToSendFrom(jurisdiction);
     await this.send(
       user.email,
       emailFromAddress,
@@ -248,13 +240,12 @@ export class EmailService {
 
   /* send change of email email */
   public async changeEmail(
-    jurisdictionName: string,
     user: User,
     appUrl: string,
     confirmationUrl: string,
     newEmail: string,
   ) {
-    const jurisdiction = await this.getJurisdiction(null, jurisdictionName);
+    const jurisdiction = await this.getJurisdiction();
     await this.loadTranslations(jurisdiction, user.language);
     await this.send(
       newEmail,
@@ -270,20 +261,17 @@ export class EmailService {
 
   /* Send forgot password email */
   public async forgotPassword(
-    jurisdictionIds: IdDTO[],
+    jurisdictionId: string,
     user: User,
     appUrl: string,
     resetToken: string,
   ) {
-    const jurisdiction = await this.getJurisdiction(jurisdictionIds);
+    const jurisdiction = await this.getJurisdiction(jurisdictionId);
     void (await this.loadTranslations(jurisdiction, user.language));
     const compiledTemplate = this.template('forgot-password');
     const resetUrl = getPublicEmailURL(appUrl, resetToken, '/reset-password');
     const baseUrl = appUrl ? new URL(appUrl).origin : undefined;
-    const emailFromAddress = await this.getEmailToSendFrom(
-      jurisdictionIds,
-      jurisdiction,
-    );
+    const emailFromAddress = this.getEmailToSendFrom(jurisdiction);
 
     await this.send(
       user.email,
@@ -298,12 +286,9 @@ export class EmailService {
   }
 
   public async sendMfaCode(user: User, singleUseCode: string) {
-    const jurisdiction = await this.getJurisdiction(user.jurisdictions);
+    const jurisdiction = await this.getJurisdiction();
     void (await this.loadTranslations(jurisdiction, user.language));
-    const emailFromAddress = await this.getEmailToSendFrom(
-      user.jurisdictions,
-      jurisdiction,
-    );
+    const emailFromAddress = this.getEmailToSendFrom(jurisdiction);
     await this.send(
       user.email,
       emailFromAddress,
@@ -321,14 +306,11 @@ export class EmailService {
     jurisdictionName?: string,
   ) {
     const jurisdiction = await this.getJurisdiction(
-      user.jurisdictions,
+      undefined,
       jurisdictionName,
     );
     void (await this.loadTranslations(jurisdiction, user.language));
-    const emailFromAddress = await this.getEmailToSendFrom(
-      user.jurisdictions,
-      jurisdiction,
-    );
+    const emailFromAddress = this.getEmailToSendFrom(jurisdiction);
     await this.send(
       user.email,
       emailFromAddress,
@@ -350,10 +332,11 @@ export class EmailService {
     application: Application,
     appUrl: string,
   ) {
-    const jurisdiction = await this.getJurisdiction([listing.jurisdictions]);
+    const jurisdiction = await this.getJurisdiction(listing.jurisdictions?.id);
     void (await this.loadTranslations(jurisdiction, application.language));
-    const enableUnitGroups = doJurisdictionHaveFeatureFlagSet(
-      jurisdiction,
+    const featureFlags = await this.featureFlagService.list();
+    const enableUnitGroups = isFeatureFlagActive(
+      featureFlags,
       FeatureFlagEnum.enableUnitGroups,
     );
     const listingUrl = `${appUrl}/listing/${listing.id}`;
@@ -463,7 +446,7 @@ export class EmailService {
     appUrl: string,
     contactEmail?: string,
   ) {
-    const jurisdiction = await this.getJurisdiction([listing.jurisdictions]);
+    const jurisdiction = await this.getJurisdiction(listing.jurisdictions?.id);
     void (await this.loadTranslations(jurisdiction, application.language));
 
     const summaryItems = changes.map((change) => {
@@ -527,7 +510,9 @@ export class EmailService {
     appUrl: string,
   ) {
     try {
-      const jurisdiction = await this.getJurisdiction([jurisdictionId]);
+      const jurisdiction = await this.getJurisdiction(
+        typeof jurisdictionId === 'string' ? jurisdictionId : jurisdictionId?.id,
+      );
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(
         `Sending request approval email for listing ${listingInfo.name} to ${emails.length} emails`,
@@ -555,9 +540,7 @@ export class EmailService {
     appUrl: string,
   ) {
     try {
-      const jurisdiction = listingInfo.juris
-        ? await this.getJurisdiction([{ id: listingInfo.juris }])
-        : user.jurisdictions[0];
+      const jurisdiction = await this.getJurisdiction(listingInfo.juris);
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(
         `Sending changes requested email for listing ${listingInfo.name} to ${emails.length} emails`,
@@ -585,7 +568,9 @@ export class EmailService {
     publicUrl: string,
   ) {
     try {
-      const jurisdiction = await this.getJurisdiction([jurisdictionId]);
+      const jurisdiction = await this.getJurisdiction(
+        typeof jurisdictionId === 'string' ? jurisdictionId : jurisdictionId?.id,
+      );
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(
         `Sending listing approved email for listing ${listingInfo.name} to ${emails.length} emails`,
@@ -609,7 +594,9 @@ export class EmailService {
     application: Application,
     jurisdictionId: IdDTO,
   ) {
-    const jurisdiction = await this.getJurisdiction([jurisdictionId]);
+    const jurisdiction = await this.getJurisdiction(
+      typeof jurisdictionId === 'string' ? jurisdictionId : jurisdictionId?.id,
+    );
     void (await this.loadTranslations(jurisdiction, application.language));
     const compiledTemplate = this.template('script-runner');
 
@@ -629,28 +616,15 @@ export class EmailService {
     );
   }
 
-  /**
-   *
-   * @param jurisdictionIds the set of jurisdicitons for the user (sent as IdDTO[]
-   * @param user the user that should received the csv export
-   * @param csvData the data that makes up the content of the csv to be sent as an attachment
-   * @param exportEmailTitle the title of the email ('User Export' is an example)
-   * @param exportEmailFileDescription describes what is being sent. Completes the line:
-     'The attached file is %{fileDescription}. If you have any questions, please reach out to your administrator.
-   */
   async sendCSV(
-    jurisdictionIds: IdDTO[],
     user: User,
     csvData: string,
     exportEmailTitle: string,
     exportEmailFileDescription: string,
   ): Promise<void> {
-    const jurisdiction = await this.getJurisdiction(jurisdictionIds);
+    const jurisdiction = await this.getJurisdiction();
     void (await this.loadTranslations(jurisdiction, user.language));
-    const emailFromAddress = await this.getEmailToSendFrom(
-      user.jurisdictions,
-      jurisdiction,
-    );
+    const emailFromAddress = this.getEmailToSendFrom(jurisdiction);
     await this.send(
       user.email,
       emailFromAddress,
@@ -681,9 +655,7 @@ export class EmailService {
     appUrl: string,
   ) {
     try {
-      const jurisdiction = await this.getJurisdiction([
-        { id: listingInfo.juris },
-      ]);
+      const jurisdiction = await this.getJurisdiction(listingInfo.juris);
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(
         `Sending lottery released email for listing ${listingInfo.name} to ${emails.length} emails`,
@@ -712,9 +684,7 @@ export class EmailService {
     appUrl: string,
   ) {
     try {
-      const jurisdiction = await this.getJurisdiction([
-        { id: listingInfo.juris },
-      ]);
+      const jurisdiction = await this.getJurisdiction(listingInfo.juris);
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(
         `Sending lottery published admin email for listing ${listingInfo.name} to ${emails.length} emails`,
@@ -744,9 +714,7 @@ export class EmailService {
     emails: { [key: string]: string[] },
   ) {
     try {
-      const jurisdiction = await this.getJurisdiction([
-        { id: listingInfo.juris },
-      ]);
+      const jurisdiction = await this.getJurisdiction(listingInfo.juris);
 
       for (const language in emails) {
         void (await this.loadTranslations(
@@ -781,12 +749,9 @@ export class EmailService {
   }
 
   public async warnOfAccountRemoval(user: User) {
-    const jurisdiction = await this.getJurisdiction(user.jurisdictions);
+    const jurisdiction = await this.getJurisdiction();
     void (await this.loadTranslations(jurisdiction, user.language));
-    const emailFromAddress = await this.getEmailToSendFrom(
-      user.jurisdictions,
-      jurisdiction,
-    );
+    const emailFromAddress = this.getEmailToSendFrom(jurisdiction);
     const signInUrl = jurisdiction ? `${jurisdiction.publicUrl}/sign-in` : '';
     await this.send(
       user.email,

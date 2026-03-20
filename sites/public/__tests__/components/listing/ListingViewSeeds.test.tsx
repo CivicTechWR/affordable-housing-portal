@@ -19,7 +19,7 @@ describe("<ListingViewSeeds>", () => {
     const view = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds listing={listing} jurisdiction={jurisdiction} />
@@ -32,7 +32,7 @@ describe("<ListingViewSeeds>", () => {
     const view = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -55,7 +55,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -82,7 +82,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -118,7 +118,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -161,7 +161,7 @@ describe("<ListingViewSeeds>", () => {
     const view = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds listing={listing} jurisdiction={jurisdiction} />
@@ -174,7 +174,7 @@ describe("<ListingViewSeeds>", () => {
     const view = render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -204,7 +204,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -246,7 +246,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -290,7 +290,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -334,7 +334,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -378,7 +378,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -417,7 +417,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -460,7 +460,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds
@@ -503,7 +503,7 @@ describe("<ListingViewSeeds>", () => {
     render(
       <AuthContext.Provider
         value={{
-          doJurisdictionsHaveFeatureFlagOn: () => true,
+          isFeatureFlagOn: () => true,
         }}
       >
         <ListingViewSeeds

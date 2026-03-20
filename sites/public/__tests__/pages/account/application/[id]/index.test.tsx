@@ -39,7 +39,7 @@ const renderApplicationView = (enableApplicationStatus = false) =>
         },
         applicationsService: new ApplicationsService(),
         listingsService: new ListingsService(),
-        doJurisdictionsHaveFeatureFlagOn: (flag) =>
+        isFeatureFlagOn: (flag) =>
           flag === FeatureFlagEnum.enableApplicationStatus ? enableApplicationStatus : false,
       }}
     >

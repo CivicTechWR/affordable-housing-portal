@@ -33,31 +33,26 @@ const ApplicationsList = () => {
   const { application } = useSingleApplicationData(applicationId)
   const { listingDto } = useSingleListingData(application?.listings?.id)
 
-  const { applicationsService, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { applicationsService, isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableAdaOtherOption = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableAdaOtherOption,
-    listingDto?.jurisdictions.id
+  const enableAdaOtherOption = isFeatureFlagOn(
+    FeatureFlagEnum.enableAdaOtherOption
   )
 
-  const disableWorkInRegion = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.disableWorkInRegion,
-    listingDto?.jurisdictions.id
+  const disableWorkInRegion = isFeatureFlagOn(
+    FeatureFlagEnum.disableWorkInRegion
   )
 
-  const enableFullTimeStudentQuestion = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableFullTimeStudentQuestion,
-    listingDto?.jurisdictions.id
+  const enableFullTimeStudentQuestion = isFeatureFlagOn(
+    FeatureFlagEnum.enableFullTimeStudentQuestion
   )
 
-  const enableApplicationStatus = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.enableApplicationStatus,
-    listingDto?.jurisdictions.id
+  const enableApplicationStatus = isFeatureFlagOn(
+    FeatureFlagEnum.enableApplicationStatus
   )
 
-  const swapCommunityTypeWithPrograms = doJurisdictionsHaveFeatureFlagOn(
-    FeatureFlagEnum.swapCommunityTypeWithPrograms,
-    listingDto?.jurisdictions.id
+  const swapCommunityTypeWithPrograms = isFeatureFlagOn(
+    FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
 
   const [errorAlert, setErrorAlert] = useState(false)
