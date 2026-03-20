@@ -170,7 +170,7 @@ export const stagingSeed = async (
     }),
   });
   // Basic configuration jurisdiction
-  const bridgeBayJurisdiction = await prismaClient.jurisdictions.create({
+  await prismaClient.jurisdictions.create({
     data: jurisdictionFactory('Bridge Bay', {
       publicSiteBaseURL: publicSiteBaseURL,
       featureFlags: [
@@ -188,7 +188,7 @@ export const stagingSeed = async (
     }),
   });
   // Jurisdiction with no feature flags enabled
-  const nadaHill = await prismaClient.jurisdictions.create({
+  await prismaClient.jurisdictions.create({
     data: jurisdictionFactory('Nada Hill', {
       publicSiteBaseURL: publicSiteBaseURL,
       featureFlags: [],
@@ -334,13 +334,6 @@ export const stagingSeed = async (
       roles: { isSuperAdmin: true, isAdmin: true },
       email: 'superadmin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [
-        mainJurisdiction.id,
-        lakeviewJurisdiction.id,
-        bridgeBayJurisdiction.id,
-        nadaHill.id,
-        angelopolisJurisdiction.id,
-      ],
       acceptedTerms: true,
       password: 'abcdef',
     }),
@@ -351,13 +344,6 @@ export const stagingSeed = async (
       roles: { isAdmin: true },
       email: 'admin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [
-        mainJurisdiction.id,
-        lakeviewJurisdiction.id,
-        bridgeBayJurisdiction.id,
-        nadaHill.id,
-        angelopolisJurisdiction.id,
-      ],
       acceptedTerms: true,
       password: 'abcdef',
     }),
@@ -369,13 +355,6 @@ export const stagingSeed = async (
       email: 'support-admin@example.com',
       confirmedAt: new Date(),
       acceptedTerms: true,
-      jurisdictionIds: [
-        mainJurisdiction.id,
-        lakeviewJurisdiction.id,
-        bridgeBayJurisdiction.id,
-        nadaHill.id,
-        angelopolisJurisdiction.id,
-      ],
     }),
   });
   // create a jurisdictional admin
@@ -384,7 +363,6 @@ export const stagingSeed = async (
       roles: { isJurisdictionalAdmin: true },
       email: 'jurisdiction-admin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [mainJurisdiction.id],
       acceptedTerms: true,
     }),
   });
@@ -394,7 +372,6 @@ export const stagingSeed = async (
       roles: { isLimitedJurisdictionalAdmin: true },
       email: 'limited-jurisdiction-admin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [mainJurisdiction.id],
       acceptedTerms: true,
     }),
   });
@@ -404,7 +381,6 @@ export const stagingSeed = async (
       roles: { isPartner: true },
       email: 'partner@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [mainJurisdiction.id],
       acceptedTerms: true,
     }),
   });
@@ -413,7 +389,6 @@ export const stagingSeed = async (
       roles: { isAdmin: true },
       email: 'unverified@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [mainJurisdiction.id],
       acceptedTerms: false,
     }),
   });
@@ -422,7 +397,6 @@ export const stagingSeed = async (
       roles: { isAdmin: true },
       email: 'mfauser@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [mainJurisdiction.id],
       acceptedTerms: true,
       mfaEnabled: true,
       singleUseCode: '12345',
@@ -432,7 +406,6 @@ export const stagingSeed = async (
     data: await userFactory({
       email: 'public-user@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [mainJurisdiction.id],
       password: 'abcdef',
     }),
   });
@@ -445,13 +418,6 @@ export const stagingSeed = async (
       },
       email: `partner-user@example.com`,
       confirmedAt: new Date(),
-      jurisdictionIds: [
-        mainJurisdiction.id,
-        lakeviewJurisdiction.id,
-        bridgeBayJurisdiction.id,
-        nadaHill.id,
-        angelopolisJurisdiction.id,
-      ],
       acceptedTerms: true,
     }),
   });
@@ -1332,7 +1298,6 @@ export const stagingSeed = async (
             .toLowerCase()
             .replaceAll(' ', '-')}@example.com`,
           confirmedAt: new Date(),
-          jurisdictionIds: [savedListing.jurisdictionId],
           acceptedTerms: true,
           listings: [savedListing.id],
         }),

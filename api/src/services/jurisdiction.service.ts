@@ -85,6 +85,26 @@ export class JurisdictionService {
     return mapTo(Jurisdiction, rawJurisdiction);
   }
 
+  /**
+   * Returns the first jurisdiction row to use as the singleton site configuration.
+   *
+   * @returns The singleton jurisdiction record.
+   * @throws {NotFoundException} If no jurisdiction rows exist.
+   */
+  async findSingleton(): Promise<Jurisdiction> {
+    const rawJurisdiction = await this.prisma.jurisdictions.findFirst({
+      include: view,
+    });
+
+    if (!rawJurisdiction) {
+      throw new NotFoundException(
+        'site configuration was requested but not found',
+      );
+    }
+
+    return mapTo(Jurisdiction, rawJurisdiction);
+  }
+
   /*
     this will create a jurisdiction
   */

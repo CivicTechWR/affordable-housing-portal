@@ -34,16 +34,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       include: {
         listings: true,
         userRoles: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                name: true,
-                active: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id: userId,
@@ -70,7 +60,21 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       `);
     }
 
-    const user = mapTo(User, rawUser);
+    const siteJurisdiction = await this.prisma.jurisdictions.findFirst({
+      include: {
+        featureFlags: {
+          select: {
+            name: true,
+            active: true,
+          },
+        },
+      },
+    });
+
+    const user = mapTo(User, {
+      ...rawUser,
+      jurisdictions: siteJurisdiction ? [siteJurisdiction] : [],
+    });
     return user;
   }
 

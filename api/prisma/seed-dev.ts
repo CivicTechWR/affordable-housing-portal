@@ -57,7 +57,6 @@ export const devSeeding = async (
       roles: { isAdmin: true },
       email: 'admin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [jurisdiction.id],
       acceptedTerms: true,
       password: 'abcdef',
     }),
@@ -66,7 +65,6 @@ export const devSeeding = async (
     data: await userFactory({
       email: 'public-user@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [jurisdiction.id],
       password: 'abcdef',
     }),
   });
@@ -75,7 +73,6 @@ export const devSeeding = async (
       roles: { isJurisdictionalAdmin: true },
       email: 'jurisdiction-admin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [jurisdiction.id],
       acceptedTerms: true,
     }),
   });
@@ -84,7 +81,6 @@ export const devSeeding = async (
       roles: { isLimitedJurisdictionalAdmin: true },
       email: 'limited-jurisdiction-admin@example.com',
       confirmedAt: new Date(),
-      jurisdictionIds: [jurisdiction.id],
       acceptedTerms: true,
     }),
   });
@@ -92,7 +88,6 @@ export const devSeeding = async (
     data: await userFactory({
       roles: { isSupportAdmin: true },
       email: 'support-admin@example.com',
-      jurisdictionIds: [jurisdiction.id],
       confirmedAt: new Date(),
       acceptedTerms: true,
     }),

@@ -303,8 +303,9 @@ export class ListingService implements OnModuleInit {
   public async getUserEmailInfo(
     userRoles: UserRoleEnum | UserRoleEnum[],
     listingId?: string,
-    jurisId?: string,
+    _jurisId?: string,
   ): Promise<{ emails: string[] }> {
+    void _jurisId;
     // determine where clause(s)
     const userRolesWhere: Prisma.UserAccountsWhereInput[] = [];
     if (userRoles.includes(UserRoleEnum.admin))
@@ -319,13 +320,11 @@ export class ListingService implements OnModuleInit {
     if (userRoles.includes(UserRoleEnum.jurisdictionAdmin)) {
       userRolesWhere.push({
         userRoles: { isJurisdictionalAdmin: true },
-        jurisdictions: { some: { id: jurisId } },
       });
     }
     if (userRoles.includes(UserRoleEnum.limitedJurisdictionAdmin)) {
       userRolesWhere.push({
         userRoles: { isLimitedJurisdictionalAdmin: true },
-        jurisdictions: { some: { id: jurisId } },
       });
     }
 

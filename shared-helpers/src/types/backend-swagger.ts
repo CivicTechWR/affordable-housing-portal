@@ -8685,9 +8685,6 @@ export interface UserCreate {
 
   /**  */
   emailConfirmation?: string
-
-  /**  */
-  jurisdictions?: IdDTO[]
 }
 
 export interface UserDeleteDTO {
@@ -8734,9 +8731,6 @@ export interface UserInvite {
 
   /**  */
   email: string
-
-  /**  */
-  jurisdictions: IdDTO[]
 }
 
 export interface RequestSingleUseCode {
@@ -8805,9 +8799,6 @@ export interface UserUpdate {
 
   /**  */
   appUrl?: string
-
-  /**  */
-  jurisdictions?: IdDTO[]
 }
 
 export interface Login {

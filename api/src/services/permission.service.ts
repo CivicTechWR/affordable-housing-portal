@@ -5,7 +5,6 @@ import { UserRoleEnum } from '../enums/permissions/user-role-enum';
 import { User } from '../dtos/users/user.dto';
 import { PrismaService } from './prisma.service';
 import { permissionActions } from '../enums/permissions/permission-actions-enum';
-import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import Listing from '../dtos/listings/listing.dto';
 
 export type permissionCheckingObj = {
@@ -41,31 +40,27 @@ export class PermissionService {
     );
 
     if (user) {
-      const userJurisdictions = user.jurisdictions ?? [];
       e = await this.addUserPermissions(e, user);
 
       if (type === 'user' && obj?.id) {
         const accessedUser = await this.prisma.userAccounts.findUnique({
           select: {
             id: true,
-            jurisdictions: {
-              where: {
-                id: {
-                  in: userJurisdictions.map((juris) => juris.id),
-                },
-              },
-            },
-            listings: true,
-            userRoles: true,
           },
           where: {
             id: obj.id,
           },
         });
-        obj.jurisdictionId =
-          accessedUser?.jurisdictions.map(
-            (jurisdiction) => jurisdiction.id,
-          )[0] || '';
+
+        if (accessedUser) {
+          const singletonJurisdiction =
+            await this.prisma.jurisdictions.findFirst({
+              select: {
+                id: true,
+              },
+            });
+          obj.jurisdictionId = singletonJurisdiction?.id || '';
+        }
       }
     }
     return await e.enforce(user ? user.id : 'anonymous', type, action, obj);
@@ -76,8 +71,13 @@ export class PermissionService {
     Casbin doesn't support our permissioning requirements for jurisdictionalAdmin or partners so we custom build the permission set here
   */
   async addUserPermissions(enforcer: Enforcer, user: User): Promise<Enforcer> {
-    const userJurisdictions = user.jurisdictions ?? [];
+    const singletonJurisdiction = await this.prisma.jurisdictions.findFirst({
+      select: {
+        id: true,
+      },
+    });
     const userListings = user.listings ?? [];
+    const userJurisdictionId = singletonJurisdiction?.id;
 
     await enforcer.addRoleForUser(user.id, UserRoleEnum.user);
 
@@ -88,69 +88,63 @@ export class PermissionService {
     } else if (user.userRoles?.isJurisdictionalAdmin) {
       await enforcer.addRoleForUser(user.id, UserRoleEnum.jurisdictionAdmin);
 
-      await Promise.all(
-        userJurisdictions.map(async (adminInJurisdiction: Jurisdiction) => {
-          await enforcer.addPermissionForUser(
-            user.id,
-            'application',
-            `r.obj.jurisdictionId == '${adminInJurisdiction.id}'`,
-            `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
-          );
-          await enforcer.addPermissionForUser(
-            user.id,
-            'listing',
-            `r.obj.jurisdictionId == '${adminInJurisdiction.id}'`,
-            `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
-          );
-          await enforcer.addPermissionForUser(
-            user.id,
-            'multiselectQuestion',
-            `r.obj.jurisdictionId == '${adminInJurisdiction.id}'`,
-            `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
-          );
-          await enforcer.addPermissionForUser(
-            user.id,
-            'properties',
-            `r.obj.jurisdictionId == '${adminInJurisdiction.id}'`,
-            `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
-          );
-          await enforcer.addPermissionForUser(
-            user.id,
-            'user',
-            `r.obj.jurisdictionId == '${adminInJurisdiction.id}'`,
-            `(${permissionActions.read}|${permissionActions.invitePartner}|${permissionActions.inviteJurisdictionalAdmin}|${permissionActions.update}|${permissionActions.delete})`,
-          );
-        }),
-      );
+      if (userJurisdictionId) {
+        await enforcer.addPermissionForUser(
+          user.id,
+          'application',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
+        );
+        await enforcer.addPermissionForUser(
+          user.id,
+          'listing',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
+        );
+        await enforcer.addPermissionForUser(
+          user.id,
+          'multiselectQuestion',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
+        );
+        await enforcer.addPermissionForUser(
+          user.id,
+          'properties',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
+        );
+        await enforcer.addPermissionForUser(
+          user.id,
+          'user',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.read}|${permissionActions.invitePartner}|${permissionActions.inviteJurisdictionalAdmin}|${permissionActions.update}|${permissionActions.delete})`,
+        );
+      }
     } else if (user.userRoles?.isLimitedJurisdictionalAdmin) {
       await enforcer.addRoleForUser(
         user.id,
         UserRoleEnum.limitedJurisdictionAdmin,
       );
 
-      await Promise.all(
-        userJurisdictions.map(async (adminInJurisdiction: Jurisdiction) => {
-          await enforcer.addPermissionForUser(
-            user.id,
-            'listing',
-            `r.obj.jurisdictionId == '${adminInJurisdiction.id}'`,
-            `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
-          );
-        }),
-      );
+      if (userJurisdictionId) {
+        await enforcer.addPermissionForUser(
+          user.id,
+          'listing',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.read}|${permissionActions.create}|${permissionActions.update}|${permissionActions.delete})`,
+        );
+      }
     } else if (user.userRoles?.isPartner) {
       await enforcer.addRoleForUser(user.id, UserRoleEnum.partner);
 
-      await Promise.all(
-        userJurisdictions.map(async (jurisdiction: Jurisdiction) => {
-          await enforcer.addPermissionForUser(
-            user.id,
-            'listing',
-            `r.obj.jurisdictionId == '${jurisdiction.id}'`,
-            `(${permissionActions.create})`,
-          );
-        }),
-      );
+      if (userJurisdictionId) {
+        await enforcer.addPermissionForUser(
+          user.id,
+          'listing',
+          `r.obj.jurisdictionId == '${userJurisdictionId}'`,
+          `(${permissionActions.create})`,
+        );
+      }
 
       await Promise.all(
         userListings.map(async (listing: Listing) => {

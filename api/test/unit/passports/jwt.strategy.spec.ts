@@ -19,6 +19,13 @@ describe('Testing jwt strategy', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
+  beforeEach(() => {
+    prisma.jurisdictions.findFirst = jest.fn().mockResolvedValue({
+      id: 'jurisdiction-id',
+      featureFlags: [],
+    });
+  });
+
   it('should fail because user does not exist', async () => {
     const id = randomUUID();
     const token = sign(
@@ -44,16 +51,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,
@@ -92,16 +89,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,
@@ -146,16 +133,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,
@@ -204,16 +181,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,

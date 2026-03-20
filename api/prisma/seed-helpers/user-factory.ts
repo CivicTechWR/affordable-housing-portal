@@ -8,7 +8,6 @@ export const userFactory = async (optionalParams?: {
   email?: string;
   favoriteListings?: string[];
   firstName?: string;
-  jurisdictionIds?: string[];
   lastName?: string;
   listings?: string[];
   mfaEnabled?: boolean;
@@ -45,15 +44,6 @@ export const userFactory = async (optionalParams?: {
     ? {
         connect: optionalParams.favoriteListings.map((listing) => {
           return { id: listing };
-        }),
-      }
-    : undefined,
-  jurisdictions: optionalParams?.jurisdictionIds
-    ? {
-        connect: optionalParams?.jurisdictionIds.map((jurisdiction) => {
-          return {
-            id: jurisdiction,
-          };
         }),
       }
     : undefined,
