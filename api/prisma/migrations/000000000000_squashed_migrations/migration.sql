@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateExtension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -63,9 +66,6 @@ CREATE TYPE "multiselect_questions_status_enum" AS ENUM ('draft', 'visible', 'ac
 
 -- CreateEnum
 CREATE TYPE "neighborhood_amenities_enum" AS ENUM ('groceryStores', 'publicTransportation', 'schools', 'parksAndCommunityCenters', 'pharmacies', 'healthCareResources', 'shoppingVenues', 'hospitals', 'seniorCenters', 'recreationalFacilities', 'playgrounds', 'busStops');
-
--- CreateEnum
-CREATE TYPE "property_region_enum" AS ENUM ('Greater_Downtown', 'Eastside', 'Southwest', 'Westside');
 
 -- CreateEnum
 CREATE TYPE "rent_type_enum" AS ENUM ('fixedRent', 'rentRange');
@@ -1038,7 +1038,6 @@ CREATE TABLE "listings" (
     "marketing_type" "listings_marketing_type_enum" NOT NULL DEFAULT 'marketing',
     "marketing_year" INTEGER,
     "name" TEXT NOT NULL,
-    "neighborhood" TEXT,
     "neighborhood_amenities_id" UUID,
     "owner_company" TEXT,
     "paper_application" BOOLEAN,
@@ -1051,7 +1050,6 @@ CREATE TABLE "listings" (
     "property_id" UUID,
     "published_at" TIMESTAMPTZ(6),
     "referral_opportunity" BOOLEAN,
-    "region" "property_region_enum",
     "rental_assistance" TEXT,
     "rental_history" TEXT,
     "requested_changes" TEXT,
@@ -1186,7 +1184,6 @@ CREATE TABLE "listing_snapshot" (
     "marketing_type" "listings_marketing_type_enum" NOT NULL DEFAULT 'marketing',
     "marketing_year" INTEGER,
     "name" TEXT NOT NULL,
-    "neighborhood" TEXT,
     "neighborhood_amenity_snapshot_id" UUID,
     "owner_company" TEXT,
     "paper_application" BOOLEAN,
@@ -1198,7 +1195,6 @@ CREATE TABLE "listing_snapshot" (
     "property_snapshot_id" UUID,
     "published_at" TIMESTAMPTZ(6),
     "referral_opportunity" BOOLEAN,
-    "region" "property_region_enum",
     "rental_assistance" TEXT,
     "rental_history" TEXT,
     "requested_changes" TEXT,
@@ -1791,73 +1787,97 @@ CREATE TABLE "user_role_snapshot" (
 -- CreateTable
 CREATE TABLE "_ApplicationFlaggedSetToApplications" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_ApplicationFlaggedSetToApplications_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_ApplicationsToUnitTypes" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_ApplicationsToUnitTypes_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_ApplicationSnapshotToUnitTypes" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_ApplicationSnapshotToUnitTypes_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_FeatureFlagsToJurisdictions" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_FeatureFlagsToJurisdictions_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_JurisdictionsToUserAccounts" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_JurisdictionsToUserAccounts_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_JurisdictionsToUserAccountSnapshot" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_JurisdictionsToUserAccountSnapshot_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_favorite_listings" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_favorite_listings_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_ListingsToUserAccounts" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_ListingsToUserAccounts_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_ListingsToUserPreferences" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_ListingsToUserPreferences_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_ListingSnapshotToUserAccountSnapshot" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_ListingSnapshotToUserAccountSnapshot_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_UnitGroupToUnitTypes" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_UnitGroupToUnitTypes_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateTable
 CREATE TABLE "_UnitGroupSnapshotToUnitTypes" (
     "A" UUID NOT NULL,
-    "B" UUID NOT NULL
+    "B" UUID NOT NULL,
+
+    CONSTRAINT "_UnitGroupSnapshotToUnitTypes_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -2062,73 +2082,37 @@ CREATE UNIQUE INDEX "user_preferences_user_id_key" ON "user_preferences"("user_i
 CREATE UNIQUE INDEX "user_role_snapshot_user_snapshot_id_key" ON "user_role_snapshot"("user_snapshot_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_ApplicationFlaggedSetToApplications_AB_unique" ON "_ApplicationFlaggedSetToApplications"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_ApplicationFlaggedSetToApplications_B_index" ON "_ApplicationFlaggedSetToApplications"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_ApplicationsToUnitTypes_AB_unique" ON "_ApplicationsToUnitTypes"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ApplicationsToUnitTypes_B_index" ON "_ApplicationsToUnitTypes"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_ApplicationSnapshotToUnitTypes_AB_unique" ON "_ApplicationSnapshotToUnitTypes"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_ApplicationSnapshotToUnitTypes_B_index" ON "_ApplicationSnapshotToUnitTypes"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_FeatureFlagsToJurisdictions_AB_unique" ON "_FeatureFlagsToJurisdictions"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_FeatureFlagsToJurisdictions_B_index" ON "_FeatureFlagsToJurisdictions"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_JurisdictionsToUserAccounts_AB_unique" ON "_JurisdictionsToUserAccounts"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_JurisdictionsToUserAccounts_B_index" ON "_JurisdictionsToUserAccounts"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_JurisdictionsToUserAccountSnapshot_AB_unique" ON "_JurisdictionsToUserAccountSnapshot"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_JurisdictionsToUserAccountSnapshot_B_index" ON "_JurisdictionsToUserAccountSnapshot"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_favorite_listings_AB_unique" ON "_favorite_listings"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_favorite_listings_B_index" ON "_favorite_listings"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_ListingsToUserAccounts_AB_unique" ON "_ListingsToUserAccounts"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ListingsToUserAccounts_B_index" ON "_ListingsToUserAccounts"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_ListingsToUserPreferences_AB_unique" ON "_ListingsToUserPreferences"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_ListingsToUserPreferences_B_index" ON "_ListingsToUserPreferences"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_ListingSnapshotToUserAccountSnapshot_AB_unique" ON "_ListingSnapshotToUserAccountSnapshot"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_ListingSnapshotToUserAccountSnapshot_B_index" ON "_ListingSnapshotToUserAccountSnapshot"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_UnitGroupToUnitTypes_AB_unique" ON "_UnitGroupToUnitTypes"("A", "B");
-
--- CreateIndex
 CREATE INDEX "_UnitGroupToUnitTypes_B_index" ON "_UnitGroupToUnitTypes"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_UnitGroupSnapshotToUnitTypes_AB_unique" ON "_UnitGroupSnapshotToUnitTypes"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_UnitGroupSnapshotToUnitTypes_B_index" ON "_UnitGroupSnapshotToUnitTypes"("B");
@@ -2621,3 +2605,67 @@ ALTER TABLE "_UnitGroupSnapshotToUnitTypes" ADD CONSTRAINT "_UnitGroupSnapshotTo
 
 -- AddForeignKey
 ALTER TABLE "_UnitGroupSnapshotToUnitTypes" ADD CONSTRAINT "_UnitGroupSnapshotToUnitTypes_B_fkey" FOREIGN KEY ("B") REFERENCES "unit_types"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+CREATE VIEW "application_flagged_set_possibilities" AS (
+    SELECT
+        CONCAT(
+            LOWER(a.first_name),
+            '-',
+            LOWER(a.last_name),
+            '-',
+            a.birth_month,
+            '-',
+            a.birth_day,
+            '-',
+            a.birth_year
+        ) as "key",
+        app.listing_id,
+        app.id as "application_id",
+        'nameAndDOB' as "type"
+    FROM
+        applicant a,
+        applications app
+    WHERE
+        a.id = app.applicant_id
+        and app.deleted_at is null
+)
+UNION
+(
+    SELECT
+        a.email_address as "key",
+        app.listing_id,
+        app.id as "application_id",
+        'email' as "type"
+    FROM
+        applications app,
+        applicant a
+    WHERE
+        a.id = app.applicant_id
+        and a.email_address is not null
+        and app.deleted_at is null
+)
+UNION
+(
+    SELECT
+        CONCAT(
+            LOWER(hm.first_name),
+            '-',
+            LOWER(hm.last_name),
+            '-',
+            hm.birth_month,
+            '-',
+            hm.birth_day,
+            '-',
+            hm.birth_year
+        ) as "key",
+        app.listing_id,
+        app.id as "application_id",
+        'nameAndDOB' as "type"
+    FROM
+        applications app,
+        household_member hm
+    WHERE
+        hm.application_id = app.id
+        and app.deleted_at is null
+);
