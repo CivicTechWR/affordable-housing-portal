@@ -798,10 +798,7 @@ export const ListingView = (props: ListingProps) => {
             {preferencesSection}
 
             {buildingSelectionCriteria && (
-              <ListSection
-                title={t("listings.buildingSelectionCriteria")}
-                subtitle={""}
-              >
+              <ListSection title={t("listings.buildingSelectionCriteria")} subtitle={""}>
                 {buildingSelectionCriteria}
               </ListSection>
             )}

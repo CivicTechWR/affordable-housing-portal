@@ -17,8 +17,7 @@ const DetailAdditionalEligibility = () => {
 
   if (
     disableBuildingSelectionCriteria ||
-    (!listing.buildingSelectionCriteria &&
-      !listing.listingsBuildingSelectionCriteriaFile?.fileId)
+    (!listing.buildingSelectionCriteria && !listing.listingsBuildingSelectionCriteriaFile?.fileId)
   ) {
     return null
   }
