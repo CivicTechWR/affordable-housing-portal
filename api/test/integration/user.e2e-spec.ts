@@ -814,7 +814,6 @@ describe('User Controller Tests', () => {
         data: {
           name: 'single_use_code_1',
           allowSingleUseCodeLogin: true,
-          rentalAssistanceDefault: 'test',
         },
       });
       emailService.sendSingleUseCode = jest.fn();
@@ -847,7 +846,6 @@ describe('User Controller Tests', () => {
         data: {
           name: 'single_use_code_3',
           allowSingleUseCodeLogin: true,
-          rentalAssistanceDefault: 'test',
         },
       });
       emailService.sendSingleUseCode = jest.fn();

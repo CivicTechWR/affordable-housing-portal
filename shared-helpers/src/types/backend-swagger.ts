@@ -4680,12 +4680,6 @@ export interface Listing {
   costsNotIncluded?: string
 
   /**  */
-  creditHistory?: string
-
-  /**  */
-  criminalBackground?: string
-
-  /**  */
   depositMin?: string
 
   /**  */
@@ -4741,12 +4735,6 @@ export interface Listing {
 
   /**  */
   programRules?: string
-
-  /**  */
-  rentalAssistance?: string
-
-  /**  */
-  rentalHistory?: string
 
   /**  */
   requiredDocuments?: string
@@ -5624,12 +5612,6 @@ export interface ListingCreate {
   costsNotIncluded?: string
 
   /**  */
-  creditHistory?: string
-
-  /**  */
-  criminalBackground?: string
-
-  /**  */
   depositMin?: string
 
   /**  */
@@ -5682,12 +5664,6 @@ export interface ListingCreate {
 
   /**  */
   programRules?: string
-
-  /**  */
-  rentalAssistance?: string
-
-  /**  */
-  rentalHistory?: string
 
   /**  */
   requiredDocuments?: string
@@ -6468,12 +6444,6 @@ export interface ListingUpdate {
   costsNotIncluded?: string
 
   /**  */
-  creditHistory?: string
-
-  /**  */
-  criminalBackground?: string
-
-  /**  */
   depositMin?: string
 
   /**  */
@@ -6526,12 +6496,6 @@ export interface ListingUpdate {
 
   /**  */
   programRules?: string
-
-  /**  */
-  rentalAssistance?: string
-
-  /**  */
-  rentalHistory?: string
 
   /**  */
   requiredDocuments?: string
@@ -7646,9 +7610,6 @@ export interface JurisdictionCreate {
   emailFromAddress: string
 
   /**  */
-  rentalAssistanceDefault: string
-
-  /**  */
   whatToExpect: string
 
   /**  */
@@ -7715,9 +7676,6 @@ export interface JurisdictionUpdate {
 
   /**  */
   emailFromAddress: string
-
-  /**  */
-  rentalAssistanceDefault: string
 
   /**  */
   whatToExpect: string
@@ -7818,9 +7776,6 @@ export interface Jurisdiction {
 
   /**  */
   emailFromAddress: string
-
-  /**  */
-  rentalAssistanceDefault: string
 
   /**  */
   whatToExpect: string

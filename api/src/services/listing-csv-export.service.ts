@@ -978,22 +978,6 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
 
     headers.push(
       ...[
-        {
-          path: 'creditHistory',
-          label: 'Eligibility Rules - Credit History',
-        },
-        {
-          path: 'rentalHistory',
-          label: 'Eligibility Rules - Rental History',
-        },
-        {
-          path: 'criminalBackground',
-          label: 'Eligibility Rules - Criminal Background',
-        },
-        {
-          path: 'rentalAssistance',
-          label: 'Eligibility Rules - Rental Assistance',
-        },
         ...(doAnyJurisdictionHaveFalsyFeatureFlagValue(
           user.jurisdictions,
           FeatureFlagEnum.disableBuildingSelectionCriteria,

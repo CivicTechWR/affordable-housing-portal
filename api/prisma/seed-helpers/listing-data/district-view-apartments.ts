@@ -41,8 +41,6 @@ export const districtViewApartments: Prisma.ListingsCreateInput = {
   },
   buildingSelectionCriteria: null,
   costsNotIncluded: null,
-  creditHistory: null,
-  criminalBackground: null,
   depositMin: '500',
   depositMax: '0',
   depositHelperText: "Deposit will not exceed one month's rent",
@@ -55,9 +53,6 @@ export const districtViewApartments: Prisma.ListingsCreateInput = {
   name: 'District View Apartments',
   postmarkedApplicationsReceivedByDate: null,
   programRules: null,
-  rentalAssistance:
-    'Housing Choice Vouchers, Section 8 and other valid rental assistance programs will be considered for this property. In the case of a valid rental subsidy, the required minimum income will be based on the portion of the rent that the tenant pays after use of the subsidy.',
-  rentalHistory: null,
   requiredDocuments: null,
   specialNotes: null,
   waitlistCurrentSize: null,
