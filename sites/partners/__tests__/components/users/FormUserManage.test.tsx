@@ -165,9 +165,7 @@ describe("<FormUserManage>", () => {
         screen.getByRole("combobox", { name: "Role" }),
         screen.getByRole("option", { name: "Jurisdictional admin" })
       )
-      expect(
-        screen.queryByRole("checkbox", { name: siteConfig.name })
-      ).not.toBeInTheDocument()
+      expect(screen.queryByRole("checkbox", { name: siteConfig.name })).not.toBeInTheDocument()
       await userEvent.click(screen.getByRole("button", { name: "Invite" }))
 
       await waitFor(() => {

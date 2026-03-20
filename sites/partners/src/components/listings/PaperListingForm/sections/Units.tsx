@@ -86,21 +86,13 @@ const FormUnits = ({
   const { register, errors, clearErrors, getValues, control, setValue } = formMethods
   const listing = getValues()
 
-  const homeTypeEnabled = isFeatureFlagOn(
-    FeatureFlagEnum.enableHomeType
-  )
+  const homeTypeEnabled = isFeatureFlagOn(FeatureFlagEnum.enableHomeType)
 
-  const enableSection8Question = isFeatureFlagOn(
-    FeatureFlagEnum.enableSection8Question
-  )
+  const enableSection8Question = isFeatureFlagOn(FeatureFlagEnum.enableSection8Question)
 
-  const enableUnitGroups = isFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups
-  )
+  const enableUnitGroups = isFeatureFlagOn(FeatureFlagEnum.enableUnitGroups)
 
-  const enableNonRegulatedListings = isFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings
-  )
+  const enableNonRegulatedListings = isFeatureFlagOn(FeatureFlagEnum.enableNonRegulatedListings)
 
   const listingAvailability = useWatch({
     control,

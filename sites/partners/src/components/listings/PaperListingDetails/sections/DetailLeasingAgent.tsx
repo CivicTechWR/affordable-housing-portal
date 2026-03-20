@@ -11,13 +11,9 @@ const DetailLeasingAgent = () => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableCompanyWebsite = isFeatureFlagOn(
-    FeatureFlagEnum.enableCompanyWebsite
-  )
+  const enableCompanyWebsite = isFeatureFlagOn(FeatureFlagEnum.enableCompanyWebsite)
 
-  const enableLeasingAgentAltText = isFeatureFlagOn(
-    FeatureFlagEnum.enableLeasingAgentAltText
-  )
+  const enableLeasingAgentAltText = isFeatureFlagOn(FeatureFlagEnum.enableLeasingAgentAltText)
 
   const leasingAgentNameText = enableLeasingAgentAltText
     ? t("leasingAgent.ManagerPropName")

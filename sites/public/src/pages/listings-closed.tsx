@@ -8,11 +8,7 @@ import {
 } from "../components/browse/FilterDrawerHelpers"
 import { ListingBrowse, TabsIndexEnum } from "../components/browse/ListingBrowse"
 import { isFeatureFlagOn } from "../lib/helpers"
-import {
-  fetchClosedListings,
-  fetchSiteConfig,
-  fetchMultiselectProgramData,
-} from "../lib/hooks"
+import { fetchClosedListings, fetchSiteConfig, fetchMultiselectProgramData } from "../lib/hooks"
 import { ListingsProps } from "./listings"
 
 export default function ListingsPageClosed(props: ListingsProps) {

@@ -54,29 +54,19 @@ const ApplicationForm = ({ listingId, editMode, application }: ApplicationFormPr
     MultiselectQuestionsApplicationSectionEnum.programs
   )
 
-  const enableApplicationStatus = isFeatureFlagOn(
-    FeatureFlagEnum.enableApplicationStatus
-  )
+  const enableApplicationStatus = isFeatureFlagOn(FeatureFlagEnum.enableApplicationStatus)
 
-  const enableUnitGroups = isFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups
-  )
+  const enableUnitGroups = isFeatureFlagOn(FeatureFlagEnum.enableUnitGroups)
 
   const enableFullTimeStudentQuestion = isFeatureFlagOn(
     FeatureFlagEnum.enableFullTimeStudentQuestion
   )
 
-  const enableAdaOtherOption = isFeatureFlagOn(
-    FeatureFlagEnum.enableAdaOtherOption
-  )
+  const enableAdaOtherOption = isFeatureFlagOn(FeatureFlagEnum.enableAdaOtherOption)
 
-  const disableWorkInRegion = isFeatureFlagOn(
-    FeatureFlagEnum.disableWorkInRegion
-  )
+  const disableWorkInRegion = isFeatureFlagOn(FeatureFlagEnum.disableWorkInRegion)
 
-  const enableLimitedHowDidYouHear = isFeatureFlagOn(
-    FeatureFlagEnum.enableLimitedHowDidYouHear
-  )
+  const enableLimitedHowDidYouHear = isFeatureFlagOn(FeatureFlagEnum.enableLimitedHowDidYouHear)
 
   const swapCommunityTypeWithPrograms = isFeatureFlagOn(
     FeatureFlagEnum.swapCommunityTypeWithPrograms

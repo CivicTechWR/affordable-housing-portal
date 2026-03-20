@@ -399,7 +399,6 @@ export class LotteryService {
         UserRoleEnum.supportAdmin,
       ],
       listing.id,
-      listing.jurisdictions?.id,
     );
 
     const publicUserEmailInfo = await this.getPublicUserEmailInfo(listing.id);
@@ -502,7 +501,6 @@ export class LotteryService {
             UserRoleEnum.supportAdmin,
           ],
           storedListing.id,
-          storedListing.jurisdictionId,
         );
 
         await this.emailService.lotteryReleased(

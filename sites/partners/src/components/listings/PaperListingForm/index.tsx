@@ -258,25 +258,17 @@ const ListingForm = ({
     whatToExpectAdditionalDetailsEditor,
   ])
 
-  const enableUnitGroups = isFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups
-  )
+  const enableUnitGroups = isFeatureFlagOn(FeatureFlagEnum.enableUnitGroups)
 
-  const disableListingPreferences = isFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences
-  )
+  const disableListingPreferences = isFeatureFlagOn(FeatureFlagEnum.disableListingPreferences)
 
   const swapCommunityTypeWithPrograms = isFeatureFlagOn(
     FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
 
-  const enableNonRegulatedListings = isFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings
-  )
+  const enableNonRegulatedListings = isFeatureFlagOn(FeatureFlagEnum.enableNonRegulatedListings)
 
-  const enableListingImageAltText = isFeatureFlagOn(
-    FeatureFlagEnum.enableListingImageAltText
-  )
+  const enableListingImageAltText = isFeatureFlagOn(FeatureFlagEnum.enableListingImageAltText)
 
   useEffect(() => {
     if (enableNonRegulatedListings && !listing?.listingType) {
@@ -388,11 +380,7 @@ const ListingForm = ({
             whatToExpectAdditionalDetailsEditor?.getHTML()
           )
 
-          if (
-            !isFeatureFlagOn(
-              FeatureFlagEnum.enableSection8Question
-            )
-          ) {
+          if (!isFeatureFlagOn(FeatureFlagEnum.enableSection8Question)) {
             formData.listingSection8Acceptance = YesNoEnum.no
           }
 
@@ -574,9 +562,7 @@ const ListingForm = ({
                             enableListingFileNumber={isFeatureFlagOn(
                               FeatureFlagEnum.enableListingFileNumber
                             )}
-                            enableProperties={isFeatureFlagOn(
-                              FeatureFlagEnum.enableProperties
-                            )}
+                            enableProperties={isFeatureFlagOn(FeatureFlagEnum.enableProperties)}
                             jurisdictionName={null}
                             jurisdictionId={null}
                             listingId={listing?.id}
@@ -653,15 +639,11 @@ const ListingForm = ({
                             enableSmokingPolicyRadio={isFeatureFlagOn(
                               FeatureFlagEnum.enableSmokingPolicyRadio
                             )}
-                            enableParkingFee={isFeatureFlagOn(
-                              FeatureFlagEnum.enableParkingFee
-                            )}
+                            enableParkingFee={isFeatureFlagOn(FeatureFlagEnum.enableParkingFee)}
                             enablePetPolicyCheckbox={isFeatureFlagOn(
                               FeatureFlagEnum.enablePetPolicyCheckbox
                             )}
-                            enableParkingType={isFeatureFlagOn(
-                              FeatureFlagEnum.enableParkingType
-                            )}
+                            enableParkingType={isFeatureFlagOn(FeatureFlagEnum.enableParkingType)}
                             existingParkingTypes={listing?.parkType}
                             requiredFields={requiredFields}
                           />
@@ -681,18 +663,16 @@ const ListingForm = ({
                             listing={listing}
                             requiredFields={requiredFields}
                           />
-                          {!isFeatureFlagOn(
-                            FeatureFlagEnum.disableBuildingSelectionCriteria
-                          ) && <BuildingSelectionCriteria />}
+                          {!isFeatureFlagOn(FeatureFlagEnum.disableBuildingSelectionCriteria) && (
+                            <BuildingSelectionCriteria />
+                          )}
                           <AdditionalDetails
                             enableNonRegulatedListings={enableNonRegulatedListings}
                             existingDocuments={listing?.requiredDocumentsList}
                             requiredFields={requiredFields}
                           />
                           <ListingVerification
-                            enableIsVerified={isFeatureFlagOn(
-                              "enableIsVerified"
-                            )}
+                            enableIsVerified={isFeatureFlagOn("enableIsVerified")}
                           />
                           <div className="text-right -mr-8 -mt-8 relative" style={{ top: "7rem" }}>
                             <Button

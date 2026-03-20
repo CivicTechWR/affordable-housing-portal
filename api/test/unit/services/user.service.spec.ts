@@ -4,7 +4,6 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LanguagesEnum } from '@prisma/client';
 import { randomUUID } from 'crypto';
-import { Request } from 'express';
 import { verify } from 'jsonwebtoken';
 import { IdDTO } from '../../../src/dtos/shared/id.dto';
 import { User } from '../../../src/dtos/users/user.dto';
@@ -2327,19 +2326,13 @@ describe('Testing user service', () => {
         id,
       });
 
-      const res = await service.requestSingleUseCode(
-        {
-          email: 'example@exygy.com',
-        },
-        { headers: { jurisdictionname: 'juris 1' } } as unknown as Request,
-      );
+      const res = await service.requestSingleUseCode({
+        email: 'example@exygy.com',
+      });
 
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.userAccounts.update).not.toHaveBeenCalled();
@@ -2370,12 +2363,9 @@ describe('Testing user service', () => {
 
       await expect(
         async () =>
-          await service.requestSingleUseCode(
-            {
-              email: 'example@exygy.com',
-            },
-            { headers: { jurisdictionname: 'juris 1' } } as unknown as Request,
-          ),
+          await service.requestSingleUseCode({
+            email: 'example@exygy.com',
+          }),
       ).rejects.toThrowError(
         `user ${id} attempted to login, but password is no longer valid`,
       );
@@ -2384,16 +2374,13 @@ describe('Testing user service', () => {
         where: {
           email: 'example@exygy.com',
         },
-        include: {
-          jurisdictions: true,
-        },
       });
       expect(prisma.jurisdictions.findFirst).not.toHaveBeenCalled();
       expect(prisma.userAccounts.update).not.toHaveBeenCalled();
       expect(emailService.sendSingleUseCode).not.toHaveBeenCalled();
     });
 
-    it('should request single use code but jurisdiction does not exist', async () => {
+    it('should request single use code but site config does not exist', async () => {
       const id = randomUUID();
       emailService.sendSingleUseCode = jest.fn();
       prisma.userAccounts.findFirst = jest.fn().mockResolvedValue({
@@ -2407,20 +2394,14 @@ describe('Testing user service', () => {
 
       await expect(
         async () =>
-          await service.requestSingleUseCode(
-            {
-              email: 'example@exygy.com',
-            },
-            { headers: { jurisdictionname: 'juris 1' } } as unknown as Request,
-          ),
-      ).rejects.toThrowError('Jurisidiction juris 1 does not exists');
+          await service.requestSingleUseCode({
+            email: 'example@exygy.com',
+          }),
+      ).rejects.toThrowError('Site configuration missing');
 
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -2429,52 +2410,10 @@ describe('Testing user service', () => {
           allowSingleUseCodeLogin: true,
           name: true,
         },
-        where: {
-          name: 'juris 1',
-        },
         orderBy: {
           allowSingleUseCodeLogin: OrderByEnum.DESC,
         },
       });
-      expect(prisma.userAccounts.update).not.toHaveBeenCalled();
-      expect(emailService.sendSingleUseCode).not.toHaveBeenCalled();
-    });
-
-    it('should request single use code but jurisdictionname was not sent', async () => {
-      const id = randomUUID();
-      emailService.sendSingleUseCode = jest.fn();
-      prisma.userAccounts.findFirst = jest.fn().mockResolvedValue({
-        id,
-        passwordUpdatedAt: new Date(),
-      });
-      prisma.jurisdictions.findFirst = jest.fn().mockResolvedValue({
-        id,
-      });
-      prisma.userAccounts.update = jest.fn().mockResolvedValue({
-        id,
-      });
-
-      await expect(
-        async () =>
-          await service.requestSingleUseCode(
-            {
-              email: 'example@exygy.com',
-            },
-            {} as unknown as Request,
-          ),
-      ).rejects.toThrowError(
-        'jurisdictionname is missing from the request headers',
-      );
-
-      expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
-        where: {
-          email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
-        },
-      });
-      expect(prisma.jurisdictions.findFirst).not.toHaveBeenCalled();
       expect(prisma.userAccounts.update).not.toHaveBeenCalled();
       expect(emailService.sendSingleUseCode).not.toHaveBeenCalled();
     });
@@ -2499,19 +2438,13 @@ describe('Testing user service', () => {
         id,
       });
 
-      const res = await service.requestSingleUseCode(
-        {
-          email: 'example@exygy.com',
-        },
-        { headers: { jurisdictionname: 'juris 1' } } as unknown as Request,
-      );
+      const res = await service.requestSingleUseCode({
+        email: 'example@exygy.com',
+      });
 
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -2519,9 +2452,6 @@ describe('Testing user service', () => {
           id: true,
           allowSingleUseCodeLogin: true,
           name: true,
-        },
-        where: {
-          name: 'juris 1',
         },
         orderBy: {
           allowSingleUseCodeLogin: OrderByEnum.DESC,
@@ -2559,19 +2489,13 @@ describe('Testing user service', () => {
         id,
       });
 
-      const res = await service.requestSingleUseCode(
-        {
-          email: 'example@exygy.com',
-        },
-        { headers: { jurisdictionname: 'juris 1' } } as unknown as Request,
-      );
+      const res = await service.requestSingleUseCode({
+        email: 'example@exygy.com',
+      });
 
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -2579,9 +2503,6 @@ describe('Testing user service', () => {
           id: true,
           allowSingleUseCodeLogin: true,
           name: true,
-        },
-        where: {
-          name: 'juris 1',
         },
         orderBy: {
           allowSingleUseCodeLogin: OrderByEnum.DESC,

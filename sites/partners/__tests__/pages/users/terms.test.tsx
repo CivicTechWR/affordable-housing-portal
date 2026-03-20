@@ -19,8 +19,18 @@ beforeEach(() => {
         ctx.json({
           id: "user1",
           roles: { id: "user1", isAdmin: true, isPartner: false },
-          jurisdictions: [{ id: "id1", partnerTerms: "Example Terms" }],
         })
+      )
+    }),
+    rest.get("http://localhost/api/adapter/jurisdictions", (_req, res, ctx) => {
+      return res(
+        ctx.json([
+          {
+            id: "id1",
+            name: "Example City",
+            partnerTerms: "Example Terms",
+          },
+        ])
       )
     }),
     rest.post("http://localhost:3100/auth/token", (_req, res, ctx) => {

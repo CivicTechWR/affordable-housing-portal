@@ -46,16 +46,26 @@ describe('Testing jurisdiction service', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
+  beforeEach(() => {
+    prisma.featureFlags.findMany = jest.fn().mockResolvedValue([]);
+  });
+
   it('testing list()', async () => {
     const date = new Date();
     const mockedValue = mockJurisdictionSet(3, date);
     prisma.jurisdictions.findMany = jest.fn().mockResolvedValue(mockedValue);
 
-    expect(await service.list()).toEqual(mockedValue);
+    expect(await service.list()).toEqual(
+      mockedValue.map((jurisdiction) =>
+        expect.objectContaining({
+          ...jurisdiction,
+          featureFlags: [],
+        }),
+      ),
+    );
 
     expect(prisma.jurisdictions.findMany).toHaveBeenCalledWith({
       include: {
-        featureFlags: true,
         multiselectQuestions: true,
       },
     });
@@ -67,7 +77,10 @@ describe('Testing jurisdiction service', () => {
     prisma.jurisdictions.findFirst = jest.fn().mockResolvedValue(mockedValue);
 
     expect(await service.findOne({ jurisdictionId: 'example Id' })).toEqual(
-      mockedValue,
+      expect.objectContaining({
+        ...mockedValue,
+        featureFlags: [],
+      }),
     );
 
     expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -77,7 +90,6 @@ describe('Testing jurisdiction service', () => {
         },
       },
       include: {
-        featureFlags: true,
         multiselectQuestions: true,
       },
     });
@@ -89,7 +101,10 @@ describe('Testing jurisdiction service', () => {
     prisma.jurisdictions.findFirst = jest.fn().mockResolvedValue(mockedValue);
 
     expect(await service.findOne({ jurisdictionName: 'example Id' })).toEqual(
-      mockedValue,
+      expect.objectContaining({
+        ...mockedValue,
+        featureFlags: [],
+      }),
     );
 
     expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -99,7 +114,6 @@ describe('Testing jurisdiction service', () => {
         },
       },
       include: {
-        featureFlags: true,
         multiselectQuestions: true,
       },
     });
@@ -121,7 +135,6 @@ describe('Testing jurisdiction service', () => {
         },
       },
       include: {
-        featureFlags: true,
         multiselectQuestions: true,
       },
     });
@@ -149,7 +162,12 @@ describe('Testing jurisdiction service', () => {
       duplicateListingPermissions: [],
     };
 
-    expect(await service.create(params)).toEqual(mockedValue);
+    expect(await service.create(params)).toEqual(
+      expect.objectContaining({
+        ...mockedValue,
+        featureFlags: [],
+      }),
+    );
 
     expect(prisma.jurisdictions.create).toHaveBeenCalledWith({
       data: {
@@ -169,7 +187,6 @@ describe('Testing jurisdiction service', () => {
         duplicateListingPermissions: [],
       },
       include: {
-        featureFlags: true,
         multiselectQuestions: true,
       },
     });
@@ -206,22 +223,25 @@ describe('Testing jurisdiction service', () => {
       duplicateListingPermissions: [],
     };
 
-    expect(await service.update(params)).toEqual({
-      id: mockedJurisdiction.id,
-      name: `updated jurisdiction 3`,
-      notificationsSignUpUrl: `notificationsSignUpUrl: 3`,
-      languages: [LanguagesEnum.en],
-      partnerTerms: `partnerTerms: 3`,
-      publicUrl: `publicUrl: 3`,
-      emailFromAddress: `emailFromAddress: 3`,
-      rentalAssistanceDefault: `rentalAssistanceDefault: 3`,
-      whatToExpect: `whatToExpect: 3`,
-      whatToExpectAdditionalText: `whatToExpectAdditionalText: 3`,
-      whatToExpectUnderConstruction: `whatToExpectUnderConstruction: 3`,
-      enablePartnerSettings: true,
-      createdAt: date,
-      updatedAt: date,
-    });
+    expect(await service.update(params)).toEqual(
+      expect.objectContaining({
+        id: mockedJurisdiction.id,
+        name: `updated jurisdiction 3`,
+        notificationsSignUpUrl: `notificationsSignUpUrl: 3`,
+        languages: [LanguagesEnum.en],
+        partnerTerms: `partnerTerms: 3`,
+        publicUrl: `publicUrl: 3`,
+        emailFromAddress: `emailFromAddress: 3`,
+        rentalAssistanceDefault: `rentalAssistanceDefault: 3`,
+        whatToExpect: `whatToExpect: 3`,
+        whatToExpectAdditionalText: `whatToExpectAdditionalText: 3`,
+        whatToExpectUnderConstruction: `whatToExpectUnderConstruction: 3`,
+        enablePartnerSettings: true,
+        createdAt: date,
+        updatedAt: date,
+        featureFlags: [],
+      }),
+    );
 
     expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
       where: {
@@ -250,7 +270,6 @@ describe('Testing jurisdiction service', () => {
         id: mockedJurisdiction.id,
       },
       include: {
-        featureFlags: true,
         multiselectQuestions: true,
       },
     });

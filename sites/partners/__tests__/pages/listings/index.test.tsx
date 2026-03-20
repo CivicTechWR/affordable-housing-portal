@@ -206,8 +206,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ListingsList />
@@ -361,8 +360,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag, true),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag, true),
         }}
       >
         <ListingsList />
@@ -463,8 +461,7 @@ describe("listings", () => {
               } as Jurisdiction,
             ],
           },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ListingsList />

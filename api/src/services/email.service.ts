@@ -196,11 +196,7 @@ export class EmailService {
   }
 
   /* Send welcome email to new public users */
-  public async welcome(
-    user: User,
-    appUrl: string,
-    confirmationUrl: string,
-  ) {
+  public async welcome(user: User, appUrl: string, confirmationUrl: string) {
     const jurisdiction = await this.getJurisdiction();
     const baseUrl = appUrl ? new URL(appUrl).origin : undefined;
     await this.loadTranslations(jurisdiction, user.language);
@@ -511,7 +507,9 @@ export class EmailService {
   ) {
     try {
       const jurisdiction = await this.getJurisdiction(
-        typeof jurisdictionId === 'string' ? jurisdictionId : jurisdictionId?.id,
+        typeof jurisdictionId === 'string'
+          ? jurisdictionId
+          : jurisdictionId?.id,
       );
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(
@@ -569,7 +567,9 @@ export class EmailService {
   ) {
     try {
       const jurisdiction = await this.getJurisdiction(
-        typeof jurisdictionId === 'string' ? jurisdictionId : jurisdictionId?.id,
+        typeof jurisdictionId === 'string'
+          ? jurisdictionId
+          : jurisdictionId?.id,
       );
       void (await this.loadTranslations(jurisdiction));
       this.logger.log(

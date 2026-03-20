@@ -14,20 +14,12 @@ const DetailListingIntro = () => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableHousingDeveloperOwner = isFeatureFlagOn(
-    FeatureFlagEnum.enableHousingDeveloperOwner
-  )
-  const enableListingFileNumber = isFeatureFlagOn(
-    FeatureFlagEnum.enableListingFileNumber
-  )
+  const enableHousingDeveloperOwner = isFeatureFlagOn(FeatureFlagEnum.enableHousingDeveloperOwner)
+  const enableListingFileNumber = isFeatureFlagOn(FeatureFlagEnum.enableListingFileNumber)
 
-  const enableNonRegulatedListings = isFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings
-  )
+  const enableNonRegulatedListings = isFeatureFlagOn(FeatureFlagEnum.enableNonRegulatedListings)
 
-  const enableProperties = isFeatureFlagOn(
-    FeatureFlagEnum.enableProperties
-  )
+  const enableProperties = isFeatureFlagOn(FeatureFlagEnum.enableProperties)
 
   let developerFieldTitle = t("listings.developer")
   if (enableHousingDeveloperOwner) {

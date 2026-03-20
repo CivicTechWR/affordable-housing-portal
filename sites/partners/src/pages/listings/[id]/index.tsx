@@ -58,9 +58,7 @@ export default function ListingDetail(props: ListingProps) {
 
   if (!listing) return null
 
-  const enableConfigurableRegions = isFeatureFlagOn(
-    FeatureFlagEnum.enableConfigurableRegions
-  )
+  const enableConfigurableRegions = isFeatureFlagOn(FeatureFlagEnum.enableConfigurableRegions)
 
   return (
     <ListingContext.Provider value={listing}>

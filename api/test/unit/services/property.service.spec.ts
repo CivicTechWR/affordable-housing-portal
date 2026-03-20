@@ -376,7 +376,6 @@ describe('Testing property service', () => {
       expect(result).toEqual(mockCreatedProperty);
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
         select: {
-          featureFlags: true,
           id: true,
         },
         where: {
@@ -440,7 +439,6 @@ describe('Testing property service', () => {
 
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
         select: {
-          featureFlags: true,
           id: true,
         },
         where: {

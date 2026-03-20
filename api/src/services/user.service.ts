@@ -172,10 +172,7 @@ export class UserService {
   /*
     this will update a user or error if no user is found with the Id
   */
-  async update(
-    dto: UserUpdate,
-    requestingUser: User,
-  ): Promise<User> {
+  async update(dto: UserUpdate, requestingUser: User): Promise<User> {
     const storedUser = await this.findUserOrError(
       { userId: dto.id },
       UserViews.full,
@@ -609,7 +606,7 @@ export class UserService {
     if (!forPartners && sendWelcomeEmail) {
       // Single-use-code login remains a site-level setting, so read it from the singleton config.
       if (siteJurisdiction?.allowSingleUseCodeLogin) {
-        this.requestSingleUseCode(dto, req);
+        this.requestSingleUseCode(dto);
       } else {
         const confirmationUrl = this.getPublicConfirmationUrl(
           dto.appUrl,
@@ -782,10 +779,7 @@ export class UserService {
    * @param dto the incoming request with the email
    * @returns a SuccessDTO always, and if the user exists it will send a code to the requester
    */
-  async requestSingleUseCode(
-    dto: RequestSingleUseCode,
-    req: Request,
-  ): Promise<SuccessDTO> {
+  async requestSingleUseCode(dto: RequestSingleUseCode): Promise<SuccessDTO> {
     const user = await this.prisma.userAccounts.findFirst({
       where: { email: dto.email },
     });

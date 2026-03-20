@@ -2,7 +2,6 @@ import { Strategy } from 'passport-local';
 import { Request } from 'express';
 import { PassportStrategy } from '@nestjs/passport';
 import {
-  BadRequestException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,

@@ -56,9 +56,7 @@ const DetailAccessibilityFeatures = (props: DetailAccessibilityFeaturesProps) =>
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableAccessibilityFeatures = isFeatureFlagOn(
-    FeatureFlagEnum.enableAccessibilityFeatures
-  )
+  const enableAccessibilityFeatures = isFeatureFlagOn(FeatureFlagEnum.enableAccessibilityFeatures)
 
   const hasCategories = props?.listingFeaturesConfiguration?.categories?.length > 0
 

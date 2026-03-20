@@ -76,8 +76,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -160,8 +159,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -232,8 +230,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -279,8 +276,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -335,8 +331,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -403,8 +398,7 @@ describe("<SettingsProperties>", () => {
               listings: [],
             },
             propertiesService: new PropertiesService(),
-            isFeatureFlagOn: (featureFlag) =>
-              featureFlag === FeatureFlagEnum.enableProperties,
+            isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
           }}
         >
           <SettingsProperties />
@@ -510,8 +504,7 @@ describe("<SettingsProperties>", () => {
             },
             listingsService: new ListingsService(),
             propertiesService: new PropertiesService(),
-            isFeatureFlagOn: (featureFlag) =>
-              featureFlag === FeatureFlagEnum.enableProperties,
+            isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
           }}
         >
           <SettingsProperties />
@@ -583,8 +576,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -652,8 +644,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />
@@ -696,8 +687,7 @@ describe("<SettingsProperties>", () => {
             listings: [],
           },
           propertiesService: new PropertiesService(),
-          isFeatureFlagOn: (featureFlag) =>
-            featureFlag === FeatureFlagEnum.enableProperties,
+          isFeatureFlagOn: (featureFlag) => featureFlag === FeatureFlagEnum.enableProperties,
         }}
       >
         <SettingsProperties />

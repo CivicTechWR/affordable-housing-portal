@@ -13,9 +13,7 @@ const Advocates = () => {
   const { isFeatureFlagOn } = useContext(AuthContext)
   const router = useRouter()
 
-  const enableHousingAdvocate = isFeatureFlagOn(
-    FeatureFlagEnum.enableHousingAdvocate
-  )
+  const enableHousingAdvocate = isFeatureFlagOn(FeatureFlagEnum.enableHousingAdvocate)
 
   return (
     <Layout>

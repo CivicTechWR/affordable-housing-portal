@@ -593,10 +593,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     ];
 
     if (
-      isFeatureFlagActive(
-        user.featureFlags,
-        FeatureFlagEnum.enableHomeType,
-      )
+      isFeatureFlagActive(user.featureFlags, FeatureFlagEnum.enableHomeType)
     ) {
       headers.push({
         path: 'homeType',
@@ -605,10 +602,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      isFeatureFlagActive(
-        user.featureFlags,
-        FeatureFlagEnum.enableUnitGroups,
-      )
+      isFeatureFlagActive(user.featureFlags, FeatureFlagEnum.enableUnitGroups)
     ) {
       headers.push({
         path: 'unitGroups.length',
@@ -616,10 +610,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
       });
     }
     if (
-      !isFeatureFlagActive(
-        user.featureFlags,
-        FeatureFlagEnum.enableUnitGroups,
-      )
+      !isFeatureFlagActive(user.featureFlags, FeatureFlagEnum.enableUnitGroups)
     ) {
       headers.push({
         path: 'units.length',
@@ -843,11 +834,10 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
           path: 'smokingPolicy',
           label: 'Smoking Policy',
           format: (val: string): string => {
-            const enableSmokingPolicyRadio =
-              isFeatureFlagActive(
-                user.featureFlags,
-                FeatureFlagEnum.enableSmokingPolicyRadio,
-              );
+            const enableSmokingPolicyRadio = isFeatureFlagActive(
+              user.featureFlags,
+              FeatureFlagEnum.enableSmokingPolicyRadio,
+            );
             if (!val) return enableSmokingPolicyRadio ? 'Policy unknown' : '';
             return val;
           },
@@ -914,10 +904,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      isFeatureFlagActive(
-        user.featureFlags,
-        FeatureFlagEnum.enableParkingFee,
-      )
+      isFeatureFlagActive(user.featureFlags, FeatureFlagEnum.enableParkingFee)
     ) {
       headers.push({
         path: 'parkingFee',
@@ -926,10 +913,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     }
 
     if (
-      isFeatureFlagActive(
-        user.featureFlags,
-        FeatureFlagEnum.enableParkingType,
-      )
+      isFeatureFlagActive(user.featureFlags, FeatureFlagEnum.enableParkingType)
     ) {
       headers.push(
         ...[
@@ -1320,10 +1304,7 @@ export class ListingCsvExporterService implements CsvExporterServiceInterface {
     );
 
     if (
-      isFeatureFlagActive(
-        user.featureFlags,
-        FeatureFlagEnum.enableIsVerified,
-      )
+      isFeatureFlagActive(user.featureFlags, FeatureFlagEnum.enableIsVerified)
     )
       headers.push({
         path: 'isVerified',

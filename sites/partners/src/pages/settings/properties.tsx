@@ -110,7 +110,7 @@ const SettingsProperties = () => {
         },
       },
     ],
-    [siteConfig]
+    []
   )
 
   const handleSave = (propertyData: PropertyCreate) => {

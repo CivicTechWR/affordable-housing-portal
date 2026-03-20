@@ -1,11 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import {
-  IsEmail,
-  IsString,
-  Matches,
-  MaxLength,
-} from 'class-validator';
+import { IsEmail, IsString, Matches, MaxLength } from 'class-validator';
 import { UserUpdate } from './user-update.dto';
 
 import { EnforceLowerCase } from '../../decorators/enforce-lower-case.decorator';

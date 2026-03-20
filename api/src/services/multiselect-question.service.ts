@@ -309,7 +309,7 @@ export class MultiselectQuestionService {
             : undefined,
 
         // TODO: Use of the feature flag is temporary until after MSQ refactor
-        isExclusive: enableV2MSQ ? isExclusive : false,
+        isExclusive: enableV2MSQ ? isExclusive ?? false : false,
         name: enableV2MSQ ? name : createData.text,
         status: enableV2MSQ ? status : MultiselectQuestionsStatusEnum.draft,
 
@@ -431,7 +431,7 @@ export class MultiselectQuestionService {
             : undefined,
 
           // TODO: Use of the feature flag is temporary until after MSQ refactor
-          isExclusive: enableV2MSQ ? isExclusive : false,
+          isExclusive: enableV2MSQ ? isExclusive ?? false : false,
           name: enableV2MSQ ? name : updateData.text,
           status: enableV2MSQ ? status : MultiselectQuestionsStatusEnum.draft,
 

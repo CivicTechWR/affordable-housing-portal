@@ -31,9 +31,7 @@ const DetailAdditionalDetails = () => {
     return documentsExist ? <ul className={"flex flex-wrap"}>{documents}</ul> : <>{t("t.none")}</>
   }
 
-  const enableNonRegulatedListings = isFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings
-  )
+  const enableNonRegulatedListings = isFeatureFlagOn(FeatureFlagEnum.enableNonRegulatedListings)
 
   const showRequiredDocumentsListField =
     enableNonRegulatedListings && listing.listingType === EnumListingListingType.nonRegulated

@@ -59,7 +59,12 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  server.use(rest.get("http://localhost/api/adapter/user", (_req, res, ctx) => res(ctx.json(user))))
+  server.use(
+    rest.get("http://localhost/api/adapter/user", (_req, res, ctx) => res(ctx.json(user))),
+    rest.get("http://localhost/api/adapter/jurisdictions", (_req, res, ctx) => {
+      return res(ctx.json([jurisdiction]))
+    })
+  )
 })
 
 afterEach(() => {
@@ -530,8 +535,7 @@ describe("listing data", () => {
         <AuthContext.Provider
           value={{
             profile: { ...user, jurisdictions: [], listings: [] },
-            isFeatureFlagOn: (featureFlag) =>
-              mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+            isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
           <ListingContext.Provider
@@ -1452,8 +1456,7 @@ describe("listing data", () => {
           <AuthContext.Provider
             value={{
               profile: { ...user, jurisdictions: [], listings: [] },
-              isFeatureFlagOn: (featureFlag) =>
-                mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+              isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
             <ListingContext.Provider
@@ -1528,8 +1531,7 @@ describe("listing data", () => {
                 listings: [],
                 jurisdictions: [jurisdiction],
               },
-              isFeatureFlagOn: (featureFlag) =>
-                mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+              isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
             <ListingDetail
@@ -1570,8 +1572,7 @@ describe("listing data", () => {
               listings: [],
               jurisdictions: [jurisdiction],
             },
-            isFeatureFlagOn: (featureFlag) =>
-              mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+            isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
           <ListingDetail listing={result.props.listing} />
@@ -1606,8 +1607,7 @@ describe("listing data", () => {
                 listings: [],
                 jurisdictions: [jurisdiction],
               },
-              isFeatureFlagOn: (featureFlag) =>
-                mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+              isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
             <ListingDetail listing={result.props.listing} />
@@ -1665,8 +1665,7 @@ describe("listing data", () => {
                 listings: [],
                 jurisdictions: [jurisdiction],
               },
-              isFeatureFlagOn: (featureFlag) =>
-                mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+              isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
             }}
           >
             <ListingDetail listing={result.props.listing} />
@@ -1716,8 +1715,8 @@ describe("listing data", () => {
               listings: [],
               jurisdictions: [{ ...jurisdiction, id: "id" }],
             },
-            isFeatureFlagOn: (featureFlag) =>
-              mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+            siteConfig: jurisdiction,
+            isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
           <ListingDetail listing={result.props.listing} />
@@ -1752,8 +1751,7 @@ describe("listing data", () => {
             listings: [],
             jurisdictions: [jurisdiction],
           },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ListingDetail
@@ -1856,8 +1854,7 @@ describe("listing data", () => {
             listings: [],
             jurisdictions: [jurisdiction],
           },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ListingDetail listing={listing} />
@@ -1886,8 +1883,7 @@ describe("listing data", () => {
             listings: [],
             jurisdictions: [jurisdiction],
           },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ListingDetail

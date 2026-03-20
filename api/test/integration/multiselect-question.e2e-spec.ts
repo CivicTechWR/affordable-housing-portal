@@ -40,6 +40,10 @@ describe('MultiselectQuestion Controller Tests', () => {
     app.use(cookieParser());
     await app.init();
     await createAllFeatureFlags(prisma);
+    await prisma.featureFlags.updateMany({
+      data: { active: false },
+      where: { name: FeatureFlagEnum.enableV2MSQ },
+    });
   });
 
   afterAll(async () => {
@@ -385,10 +389,12 @@ describe('MultiselectQuestion Controller Tests', () => {
     let jurisdictionId: string;
     let cookies = '';
     beforeAll(async () => {
+      await prisma.featureFlags.updateMany({
+        data: { active: true },
+        where: { name: FeatureFlagEnum.enableV2MSQ },
+      });
       const jurisdiction = await prisma.jurisdictions.create({
-        data: jurisdictionFactory('enableV2', {
-          featureFlags: [FeatureFlagEnum.enableV2MSQ],
-        }),
+        data: jurisdictionFactory('enableV2'),
       });
       jurisdictionId = jurisdiction.id;
 
@@ -415,18 +421,14 @@ describe('MultiselectQuestion Controller Tests', () => {
       let listJurisdictionId: string;
       beforeAll(async () => {
         const jurisdiction = await prisma.jurisdictions.create({
-          data: jurisdictionFactory('enableV2 juris list', {
-            featureFlags: [FeatureFlagEnum.enableV2MSQ],
-          }),
+          data: jurisdictionFactory('enableV2 juris list'),
         });
         listJurisdictionId = jurisdiction.id;
       });
 
       it('should get multiselect questions from list endpoint when jurisdiction filter is sent', async () => {
         const jurisdictionB = await prisma.jurisdictions.create({
-          data: jurisdictionFactory('enableV2 juris list test', {
-            featureFlags: [FeatureFlagEnum.enableV2MSQ],
-          }),
+          data: jurisdictionFactory('enableV2 juris list test'),
         });
 
         const multiselectQuestionA = await prisma.multiselectQuestions.create({
@@ -943,9 +945,7 @@ describe('MultiselectQuestion Controller Tests', () => {
     describe('retireMultiselectQuestions', () => {
       it('should retire multiselectQuestions in toRetire status with no active listings', async () => {
         const jurisdictionAll = await prisma.jurisdictions.create({
-          data: jurisdictionFactory('enableV2 juris retire all', {
-            featureFlags: [FeatureFlagEnum.enableV2MSQ],
-          }),
+          data: jurisdictionFactory('enableV2 juris retire all'),
         });
         const multiselectQuestionClosedListing =
           await prisma.multiselectQuestions.create({
@@ -1007,9 +1007,7 @@ describe('MultiselectQuestion Controller Tests', () => {
 
       it('should not retire multiselectQuestions in toRetire status with active listings', async () => {
         const jurisdictionSome = await prisma.jurisdictions.create({
-          data: jurisdictionFactory('enableV2 juris retire some', {
-            featureFlags: [FeatureFlagEnum.enableV2MSQ],
-          }),
+          data: jurisdictionFactory('enableV2 juris retire some'),
         });
         const multiselectQuestionActiveListing =
           await prisma.multiselectQuestions.create({

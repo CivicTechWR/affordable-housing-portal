@@ -796,6 +796,10 @@ describe('Testing application service', () => {
     jest.resetAllMocks();
   });
 
+  beforeEach(() => {
+    prisma.featureFlags.findMany = jest.fn().mockResolvedValue([]);
+  });
+
   //common shared variables
   const userId = randomUUID();
   const requestingUser = {
@@ -1788,7 +1792,7 @@ describe('Testing application service', () => {
           id: expect.anything(),
         },
         include: {
-          jurisdictions: { include: { featureFlags: true } },
+          jurisdictions: true,
           listingsBuildingAddress: true,
           listingMultiselectQuestions: {
             include: {
@@ -2022,7 +2026,7 @@ describe('Testing application service', () => {
           id: expect.anything(),
         },
         include: {
-          jurisdictions: { include: { featureFlags: true } },
+          jurisdictions: true,
           listingsBuildingAddress: true,
           listingMultiselectQuestions: {
             include: {
@@ -2270,7 +2274,7 @@ describe('Testing application service', () => {
           id: expect.anything(),
         },
         include: {
-          jurisdictions: { include: { featureFlags: true } },
+          jurisdictions: true,
           listingsBuildingAddress: true,
           listingMultiselectQuestions: {
             include: {
@@ -2546,7 +2550,7 @@ describe('Testing application service', () => {
           id: expect.anything(),
         },
         include: {
-          jurisdictions: { include: { featureFlags: true } },
+          jurisdictions: true,
           listingsBuildingAddress: true,
           listingMultiselectQuestions: {
             include: {
@@ -2597,7 +2601,7 @@ describe('Testing application service', () => {
           id: expect.anything(),
         },
         include: {
-          jurisdictions: { include: { featureFlags: true } },
+          jurisdictions: true,
           listingsBuildingAddress: true,
           listingMultiselectQuestions: {
             include: {
@@ -2654,7 +2658,7 @@ describe('Testing application service', () => {
           id: expect.anything(),
         },
         include: {
-          jurisdictions: { include: { featureFlags: true } },
+          jurisdictions: true,
           listingsBuildingAddress: true,
           listingMultiselectQuestions: {
             include: {

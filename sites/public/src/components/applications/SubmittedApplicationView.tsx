@@ -103,15 +103,11 @@ const SubmittedApplicationView = ({
               ?.length === 0
           }
           editMode={false}
-          enableUnitGroups={isFeatureFlagOn(
-            FeatureFlagEnum.enableUnitGroups
-          )}
+          enableUnitGroups={isFeatureFlagOn(FeatureFlagEnum.enableUnitGroups)}
           enableFullTimeStudentQuestion={isFeatureFlagOn(
             FeatureFlagEnum.enableFullTimeStudentQuestion
           )}
-          enableAdaOtherOption={isFeatureFlagOn(
-            FeatureFlagEnum.enableAdaOtherOption
-          )}
+          enableAdaOtherOption={isFeatureFlagOn(FeatureFlagEnum.enableAdaOtherOption)}
           swapCommunityTypeWithPrograms={isFeatureFlagOn(
             FeatureFlagEnum.swapCommunityTypeWithPrograms
           )}

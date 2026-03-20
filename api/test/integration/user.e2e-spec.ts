@@ -724,7 +724,7 @@ describe('User Controller Tests', () => {
 
   describe('create endpoint', () => {
     it('should create public user', async () => {
-      const juris = await prisma.jurisdictions.create({
+      await prisma.jurisdictions.create({
         data: jurisdictionFactory(),
       });
 
@@ -742,15 +742,11 @@ describe('User Controller Tests', () => {
           lastName: 'Public User lastName',
           password: 'Abcdef12345!',
           email: 'publicUser@email.com',
-          jurisdictions: [{ id: juris.id }],
         } as UserCreate)
         .set('Cookie', cookies)
         .expect(201);
 
       expect(res.body.firstName).toEqual('Public User firstName');
-      expect(res.body.jurisdictions).toEqual([
-        expect.objectContaining({ id: juris.id, name: juris.name }),
-      ]);
       expect(res.body.email).toEqual('publicuser@email.com');
 
       const applicationsOnUser = await prisma.userAccounts.findUnique({
@@ -769,7 +765,7 @@ describe('User Controller Tests', () => {
 
   describe('invite partner endpoint', () => {
     it('should create partner user', async () => {
-      const juris = await prisma.jurisdictions.create({
+      await prisma.jurisdictions.create({
         data: jurisdictionFactory(),
       });
 
@@ -781,7 +777,6 @@ describe('User Controller Tests', () => {
           lastName: 'Partner User lastName',
           password: 'Abcdef12345!',
           email: 'partnerUser@email.com',
-          jurisdictions: [{ id: juris.id }],
           agreedToTermsOfService: true,
           userRoles: {
             isAdmin: true,
@@ -791,9 +786,6 @@ describe('User Controller Tests', () => {
         .expect(201);
 
       expect(res.body.firstName).toEqual('Partner User firstName');
-      expect(res.body.jurisdictions).toEqual([
-        expect.objectContaining({ id: juris.id, name: juris.name }),
-      ]);
       expect(res.body.email).toEqual('partneruser@email.com');
     });
   });
@@ -810,7 +802,7 @@ describe('User Controller Tests', () => {
         }),
       });
 
-      const jurisdiction = await prisma.jurisdictions.create({
+      await prisma.jurisdictions.create({
         data: {
           name: 'single_use_code_1',
           allowSingleUseCodeLogin: true,
@@ -825,7 +817,6 @@ describe('User Controller Tests', () => {
         .send({
           email: storedUser.email,
         } as RequestMfaCode)
-        .set({ jurisdictionname: jurisdiction.name })
         .expect(201);
 
       expect(res.body).toEqual({ success: true });
@@ -843,13 +834,6 @@ describe('User Controller Tests', () => {
     });
 
     it('should request single use code, but user does not exist', async () => {
-      const jurisdiction = await prisma.jurisdictions.create({
-        data: {
-          name: 'single_use_code_3',
-          allowSingleUseCodeLogin: true,
-          rentalAssistanceDefault: 'test',
-        },
-      });
       emailService.sendSingleUseCode = jest.fn();
 
       const res = await request(app.getHttpServer())
@@ -858,7 +842,6 @@ describe('User Controller Tests', () => {
         .send({
           email: 'thisEmailDoesNotExist@exygy.com',
         } as RequestMfaCode)
-        .set({ jurisdictionname: jurisdiction.name })
         .expect(201);
       expect(res.body.success).toEqual(true);
 

@@ -21,9 +21,7 @@ const DetailRankingsAndResults = () => {
     FeatureFlagEnum.enableWaitlistAdditionalFields
   )
 
-  const enableUnitGroups = isFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups
-  )
+  const enableUnitGroups = isFeatureFlagOn(FeatureFlagEnum.enableUnitGroups)
 
   const enableWhatToExpectAdditionalField = isFeatureFlagOn(
     FeatureFlagEnum.enableWhatToExpectAdditionalField

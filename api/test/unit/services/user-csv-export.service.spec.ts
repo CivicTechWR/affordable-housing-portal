@@ -254,7 +254,6 @@ describe('Testing user csv export service', () => {
                 },
               ],
             },
-            { jurisdictions: { some: { id: { in: [jurisdiction1] } } } },
           ],
         },
       });

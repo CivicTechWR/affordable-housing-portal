@@ -94,30 +94,6 @@ describe('Jurisdiction Controller Tests', () => {
     expect(res.body.name).toEqual(jurisdictionA.name);
   });
 
-  it("retrieve endpoint with name that doesn't exist should error", async () => {
-    const name = 'a nonexistant name';
-    const res = await request(app.getHttpServer())
-      .get(`/jurisdictions/byName/${name}`)
-      .set({ passkey: process.env.API_PASS_KEY || '' })
-      .expect(404);
-    expect(res.body.message).toEqual(
-      `jurisdiction ${name} was requested but not found`,
-    );
-  });
-
-  it('testing retrieveByName endpoint', async () => {
-    const jurisdictionA = await prisma.jurisdictions.create({
-      data: jurisdictionFactory(),
-    });
-
-    const res = await request(app.getHttpServer())
-      .get(`/jurisdictions/byName/${jurisdictionA.name}`)
-      .set({ passkey: process.env.API_PASS_KEY || '' })
-      .expect(200);
-
-    expect(res.body.name).toEqual(jurisdictionA.name);
-  });
-
   it('testing create endpoint', async () => {
     const createBody: JurisdictionCreate = {
       name: 'new jurisdiction',

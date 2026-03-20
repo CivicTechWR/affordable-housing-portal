@@ -19,17 +19,11 @@ const DetailApplicationDates = () => {
   const { isFeatureFlagOn } = useContext(AuthContext)
   const [drawer, setDrawer] = useState<ListingEvent | null>(null)
 
-  const enableMarketingStatus = isFeatureFlagOn(
-    FeatureFlagEnum.enableMarketingStatus
-  )
+  const enableMarketingStatus = isFeatureFlagOn(FeatureFlagEnum.enableMarketingStatus)
 
-  const enableMarketingStatusMonths = isFeatureFlagOn(
-    FeatureFlagEnum.enableMarketingStatusMonths
-  )
+  const enableMarketingStatusMonths = isFeatureFlagOn(FeatureFlagEnum.enableMarketingStatusMonths)
 
-  const enableMarketingFlyer = isFeatureFlagOn(
-    FeatureFlagEnum.enableMarketingFlyer
-  )
+  const enableMarketingFlyer = isFeatureFlagOn(FeatureFlagEnum.enableMarketingFlyer)
 
   const openHouseHeaders = {
     date: "t.date",

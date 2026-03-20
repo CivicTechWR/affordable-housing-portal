@@ -56,8 +56,7 @@ describe("DetailBuildingFeatures", () => {
     render(
       <AuthContext.Provider
         value={{
-          isFeatureFlagOn: (flag) =>
-            flag === FeatureFlagEnum.enablePetPolicyCheckbox,
+          isFeatureFlagOn: (flag) => flag === FeatureFlagEnum.enablePetPolicyCheckbox,
         }}
       >
         <ListingContext.Provider

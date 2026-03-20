@@ -17,9 +17,7 @@ const DetailApplicationAddress = () => {
 
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableLeasingAgentAltText = isFeatureFlagOn(
-    FeatureFlagEnum.enableLeasingAgentAltText
-  )
+  const enableLeasingAgentAltText = isFeatureFlagOn(FeatureFlagEnum.enableLeasingAgentAltText)
   const leasingAgentAddressText = enableLeasingAgentAltText
     ? t("listings.leasingAgentAddressManagerProp")
     : t("listings.leasingAgentAddress")

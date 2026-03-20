@@ -38,8 +38,7 @@ describe("DetailUnits", () => {
     render(
       <AuthContext.Provider
         value={{
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag, false),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag, false),
         }}
       >
         <ListingContext.Provider
@@ -463,8 +462,7 @@ describe("DetailUnits", () => {
       render(
         <AuthContext.Provider
           value={{
-            isFeatureFlagOn: (featureFlag) =>
-              mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+            isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
           <ListingContext.Provider
@@ -489,8 +487,7 @@ describe("DetailUnits", () => {
       render(
         <AuthContext.Provider
           value={{
-            isFeatureFlagOn: (featureFlag) =>
-              mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+            isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
           }}
         >
           <ListingContext.Provider

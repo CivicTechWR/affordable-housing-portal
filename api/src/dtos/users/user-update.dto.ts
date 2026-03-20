@@ -1,5 +1,5 @@
 import { ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import {
   IsEmail,
   IsNotEmpty,

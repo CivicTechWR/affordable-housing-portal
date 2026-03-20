@@ -6,7 +6,6 @@ import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../../src/modules/app.module';
 import { PrismaService } from '../../src/services/prisma.service';
 import { featureFlagFactory } from '../../prisma/seed-helpers/feature-flag-factory';
-import { jurisdictionFactory } from '../../prisma/seed-helpers/jurisdiction-factory';
 import { randomName } from '../../prisma/seed-helpers/word-generator';
 import { userFactory } from '../../prisma/seed-helpers/user-factory';
 import { Login } from '../../src/dtos/auth/login.dto';
@@ -90,7 +89,6 @@ describe('Feature Flag Controller Tests', () => {
 
       expect(res.body).toEqual({
         ...body,
-        jurisdictions: [],
         id: expect.anything(),
         createdAt: expect.anything(),
         updatedAt: expect.anything(),
@@ -120,7 +118,6 @@ describe('Feature Flag Controller Tests', () => {
       expect(res.body).toEqual({
         ...body,
         name: featureFlag.name,
-        jurisdictions: [],
         createdAt: expect.anything(),
         updatedAt: expect.anything(),
       });
@@ -178,103 +175,6 @@ describe('Feature Flag Controller Tests', () => {
 
       expect(res.body.message).toEqual(
         `feature flag id ${id} was requested but not found`,
-      );
-    });
-  });
-
-  describe('associateJurisdictions endpoint', () => {
-    it('should associate and remove jurisdictions to an existing feature flag', async () => {
-      const jurisdiction1 = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
-      });
-      const jurisdiction2 = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
-      });
-      const jurisdiction3 = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
-      });
-      const featureFlag = await prisma.featureFlags.create({
-        data: featureFlagFactory(undefined, undefined, undefined, [
-          jurisdiction1.id,
-          jurisdiction2.id,
-        ]),
-      });
-
-      const body = {
-        id: featureFlag.id,
-        associate: [jurisdiction3.id],
-        remove: [jurisdiction2.id],
-      };
-
-      const res = await request(app.getHttpServer())
-        .put(`/featureFlags/associateJurisdictions`)
-        .set({ passkey: process.env.API_PASS_KEY || '' })
-        .send(body)
-        .set('Cookie', adminAccessToken)
-        .expect(200);
-
-      expect(res.body).toEqual({
-        ...featureFlag,
-        jurisdictions: [
-          {
-            id: jurisdiction1.id,
-            name: jurisdiction1.name,
-          },
-          {
-            id: jurisdiction3.id,
-            name: jurisdiction3.name,
-          },
-        ],
-        createdAt: expect.anything(),
-        updatedAt: expect.anything(),
-      });
-    });
-
-    it('should not associate a jurisdiction also set to remove to an existing feature flag', async () => {
-      const jurisdiction = await prisma.jurisdictions.create({
-        data: jurisdictionFactory(),
-      });
-      const featureFlag = await prisma.featureFlags.create({
-        data: featureFlagFactory(),
-      });
-
-      const body = {
-        id: featureFlag.id,
-        associate: [jurisdiction.id],
-        remove: [jurisdiction.id],
-      };
-
-      const res = await request(app.getHttpServer())
-        .put(`/featureFlags/associateJurisdictions`)
-        .set({ passkey: process.env.API_PASS_KEY || '' })
-        .send(body)
-        .set('Cookie', adminAccessToken)
-        .expect(200);
-
-      expect(res.body).toEqual({
-        ...featureFlag,
-        jurisdictions: [],
-        createdAt: expect.anything(),
-        updatedAt: expect.anything(),
-      });
-    });
-
-    it('should error when trying to associateJurisdictions a feature flag that does not exist', async () => {
-      const body = {
-        id: randomUUID(),
-        associate: [],
-        remove: [],
-      };
-
-      const res = await request(app.getHttpServer())
-        .put(`/featureFlags/associateJurisdictions`)
-        .set({ passkey: process.env.API_PASS_KEY || '' })
-        .send(body)
-        .set('Cookie', adminAccessToken)
-        .expect(404);
-
-      expect(res.body.message).toEqual(
-        `feature flag id ${body.id} was requested but not found`,
       );
     });
   });

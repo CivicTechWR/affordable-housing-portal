@@ -27,7 +27,11 @@ const Admin = () => {
     setIsLoading(true)
   }
 
-  const onFeatureFlagToggle = async (featureFlag: { id: string; description: string; active: boolean }) => {
+  const onFeatureFlagToggle = async (featureFlag: {
+    id: string
+    description: string
+    active: boolean
+  }) => {
     await featureFlagService.update({
       body: {
         id: featureFlag.id,

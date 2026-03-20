@@ -23,21 +23,13 @@ const DetailUnits = ({ setUnitDrawer }: DetailUnitsProps) => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableHomeType = isFeatureFlagOn(
-    FeatureFlagEnum.enableHomeType
-  )
+  const enableHomeType = isFeatureFlagOn(FeatureFlagEnum.enableHomeType)
 
-  const enableSection8Question = isFeatureFlagOn(
-    FeatureFlagEnum.enableSection8Question
-  )
+  const enableSection8Question = isFeatureFlagOn(FeatureFlagEnum.enableSection8Question)
 
-  const enableUnitGroups = isFeatureFlagOn(
-    FeatureFlagEnum.enableUnitGroups
-  )
+  const enableUnitGroups = isFeatureFlagOn(FeatureFlagEnum.enableUnitGroups)
 
-  const enableNonRegulatedListings = isFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings
-  )
+  const enableNonRegulatedListings = isFeatureFlagOn(FeatureFlagEnum.enableNonRegulatedListings)
 
   const showNonRegulated =
     enableNonRegulatedListings && listing.listingType === EnumListingListingType.nonRegulated

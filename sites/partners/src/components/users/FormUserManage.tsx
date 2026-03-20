@@ -102,7 +102,7 @@ const FormUserManage = ({
     defaultValues,
   })
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { register, errors, getValues, trigger, setValue } = methods
+  const { register, errors, getValues, trigger } = methods
 
   const listingsOptions = useMemo(() => {
     return [...listings]
@@ -355,9 +355,7 @@ const FormUserManage = ({
                       </Grid.Cell>
                     </Grid.Row>
                   </SectionWithGrid>
-                  <JurisdictionAndListingSelection
-                    listingsOptions={listingsOptions}
-                  />
+                  <JurisdictionAndListingSelection listingsOptions={listingsOptions} />
                 </Card.Section>
               </Card>
             </Form>

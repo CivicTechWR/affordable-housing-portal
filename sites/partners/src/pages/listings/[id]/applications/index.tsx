@@ -42,12 +42,8 @@ const ApplicationsList = () => {
   const enableFullTimeStudentQuestion = isFeatureFlagOn(
     FeatureFlagEnum.enableFullTimeStudentQuestion
   )
-  const disableWorkInRegion = isFeatureFlagOn(
-    FeatureFlagEnum.disableWorkInRegion
-  )
-  const enableApplicationStatus = isFeatureFlagOn(
-    FeatureFlagEnum.enableApplicationStatus
-  )
+  const disableWorkInRegion = isFeatureFlagOn(FeatureFlagEnum.disableWorkInRegion)
+  const enableApplicationStatus = isFeatureFlagOn(FeatureFlagEnum.enableApplicationStatus)
   const includeDemographicsPartner =
     profile?.userRoles?.isPartner && siteConfig?.enablePartnerDemographics
   const { onExport, exportLoading } = useZipExport(

@@ -44,16 +44,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,
@@ -92,16 +82,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,
@@ -146,16 +126,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,
@@ -204,16 +174,6 @@ describe('Testing jwt strategy', () => {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: {
-          include: {
-            featureFlags: {
-              select: {
-                active: true,
-                name: true,
-              },
-            },
-          },
-        },
       },
       where: {
         id,

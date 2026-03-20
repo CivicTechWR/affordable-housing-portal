@@ -6,13 +6,7 @@ import { useForm } from "react-hook-form"
 import dayjs from "dayjs"
 import { ColDef, ColGroupDef } from "ag-grid-community"
 import { Button, Dialog, Grid, Icon } from "@bloom-housing/ui-seeds"
-import {
-  t,
-  AgTable,
-  useAgTable,
-  Form,
-  Field,
-} from "@bloom-housing/ui-components"
+import { t, AgTable, useAgTable, Form, Field } from "@bloom-housing/ui-components"
 import { AuthContext } from "@bloom-housing/shared-helpers"
 import {
   EnumListingListingType,
@@ -126,9 +120,7 @@ export default function ListingsList() {
     ListingsLink,
   }
 
-  const isNonRegulatedEnabled = isFeatureFlagOn(
-    FeatureFlagEnum.enableNonRegulatedListings
-  )
+  const isNonRegulatedEnabled = isFeatureFlagOn(FeatureFlagEnum.enableNonRegulatedListings)
 
   const onModalClose = () => {
     setListingSelectModal(false)
@@ -214,13 +206,7 @@ export default function ListingsList() {
       }
     )
 
-    if (
-      getFlagInAllJurisdictions(
-        FeatureFlagEnum.enableIsVerified,
-        true,
-        isFeatureFlagOn
-      )
-    ) {
+    if (getFlagInAllJurisdictions(FeatureFlagEnum.enableIsVerified, true, isFeatureFlagOn)) {
       columns.push({
         headerName: t("t.verified"),
         field: "isVerified",
@@ -232,13 +218,7 @@ export default function ListingsList() {
       })
     }
 
-    if (
-      getFlagInAllJurisdictions(
-        FeatureFlagEnum.enableUnitGroups,
-        false,
-        isFeatureFlagOn
-      )
-    ) {
+    if (getFlagInAllJurisdictions(FeatureFlagEnum.enableUnitGroups, false, isFeatureFlagOn)) {
       columns.push(
         {
           headerName: t("listings.availableUnits"),
@@ -259,13 +239,7 @@ export default function ListingsList() {
         }
       )
     }
-    if (
-      getFlagInAllJurisdictions(
-        FeatureFlagEnum.enableListingUpdatedAt,
-        true,
-        isFeatureFlagOn
-      )
-    ) {
+    if (getFlagInAllJurisdictions(FeatureFlagEnum.enableListingUpdatedAt, true, isFeatureFlagOn)) {
       columns.push({
         headerName: t("t.lastUpdated"),
         field: "contentUpdatedAt",
@@ -399,9 +373,7 @@ export default function ListingsList() {
             <Grid>
               <div aria-live="polite">
                 <fieldset>
-                  <legend className={`text__caps-spaced`}>
-                    {t("listings.listingTypeTitle")}
-                  </legend>
+                  <legend className={`text__caps-spaced`}>{t("listings.listingTypeTitle")}</legend>
                   <Grid.Row columns={4}>
                     <Grid.Cell className={"seeds-grid-span-2"}>
                       <div className="pb-4 sm:pb-0">

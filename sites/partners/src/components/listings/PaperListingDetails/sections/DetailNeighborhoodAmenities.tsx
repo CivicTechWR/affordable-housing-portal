@@ -17,9 +17,7 @@ const DetailNeighborhoodAmenities = () => {
 
   const { data: jurisdictionData } = useJurisdiction(listing.jurisdictions.id)
 
-  const enableNeighborhoodAmenities = isFeatureFlagOn(
-    FeatureFlagEnum.enableNeighborhoodAmenities
-  )
+  const enableNeighborhoodAmenities = isFeatureFlagOn(FeatureFlagEnum.enableNeighborhoodAmenities)
 
   const visibleAmenities = useMemo(() => {
     const visibleAmenitiesList = jurisdictionData?.visibleNeighborhoodAmenities || []

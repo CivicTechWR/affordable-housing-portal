@@ -790,7 +790,7 @@ export class ApplicationService {
         },
       );
       if (
-        !dto.applicationSelections.every(({ multiselectQuestion }) => {
+        !(dto.applicationSelections ?? []).every(({ multiselectQuestion }) => {
           return listingMultiselectIds.includes(multiselectQuestion.id);
         })
       ) {
@@ -1079,12 +1079,6 @@ export class ApplicationService {
         },
       },
     });
-    const featureFlags = await this.prisma.featureFlags.findMany();
-    const enableV2MSQ = isFeatureFlagActive(
-      featureFlags,
-      FeatureFlagEnum.enableV2MSQ,
-    );
-
     const transactions = [];
 
     // All connected household members should be deleted so they can be recreated in the update below.

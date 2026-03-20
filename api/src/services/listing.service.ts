@@ -302,9 +302,10 @@ export class ListingService implements OnModuleInit {
   public async getUserEmailInfo(
     userRoles: UserRoleEnum | UserRoleEnum[],
     listingId?: string,
-    jurisId?: string,
   ): Promise<{ emails: string[] }> {
-    const normalizedUserRoles = Array.isArray(userRoles) ? userRoles : [userRoles];
+    const normalizedUserRoles = Array.isArray(userRoles)
+      ? userRoles
+      : [userRoles];
 
     // determine where clause(s)
     const userRolesWhere: Prisma.UserAccountsWhereInput[] = [];
@@ -364,7 +365,6 @@ export class ListingService implements OnModuleInit {
       const userInfo = await this.getUserEmailInfo(
         params.approvingRoles,
         params.listingInfo.id,
-        params.jurisId,
       );
       await this.emailService.requestApproval(
         { id: params.jurisId },
@@ -381,7 +381,6 @@ export class ListingService implements OnModuleInit {
       const userInfo = await this.getUserEmailInfo(
         nonApprovingRoles,
         params.listingInfo.id,
-        params.jurisId,
       );
       await this.emailService.changesRequested(
         params.user,
@@ -411,7 +410,6 @@ export class ListingService implements OnModuleInit {
             UserRoleEnum.supportAdmin,
           ],
           params.listingInfo.id,
-          params.jurisId,
         );
         const jurisdiction = await this.prisma.jurisdictions.findUnique({
           select: {
@@ -1750,18 +1748,13 @@ export class ListingService implements OnModuleInit {
 
     if (
       requestingUser?.userRoles?.isPartner &&
-        !requestingUser?.listings?.some(
-          (listing) => listing.id === storedListing.id,
-        )
+      !requestingUser?.listings?.some(
+        (listing) => listing.id === storedListing.id,
+      )
     ) {
       throw new ForbiddenException();
     }
 
-    const rawJurisdiction = await this.prisma.jurisdictions.findUnique({
-      where: {
-        id: storedListing.jurisdictions.id,
-      },
-    });
     const featureFlags = await this.prisma.featureFlags.findMany();
 
     const enableV2MSQ = isFeatureFlagActive(

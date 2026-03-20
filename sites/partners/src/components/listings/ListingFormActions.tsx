@@ -232,13 +232,13 @@ const ListingFormActions = ({
       </Grid.Cell>
     )
 
+    const previewUrl = jurisdiction?.publicUrl
+      ? `${jurisdiction.publicUrl}/preview/listings/${listingId}`
+      : `/preview/listings/${listingId}`
+
     const previewButton = (
       <Grid.Cell key="btn-preview">
-        <Button
-          variant="primary-outlined"
-          className="w-full"
-          href={`${jurisdiction?.publicUrl}/preview/listings/${listingId}`}
-        >
+        <Button variant="primary-outlined" className="w-full" href={previewUrl}>
           {t("listings.actions.preview")}
         </Button>
       </Grid.Cell>

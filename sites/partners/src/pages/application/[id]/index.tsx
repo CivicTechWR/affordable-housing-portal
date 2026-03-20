@@ -35,21 +35,15 @@ const ApplicationsList = () => {
 
   const { applicationsService, isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableAdaOtherOption = isFeatureFlagOn(
-    FeatureFlagEnum.enableAdaOtherOption
-  )
+  const enableAdaOtherOption = isFeatureFlagOn(FeatureFlagEnum.enableAdaOtherOption)
 
-  const disableWorkInRegion = isFeatureFlagOn(
-    FeatureFlagEnum.disableWorkInRegion
-  )
+  const disableWorkInRegion = isFeatureFlagOn(FeatureFlagEnum.disableWorkInRegion)
 
   const enableFullTimeStudentQuestion = isFeatureFlagOn(
     FeatureFlagEnum.enableFullTimeStudentQuestion
   )
 
-  const enableApplicationStatus = isFeatureFlagOn(
-    FeatureFlagEnum.enableApplicationStatus
-  )
+  const enableApplicationStatus = isFeatureFlagOn(FeatureFlagEnum.enableApplicationStatus)
 
   const swapCommunityTypeWithPrograms = isFeatureFlagOn(
     FeatureFlagEnum.swapCommunityTypeWithPrograms

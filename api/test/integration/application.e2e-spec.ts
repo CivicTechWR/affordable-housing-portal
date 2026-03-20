@@ -219,6 +219,10 @@ describe('Application Controller Tests', () => {
     app.use(cookieParser());
     await app.init();
     await createAllFeatureFlags(prisma);
+    await prisma.featureFlags.updateMany({
+      data: { active: false },
+      where: { name: FeatureFlagEnum.enableV2MSQ },
+    });
     await unitTypeFactoryAll(prisma);
     await prisma.translations.create({
       data: translationFactory(),
@@ -480,6 +484,10 @@ describe('Application Controller Tests', () => {
     let listing1;
 
     beforeAll(async () => {
+      await prisma.featureFlags.updateMany({
+        data: { active: true },
+        where: { name: FeatureFlagEnum.enableV2MSQ },
+      });
       storedUser = await prisma.userAccounts.create({
         data: await userFactory({
           mfaEnabled: false,
@@ -959,9 +967,7 @@ describe('Application Controller Tests', () => {
       publicUserCookies = resLogIn.headers['set-cookie'];
       unitTypeA = await unitTypeFactorySingle(prisma, UnitTypeEnum.oneBdrm);
       jurisdiction = await prisma.jurisdictions.create({
-        data: jurisdictionFactory('applicationSubmitWithV2MSQ', {
-          featureFlags: [FeatureFlagEnum.enableV2MSQ],
-        }),
+        data: jurisdictionFactory('applicationSubmitWithV2MSQ'),
       });
       await reservedCommunityTypeFactoryAll(jurisdiction.id, prisma);
       listing1 = await prisma.listings.create({
@@ -1439,14 +1445,16 @@ describe('Application Controller Tests', () => {
       expect(res.body.id).not.toBeNull();
     });
     it('should create application from partner site with MSQ V2', async () => {
+      await prisma.featureFlags.updateMany({
+        data: { active: true },
+        where: { name: FeatureFlagEnum.enableV2MSQ },
+      });
       const unitTypeA = await unitTypeFactorySingle(
         prisma,
         UnitTypeEnum.oneBdrm,
       );
       const jurisdiction = await prisma.jurisdictions.create({
-        data: jurisdictionFactory('applicationPostWithV2MSQ', {
-          featureFlags: [FeatureFlagEnum.enableV2MSQ],
-        }),
+        data: jurisdictionFactory('applicationPostWithV2MSQ'),
       });
       await reservedCommunityTypeFactoryAll(jurisdiction.id, prisma);
       const listing1 = await prisma.listings.create({

@@ -15,9 +15,7 @@ const DetailAdditionalFees = () => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableUtilitiesIncluded = isFeatureFlagOn(
-    FeatureFlagEnum.enableUtilitiesIncluded
-  )
+  const enableUtilitiesIncluded = isFeatureFlagOn(FeatureFlagEnum.enableUtilitiesIncluded)
 
   const getUtilitiesIncluded = () => {
     let utilitiesExist = false

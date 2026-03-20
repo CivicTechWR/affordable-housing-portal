@@ -30,7 +30,6 @@ import { ValidationMethod } from '../src/enums/multiselect-questions/validation-
 import { ListingFeaturesConfiguration } from '../src/dtos/jurisdictions/listing-features-config.dto';
 import { householdMemberFactorySingle } from './seed-helpers/household-member-factory';
 import { createAllFeatureFlags } from './seed-helpers/feature-flag-factory';
-import { FeatureFlagEnum } from '../src/enums/feature-flags/feature-flags-enum';
 import { hollywoodHillsHeights } from './seed-helpers/listing-data/hollywood-hills-heights';
 import { districtViewApartments } from './seed-helpers/listing-data/district-view-apartments';
 import { blueSkyApartments } from './seed-helpers/listing-data/blue-sky-apartments';
@@ -48,7 +47,6 @@ export const stagingSeed = async (
 ) => {
   // Seed feature flags
   await createAllFeatureFlags(prismaClient);
-  const optionalMainFlags = msqV2 ? [FeatureFlagEnum.enableV2MSQ] : [];
   const defaultListingFeatureConfiguration: ListingFeaturesConfiguration = {
     fields: [
       { id: 'wheelchairRamp' },
@@ -110,7 +108,7 @@ export const stagingSeed = async (
     }),
   });
   // Basic configuration jurisdiction
-  const bridgeBayJurisdiction = await prismaClient.jurisdictions.create({
+  await prismaClient.jurisdictions.create({
     data: jurisdictionFactory('Bridge Bay', {
       publicSiteBaseURL: publicSiteBaseURL,
       languages: [LanguagesEnum.en, LanguagesEnum.es, LanguagesEnum.vi],
@@ -118,7 +116,7 @@ export const stagingSeed = async (
     }),
   });
   // Jurisdiction with no feature flags enabled
-  const nadaHill = await prismaClient.jurisdictions.create({
+  await prismaClient.jurisdictions.create({
     data: jurisdictionFactory('Nada Hill', {
       publicSiteBaseURL: publicSiteBaseURL,
       requiredListingFields: ['name'],

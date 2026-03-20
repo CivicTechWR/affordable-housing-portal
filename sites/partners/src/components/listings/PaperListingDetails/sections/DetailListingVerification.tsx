@@ -9,9 +9,7 @@ const DetailListingVerification = () => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableIsVerified = isFeatureFlagOn(
-    "enableIsVerified"
-  )
+  const enableIsVerified = isFeatureFlagOn("enableIsVerified")
 
   if (!enableIsVerified) {
     return null

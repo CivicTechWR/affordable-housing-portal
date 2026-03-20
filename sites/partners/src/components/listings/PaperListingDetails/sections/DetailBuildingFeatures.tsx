@@ -11,21 +11,13 @@ const DetailBuildingFeatures = () => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const enableParkingFee = isFeatureFlagOn(
-    FeatureFlagEnum.enableParkingFee
-  )
+  const enableParkingFee = isFeatureFlagOn(FeatureFlagEnum.enableParkingFee)
 
-  const enableParkingType = isFeatureFlagOn(
-    FeatureFlagEnum.enableParkingType
-  )
+  const enableParkingType = isFeatureFlagOn(FeatureFlagEnum.enableParkingType)
 
-  const enableSmokingPolicyRadio = isFeatureFlagOn(
-    FeatureFlagEnum.enableSmokingPolicyRadio
-  )
+  const enableSmokingPolicyRadio = isFeatureFlagOn(FeatureFlagEnum.enableSmokingPolicyRadio)
 
-  const enablePetPolicyCheckbox = isFeatureFlagOn(
-    FeatureFlagEnum.enablePetPolicyCheckbox
-  )
+  const enablePetPolicyCheckbox = isFeatureFlagOn(FeatureFlagEnum.enablePetPolicyCheckbox)
 
   const getPetPolicy = () => {
     const petPolicyStrings = []

@@ -48,7 +48,9 @@ export class JurisdictionService {
    */
   private async attachFeatureFlagsList<T extends Record<string, unknown>>(
     jurisdictions: T[],
-  ): Promise<Array<T & { featureFlags: Prisma.FeatureFlagsUncheckedCreateInput[] }>> {
+  ): Promise<
+    Array<T & { featureFlags: Prisma.FeatureFlagsUncheckedCreateInput[] }>
+  > {
     const featureFlags = await this.prisma.featureFlags.findMany();
     return jurisdictions.map((jurisdiction) => ({
       ...jurisdiction,

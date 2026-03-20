@@ -180,10 +180,9 @@ export class UserController {
   })
   @ApiOkResponse({ type: SuccessDTO })
   async requestSingleUseCode(
-    @Request() req: ExpressRequest,
     @Body() dto: RequestSingleUseCode,
   ): Promise<SuccessDTO> {
-    return await this.userService.requestSingleUseCode(dto, req);
+    return await this.userService.requestSingleUseCode(dto);
   }
 
   @Post('resend-confirmation')

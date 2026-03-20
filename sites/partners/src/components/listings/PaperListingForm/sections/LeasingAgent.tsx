@@ -11,7 +11,6 @@ import {
   getAddressErrorMessage,
 } from "../../../../lib/helpers"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
-import { ListingContext } from "../../ListingContext"
 import { FeatureFlagEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 
 type LeasingAgentProps = {
@@ -21,7 +20,6 @@ type LeasingAgentProps = {
 
 const LeasingAgent = (props: LeasingAgentProps) => {
   const formMethods = useFormContext()
-  const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -51,9 +49,7 @@ const LeasingAgent = (props: LeasingAgentProps) => {
     )
   }
 
-  const enableLeasingAgentAltText = isFeatureFlagOn(
-    FeatureFlagEnum.enableLeasingAgentAltText
-  )
+  const enableLeasingAgentAltText = isFeatureFlagOn(FeatureFlagEnum.enableLeasingAgentAltText)
 
   const leasingAgentNameText = enableLeasingAgentAltText
     ? t("leasingAgent.ManagerPropName")

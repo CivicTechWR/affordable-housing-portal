@@ -1,10 +1,5 @@
 import { Expose } from 'class-transformer';
-import {
-  IsBoolean,
-  IsDefined,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { IsBoolean, IsDefined, IsString, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDTO } from '../shared/abstract.dto';
 import { ValidationsGroupsEnum } from '../../enums/shared/validation-groups-enum';

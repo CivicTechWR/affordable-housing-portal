@@ -13,9 +13,7 @@ const DetailPreferences = () => {
   const listing = useContext(ListingContext)
   const { isFeatureFlagOn } = useContext(AuthContext)
 
-  const disableListingPreferences = isFeatureFlagOn(
-    FeatureFlagEnum.disableListingPreferences
-  )
+  const disableListingPreferences = isFeatureFlagOn(FeatureFlagEnum.disableListingPreferences)
 
   const preferencesTableHeaders = {
     order: "t.order",

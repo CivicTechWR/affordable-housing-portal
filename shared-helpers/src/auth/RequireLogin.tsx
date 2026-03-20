@@ -74,7 +74,7 @@ const RequireLogin: FunctionComponent<RequireLoginProps> = ({
     initialStateLoaded,
     profile,
     router,
-    signInPath,
+    signInPathname,
     signInMessage,
     termsPath,
     hasTerms,

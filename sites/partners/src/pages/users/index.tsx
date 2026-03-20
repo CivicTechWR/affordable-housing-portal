@@ -138,9 +138,7 @@ const Users = () => {
     view: ListingViews.name,
   })
 
-  const enableHousingAdvocate = isFeatureFlagOn(
-    FeatureFlagEnum.enableHousingAdvocate
-  )
+  const enableHousingAdvocate = isFeatureFlagOn(FeatureFlagEnum.enableHousingAdvocate)
 
   if (error) return <div>{t("t.errorOccurred")}</div>
 

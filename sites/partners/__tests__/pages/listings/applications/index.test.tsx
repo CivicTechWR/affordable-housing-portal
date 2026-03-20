@@ -56,8 +56,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ApplicationsList />
@@ -94,8 +93,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ApplicationsList />
@@ -216,8 +214,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ApplicationsList />
@@ -258,8 +255,7 @@ describe("applications", () => {
           applicationsService: new ApplicationsService(),
           listingsService: new ListingsService(),
           profile: { ...user, listings: [{ id: listing.id }], jurisdictions: [] },
-          isFeatureFlagOn: (featureFlag) =>
-            mockJurisdictionsHaveFeatureFlagOn(featureFlag),
+          isFeatureFlagOn: (featureFlag) => mockJurisdictionsHaveFeatureFlagOn(featureFlag),
         }}
       >
         <ApplicationsList />
