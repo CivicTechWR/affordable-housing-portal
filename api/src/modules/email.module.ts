@@ -4,7 +4,6 @@ import { EmailService } from '../services/email.service';
 import { JurisdictionService } from '../services/jurisdiction.service';
 import { TranslationService } from '../services/translation.service';
 import { GoogleTranslateService } from '../services/google-translate.service';
-import { ResendService } from '../services/resend.service';
 
 @Module({
   imports: [],
@@ -15,7 +14,6 @@ import { ResendService } from '../services/resend.service';
     TranslationService,
     ConfigService,
     GoogleTranslateService,
-    ResendService,
     Logger,
   ],
   exports: [EmailService],

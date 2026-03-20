@@ -9,7 +9,6 @@ import {
 } from '@prisma/client';
 import { ErrorResponse } from 'resend';
 import { EmailService } from '../../../src/services/email.service';
-import { ResendService } from '../../../src/services/resend.service';
 import { TranslationService } from '../../../src/services/translation.service';
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { GoogleTranslateService } from '../../../src/services/google-translate.service';
@@ -46,14 +45,12 @@ const jurisdictionServiceMock = {
 describe('Testing email service', () => {
   let service: EmailService;
   let module: TestingModule;
-  let resendService: ResendService;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [ConfigModule],
       providers: [
         EmailService,
-        ResendService,
         {
           provide: TranslationService,
           useValue: translationServiceMock,
@@ -73,16 +70,15 @@ describe('Testing email service', () => {
 
   beforeEach(async () => {
     jest.useFakeTimers();
-    resendService = module.get<ResendService>(ResendService);
     sendMock = jest
       .fn()
       .mockResolvedValue({ data: { id: 'email-id' }, error: null });
     sendBatchMock = jest
       .fn()
       .mockResolvedValue({ data: [{ id: 'batch-email-id' }], error: null });
-    resendService.send = sendMock;
-    resendService.sendBatch = sendBatchMock;
     service = await module.resolve(EmailService);
+    service['resend'].emails.send = sendMock;
+    service['resend'].batch.send = sendBatchMock;
   });
 
   afterEach(() => {

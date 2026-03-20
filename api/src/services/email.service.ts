@@ -1,4 +1,5 @@
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import Handlebars from 'handlebars';
 import Polyglot from 'node-polyglot';
@@ -8,9 +9,8 @@ import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import advanced from 'dayjs/plugin/advancedFormat';
 import { LanguagesEnum, ReviewOrderTypeEnum } from '@prisma/client';
-import { ErrorResponse } from 'resend';
+import { ErrorResponse, Resend } from 'resend';
 import { JurisdictionService } from './jurisdiction.service';
-import { ResendService } from './resend.service';
 import { TranslationService } from './translation.service';
 import { Application } from '../dtos/applications/application.dto';
 import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
@@ -41,14 +41,16 @@ type listingInfo = {
 @Injectable()
 export class EmailService {
   polyglot: Polyglot;
+  private readonly resend: Resend;
 
   constructor(
-    private readonly resend: ResendService,
+    configService: ConfigService,
     private readonly translationService: TranslationService,
     private readonly jurisdictionService: JurisdictionService,
     @Inject(Logger)
     private logger = new Logger(EmailService.name),
   ) {
+    this.resend = new Resend(configService.get<string>('EMAIL_API_KEY'));
     this.polyglot = new Polyglot({
       phrases: {},
     });
@@ -180,7 +182,7 @@ export class EmailService {
       ) {
         let response: BatchEmailResponse;
         try {
-          response = await this.resend.sendBatch(payloads);
+          response = await this.resend.batch.send(payloads);
         } catch (error) {
           this.logSendFailure(chunk, error, retriesRemaining);
           continue;
@@ -237,8 +239,8 @@ export class EmailService {
     ) {
       let response: SingleEmailResponse;
       try {
-        // Attempt delivery through the provider wrapper.
-        response = await this.resend.send(emailParams);
+        // Attempt delivery through the Resend SDK client.
+        response = await this.resend.emails.send(emailParams);
       } catch (error) {
         // Network or SDK failures use the same retry path as API-level failures.
         this.logSendFailure(to, error, retriesRemaining);

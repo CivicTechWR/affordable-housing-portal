@@ -20,7 +20,6 @@ import { GoogleTranslateService } from '../../../src/services/google-translate.s
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { PermissionService } from '../../../src/services/permission.service';
 import { PrismaService } from '../../../src/services/prisma.service';
-import { ResendService } from '../../../src/services/resend.service';
 import { TranslationService } from '../../../src/services/translation.service';
 import { UserService } from '../../../src/services/user.service';
 import { passwordToHash } from '../../../src/utilities/password-helpers';
@@ -71,11 +70,6 @@ describe('Testing user service', () => {
     return toReturn;
   };
 
-  const resendServiceMock = {
-    send: jest
-      .fn()
-      .mockResolvedValue({ data: { id: 'email-id' }, error: null }),
-  };
   const googleTranslateServiceMock = {
     isConfigured: () => true,
     fetch: jest.fn(),
@@ -95,17 +89,12 @@ describe('Testing user service', () => {
         PrismaService,
         EmailService,
         ConfigService,
-        ResendService,
         TranslationService,
         JurisdictionService,
         ApplicationService,
         GeocodingService,
         SchedulerRegistry,
         CronJobService,
-        {
-          provide: ResendService,
-          useValue: resendServiceMock,
-        },
         {
           provide: GoogleTranslateService,
           useValue: googleTranslateServiceMock,
