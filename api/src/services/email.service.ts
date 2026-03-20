@@ -122,7 +122,7 @@ export class EmailService {
    * @param from - The sender address (e.g. "App Name <no-reply@domain>").
    * @param subject - The email subject line.
    * @param body - The rendered HTML body.
-   * @param retry - Number of remaining retry attempts (default 3).
+   * @param retry - Number of retry attempts (default 3).
    * @param attachment - Optional file attachment (forces per-recipient sends).
    */
   private async send(
