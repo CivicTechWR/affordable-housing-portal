@@ -29,41 +29,6 @@ const ProgramsAndPreferences = ({
   programs,
   setPrograms,
 }: ProgramsAndPreferencesProps) => {
-  const programComponent = !swapCommunityTypeWithPrograms ? (
-    <SelectAndOrder
-      addText={t("listings.addProgram")}
-      applicationSection={MultiselectQuestionsApplicationSectionEnum.programs}
-      dataFetcher={useJurisdictionalMultiselectQuestionList}
-      drawerButtonText={t("listings.selectPrograms")}
-      drawerButtonId="select-programs-button"
-      drawerTitle={t("listings.addPrograms")}
-      editText={t("listings.editPrograms")}
-      formKey={"program"}
-      jurisdiction={jurisdiction}
-      listingData={programs || []}
-      setListingData={setPrograms}
-      subtitle={t("listings.sections.housingProgramsSubtext")}
-      title={t("listings.sections.housingProgramsTitle")}
-    />
-  ) : (
-    <SelectAndOrder
-      addText={t("listings.addCommunityTypes")}
-      applicationSection={MultiselectQuestionsApplicationSectionEnum.programs}
-      dataFetcher={useJurisdictionalMultiselectQuestionList}
-      drawerButtonText={t("listings.selectCommunityTypes")}
-      drawerButtonId="select-community-types-button"
-      drawerTitle={t("listings.addCommunityTypes")}
-      editText={t("listings.editCommunities")}
-      formKey={"program"}
-      jurisdiction={jurisdiction}
-      listingData={programs || []}
-      setListingData={setPrograms}
-      subNote={`${t("listing.choosePopulations")}.`}
-      subtitle={t("listings.sections.communityType.tellUs")}
-      title={t("t.communityTypes")}
-    />
-  )
-
   return (
     <>
       {!disableListingPreferences && (
@@ -88,7 +53,24 @@ const ProgramsAndPreferences = ({
           title={t("listings.sections.housingPreferencesTitle")}
         />
       )}
-      {programComponent}
+      {swapCommunityTypeWithPrograms && (
+        <SelectAndOrder
+          addText={t("listings.addCommunityTypes")}
+          applicationSection={MultiselectQuestionsApplicationSectionEnum.programs}
+          dataFetcher={useJurisdictionalMultiselectQuestionList}
+          drawerButtonText={t("listings.selectCommunityTypes")}
+          drawerButtonId="select-community-types-button"
+          drawerTitle={t("listings.addCommunityTypes")}
+          editText={t("listings.editCommunities")}
+          formKey={"program"}
+          jurisdiction={jurisdiction}
+          listingData={programs || []}
+          setListingData={setPrograms}
+          subNote={`${t("listing.choosePopulations")}.`}
+          subtitle={t("listings.sections.communityType.tellUs")}
+          title={t("t.communityTypes")}
+        />
+      )}
     </>
   )
 }

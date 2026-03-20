@@ -596,49 +596,33 @@ export const getEligibilitySections = (
     })
   }
 
-  // Programs
-  const programs = getFilteredMultiselectQuestions(
-    listing.listingMultiselectQuestions,
-    MultiselectQuestionsApplicationSectionEnum.programs
-  )
-  if (programs?.length > 0) {
-    eligibilityFeatures.push(
-      !swapCommunityTypeWithPrograms
-        ? {
-            header: t("listings.sections.housingProgramsTitle"),
-            subheader: t("listings.sections.housingProgramsSubtitle"),
-            note: t("listings.remainingUnitsAfterPrograms"),
-            content: (
-              <CardList
-                cardContent={programs.map((question) => {
-                  return {
-                    heading: question.multiselectQuestions.text,
-                    description: question.multiselectQuestions.description,
-                  }
-                })}
-              />
-            ),
-          }
-        : {
-            header: t("t.communityTypes"),
-            subheader: t("listings.communityTypesDescription"),
-            note: t("listings.communityTypesNote"),
-            content: (
-              <CardList
-                cardContent={programs.map((question) => {
-                  return {
-                    heading: t(
-                      question.multiselectQuestions.untranslatedText
-                        ? `listingFilters.program.${question.multiselectQuestions.untranslatedText}`
-                        : `listingFilters.program.${question.multiselectQuestions.text}`
-                    ),
-                    description: question.multiselectQuestions.description,
-                  }
-                })}
-              />
-            ),
-          }
+  // Community Types (only when swapCommunityTypeWithPrograms is enabled)
+  if (swapCommunityTypeWithPrograms) {
+    const programs = getFilteredMultiselectQuestions(
+      listing.listingMultiselectQuestions,
+      MultiselectQuestionsApplicationSectionEnum.programs
     )
+    if (programs?.length > 0) {
+      eligibilityFeatures.push({
+        header: t("t.communityTypes"),
+        subheader: t("listings.communityTypesDescription"),
+        note: t("listings.communityTypesNote"),
+        content: (
+          <CardList
+            cardContent={programs.map((question) => {
+              return {
+                heading: t(
+                  question.multiselectQuestions.untranslatedText
+                    ? `listingFilters.program.${question.multiselectQuestions.untranslatedText}`
+                    : `listingFilters.program.${question.multiselectQuestions.text}`
+                ),
+                description: question.multiselectQuestions.description,
+              }
+            })}
+          />
+        ),
+      })
+    }
   }
 
   // Building Selection Criteria

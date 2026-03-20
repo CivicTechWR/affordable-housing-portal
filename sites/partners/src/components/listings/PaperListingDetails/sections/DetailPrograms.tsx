@@ -36,20 +36,16 @@ const DetailPrograms = () => {
     [listing]
   )
 
+  if (!swapCommunityTypeWithPrograms) return null
+
   return (
     <SectionWithGrid
-      heading={
-        !swapCommunityTypeWithPrograms
-          ? t("listings.sections.housingProgramsTitle")
-          : t("t.communityTypes")
-      }
+      heading={t("t.communityTypes")}
       inset
       bypassGrid
     >
       <SectionWithGrid.HeadingRow>
-        {!swapCommunityTypeWithPrograms
-          ? t("listings.activePrograms")
-          : t("listings.activeCommunityTypes")}
+        {t("listings.activeCommunityTypes")}
       </SectionWithGrid.HeadingRow>
       <Grid.Row>
         <Grid.Cell>

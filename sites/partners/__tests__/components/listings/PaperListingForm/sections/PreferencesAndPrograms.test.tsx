@@ -179,20 +179,9 @@ describe("PreferencesAndPrograms", () => {
       expect(screen.queryByRole("button", { name: /add preference/i })).not.toBeInTheDocument()
     })
   })
-  describe("Programs", () => {
-    it.todo("should render the program section when no programs have been added")
-
-    it.todo("should render the program section when programs have been added")
-
-    it.todo("should open drawer and add a program")
-
-    it.todo("should delete a program")
-
-    it.todo("should reorder program list")
-
-    // default state
+  describe("Programs / Community Types", () => {
     describe("when feature flag swapCommunityTypesWithPrograms is false", () => {
-      it("should show programs section copy as programs", () => {
+      it("should not render the programs/community types section", () => {
         const programs: MultiselectQuestion[] = [
           {
             id: "programId",
@@ -227,15 +216,9 @@ describe("PreferencesAndPrograms", () => {
           </AuthContext.Provider>
         )
 
-        expect(screen.getByText("Housing programs")).toBeInTheDocument()
-        expect(
-          screen.getByText("Tell us about any additional housing programs related to this listing.")
-        ).toBeInTheDocument()
-        expect(screen.getByText("Edit programs")).toBeInTheDocument()
-        expect(screen.queryByText("Community", { exact: false })).toBeFalsy()
+        expect(screen.queryByText("Housing programs")).not.toBeInTheDocument()
+        expect(screen.queryByText("Community types")).not.toBeInTheDocument()
       })
-
-      it.todo("should show drawer copy as programs")
     })
 
     describe("when feature flag swapCommunityTypesWithPrograms is true", () => {
