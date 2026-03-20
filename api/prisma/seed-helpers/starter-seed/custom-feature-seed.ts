@@ -1,6 +1,5 @@
 import { PrismaClient, CustomListingScope } from '@prisma/client';
 
-
 const customListingFeatures = [
   {
     displayName: 'Main Entrance is Barrier-Free',
