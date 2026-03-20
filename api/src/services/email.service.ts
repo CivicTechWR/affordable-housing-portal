@@ -8,7 +8,13 @@ import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import advanced from 'dayjs/plugin/advancedFormat';
 import { LanguagesEnum, ReviewOrderTypeEnum } from '@prisma/client';
-import { CreateEmailOptions, ErrorResponse } from 'resend';
+import {
+  CreateBatchRequestOptions,
+  CreateBatchResponse,
+  CreateEmailOptions,
+  CreateEmailResponse,
+  ErrorResponse,
+} from 'resend';
 import { JurisdictionService } from './jurisdiction.service';
 import { ResendService } from './resend.service';
 import { TranslationService } from './translation.service';
@@ -108,8 +114,16 @@ export class EmailService {
   }
 
   /**
-   * Sends an email using the Resend transport while preserving the previous
-   * SendGrid behavior of delivering array recipients as separate messages.
+   * Sends an email to one or more recipients. Array recipients are dispatched
+   * via the Resend batch API for fewer round-trips; attachments force a
+   * per-recipient fallback because the batch endpoint does not support them.
+   *
+   * @param to - A single email address or an array of addresses.
+   * @param from - The sender address (e.g. "App Name <no-reply@domain>").
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of remaining retry attempts (default 3).
+   * @param attachment - Optional file attachment (forces per-recipient sends).
    */
   private async send(
     to: string | string[],
@@ -119,20 +133,101 @@ export class EmailService {
     retry = 3,
     attachment?: EmailAttachmentData,
   ) {
-    // Preserve recipient privacy by sending one message per address.
-    if (Array.isArray(to)) {
-      await Promise.all(
-        to.map((recipient) =>
-          this.sendSingle(recipient, from, subject, body, retry, attachment),
-        ),
-      );
-    } else {
+    if (!Array.isArray(to)) {
       await this.sendSingle(to, from, subject, body, retry, attachment);
+      return;
+    }
+
+    if (to.length === 0) return;
+
+    // If no attachments, we can use the batch API.
+    if (!attachment) {
+      await this.sendBatch(to, from, subject, body, retry);
+      return;
+    }
+
+    await Promise.all(
+      to.map((recipient) =>
+        this.sendSingle(recipient, from, subject, body, retry, attachment),
+      ),
+    );
+  }
+
+  /**
+   * Sends identical emails to multiple recipients via the Resend batch API.
+   * Automatically chunks into groups of 100 (Resend's per-request limit).
+   *
+   * @param to - Array of recipient email addresses.
+   * @param from - The sender address.
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of retry attempts (default 3).
+   */
+  private async sendBatch(
+    to: string[],
+    from: string,
+    subject: string,
+    body: string,
+    retry = 3,
+  ) {
+    const BATCH_LIMIT = 100;
+    for (let i = 0; i < to.length; i += BATCH_LIMIT) {
+      const chunk = to.slice(i, i + BATCH_LIMIT);
+      await this.sendBatchChunk(chunk, from, subject, body, retry);
+    }
+  }
+
+  /**
+   * Sends a single chunk of emails with retry logic.
+   *
+   * @param chunk - Array of recipient email addresses (max 100).
+   * @param from - The sender address.
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of retry attempts remaining.
+   */
+  private async sendBatchChunk(
+    chunk: string[],
+    from: string,
+    subject: string,
+    body: string,
+    retry: number,
+  ) {
+    const payloads = chunk.map((recipient) => ({
+      to: recipient,
+      from,
+      subject,
+      html: body,
+    }));
+
+    for (
+      let retriesRemaining = retry;
+      retriesRemaining >= 0;
+      retriesRemaining--
+    ) {
+      let response: CreateBatchResponse<CreateBatchRequestOptions>;
+      try {
+        response = await this.resend.sendBatch(payloads);
+      } catch (error) {
+        this.logSendFailure(chunk, error, retriesRemaining);
+        continue;
+      }
+
+      if (!response.error) return;
+
+      this.logSendFailure(chunk, response.error, retriesRemaining);
     }
   }
 
   /**
    * Sends a single Resend email request and retries failed delivery attempts.
+   *
+   * @param to - The recipient email address.
+   * @param from - The sender address.
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of remaining retry attempts (default 3).
+   * @param attachment - Optional file attachment.
    */
   private async sendSingle(
     to: string,
@@ -161,32 +256,35 @@ export class EmailService {
       ];
     }
 
-    let response;
-    try {
-      // Attempt delivery through the provider wrapper.
-      response = await this.resend.send(emailParams);
-    } catch (error) {
-      // Network or SDK failures use the same retry path as API-level failures.
-      this.logSendFailure(to, error, retry);
-      if (retry > 0) {
-        await this.sendSingle(to, from, subject, body, retry - 1, attachment);
+    for (
+      let retriesRemaining = retry;
+      retriesRemaining >= 0;
+      retriesRemaining--
+    ) {
+      let response: CreateEmailResponse;
+      try {
+        // Attempt delivery through the provider wrapper.
+        response = await this.resend.send(emailParams);
+      } catch (error) {
+        // Network or SDK failures use the same retry path as API-level failures.
+        this.logSendFailure(to, error, retriesRemaining);
+        continue;
       }
-      return;
-    }
 
-    // Successful API responses with no provider error are complete.
-    if (!response.error) return;
+      // Successful API responses with no provider error are complete.
+      if (!response.error) return;
 
-    // Provider-declared delivery failures are logged and retried without aborting the caller flow.
-    this.logSendFailure(to, response.error, retry);
-    if (retry > 0) {
-      await this.sendSingle(to, from, subject, body, retry - 1, attachment);
+      // Provider-declared delivery failures are logged and retried without aborting the caller flow.
+      this.logSendFailure(to, response.error, retriesRemaining);
     }
-    return;
   }
 
   /**
    * Logs a delivery failure with normalized recipient and provider error details.
+   *
+   * @param to - The recipient address(es) that failed.
+   * @param error - The Resend API error, thrown exception, or unknown value.
+   * @param retriesRemaining - How many retry attempts are left.
    */
   private logSendFailure(
     to: string | string[],
@@ -206,6 +304,9 @@ export class EmailService {
 
   /**
    * Converts Resend and runtime errors into a consistent log message format.
+   *
+   * @param error - The Resend API error, thrown exception, or unknown value.
+   * @returns A human-readable error string suitable for logging.
    */
   private getSendErrorMessage(error: ErrorResponse | Error | unknown): string {
     // Prefer structured provider metadata when Resend returns an API error object.
@@ -226,6 +327,9 @@ export class EmailService {
 
   /**
    * Detects whether an unknown value matches the Resend API error shape.
+   *
+   * @param error - The value to check.
+   * @returns `true` if the value has `message`, `name`, and `statusCode` properties.
    */
   private isResendErrorResponse(error: unknown): error is ErrorResponse {
     return (

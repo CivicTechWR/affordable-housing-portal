@@ -22,6 +22,7 @@ import { ApplicationStatusChangeItem } from 'src/utilities/applicationStatusChan
 import Listing from 'src/dtos/listings/listing.dto';
 
 let sendMock;
+let sendBatchMock;
 const loggerMock = {
   error: jest.fn(),
   log: jest.fn(),
@@ -76,7 +77,11 @@ describe('Testing email service', () => {
     sendMock = jest
       .fn()
       .mockResolvedValue({ data: { id: 'email-id' }, error: null });
+    sendBatchMock = jest
+      .fn()
+      .mockResolvedValue({ data: [{ id: 'batch-email-id' }], error: null });
     resendService.send = sendMock;
+    resendService.sendBatch = sendBatchMock;
     service = await module.resolve(EmailService);
   });
 
@@ -310,7 +315,7 @@ describe('Testing email service', () => {
     ]);
   });
 
-  it('sends array recipients as individual emails', async () => {
+  it('sends array recipients via a single batch API call', async () => {
     await service.requestApproval(
       { id: 'jurisdiction-id', name: 'Jurisdiction' },
       { id: 'listing-id', name: 'Listing' },
@@ -318,9 +323,11 @@ describe('Testing email service', () => {
       'http://localhost:3001',
     );
 
-    expect(sendMock).toHaveBeenCalledTimes(2);
-    expect(sendMock.mock.calls[0][0].to).toEqual('first@example.com');
-    expect(sendMock.mock.calls[1][0].to).toEqual('second@example.com');
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(sendBatchMock).toHaveBeenCalledTimes(1);
+    expect(sendBatchMock.mock.calls[0][0]).toHaveLength(2);
+    expect(sendBatchMock.mock.calls[0][0][0].to).toEqual('first@example.com');
+    expect(sendBatchMock.mock.calls[0][0][1].to).toEqual('second@example.com');
   });
 
   describe('application confirmation', () => {
@@ -563,8 +570,9 @@ describe('Testing email service', () => {
         'http://localhost:3001',
       );
 
-      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
-      const emailMock = sendMock.mock.calls[0][0];
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
       expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('Listing approval requested');
       expect(emailMock.html).toMatch(
@@ -605,8 +613,9 @@ describe('Testing email service', () => {
         'http://localhost:3001',
       );
 
-      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
-      const emailMock = sendMock.mock.calls[0][0];
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
       expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('Listing changes requested');
       expect(emailMock.html).toMatch(
@@ -650,8 +659,9 @@ describe('Testing email service', () => {
         'http://localhost:3000',
       );
 
-      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
-      const emailMock = sendMock.mock.calls[0][0];
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
       expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('New published listing');
       expect(emailMock.html).toMatch(
@@ -739,8 +749,9 @@ describe('Testing email service', () => {
         { en: emailArr },
       );
 
-      expect(sendMock).toHaveBeenCalledTimes(emailArr.length);
-      const emailMock = sendMock.mock.calls[0][0];
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
       expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual(
         'New Housing Lottery Results Available',
@@ -774,6 +785,44 @@ describe('Testing email service', () => {
         2,
         'jurisdictionId',
         'es',
+      );
+    });
+  });
+
+  describe('retry behavior', () => {
+    it('should retry sendSingle in a loop until attempts are exhausted', async () => {
+      sendMock.mockRejectedValue(new Error('single send failed'));
+
+      await service['sendSingle'](
+        'applicant.email@example.com',
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        3,
+      );
+
+      expect(sendMock).toHaveBeenCalledTimes(4);
+      expect(loggerMock.error).toHaveBeenCalledTimes(4);
+      expect(loggerMock.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Retries remaining: 0'),
+      );
+    });
+
+    it('should retry sendBatch in a loop until attempts are exhausted', async () => {
+      sendBatchMock.mockRejectedValue(new Error('batch send failed'));
+
+      await service['sendBatch'](
+        ['first@example.com', 'second@example.com'],
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        2,
+      );
+
+      expect(sendBatchMock).toHaveBeenCalledTimes(3);
+      expect(loggerMock.error).toHaveBeenCalledTimes(3);
+      expect(loggerMock.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Retries remaining: 0'),
       );
     });
   });
