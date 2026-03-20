@@ -8,13 +8,7 @@ import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import advanced from 'dayjs/plugin/advancedFormat';
 import { LanguagesEnum, ReviewOrderTypeEnum } from '@prisma/client';
-import {
-  CreateBatchRequestOptions,
-  CreateBatchResponse,
-  CreateEmailOptions,
-  CreateEmailResponse,
-  ErrorResponse,
-} from 'resend';
+import { ErrorResponse } from 'resend';
 import { JurisdictionService } from './jurisdiction.service';
 import { ResendService } from './resend.service';
 import { TranslationService } from './translation.service';
@@ -24,20 +18,19 @@ import { Listing } from '../dtos/listings/listing.dto';
 import { IdDTO } from '../dtos/shared/id.dto';
 import { User } from '../dtos/users/user.dto';
 import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
+import {
+  BatchHtmlEmailPayload,
+  BatchEmailResponse,
+  EmailAttachmentData,
+  HtmlEmailPayload,
+  SingleEmailResponse,
+} from '../types/email';
 import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
 import { getPublicEmailURL } from '../utilities/get-public-email-url';
 import type { ApplicationStatusChangeItem } from '../utilities/applicationStatusChanges';
 dayjs.extend(utc);
 dayjs.extend(tz);
 dayjs.extend(advanced);
-
-type EmailAttachmentData = {
-  data: string;
-  name: string;
-  type: string;
-};
-
-type HtmlEmailPayload = Extract<CreateEmailOptions, { html: string }>;
 
 type listingInfo = {
   id: string;
@@ -173,49 +166,30 @@ export class EmailService {
     const BATCH_LIMIT = 100;
     for (let i = 0; i < to.length; i += BATCH_LIMIT) {
       const chunk = to.slice(i, i + BATCH_LIMIT);
-      await this.sendBatchChunk(chunk, from, subject, body, retry);
-    }
-  }
+      const payloads: BatchHtmlEmailPayload[] = chunk.map((recipient) => ({
+        to: recipient,
+        from,
+        subject,
+        html: body,
+      }));
 
-  /**
-   * Sends a single chunk of emails with retry logic.
-   *
-   * @param chunk - Array of recipient email addresses (max 100).
-   * @param from - The sender address.
-   * @param subject - The email subject line.
-   * @param body - The rendered HTML body.
-   * @param retry - Number of retry attempts remaining.
-   */
-  private async sendBatchChunk(
-    chunk: string[],
-    from: string,
-    subject: string,
-    body: string,
-    retry: number,
-  ) {
-    const payloads = chunk.map((recipient) => ({
-      to: recipient,
-      from,
-      subject,
-      html: body,
-    }));
+      for (
+        let retriesRemaining = retry;
+        retriesRemaining >= 0;
+        retriesRemaining--
+      ) {
+        let response: BatchEmailResponse;
+        try {
+          response = await this.resend.sendBatch(payloads);
+        } catch (error) {
+          this.logSendFailure(chunk, error, retriesRemaining);
+          continue;
+        }
 
-    for (
-      let retriesRemaining = retry;
-      retriesRemaining >= 0;
-      retriesRemaining--
-    ) {
-      let response: CreateBatchResponse<CreateBatchRequestOptions>;
-      try {
-        response = await this.resend.sendBatch(payloads);
-      } catch (error) {
-        this.logSendFailure(chunk, error, retriesRemaining);
-        continue;
+        if (!response.error) break;
+
+        this.logSendFailure(chunk, response.error, retriesRemaining);
       }
-
-      if (!response.error) return;
-
-      this.logSendFailure(chunk, response.error, retriesRemaining);
     }
   }
 
@@ -226,7 +200,7 @@ export class EmailService {
    * @param from - The sender address.
    * @param subject - The email subject line.
    * @param body - The rendered HTML body.
-   * @param retry - Number of remaining retry attempts (default 3).
+   * @param retry - Number of retry attempts (default 3).
    * @param attachment - Optional file attachment.
    */
   private async sendSingle(
@@ -261,7 +235,7 @@ export class EmailService {
       retriesRemaining >= 0;
       retriesRemaining--
     ) {
-      let response: CreateEmailResponse;
+      let response: SingleEmailResponse;
       try {
         // Attempt delivery through the provider wrapper.
         response = await this.resend.send(emailParams);

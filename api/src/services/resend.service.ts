@@ -1,17 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Resend, CreateEmailOptions } from 'resend';
 import {
-  Resend,
-  CreateEmailOptions,
-  CreateEmailResponse,
-  CreateBatchResponse,
-  CreateBatchRequestOptions,
-} from 'resend';
-
-type BatchEmailPayload = Omit<
-  CreateEmailOptions,
-  'attachments' | 'scheduledAt'
->;
+  BatchEmailPayload,
+  BatchEmailResponse,
+  SingleEmailResponse,
+} from '../types/email';
 
 @Injectable()
 export class ResendService {
@@ -27,7 +21,7 @@ export class ResendService {
    * @param data - The email payload (to, from, subject, html, attachments, etc.).
    * @returns The Resend API response containing the created email ID.
    */
-  public async send(data: CreateEmailOptions): Promise<CreateEmailResponse> {
+  public async send(data: CreateEmailOptions): Promise<SingleEmailResponse> {
     return this.resend.emails.send(data);
   }
 
@@ -40,7 +34,7 @@ export class ResendService {
    */
   public async sendBatch(
     data: BatchEmailPayload[],
-  ): Promise<CreateBatchResponse<CreateBatchRequestOptions>> {
+  ): Promise<BatchEmailResponse> {
     return this.resend.batch.send(data);
   }
 }
