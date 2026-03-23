@@ -95,7 +95,7 @@ describe('Testing email service', () => {
   it('testing welcome email', async () => {
     await service.welcome(
       'test',
-      user as unknown as User,
+      user,
       'http://localhost:3000',
       'http://localhost:3000/?token=',
     );
@@ -250,7 +250,7 @@ describe('Testing email service', () => {
 
     await service.welcome(
       'test',
-      user as unknown as User,
+      user,
       'http://localhost:3000',
       'http://localhost:3000/?token=',
     );
@@ -271,7 +271,7 @@ describe('Testing email service', () => {
     await expect(
       service.welcome(
         'test',
-        user as unknown as User,
+        user,
         'http://localhost:3000',
         'http://localhost:3000/?token=',
       ),
