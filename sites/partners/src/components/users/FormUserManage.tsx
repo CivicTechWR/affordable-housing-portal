@@ -35,7 +35,7 @@ type FormUserManageValues = {
   userRoles?: string
   user_listings?: string[]
   jurisdiction_all?: boolean
-  jurisdictions?: string[]
+  jurisdictions?: string | string[]
 }
 
 const determineUserRole = (roles: UserRole) => {
@@ -47,8 +47,25 @@ const determineUserRole = (roles: UserRole) => {
     return RoleOption.JurisdictionalAdmin
   } else if (roles?.isLimitedJurisdictionalAdmin) {
     return RoleOption.LimitedJurisdictionalAdmin
+  } else if (roles?.isPartner) {
+    return RoleOption.Partner
   }
-  return RoleOption.Partner
+  return RoleOption.User
+}
+
+/**
+ * Identifies roles that store a single jurisdiction value in the form state
+ * rather than a multi-select checkbox array.
+ *
+ * @param role - The currently selected role option.
+ * @returns `true` for User, JurisdictionalAdmin, and LimitedJurisdictionalAdmin.
+ */
+const usesSingleJurisdictionValue = (role?: RoleOption) => {
+  return (
+    role === RoleOption.User ||
+    role === RoleOption.JurisdictionalAdmin ||
+    role === RoleOption.LimitedJurisdictionalAdmin
+  )
 }
 
 const FormUserManage = ({
@@ -66,7 +83,7 @@ const FormUserManage = ({
 
   const [isDeleteModalActive, setDeleteModalActive] = useState<boolean>(false)
 
-  const possibleUserRoles = [RoleOption.Partner]
+  const possibleUserRoles = [RoleOption.Partner, RoleOption.User]
   if (
     !profile?.userRoles?.isPartner &&
     !doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.disableJurisdictionalAdmin, undefined, true)
@@ -76,8 +93,6 @@ const FormUserManage = ({
   }
   if (profile?.userRoles?.isAdmin) {
     possibleUserRoles.push(RoleOption.Administrator)
-    // If any jurisdiction has enableSupportAdmin than admins can add an "Admin (support)" user
-    // This means that there can be a scenario where jurisdictions get access to this role when they don't have it enabled
     if (doJurisdictionsHaveFeatureFlagOn(FeatureFlagEnum.enableSupportAdmin)) {
       possibleUserRoles.push(RoleOption.AdminSupport)
     }
@@ -85,14 +100,17 @@ const FormUserManage = ({
 
   let defaultValues: FormUserManageValues = {}
   if (mode === "edit") {
+    const currentUserRole = determineUserRole(user.userRoles)
     defaultValues = {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      userRoles: determineUserRole(user.userRoles),
+      userRoles: currentUserRole,
       user_listings: user.listings?.map((item) => item.id) ?? [],
       jurisdiction_all: jurisdictionList?.length === user.jurisdictions.length,
-      jurisdictions: user.jurisdictions.map((elem) => elem.id),
+      jurisdictions: usesSingleJurisdictionValue(currentUserRole)
+        ? user.jurisdictions[0]?.id
+        : user.jurisdictions.map((elem) => elem.id),
     }
   } else if (profile?.userRoles?.isJurisdictionalAdmin) {
     defaultValues = {
@@ -115,7 +133,14 @@ const FormUserManage = ({
           value: juris.id,
           inputProps: {
             onChange: () => {
-              if (getValues("jurisdictions").length === jurisdictionList.length) {
+              const selectedJurisdictions = getValues("jurisdictions")
+              const selectedJurisdictionCount = Array.isArray(selectedJurisdictions)
+                ? selectedJurisdictions.length
+                : selectedJurisdictions
+                ? 1
+                : 0
+
+              if (selectedJurisdictionCount === jurisdictionList.length) {
                 setValue("jurisdiction_all", true)
               } else {
                 setValue("jurisdiction_all", false)
@@ -179,6 +204,7 @@ const FormUserManage = ({
 
   const createUserBody = useCallback(async () => {
     const { firstName, lastName, email, userRoles, jurisdictions } = getValues()
+    const selectedRole = userRoles as RoleOption
 
     /**
      * react-hook form returns:
@@ -187,6 +213,10 @@ const FormUserManage = ({
      * - array of strings if multiple checkboxes are selected
      */
     const user_listings = (() => {
+      if (selectedRole === RoleOption.User) {
+        return []
+      }
+
       const value = getValues("user_listings") as string[] | boolean | string
       const valueInArray = Array.isArray(value)
 
@@ -203,21 +233,44 @@ const FormUserManage = ({
 
     if (!validation) return
 
+    // Omit userRoles entirely for true public users, but keep explicit false flags when demoting legacy roles.
     const roles = (() => {
+      if (selectedRole === RoleOption.User) {
+        if (mode === "edit" && user?.userRoles) {
+          return {
+            isAdmin: false,
+            isSupportAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+          }
+        }
+
+        return undefined
+      }
+
       return {
-        isAdmin: userRoles.includes(RoleOption.Administrator),
-        isSupportAdmin: userRoles.includes(RoleOption.AdminSupport),
-        isPartner: userRoles.includes(RoleOption.Partner),
-        isJurisdictionalAdmin: userRoles.includes(RoleOption.JurisdictionalAdmin),
-        isLimitedJurisdictionalAdmin: userRoles.includes(RoleOption.LimitedJurisdictionalAdmin),
-        userId: undefined,
+        isAdmin: selectedRole === RoleOption.Administrator,
+        isSupportAdmin: selectedRole === RoleOption.AdminSupport,
+        isPartner: selectedRole === RoleOption.Partner,
+        isJurisdictionalAdmin: selectedRole === RoleOption.JurisdictionalAdmin,
+        isLimitedJurisdictionalAdmin: selectedRole === RoleOption.LimitedJurisdictionalAdmin,
       }
     })()
 
     const leasingAgentInListings = user_listings?.map((id) => ({ id })) || []
 
+    // Collapse public-user invites to a single jurisdiction while preserving multi-jurisdiction partner/admin edits.
     let selectedJurisdictions = []
-    if (Array.isArray(jurisdictions)) {
+    if (selectedRole === RoleOption.User) {
+      if (Array.isArray(jurisdictions)) {
+        selectedJurisdictions = jurisdictions.slice(0, 1).map((elem) => ({ id: elem }))
+      } else if (jurisdictions) {
+        selectedJurisdictions = [{ id: jurisdictions }]
+      } else {
+        selectedJurisdictions = jurisdictionOptions.slice(0, 1).map((elem) => ({ id: elem.id }))
+      }
+    } else if (Array.isArray(jurisdictions)) {
       selectedJurisdictions = jurisdictions.map((elem) => ({
         id: elem,
       }))
@@ -227,18 +280,19 @@ const FormUserManage = ({
       selectedJurisdictions = jurisdictionOptions.map((elem) => ({ id: elem.id }))
     }
 
+    // Build the smallest payload that still preserves the selected access model on the backend.
     const body = {
       firstName,
       lastName,
       email,
-      userRoles: roles,
       listings: leasingAgentInListings,
       jurisdictions: selectedJurisdictions,
       agreedToTermsOfService: user?.agreedToTermsOfService ?? false,
+      ...(roles ? { userRoles: roles } : {}),
     }
 
     return body
-  }, [getValues, trigger, user?.agreedToTermsOfService, jurisdictionOptions])
+  }, [getValues, trigger, mode, user?.agreedToTermsOfService, user?.userRoles, jurisdictionOptions])
 
   const onInvite = async () => {
     const body = await createUserBody()
@@ -411,7 +465,7 @@ const FormUserManage = ({
                           register={register}
                           controlClassName="control"
                           keyPrefix="users"
-                          options={possibleUserRoles.sort((a, b) => (a < b ? -1 : 1))}
+                          options={possibleUserRoles}
                           error={!!errors?.userRoles}
                           errorMessage={t("errors.requiredFieldError")}
                           validation={{ required: true }}

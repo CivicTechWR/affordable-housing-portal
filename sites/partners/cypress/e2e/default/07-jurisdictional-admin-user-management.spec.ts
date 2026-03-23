@@ -9,7 +9,7 @@ describe("Jurisdictional Admin User Mangement Tests", () => {
     cy.signOutApi()
   })
 
-  it("as jurisdictional admin user, should only see partners/jurisdictional admins on the same jurisdiction", () => {
+  it("as jurisdictional admin user, should only see supported roles on the same jurisdiction", () => {
     const rolesArray = ["Partner", "Jurisdictional admin", "Jurisdictional admin - No PII"]
     cy.getByTestId("ag-page-size").select("100", { force: true })
 

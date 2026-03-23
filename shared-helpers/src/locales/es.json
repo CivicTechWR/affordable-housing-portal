@@ -1225,6 +1225,7 @@
   "users.confirmationSent": "Confirmación enviada",
   "users.inviteSent": "Invitación enviada",
   "users.jurisdictionalAdmin": "Administrador jurisdiccional",
+  "users.user": "Usuario",
   "users.userDeleted": "Usuario eliminado",
   "users.userUpdated": "Usuario actualizado",
   "welcome.allApplicationClosed": "Todas las solicitudes están cerradas actualmente pero puede ver listados cerrados.",

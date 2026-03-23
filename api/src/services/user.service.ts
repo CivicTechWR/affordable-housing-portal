@@ -117,6 +117,56 @@ export class UserService {
     );
   }
 
+  /**
+   * Determines whether a role set grants access to the partner portal.
+   *
+   * @param userRoles - The role flags to evaluate.
+   * @returns `true` if any partner-portal role flag is enabled.
+   */
+  isPartnerPortalUser(userRoles?: Partial<UserRole>) {
+    return !!(
+      userRoles?.isAdmin ||
+      userRoles?.isJurisdictionalAdmin ||
+      userRoles?.isLimitedJurisdictionalAdmin ||
+      userRoles?.isPartner ||
+      userRoles?.isSupportAdmin
+    );
+  }
+
+  /**
+   * Determines whether any role flag is enabled, including isSuperAdmin.
+   *
+   * @param userRoles - The role flags to evaluate.
+   * @returns `true` if at least one role flag is set.
+   */
+  private hasAnyAssignedRole(userRoles?: Partial<UserRole>) {
+    return !!(
+      userRoles?.isAdmin ||
+      userRoles?.isJurisdictionalAdmin ||
+      userRoles?.isLimitedJurisdictionalAdmin ||
+      userRoles?.isPartner ||
+      userRoles?.isSupportAdmin ||
+      userRoles?.isSuperAdmin
+    );
+  }
+
+  /**
+   * Returns the public-site base URL for a user's first connected jurisdiction.
+   *
+   * @param user - An object containing a jurisdictions array with optional publicUrl fields.
+   * @returns The publicUrl string of the first jurisdiction.
+   * @throws {BadRequestException} When no jurisdiction or publicUrl is present.
+   */
+  private getJurisdictionPublicUrl(user: {
+    jurisdictions?: Array<{ publicUrl?: string }>;
+  }) {
+    const publicUrl = user.jurisdictions?.[0]?.publicUrl;
+    if (!publicUrl) {
+      throw new BadRequestException('jurisdictionPublicUrlMissing');
+    }
+    return publicUrl;
+  }
+
   /*
     this will get a set of users given the params passed in
     Only users with a user role of admin or jurisdictional admin can get the list of available users.
@@ -257,21 +307,25 @@ export class UserService {
     if (dto.userRoles && storedUser.userRoles) {
       if (
         this.isUserRoleChangeAllowed(requestingUser, dto.userRoles) &&
-        !(
-          dto.userRoles.isAdmin === storedUser.userRoles.isAdmin &&
-          dto.userRoles.isJurisdictionalAdmin ===
-            storedUser.userRoles.isJurisdictionalAdmin &&
-          dto.userRoles.isPartner === storedUser.userRoles.isPartner
-        )
+        !this.userRolesMatch(dto.userRoles, storedUser.userRoles)
       ) {
-        await this.prisma.userRoles.update({
-          data: {
-            ...dto.userRoles,
-          },
-          where: {
-            userId: storedUser.id,
-          },
-        });
+        // Preserve the existing "public user = no userRoles row" model when a user is demoted.
+        if (this.hasAnyAssignedRole(dto.userRoles)) {
+          await this.prisma.userRoles.update({
+            data: {
+              ...dto.userRoles,
+            },
+            where: {
+              userId: storedUser.id,
+            },
+          });
+        } else {
+          await this.prisma.userRoles.delete({
+            where: {
+              userId: storedUser.id,
+            },
+          });
+        }
       }
     }
 
@@ -368,9 +422,13 @@ export class UserService {
         },
       });
 
-      if (forPublic) {
+      // Route partner-initiated resends for no-role users back through the public-site flow.
+      if (forPublic || !this.isPartnerPortalUser(storedUser.userRoles)) {
+        const appUrl = forPublic
+          ? dto.appUrl
+          : this.getJurisdictionPublicUrl(storedUser);
         const confirmationUrl = this.getPublicConfirmationUrl(
-          dto.appUrl,
+          appUrl,
           confirmationToken,
         );
         await this.emailService.welcome(
@@ -378,7 +436,7 @@ export class UserService {
             ? storedUser.jurisdictions[0].name
             : null,
           storedUser as unknown as User,
-          dto.appUrl,
+          appUrl,
           confirmationUrl,
         );
       } else {
@@ -409,12 +467,7 @@ export class UserService {
       UserViews.full,
     );
 
-    const isPartnerPortalUser =
-      storedUser.userRoles?.isAdmin ||
-      storedUser.userRoles?.isJurisdictionalAdmin ||
-      storedUser.userRoles?.isLimitedJurisdictionalAdmin ||
-      storedUser.userRoles?.isPartner ||
-      storedUser.userRoles?.isSupportAdmin;
+    const isPartnerPortalUser = this.isPartnerPortalUser(storedUser.userRoles);
     const isUserSiteMatch = async () => {
       if (isPartnerPortalUser) {
         return dto.appUrl === process.env.PARTNERS_PORTAL_URL;
@@ -559,6 +612,28 @@ export class UserService {
         permissionActions.confirm,
       );
     }
+    // Classify partner-created invites up front so validation, reuse, and email routing stay aligned.
+    const incomingUserRoles = 'userRoles' in dto ? dto.userRoles : undefined;
+    const isPartnerPortalInvite =
+      forPartners && this.isPartnerPortalUser(incomingUserRoles);
+    const isPublicUserInvite = forPartners && !isPartnerPortalInvite;
+    const publicInviteJurisdiction =
+      isPublicUserInvite && dto.jurisdictions?.[0]
+        ? await this.prisma.jurisdictions.findUnique({
+            select: {
+              name: true,
+              publicUrl: true,
+            },
+            where: {
+              id: dto.jurisdictions[0].id,
+            },
+          })
+        : null;
+
+    if (isPublicUserInvite && !publicInviteJurisdiction?.publicUrl) {
+      throw new BadRequestException('jurisdictionPublicUrlMissing');
+    }
+
     const existingUser = await this.prisma.userAccounts.findUnique({
       include: views.full,
       where: {
@@ -568,14 +643,14 @@ export class UserService {
 
     if (existingUser) {
       // if attempting to recreate an existing user
-      if (!existingUser.userRoles && 'userRoles' in dto) {
+      if (!existingUser.userRoles && isPartnerPortalInvite) {
         // existing user && public user && user will get roles -> trying to grant partner access to a public user
         const res = await this.prisma.userAccounts.update({
           include: views.full,
           data: {
             userRoles: {
               create: {
-                ...dto.userRoles,
+                ...incomingUserRoles,
               },
             },
             listings: {
@@ -591,6 +666,54 @@ export class UserService {
           },
         });
         return mapTo(User, res);
+      } else if (!existingUser.userRoles && isPublicUserInvite) {
+        // Re-invite existing public accounts through the same public confirmation flow as fresh invites.
+        const existingJurisdictionIds = new Set(
+          existingUser.jurisdictions.map((jurisdiction) => jurisdiction.id),
+        );
+        const connectedJurisdictions = existingUser.jurisdictions
+          .map((jurisdiction) => ({ id: jurisdiction.id }))
+          .concat(
+            dto.jurisdictions.filter(
+              (jurisdiction) => !existingJurisdictionIds.has(jurisdiction.id),
+            ),
+          );
+        const confirmationToken =
+          existingUser.confirmationToken ||
+          this.createConfirmationToken(existingUser.id, existingUser.email);
+
+        const invitedUser = await this.prisma.userAccounts.update({
+          include: views.full,
+          data: {
+            jurisdictions: {
+              connect: connectedJurisdictions.map((jurisdiction) => ({
+                id: jurisdiction.id,
+              })),
+            },
+            confirmationToken,
+            confirmedAt: null,
+          },
+          where: {
+            id: existingUser.id,
+          },
+        });
+
+        const confirmationUrl = this.getPublicConfirmationUrl(
+          publicInviteJurisdiction.publicUrl,
+          confirmationToken,
+        );
+        await this.emailService.welcome(
+          publicInviteJurisdiction.name || null,
+          mapTo(User, invitedUser),
+          publicInviteJurisdiction.publicUrl,
+          confirmationUrl,
+        );
+        await this.connectUserWithExistingApplications(
+          invitedUser.email,
+          invitedUser.id,
+        );
+
+        return mapTo(User, invitedUser);
       } else if (
         existingUser?.userRoles?.isPartner &&
         'userRoles' in dto &&
@@ -661,7 +784,7 @@ export class UserService {
       };
     }
 
-    let newUser = await this.prisma.userAccounts.create({
+    const newUser = await this.prisma.userAccounts.create({
       data: {
         passwordHash: passwordHash,
         email: dto.email,
@@ -671,16 +794,15 @@ export class UserService {
         dob: dto.dob,
         phoneNumber: dto.phoneNumber,
         language: dto.language,
-        mfaEnabled: forPartners,
+        mfaEnabled: isPartnerPortalInvite,
         ...jurisdictions,
-        userRoles:
-          'userRoles' in dto
-            ? {
-                create: {
-                  ...dto.userRoles,
-                },
-              }
-            : undefined,
+        userRoles: incomingUserRoles
+          ? {
+              create: {
+                ...incomingUserRoles,
+              },
+            }
+          : undefined,
         listings: dto.listings
           ? {
               connect: dto.listings.map((listing) => ({
@@ -695,7 +817,7 @@ export class UserService {
       newUser.id,
       newUser.email,
     );
-    newUser = await this.prisma.userAccounts.update({
+    const invitedUser = await this.prisma.userAccounts.update({
       include: views.full,
       data: {
         confirmationToken: confirmationToken,
@@ -722,29 +844,46 @@ export class UserService {
         );
         await this.emailService.welcome(
           jurisdictionName,
-          mapTo(User, newUser),
+          mapTo(User, invitedUser),
           dto.appUrl,
           confirmationUrl,
         );
       }
     } else if (forPartners) {
-      const confirmationUrl = this.getPartnersConfirmationUrl(
-        this.configService.get('PARTNERS_PORTAL_URL'),
-        confirmationToken,
-      );
-      await this.emailService.invitePartnerUser(
-        dto.jurisdictions,
-        mapTo(User, newUser),
-        this.configService.get('PARTNERS_PORTAL_URL'),
-        confirmationUrl,
-      );
+      // Send partner invites to the partners portal and no-role invites to the public site.
+      if (isPartnerPortalInvite) {
+        const partnersPortalUrl = this.configService.get('PARTNERS_PORTAL_URL');
+        const confirmationUrl = this.getPartnersConfirmationUrl(
+          partnersPortalUrl,
+          confirmationToken,
+        );
+        await this.emailService.invitePartnerUser(
+          dto.jurisdictions,
+          mapTo(User, invitedUser),
+          partnersPortalUrl,
+          confirmationUrl,
+        );
+      } else {
+        const publicAppUrl = this.getJurisdictionPublicUrl(invitedUser);
+        const confirmationUrl = this.getPublicConfirmationUrl(
+          publicAppUrl,
+          confirmationToken,
+        );
+        await this.emailService.welcome(
+          invitedUser.jurisdictions?.[0]?.name || null,
+          mapTo(User, invitedUser),
+          publicAppUrl,
+          confirmationUrl,
+        );
+      }
     }
 
-    if (!forPartners) {
-      await this.connectUserWithExistingApplications(newUser.email, newUser.id);
+    // Public accounts created from either portal still need their pre-existing paper/email applications attached.
+    if (!forPartners || isPublicUserInvite) {
+      await this.connectUserWithExistingApplications(dto.email, newUser.id);
     }
 
-    return mapTo(User, newUser);
+    return mapTo(User, invitedUser);
   }
 
   /*
@@ -902,6 +1041,29 @@ export class UserService {
 
   containsInvalidCharacters(value: string): boolean {
     return value.includes('.') || value.includes('http');
+  }
+
+  /**
+   * Compares role flags while treating missing or undefined booleans as false.
+   *
+   * @param incomingUserRoles - The proposed new role flags.
+   * @param storedUserRoles - The currently persisted role flags.
+   * @returns `true` if every compared flag is equivalent.
+   */
+  private userRolesMatch(
+    incomingUserRoles?: Partial<UserRole>,
+    storedUserRoles?: Partial<UserRole>,
+  ): boolean {
+    return (
+      !!incomingUserRoles?.isAdmin === !!storedUserRoles?.isAdmin &&
+      !!incomingUserRoles?.isSupportAdmin ===
+        !!storedUserRoles?.isSupportAdmin &&
+      !!incomingUserRoles?.isPartner === !!storedUserRoles?.isPartner &&
+      !!incomingUserRoles?.isJurisdictionalAdmin ===
+        !!storedUserRoles?.isJurisdictionalAdmin &&
+      !!incomingUserRoles?.isLimitedJurisdictionalAdmin ===
+        !!storedUserRoles?.isLimitedJurisdictionalAdmin
+    );
   }
 
   isUserRoleChangeAllowed(

@@ -146,7 +146,7 @@ const axiosConfig = (router: GenericRouter) => {
 
 export const AuthContext = createContext<Partial<ContextProps>>({})
 export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ children }) => {
-  const { apiUrl } = useContext(ConfigContext)
+  const { apiUrl, appType } = useContext(ConfigContext)
   const router = useRouter()
   const [state, dispatch] = useReducer(reducer, {
     loading: false,
@@ -155,7 +155,12 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
   })
 
   const userService = useMemo(() => new UserService(), [])
-  const authService = new AuthService()
+  const authService = useMemo(() => new AuthService(), [])
+  // Tag every partners-app auth/profile request so the API can enforce partner-only access server-side.
+  const partnerPortalRequestOptions = useMemo(
+    () => (appType === "partners" ? { headers: { "x-partners-portal": "true" } } : {}),
+    [appType]
+  )
 
   useEffect(() => {
     serviceOptions.axios = axiosConfig(router)
@@ -168,8 +173,9 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
           .split("; ")
           .some((cookie) => cookie.startsWith("access-token-available=True"))
       ) {
+        // Include the portal header (if any) so the backend applies the same access rules as login.
         authService
-          .requestNewToken()
+          .requestNewToken(partnerPortalRequestOptions)
           .then(() => {
             // this auto sets the new cookies so we don't really have to do anything
             // this set up is to avoid some linting errors
@@ -180,7 +186,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
       }
     }, 1000 * 60 * 59) // runs once every 59 minutes
     return () => clearInterval(interval)
-  })
+  }, [authService, partnerPortalRequestOptions])
 
   const loadProfile = useCallback(
     async (redirect?: string) => {
@@ -191,8 +197,8 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
             .split("; ")
             .some((cookie) => cookie.startsWith("access-token-available=True"))
         ) {
-          // if we have an access token
-          profile = await userService?.profile()
+          // Pass portal options so the backend can enforce access rules when loading the profile.
+          profile = await userService?.profile(partnerPortalRequestOptions)
         } else {
           dispatch(saveProfile(null))
         }
@@ -210,7 +216,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
         }
       }
     },
-    [userService, router]
+    [partnerPortalRequestOptions, userService, router]
   )
 
   // Load our profile as soon as we have an access token available
@@ -227,8 +233,8 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
     listingsService: new ListingsService(),
     propertiesService: new PropertiesService(),
     jurisdictionsService: new JurisdictionsService(),
-    userService: new UserService(),
-    authService: new AuthService(),
+    userService: userService,
+    authService: authService,
     multiselectQuestionsService: new MultiselectQuestionsService(),
     mapLayersService: new MapLayersService(),
     lotteryService: new LotteryService(),
@@ -250,11 +256,15 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
     ) => {
       dispatch(startLoading())
       try {
-        const response = await authService?.login({
-          body: { email, password, mfaCode, mfaType, reCaptchaToken },
-        })
+        // Pass portal options so the backend can apply portal-specific access rules during login.
+        const response = await authService?.login(
+          {
+            body: { email, password, mfaCode, mfaType, reCaptchaToken },
+          },
+          partnerPortalRequestOptions
+        )
         if (response) {
-          const profile = await userService?.profile()
+          const profile = await userService?.profile(partnerPortalRequestOptions)
           if (
             profile &&
             (!forPartners ||

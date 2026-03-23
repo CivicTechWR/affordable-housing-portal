@@ -1078,6 +1078,12 @@ describe('Testing user service', () => {
       prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
         id,
         email,
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
       });
       prisma.userAccounts.update = jest.fn().mockResolvedValue({
         id,
@@ -1085,7 +1091,7 @@ describe('Testing user service', () => {
         confirmationToken: 'example confirmation token',
       });
 
-      emailService.invitePartnerUser = jest.fn();
+      emailService.welcome = jest.fn();
 
       await service.resendConfirmation({ email }, false);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
@@ -1113,6 +1119,69 @@ describe('Testing user service', () => {
           id,
         },
       });
+      expect(emailService.welcome).toHaveBeenCalledTimes(1);
+    });
+
+    it('should error when a no-role user is resent from partners without a jurisdiction public url', async () => {
+      const id = randomUUID();
+      const email = 'email@example.com';
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        email,
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: '',
+          },
+        ],
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        email,
+        confirmationToken: 'example confirmation token',
+      });
+      emailService.welcome = jest.fn();
+
+      await expect(
+        service.resendConfirmation(
+          { email, appUrl: 'http://partners.example.com' },
+          false,
+        ),
+      ).rejects.toThrowError('jurisdictionPublicUrlMissing');
+      expect(emailService.welcome).not.toHaveBeenCalled();
+    });
+
+    it('should resend partner portal confirmation for partner users', async () => {
+      const id = randomUUID();
+      const email = 'email@example.com';
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        email,
+        userRoles: {
+          isPartner: true,
+        },
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        email,
+        confirmationToken: 'example confirmation token',
+      });
+
+      emailService.invitePartnerUser = jest.fn();
+
+      await service.resendConfirmation(
+        { email, appUrl: 'http://partners.example.com' },
+        false,
+      );
+      expect(emailService.invitePartnerUser).toHaveBeenCalledTimes(1);
     });
 
     it('should not update confirmationToken if user is confirmed', async () => {
@@ -1687,6 +1756,58 @@ describe('Testing user service', () => {
       );
     });
 
+    it('should delete user roles when converting a legacy support admin to User', async () => {
+      const id = randomUUID();
+      const jurisId = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        userRoles: {
+          isAdmin: false,
+          isSupportAdmin: true,
+          isPartner: false,
+          isJurisdictionalAdmin: false,
+          isLimitedJurisdictionalAdmin: false,
+        },
+        jurisdictions: [{ id: jurisId }],
+        listings: [],
+      });
+      prisma.userRoles.delete = jest.fn().mockResolvedValue({
+        userId: id,
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+      });
+
+      await service.update(
+        {
+          id,
+          firstName: 'first name',
+          lastName: 'last name',
+          jurisdictions: [{ id: jurisId }],
+          agreedToTermsOfService: true,
+          userRoles: {
+            isAdmin: false,
+            isSupportAdmin: false,
+            isPartner: false,
+            isJurisdictionalAdmin: false,
+            isLimitedJurisdictionalAdmin: false,
+          },
+        },
+        {
+          id: 'requestingUser id',
+          userRoles: { isAdmin: true },
+        } as unknown as User,
+        'jurisdictionName',
+      );
+
+      expect(prisma.userRoles.delete).toHaveBeenCalledWith({
+        where: {
+          userId: id,
+        },
+      });
+    });
+
     it('should update connected listings to a user', async () => {
       const id = randomUUID();
       const jurisId = randomUUID();
@@ -1850,11 +1971,23 @@ describe('Testing user service', () => {
       const id = randomUUID();
 
       prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        publicUrl: 'http://public.example.com',
+      });
       prisma.userAccounts.create = jest.fn().mockResolvedValue({
         id,
       });
       prisma.userAccounts.update = jest.fn().mockResolvedValue({
         id,
+        userRoles: {
+          isAdmin: true,
+        },
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
       });
       emailService.invitePartnerUser = jest.fn();
       await service.create(
@@ -1924,6 +2057,187 @@ describe('Testing user service', () => {
           id: undefined,
         },
       );
+    });
+
+    it('should create an invited User and send the public-site confirmation email', async () => {
+      const jurisId = randomUUID();
+      const id = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        publicUrl: 'http://public.example.com',
+      });
+      prisma.userAccounts.create = jest.fn().mockResolvedValue({
+        id,
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        jurisdictions: [
+          {
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
+        email: 'publicinvite@email.com',
+      });
+      prisma.applications.findMany = jest.fn().mockResolvedValue([]);
+      emailService.welcome = jest.fn();
+      emailService.invitePartnerUser = jest.fn();
+
+      await service.create(
+        {
+          firstName: 'Public Invite firstName',
+          lastName: 'Public Invite lastName',
+          email: 'publicinvite@email.com',
+          jurisdictions: [{ id: jurisId }],
+        },
+        true,
+        undefined,
+        {
+          headers: { jurisdictionname: 'juris 1' },
+          user: {
+            id: 'requestingUser id',
+            userRoles: { isAdmin: true },
+          } as unknown as User,
+        } as unknown as Request,
+      );
+
+      expect(prisma.userAccounts.create).toHaveBeenCalledWith({
+        data: {
+          passwordHash: expect.anything(),
+          email: 'publicinvite@email.com',
+          firstName: 'Public Invite firstName',
+          lastName: 'Public Invite lastName',
+          mfaEnabled: false,
+          jurisdictions: {
+            connect: [{ id: jurisId }],
+          },
+        },
+      });
+      expect(emailService.welcome).toHaveBeenCalledTimes(1);
+      expect(emailService.invitePartnerUser).not.toHaveBeenCalled();
+      expect(prisma.applications.findMany).toHaveBeenCalledWith({
+        where: {
+          applicant: {
+            emailAddress: 'publicinvite@email.com',
+          },
+          userAccounts: null,
+        },
+      });
+    });
+
+    it('should error before creating an invited User when the jurisdiction public url is missing', async () => {
+      const jurisId = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue(null);
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        publicUrl: '',
+      });
+      prisma.userAccounts.create = jest.fn();
+
+      await expect(
+        service.create(
+          {
+            firstName: 'Public Invite firstName',
+            lastName: 'Public Invite lastName',
+            email: 'publicinvite@email.com',
+            jurisdictions: [{ id: jurisId }],
+          },
+          true,
+          undefined,
+          {
+            headers: { jurisdictionname: 'juris 1' },
+            user: {
+              id: 'requestingUser id',
+              userRoles: { isAdmin: true },
+            } as unknown as User,
+          } as unknown as Request,
+        ),
+      ).rejects.toThrowError('jurisdictionPublicUrlMissing');
+
+      expect(prisma.userAccounts.create).not.toHaveBeenCalled();
+    });
+
+    it('should re-invite an existing public user through the public confirmation flow', async () => {
+      const jurisId = randomUUID();
+      const id = randomUUID();
+
+      prisma.userAccounts.findUnique = jest.fn().mockResolvedValue({
+        id,
+        email: 'publicinvite@email.com',
+        confirmationToken: null,
+        userRoles: null,
+        jurisdictions: [],
+        listings: [],
+      });
+      prisma.jurisdictions.findUnique = jest.fn().mockResolvedValue({
+        name: 'Jurisdiction One',
+        publicUrl: 'http://public.example.com',
+      });
+      prisma.userAccounts.update = jest.fn().mockResolvedValue({
+        id,
+        email: 'publicinvite@email.com',
+        jurisdictions: [
+          {
+            id: jurisId,
+            name: 'Jurisdiction One',
+            publicUrl: 'http://public.example.com',
+          },
+        ],
+      });
+      prisma.applications.findMany = jest.fn().mockResolvedValue([]);
+      emailService.welcome = jest.fn();
+
+      await service.create(
+        {
+          firstName: 'Public Invite firstName',
+          lastName: 'Public Invite lastName',
+          email: 'publicinvite@email.com',
+          jurisdictions: [{ id: jurisId }],
+        },
+        true,
+        undefined,
+        {
+          headers: { jurisdictionname: 'juris 1' },
+          user: {
+            id: 'requestingUser id',
+            userRoles: { isAdmin: true },
+          } as unknown as User,
+        } as unknown as Request,
+      );
+
+      expect(prisma.userAccounts.update).toHaveBeenCalledWith({
+        include: {
+          jurisdictions: true,
+          listings: true,
+          userRoles: true,
+          favoriteListings: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        data: {
+          jurisdictions: {
+            connect: [{ id: jurisId }],
+          },
+          confirmationToken: expect.anything(),
+          confirmedAt: null,
+        },
+        where: {
+          id,
+        },
+      });
+      expect(emailService.welcome).toHaveBeenCalledTimes(1);
+      expect(prisma.applications.findMany).toHaveBeenCalledWith({
+        where: {
+          applicant: {
+            emailAddress: 'publicinvite@email.com',
+          },
+          userAccounts: null,
+        },
+      });
     });
 
     it('should create a partner user with existing public user present', async () => {

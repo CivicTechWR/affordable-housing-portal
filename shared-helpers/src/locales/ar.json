@@ -1225,6 +1225,7 @@
   "users.confirmationSent": "تم إرسال التأكيد",
   "users.inviteSent": "تم إرسال الدعوة",
   "users.jurisdictionalAdmin": "الإدارة القضائية",
+  "users.user": "مستخدم",
   "users.userDeleted": "تم حذف المستخدم",
   "users.userUpdated": "تم تحديث المستخدم",
   "welcome.allApplicationClosed": "جميع التطبيقات مغلقة حاليًا ، ولكن يمكنك عرض القوائم المغلقة.",

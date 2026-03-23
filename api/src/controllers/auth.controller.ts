@@ -18,7 +18,11 @@ import {
 } from 'express';
 import { defaultValidationPipeOptions } from '../utilities/default-validation-pipe-options';
 import { SuccessDTO } from '../dtos/shared/success.dto';
-import { AuthService, REFRESH_COOKIE_NAME } from '../services/auth.service';
+import {
+  AuthService,
+  PARTNERS_PORTAL_HEADER,
+  REFRESH_COOKIE_NAME,
+} from '../services/auth.service';
 import { RequestMfaCode } from '../dtos/mfa/request-mfa-code.dto';
 import { RequestMfaCodeResponse } from '../dtos/mfa/request-mfa-code-response.dto';
 import { Confirm } from '../dtos/auth/confirm.dto';
@@ -50,14 +54,17 @@ export class AuthController {
     @Response({ passthrough: true }) res: ExpressResponse,
     @Body() dto: Login,
   ): Promise<SuccessDTO> {
+    // Enforce the stricter partner-portal login rules when the request originates there.
     return await this.authService.setCredentials(
       res,
       mapTo(User, req['user']),
-      undefined,
-      dto.reCaptchaToken,
-      !!process.env.RECAPTCHA_KEY,
-      !!dto.mfaCode,
-      process.env.ENABLE_RECAPTCHA === 'TRUE',
+      {
+        reCaptchaToken: dto.reCaptchaToken,
+        reCaptchaConfigured: !!process.env.RECAPTCHA_KEY,
+        mfaCode: !!dto.mfaCode,
+        shouldReCaptchaBlockLogin: process.env.ENABLE_RECAPTCHA === 'TRUE',
+        forPartners: req.headers[PARTNERS_PORTAL_HEADER] === 'true',
+      },
     );
   }
 
@@ -116,10 +123,14 @@ export class AuthController {
     if (!req?.cookies[REFRESH_COOKIE_NAME]) {
       throw new BadRequestException('No refresh token sent with request');
     }
+    // Keep refresh-token logins aligned with the same partner-portal access gate.
     return await this.authService.setCredentials(
       res,
       mapTo(User, req['user']),
-      req.cookies[REFRESH_COOKIE_NAME],
+      {
+        incomingRefreshToken: req.cookies[REFRESH_COOKIE_NAME],
+        forPartners: req.headers[PARTNERS_PORTAL_HEADER] === 'true',
+      },
     );
   }
 

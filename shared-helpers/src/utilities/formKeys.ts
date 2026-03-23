@@ -288,6 +288,7 @@ export const listingRequiredDocumentsOptions = [
 export enum RoleOption {
   Administrator = "administrator",
   Partner = "partner",
+  User = "user",
   JurisdictionalAdmin = "jurisdictionalAdmin",
   LimitedJurisdictionalAdmin = "limitedJurisdictionalAdmin",
   AdminSupport = "adminSupport",

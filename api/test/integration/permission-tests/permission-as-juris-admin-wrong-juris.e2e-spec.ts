@@ -13,6 +13,7 @@ import { AppModule } from '../../../src/modules/app.module';
 import { PrismaService } from '../../../src/services/prisma.service';
 import { userFactory } from '../../../prisma/seed-helpers/user-factory';
 import { Login } from '../../../src/dtos/auth/login.dto';
+import { jurisdictionFactory } from '../../../prisma/seed-helpers/jurisdiction-factory';
 import { listingFactory } from '../../../prisma/seed-helpers/listing-factory';
 import { amiChartFactory } from '../../../prisma/seed-helpers/ami-chart-factory';
 import { AmiChartQueryParams } from '../../../src/dtos/ami-charts/ami-chart-query-params.dto';
@@ -959,8 +960,13 @@ describe('Testing Permissioning of endpoints as Jurisdictional Admin in the wron
     });
 
     it('should succeed for partner resend confirmation endpoint', async () => {
+      const jurisdiction = await prisma.jurisdictions.create({
+        data: await jurisdictionFactory(),
+      });
       const userA = await prisma.userAccounts.create({
-        data: await userFactory(),
+        data: await userFactory({
+          jurisdictionIds: [jurisdiction.id],
+        }),
       });
       await request(app.getHttpServer())
         .post(`/user/resend-partner-confirmation/`)

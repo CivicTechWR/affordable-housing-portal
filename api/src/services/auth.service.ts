@@ -33,6 +33,7 @@ const TOKEN_COOKIE_MAXAGE = 86400000; // 24 hours
 export const TOKEN_COOKIE_NAME = 'access-token';
 export const REFRESH_COOKIE_NAME = 'refresh-token';
 export const ACCESS_TOKEN_AVAILABLE_NAME = 'access-token-available';
+export const PARTNERS_PORTAL_HEADER = 'x-partners-portal';
 export const AUTH_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
   secure,
@@ -52,6 +53,15 @@ type IdAndEmail = {
   id: string;
   email: string;
 };
+
+export interface SetCredentialsOptions {
+  incomingRefreshToken?: string;
+  reCaptchaToken?: string;
+  reCaptchaConfigured?: boolean;
+  mfaCode?: boolean;
+  shouldReCaptchaBlockLogin?: boolean;
+  forPartners?: boolean;
+}
 
 @Injectable()
 export class AuthService {
@@ -77,6 +87,20 @@ export class AuthService {
     return sign(payload, process.env.APP_SECRET);
   }
 
+  /**
+   * Clears every auth cookie that can keep a browser session alive.
+   *
+   * @param res - Express response on which to clear the cookies.
+   */
+  private clearAuthCookies(res: Response): void {
+    res.clearCookie(TOKEN_COOKIE_NAME, AUTH_COOKIE_OPTIONS);
+    res.clearCookie(REFRESH_COOKIE_NAME, REFRESH_COOKIE_OPTIONS);
+    res.clearCookie(
+      ACCESS_TOKEN_AVAILABLE_NAME,
+      ACCESS_TOKEN_AVAILABLE_OPTIONS,
+    );
+  }
+
   /*
     this sets credentials as part of the response's cookies
     handles the storage and creation of these credentials
@@ -84,14 +108,34 @@ export class AuthService {
   async setCredentials(
     res: Response,
     user: User,
-    incomingRefreshToken?: string,
-    reCaptchaToken?: string,
-    reCaptchaConfigured?: boolean,
-    mfaCode?: boolean,
-    shouldReCaptchaBlockLogin?: boolean,
+    options?: SetCredentialsOptions,
   ): Promise<SuccessDTO> {
+    const {
+      incomingRefreshToken,
+      reCaptchaToken,
+      reCaptchaConfigured,
+      mfaCode,
+      shouldReCaptchaBlockLogin,
+      forPartners,
+    } = options ?? {};
+
     if (!user?.id) {
       throw new UnauthorizedException('no user found');
+    }
+
+    // Reject public-only users before issuing or refreshing a partner-portal session.
+    if (forPartners && !this.userService.isPartnerPortalUser(user.userRoles)) {
+      await this.prisma.userAccounts.update({
+        data: {
+          activeAccessToken: null,
+          activeRefreshToken: null,
+        },
+        where: {
+          id: user.id,
+        },
+      });
+      this.clearAuthCookies(res);
+      throw new UnauthorizedException('partnerPortalAccessDenied');
     }
 
     if (reCaptchaConfigured && !user.mfaEnabled && !mfaCode) {
@@ -173,12 +217,7 @@ export class AuthService {
             id: user.id,
           },
         });
-        res.clearCookie(TOKEN_COOKIE_NAME, AUTH_COOKIE_OPTIONS);
-        res.clearCookie(REFRESH_COOKIE_NAME, REFRESH_COOKIE_OPTIONS);
-        res.clearCookie(
-          ACCESS_TOKEN_AVAILABLE_NAME,
-          ACCESS_TOKEN_AVAILABLE_OPTIONS,
-        );
+        this.clearAuthCookies(res);
 
         throw new UnauthorizedException(
           `User ${user.id} was attempting to use outdated token ${incomingRefreshToken} to generate new tokens`,
@@ -232,12 +271,7 @@ export class AuthService {
       },
     });
 
-    res.clearCookie(TOKEN_COOKIE_NAME, AUTH_COOKIE_OPTIONS);
-    res.clearCookie(REFRESH_COOKIE_NAME, REFRESH_COOKIE_OPTIONS);
-    res.clearCookie(
-      ACCESS_TOKEN_AVAILABLE_NAME,
-      ACCESS_TOKEN_AVAILABLE_OPTIONS,
-    );
+    this.clearAuthCookies(res);
 
     return {
       success: true,

@@ -103,7 +103,7 @@ function PublicApp({ Component, router, pageProps }: AppProps) {
   const jurisdictionClassname = process.env.jurisdictionName.replace(" ", "-").toLowerCase()
 
   const pageContent = (
-    <ConfigProvider apiUrl={process.env.backendApiBase}>
+    <ConfigProvider apiUrl={process.env.backendApiBase} appType="public">
       <AuthProvider>
         <RequireLogin
           signInPath="/sign-in"

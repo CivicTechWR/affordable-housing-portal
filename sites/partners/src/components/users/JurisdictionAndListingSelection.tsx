@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { useFormContext } from "react-hook-form"
 import { t, Field, FieldGroup, Select } from "@bloom-housing/ui-components"
 import { Grid } from "@bloom-housing/ui-seeds"
@@ -11,7 +11,34 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
   const { register, errors, getValues, setValue, watch } = useFormContext()
   const { profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
   const selectedRoles = watch("userRoles")
-  const selectedJurisdictions = watch("jurisdictions")
+  const watchedJurisdictions = watch("jurisdictions")
+  // Normalize React Hook Form's string-or-array jurisdiction value into a single array shape.
+  const selectedJurisdictions = useMemo(() => {
+    if (Array.isArray(watchedJurisdictions)) {
+      return watchedJurisdictions
+    }
+    return watchedJurisdictions ? [watchedJurisdictions] : []
+  }, [watchedJurisdictions])
+  const showUserJurisdictionSelect =
+    selectedRoles === RoleOption.User &&
+    profile?.userRoles?.isAdmin &&
+    jurisdictionOptions.length > 1
+
+  useEffect(() => {
+    if (selectedRoles !== RoleOption.User) return
+
+    // Keep no-role users on one jurisdiction and clear listing-only partner selections when the role flips.
+    const defaultJurisdiction = selectedJurisdictions[0] || jurisdictionOptions[0]?.id
+    if (defaultJurisdiction) {
+      setValue("jurisdictions", defaultJurisdiction)
+    }
+    setValue("jurisdiction_all", false)
+    setValue("user_listings", [])
+
+    Object.keys(listingsOptions).forEach((key) => {
+      setValue(`listings_all_${key}`, false)
+    })
+  }, [jurisdictionOptions, listingsOptions, selectedJurisdictions, selectedRoles, setValue])
 
   /**
    * Control listing checkboxes on select/deselect all listings option
@@ -108,6 +135,36 @@ const JurisdictionAndListingSelection = ({ jurisdictionOptions, listingsOptions 
         </Grid.Cell>
       )
     })
+  }
+
+  if (showUserJurisdictionSelect) {
+    // Admins still need a jurisdiction picker when inviting a public user across multiple jurisdictions.
+    return (
+      <SectionWithGrid heading={t("t.jurisdiction")}>
+        <Grid.Row columns={4}>
+          <Grid.Cell>
+            <Select
+              id="jurisdictions"
+              name="jurisdictions"
+              label={t("t.jurisdiction")}
+              placeholder={t("t.selectOne")}
+              register={register}
+              controlClassName="control"
+              keyPrefix="users"
+              options={jurisdictionOptions}
+              error={!!errors?.jurisdictions}
+              errorMessage={t("errors.requiredFieldError")}
+              validation={{ required: true }}
+            />
+          </Grid.Cell>
+        </Grid.Row>
+      </SectionWithGrid>
+    )
+  }
+
+  if (selectedRoles === RoleOption.User) {
+    // Single-jurisdiction contexts (jurisdictional admins, or admins with only one jurisdiction) don't need a picker for User invites.
+    return null
   }
 
   if (profile?.userRoles?.isAdmin) {

@@ -753,6 +753,7 @@
   "users.makeNote": "When creating your password make sure you make note of it so you remember it in the future.",
   "users.needUniquePassword": "You'll need to add a unique password in order to confirm your account.",
   "users.partner": "Partner",
+  "users.user": "User",
   "users.requestResend": "Request resend",
   "users.requestResendDescription": "Your token expired. You will need to have a new confirmation link sent to you.",
   "users.requestResendExplanation": "Please enter your email, and we'll send you a new confirmation link",
