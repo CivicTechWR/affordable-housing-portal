@@ -83,6 +83,7 @@ describe('Testing email service', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   const user = {
@@ -787,7 +788,64 @@ describe('Testing email service', () => {
 
   describe('retry behavior', () => {
     it('should retry sendSingle in a loop until attempts are exhausted', async () => {
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
       sendMock.mockRejectedValue(new Error('single send failed'));
+
+      const sendPromise = service['sendSingle'](
+        'applicant.email@example.com',
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        3,
+      );
+      await jest.runAllTimersAsync();
+      await sendPromise;
+
+      expect(sendMock).toHaveBeenCalledTimes(4);
+      expect(loggerMock.error).toHaveBeenCalledTimes(4);
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(3);
+      expect(setTimeoutSpy.mock.calls.map(([, delay]) => delay)).toEqual([
+        1000, 2000, 4000,
+      ]);
+      expect(loggerMock.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Retries remaining: 0'),
+      );
+    });
+
+    it('should retry sendBatch in a loop until attempts are exhausted', async () => {
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+      sendBatchMock.mockRejectedValue(new Error('batch send failed'));
+
+      const sendPromise = service['sendBatch'](
+        ['first@example.com', 'second@example.com'],
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        2,
+      );
+      await jest.runAllTimersAsync();
+      await sendPromise;
+
+      expect(sendBatchMock).toHaveBeenCalledTimes(3);
+      expect(loggerMock.error).toHaveBeenCalledTimes(3);
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
+      expect(setTimeoutSpy.mock.calls.map(([, delay]) => delay)).toEqual([
+        1000, 2000,
+      ]);
+      expect(loggerMock.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Retries remaining: 0'),
+      );
+    });
+
+    it('should not retry sendSingle for 4xx resend responses', async () => {
+      sendMock.mockResolvedValue({
+        data: null,
+        error: {
+          name: 'validation_error',
+          message: 'Bad request',
+          statusCode: 400,
+        } as ErrorResponse,
+      });
 
       await service['sendSingle'](
         'applicant.email@example.com',
@@ -797,15 +855,19 @@ describe('Testing email service', () => {
         3,
       );
 
-      expect(sendMock).toHaveBeenCalledTimes(4);
-      expect(loggerMock.error).toHaveBeenCalledTimes(4);
-      expect(loggerMock.error).toHaveBeenLastCalledWith(
-        expect.stringContaining('Retries remaining: 0'),
-      );
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
     });
 
-    it('should retry sendBatch in a loop until attempts are exhausted', async () => {
-      sendBatchMock.mockRejectedValue(new Error('batch send failed'));
+    it('should not retry sendBatch for 4xx resend responses', async () => {
+      sendBatchMock.mockResolvedValue({
+        data: null,
+        error: {
+          name: 'validation_error',
+          message: 'Bad request',
+          statusCode: 400,
+        } as ErrorResponse,
+      });
 
       await service['sendBatch'](
         ['first@example.com', 'second@example.com'],
@@ -815,11 +877,8 @@ describe('Testing email service', () => {
         2,
       );
 
-      expect(sendBatchMock).toHaveBeenCalledTimes(3);
-      expect(loggerMock.error).toHaveBeenCalledTimes(3);
-      expect(loggerMock.error).toHaveBeenLastCalledWith(
-        expect.stringContaining('Retries remaining: 0'),
-      );
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
     });
   });
 });

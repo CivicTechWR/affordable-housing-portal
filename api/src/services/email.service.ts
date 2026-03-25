@@ -42,6 +42,7 @@ type listingInfo = {
 export class EmailService {
   polyglot: Polyglot;
   private readonly resend: Resend;
+  private readonly resendRetryBaseDelayMs = 1000;
 
   constructor(
     configService: ConfigService,
@@ -174,24 +175,9 @@ export class EmailService {
         subject,
         html: body,
       }));
-
-      for (
-        let retriesRemaining = retry;
-        retriesRemaining >= 0;
-        retriesRemaining--
-      ) {
-        let response: BatchEmailResponse;
-        try {
-          response = await this.resend.batch.send(payloads);
-        } catch (error) {
-          this.logSendFailure(chunk, error, retriesRemaining);
-          continue;
-        }
-
-        if (!response.error) break;
-
-        this.logSendFailure(chunk, response.error, retriesRemaining);
-      }
+      await this.retrySendWithBackoff(chunk, retry, () =>
+        this.resend.batch.send(payloads),
+      );
     }
   }
 
@@ -231,28 +217,57 @@ export class EmailService {
         },
       ];
     }
+    await this.retrySendWithBackoff(to, retry, () =>
+      this.resend.emails.send(emailParams),
+    );
+  }
 
-    for (
-      let retriesRemaining = retry;
-      retriesRemaining >= 0;
-      retriesRemaining--
-    ) {
-      let response: SingleEmailResponse;
+  private async retrySendWithBackoff<
+    TResponse extends SingleEmailResponse | BatchEmailResponse,
+  >(
+    to: string | string[],
+    retry: number,
+    sendRequest: () => Promise<TResponse>,
+  ): Promise<TResponse | null> {
+    for (let attempt = 0; attempt <= retry; attempt++) {
+      const retriesRemaining = retry - attempt;
+
       try {
-        // Attempt delivery through the Resend SDK client.
-        response = await this.resend.emails.send(emailParams);
+        const response = await sendRequest();
+
+        if (!response.error) return response;
+
+        this.logSendFailure(to, response.error, retriesRemaining);
+
+        if (
+          retriesRemaining === 0 ||
+          !this.shouldRetrySendFailure(response.error)
+        ) {
+          return null;
+        }
       } catch (error) {
-        // Network or SDK failures use the same retry path as API-level failures.
         this.logSendFailure(to, error, retriesRemaining);
-        continue;
+
+        if (retriesRemaining === 0) {
+          return null;
+        }
       }
 
-      // Successful API responses with no provider error are complete.
-      if (!response.error) return;
-
-      // Provider-declared delivery failures are logged and retried without aborting the caller flow.
-      this.logSendFailure(to, response.error, retriesRemaining);
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.resendRetryBaseDelayMs * 2 ** attempt),
+      );
     }
+
+    return null;
+  }
+
+  private shouldRetrySendFailure(error: ErrorResponse | Error | unknown) {
+    // Always retry on unknown errors.
+    if (!this.isResendErrorResponse(error) || error.statusCode === null) {
+      return true;
+    }
+
+    return error.statusCode < 400 || error.statusCode >= 500;
   }
 
   /**
