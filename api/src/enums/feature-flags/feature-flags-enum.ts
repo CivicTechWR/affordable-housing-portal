@@ -3,7 +3,6 @@
 // Keep alphabetized for readability.
 export enum FeatureFlagEnum {
   disableBuildingSelectionCriteria = 'disableBuildingSelectionCriteria',
-  disableCommonApplication = 'disableCommonApplication',
   disableJurisdictionalAdmin = 'disableJurisdictionalAdmin',
   disableListingPreferences = 'disableListingPreferences',
   disableWorkInRegion = 'disableWorkInRegion',
@@ -41,7 +40,6 @@ export enum FeatureFlagEnum {
   enablePetPolicyCheckbox = 'enablePetPolicyCheckbox',
   enableProperties = 'enableProperties',
   enableReferralQuestionUnits = 'enableReferralQuestionUnits',
-  enableRegions = 'enableRegions',
   enableResources = 'enableResources',
   enableSection8Question = 'enableSection8Question',
   enableSingleUseCode = 'enableSingleUseCode',
@@ -71,11 +69,6 @@ export const featureFlagMap: {
     name: FeatureFlagEnum.disableBuildingSelectionCriteria,
     description:
       'When true, building selection criteria is not displayed in the listing',
-  },
-  {
-    name: FeatureFlagEnum.disableCommonApplication,
-    description:
-      'When true, the digital common application is not an option for listings',
   },
   {
     name: FeatureFlagEnum.disableJurisdictionalAdmin,
@@ -251,11 +244,6 @@ export const featureFlagMap: {
   {
     name: FeatureFlagEnum.enableReferralQuestionUnits,
     description: 'when true, updates the the referral details question labels',
-  },
-  {
-    name: FeatureFlagEnum.enableRegions,
-    description:
-      'When true, the region can be defined for the building address',
   },
   {
     name: FeatureFlagEnum.enableResources,

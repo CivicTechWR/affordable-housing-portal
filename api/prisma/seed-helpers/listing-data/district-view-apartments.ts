@@ -20,7 +20,6 @@ export const districtViewApartments: Prisma.ListingsCreateInput = {
   developer: 'ABS Housing',
   householdSizeMax: 0,
   householdSizeMin: 0,
-  neighborhood: null,
   petPolicy: 'Pets are not permitted on the property. ',
   smokingPolicy: null,
   unitAmenities: 'Each unit comes with included central AC.',

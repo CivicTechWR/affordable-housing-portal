@@ -138,7 +138,8 @@ const ListingForm = ({
 
   const marketingTypeChoice = watch("marketingType")
 
-  const { listingsService, profile, doJurisdictionsHaveFeatureFlagOn } = useContext(AuthContext)
+  const { listingsService, profile, doJurisdictionsHaveFeatureFlagOn, loadProfile } =
+    useContext(AuthContext)
 
   const { addToast } = useContext(MessageContext)
 
@@ -461,7 +462,11 @@ const ListingForm = ({
                   updateListing(result as Listing)
                 }
               } else {
-                await router.push(`/listings/${result.id}`)
+                if (profile?.userRoles?.isPartner && loadProfile) {
+                  await loadProfile(`/listings/${result.id}`)
+                } else {
+                  await router.push(`/listings/${result.id}`)
+                }
               }
             }
             setLoading(false)
@@ -526,6 +531,7 @@ const ListingForm = ({
       reset,
       setError,
       profile,
+      loadProfile,
       addToast,
       enableUnitGroups,
     ]
@@ -617,10 +623,6 @@ const ListingForm = ({
                               jurisdictionId
                             )}
                             enableNonRegulatedListings={enableNonRegulatedListings}
-                            enableRegions={doJurisdictionsHaveFeatureFlagOn(
-                              FeatureFlagEnum.enableRegions,
-                              jurisdictionId
-                            )}
                             regions={selectedJurisdictionData?.regions}
                             latLong={latLong}
                             listing={listing}

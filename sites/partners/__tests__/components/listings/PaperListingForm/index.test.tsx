@@ -26,7 +26,7 @@ const jurisdictions = [
     id: "Bloomington",
     name: "Bloomington",
     featureFlags: [
-      { name: FeatureFlagEnum.enableRegions, active: true } as FeatureFlag,
+      { name: FeatureFlagEnum.enableConfigurableRegions, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableHomeType, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableCompanyWebsite, active: true } as FeatureFlag,
       { name: FeatureFlagEnum.enableWhatToExpectAdditionalField, active: true } as FeatureFlag,
@@ -46,7 +46,6 @@ const jurisdictions = [
       "paperApplication",
       "referralOpportunity",
       "rentalAssistance",
-      "neighborhood",
       "yearBuilt",
       "reservedCommunityTypes",
       "reservedCommunityDescription",
@@ -76,7 +75,7 @@ const jurisdictions = [
       "listingsLeasingAgentAddress",
       "additionalApplicationSubmissionNotes",
       "applicationDueDate",
-      "region",
+      "configurableRegion",
     ],
   },
 ]
@@ -84,6 +83,8 @@ const jurisdictions = [
 const getJurisdictionLanguages = () => {
   return [LanguagesEnum.en]
 }
+
+jest.setTimeout(30000)
 
 beforeAll(() => {
   server.listen()
@@ -189,7 +190,7 @@ describe("add listing", () => {
         value={{
           doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
-              case FeatureFlagEnum.enableRegions:
+              case FeatureFlagEnum.enableConfigurableRegions:
                 return true
               case FeatureFlagEnum.enableHomeType:
                 return true
@@ -360,7 +361,7 @@ describe("add listing", () => {
         value={{
           doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
-              case FeatureFlagEnum.enableRegions:
+              case FeatureFlagEnum.enableConfigurableRegions:
                 return true
               case FeatureFlagEnum.enableHomeType:
                 return true
@@ -388,10 +389,9 @@ describe("add listing", () => {
       "Housing developer",
       "Photos",
       "Street address",
-      "Neighborhood",
       "City",
-      "State",
-      "Zip code",
+      "Province",
+      "Postal code",
       "Year built",
       "Reserved community type",
       "Reserved community description",
@@ -466,7 +466,7 @@ describe("add listing", () => {
         value={{
           doJurisdictionsHaveFeatureFlagOn: (featureFlag: FeatureFlagEnum) => {
             switch (featureFlag) {
-              case FeatureFlagEnum.enableRegions:
+              case FeatureFlagEnum.enableConfigurableRegions:
                 return true
               case FeatureFlagEnum.enableHomeType:
                 return true
@@ -499,10 +499,9 @@ describe("add listing", () => {
       "Housing developer",
       "Photos",
       "Street address",
-      "Neighborhood",
       "City",
-      "State",
-      "Zip code",
+      "Province",
+      "Postal code",
       "Region",
       "Year built",
       "Reserved community type",

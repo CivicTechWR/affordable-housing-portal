@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
-import GeocodeService, {
-  GeocodeService as GeocodeServiceType,
-} from "@mapbox/mapbox-sdk/services/geocoding"
-import { t, Field, Select, FieldGroup, GridCell } from "@bloom-housing/ui-components"
+import { t, Field, Select, FieldGroup } from "@bloom-housing/ui-components"
 import { FieldValue, Grid } from "@bloom-housing/ui-seeds"
-import { stateKeys, Map, LatitudeLongitude } from "@bloom-housing/shared-helpers"
-import {
-  EnumListingListingType,
-  RegionEnum,
-} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import { stateKeys, Map, LatitudeLongitude, forwardGeocode } from "@bloom-housing/shared-helpers"
+import { EnumListingListingType } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import { FormListing } from "../../../../lib/listings/formTypes"
 import {
   defaultFieldProps,
@@ -19,27 +13,13 @@ import {
   getAddressErrorMessage,
   getLabel,
 } from "../../../../lib/helpers"
-import { neighborhoodRegions } from "../../../../lib/listings/Neighborhoods"
 import SectionWithGrid from "../../../shared/SectionWithGrid"
 import styles from "../ListingForm.module.scss"
-
-interface MapBoxFeature {
-  center: number[] // Index 0: longitude, Index 1: latitude
-}
-
-interface MapboxApiResponseBody {
-  features: MapBoxFeature[]
-}
-
-interface MapboxApiResponse {
-  body: MapboxApiResponseBody
-}
 
 type BuildingDetailsProps = {
   customMapPositionChosen?: boolean
   enableConfigurableRegions?: boolean
   enableNonRegulatedListings?: boolean
-  enableRegions?: boolean
   latLong?: LatitudeLongitude
   listing?: FormListing
   regions?: string[]
@@ -48,10 +28,23 @@ type BuildingDetailsProps = {
   setLatLong?: (latLong: LatitudeLongitude) => void
 }
 
+const WATERLOO_ON_COORDINATES: LatitudeLongitude = {
+  latitude: 43.4701994,
+  longitude: -80.5452429,
+}
+
+const hasValidCoordinates = (coordinates?: LatitudeLongitude) => {
+  return (
+    typeof coordinates?.latitude === "number" &&
+    Number.isFinite(coordinates.latitude) &&
+    typeof coordinates?.longitude === "number" &&
+    Number.isFinite(coordinates.longitude)
+  )
+}
+
 const BuildingDetails = ({
   customMapPositionChosen,
   enableNonRegulatedListings,
-  enableRegions,
   enableConfigurableRegions,
   latLong,
   listing,
@@ -61,11 +54,10 @@ const BuildingDetails = ({
   setLatLong,
 }: BuildingDetailsProps) => {
   const formMethods = useFormContext()
+  const [geocodingError, setGeocodingError] = useState(false)
 
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { register, watch, control, getValues, setValue, errors, clearErrors } = formMethods
-
-  const [geocodingClient, setGeocodingClient] = useState<GeocodeServiceType>()
+  const { register, control, getValues, setValue, errors, clearErrors } = formMethods
 
   interface BuildingAddress {
     city: string
@@ -95,52 +87,38 @@ const BuildingDetails = ({
       buildingAddress?.state &&
       buildingAddress?.street &&
       buildingAddress?.zipCode &&
-      buildingAddress?.zipCode.length >= 5
+      buildingAddress?.zipCode.length >= 3
     )
   }
 
-  useEffect(() => {
-    if (process.env.mapBoxToken || process.env.MAPBOX_TOKEN) {
-      try {
-        setGeocodingClient(
-          GeocodeService({
-            accessToken: process.env.mapBoxToken || process.env.MAPBOX_TOKEN,
-          })
-        )
-      } catch (err) {
-        console.warn("Could not initialize Mapbox GeocodeService:", err)
-      }
-    }
-  }, [])
-
-  const getNewLatLong = () => {
+  const getNewLatLong = async () => {
     if (
       buildingAddress?.city &&
       buildingAddress?.state &&
       buildingAddress?.street &&
-      buildingAddress?.zipCode &&
-      geocodingClient
+      buildingAddress?.zipCode
     ) {
-      geocodingClient
-        .forwardGeocode({
-          query: `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}`,
-          limit: 1,
+      try {
+        const coordinates = await forwardGeocode(
+          `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state}, ${buildingAddress.zipCode}, Canada`
+        )
+        setLatLong?.(coordinates)
+        setGeocodingError(false)
+      } catch (err) {
+        console.warn("Geocoding failed for building address:", err)
+        setLatLong?.({
+          latitude: null,
+          longitude: null,
         })
-        .send()
-        .then((response: MapboxApiResponse) => {
-          setLatLong({
-            latitude: response.body.features[0].center[1],
-            longitude: response.body.features[0].center[0],
-          })
-        })
-        .catch((err) => console.error(`Error calling Mapbox API: ${err}`))
+        setGeocodingError(true)
+      }
     }
   }
   useEffect(() => {
     let timeout
     if (!customMapPositionChosen || mapPinPosition === "automatic") {
       timeout = setTimeout(() => {
-        getNewLatLong()
+        void getNewLatLong()
       }, 1000)
     }
     return () => {
@@ -156,25 +134,16 @@ const BuildingDetails = ({
 
   useEffect(() => {
     if (mapPinPosition === "automatic") {
-      getNewLatLong()
+      void getNewLatLong()
       setCustomMapPositionChosen(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapPinPosition])
 
-  const { neighborhood, region, configurableRegion } = watch([
-    "neighborhood",
-    "region",
-    "configurableRegion",
-  ])
-
-  useEffect(() => {
-    const matchingConfig = neighborhoodRegions.find((entry) => entry.name == neighborhood)
-    if (matchingConfig && matchingConfig.region !== region) {
-      setValue("region", matchingConfig.region)
-    }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [neighborhood, setValue])
+  const configurableRegion = useWatch({
+    control,
+    name: "configurableRegion",
+  })
 
   useEffect(() => {
     if (regions && listing?.configurableRegion && configurableRegion === "") {
@@ -195,7 +164,9 @@ const BuildingDetails = ({
     )
   }
 
-  const eitherRegionEnabled = enableRegions || enableConfigurableRegions
+  const eitherRegionEnabled = enableConfigurableRegions
+  const mapPreviewCoordinates =
+    mapPinPosition === "custom" && !hasValidCoordinates(latLong) ? WATERLOO_ON_COORDINATES : latLong
 
   return (
     <>
@@ -228,39 +199,6 @@ const BuildingDetails = ({
               register={register}
             />
           </Grid.Cell>
-          <GridCell>
-            {enableRegions ? (
-              <Select
-                controlClassName="control"
-                register={register}
-                options={[
-                  { value: "", label: t("listings.sections.neighborhoodPlaceholder") },
-                  ...neighborhoodRegions.map((entry) => ({
-                    value: entry.name,
-                    label: entry.name,
-                  })),
-                ]}
-                {...defaultFieldProps(
-                  "neighborhood",
-                  t("t.neighborhood"),
-                  requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            ) : (
-              <Field
-                register={register}
-                {...defaultFieldProps(
-                  "neighborhood",
-                  t("t.neighborhood"),
-                  requiredFields,
-                  errors,
-                  clearErrors
-                )}
-              />
-            )}
-          </GridCell>
         </Grid.Row>
         <Grid.Row columns={6}>
           <Grid.Cell className={"seeds-grid-span-2"}>
@@ -327,20 +265,6 @@ const BuildingDetails = ({
             />
           </Grid.Cell>
           <Grid.Cell className="seeds-grid-span-2">
-            {enableRegions && (
-              <Select
-                register={register}
-                controlClassName="control"
-                options={[
-                  { value: "", label: t("listings.sections.regionPlaceholder") },
-                  ...Object.keys(RegionEnum).map((entry) => ({
-                    value: entry,
-                    label: entry.toString().replace("_", " "),
-                  })),
-                ]}
-                {...defaultFieldProps("region", t("t.region"), requiredFields, errors, clearErrors)}
-              />
-            )}
             {enableConfigurableRegions && (
               <Select
                 register={register}
@@ -400,20 +324,36 @@ const BuildingDetails = ({
           <Grid.Cell className="seeds-grid-span-2">
             <FieldValue label={t("listings.mapPreview")} className={styles["custom-label"]}>
               {displayMapPreview() ? (
-                <Map
-                  listingName={listing?.name}
-                  address={{
-                    city: buildingAddress.city,
-                    state: buildingAddress.state,
-                    street: buildingAddress.street,
-                    zipCode: buildingAddress.zipCode,
-                    latitude: latLong.latitude,
-                    longitude: latLong.longitude,
-                  }}
-                  enableCustomPinPositioning={getValues("mapPinPosition") === "custom"}
-                  setCustomMapPositionChosen={setCustomMapPositionChosen}
-                  setLatLong={setLatLong}
-                />
+                <>
+                  {geocodingError && mapPinPosition !== "custom" ? (
+                    <div
+                      className={"w-full p-3 flex items-center justify-center"}
+                      style={{
+                        height: "400px",
+                        backgroundColor: "#fef3cd",
+                        border: "1px solid #ffc107",
+                        color: "#856404",
+                      }}
+                    >
+                      {t("listings.mapPreviewGeocodingError")}
+                    </div>
+                  ) : (
+                    <Map
+                      listingName={listing?.name}
+                      address={{
+                        city: buildingAddress.city,
+                        state: buildingAddress.state,
+                        street: buildingAddress.street,
+                        zipCode: buildingAddress.zipCode,
+                        latitude: mapPreviewCoordinates?.latitude,
+                        longitude: mapPreviewCoordinates?.longitude,
+                      }}
+                      enableCustomPinPositioning={mapPinPosition === "custom"}
+                      setCustomMapPositionChosen={setCustomMapPositionChosen}
+                      setLatLong={setLatLong}
+                    />
+                  )}
+                </>
               ) : (
                 <div
                   className={"w-full bg-gray-400 p-3 flex items-center justify-center"}

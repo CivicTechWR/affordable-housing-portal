@@ -38,7 +38,7 @@ This monorepo contains multiple user-facing applications and backend services. T
 
 - [Node.js](https://nodejs.org/) (see `.node-version` for local version; CI uses Node 22)
 - [Yarn](https://yarnpkg.com/) — install via Homebrew: `brew install yarn`
-- [PostgreSQL](https://www.postgresql.org/) (or use Docker; see [docker.md](./docker.md))
+- [PostgreSQL](https://www.postgresql.org/)
 
 ### Install Dependencies
 
@@ -59,6 +59,14 @@ Copy `.env.template` to `.env` in each of these directories:
 - `api`
 
 Some keys are secret and available internally — ask the team for access. The template files include default values and descriptions.
+
+#### Secrets / Infisical
+
+We use Infisical to manage and seed third-party API credentials and other secrets for local development. To retrieve secrets locally:
+
+- Install the Infisical CLI and authenticate with the team account (for example, run `infisical login`).
+- If you do not yet have access to the Infisical workspace, ping the appropriate Slack channel (e.g. `#project-accessible-housing-portal`) to request access and the credentials/invite. Once invited, re-run the login and fetch steps.
+
 
 ### Run Locally
 
@@ -85,10 +93,6 @@ A number of default users are seeded for local development. The most basic is:
 - **Password:** `abcdef`
 
 This account works on both the public and partners sites. See the [seed file](./api/prisma/seed-staging.ts) for other default users and their permissions.
-
-### Running Locally in Docker
-
-See [docker.md](./docker.md) for Docker-based setup instructions.
 
 ### Recommended VSCode Extensions
 
@@ -149,10 +153,7 @@ On pull requests to `main`, the following workflows run (some have path filters)
 9. Partners Cypress (LA)
 10. Lint
 11. CodeQL
-12. Docker Compose CI
-13. gitleaks
-
-`Docker Image Build` runs on pushes to `main` and can also be triggered manually.
+12. gitleaks
 
 Configuration for all workflows can be found in the [`.github/workflows`](./.github/workflows) directory.
 

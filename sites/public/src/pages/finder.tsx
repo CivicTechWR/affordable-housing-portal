@@ -27,6 +27,7 @@ export default function Finder(props: FinderProps) {
         activeFeatureFlags={activeFeatureFlags}
         multiselectData={props.multiselectData}
         listingFeaturesConfiguration={props.jurisdiction?.listingFeaturesConfiguration}
+        regions={props.jurisdiction?.regions}
       />
     </Layout>
   )
@@ -41,7 +42,7 @@ export async function getStaticProps(context: { req: any; query: any }) {
     FeatureFlagEnum.swapCommunityTypeWithPrograms
   )
     ? await fetchMultiselectProgramData(context.req, jurisdiction?.id)
-    : null
+    : []
 
   return {
     props: {

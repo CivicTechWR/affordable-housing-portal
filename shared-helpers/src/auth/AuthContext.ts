@@ -56,7 +56,7 @@ type ContextProps = {
   unitPriorityService: UnitAccessibilityPriorityTypesService
   mapLayersService: MapLayersService
   lotteryService: LotteryService
-  loadProfile: (redirect?: string) => void
+  loadProfile: (redirect?: string) => Promise<void>
   login: (
     email: string,
     password: string,

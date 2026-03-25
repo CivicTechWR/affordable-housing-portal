@@ -10,14 +10,14 @@ describe("<SubmitApplication>", () => {
       <SubmitApplication
         applicationMailingAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Mailing Address Street",
           zipCode: "90210",
         }}
         applicationDropOffAddress={{
           city: "City",
-          state: "State",
+          state: "Province",
           street2: "Street 2",
           street: "Drop Off Address Street",
           zipCode: "90210",

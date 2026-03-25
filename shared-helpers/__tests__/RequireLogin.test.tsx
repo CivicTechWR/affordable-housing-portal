@@ -11,9 +11,14 @@ const mockRouter: GenericRouter = {
   pathname: "",
   asPath: "",
   back: jest.fn(),
-  push(url: string) {
-    this.pathname = url
-    this.asPath = url
+  push(url: string | { pathname: string; query?: Record<string, string> }) {
+    if (typeof url === "string") {
+      this.pathname = url
+      this.asPath = url
+    } else {
+      this.pathname = url.pathname
+      this.asPath = url.pathname
+    }
   },
 }
 

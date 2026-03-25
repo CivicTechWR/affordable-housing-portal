@@ -9,6 +9,7 @@ type AuthGuardProps = {
 const ListingGuard = ({ children }: AuthGuardProps) => {
   const router = useRouter()
   const listingId = router.query.id as string
+  const isAddListingRoute = router.pathname === "/listings/add"
 
   const { profile } = useContext(AuthContext)
 
@@ -19,6 +20,7 @@ const ListingGuard = ({ children }: AuthGuardProps) => {
     profile?.userRoles?.isSupportAdmin ||
     profile?.userRoles?.isJurisdictionalAdmin ||
     profile?.userRoles?.isLimitedJurisdictionalAdmin ||
+    (profile?.userRoles?.isPartner && isAddListingRoute) ||
     leasingAgentInListingsIds?.includes(listingId)
 
   if (hasPrivileges) {

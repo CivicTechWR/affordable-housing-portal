@@ -52,6 +52,8 @@ Cypress.Commands.add("checkErrorMessages", (command) => {
 })
 
 Cypress.Commands.add("beginApplicationRejectAutofill", (listingName) => {
+  cy.visit("/sign-in")
+  cy.signIn()
   cy.visit("/listings")
   if (Cypress.env("showSeedsDesign")) {
     cy.getByID("listing-seeds-link").contains(listingName).parent().click()
@@ -59,10 +61,6 @@ Cypress.Commands.add("beginApplicationRejectAutofill", (listingName) => {
     cy.get(".is-card-link").contains(listingName).parent().click()
   }
   cy.getByID("listing-view-apply-button").eq(1).click()
-  cy.getByID("app-choose-language-sign-in-button").click()
-  cy.get("[data-testid=sign-in-email-field]").type("admin@example.com")
-  cy.get("[data-testid=sign-in-password-field]").type("abcdef")
-  cy.getByID("sign-in-button").click()
   cy.getByID("app-choose-language-button").eq(0).click()
   cy.getByID("app-next-step-button").click()
   cy.getByID("application-initial-page").then(() => {

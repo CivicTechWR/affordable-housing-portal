@@ -4,100 +4,100 @@ import { randomInt } from 'node:crypto';
 export const addressFactory =
   (): Prisma.AddressCreateWithoutBuildingAddressInput =>
     [
-      yellowstoneAddress,
-      yosemiteAddress,
-      rockyMountainAddress,
-      moabAddress,
-      acadiaAddress,
-      grandCanyonAddress,
-      glacierAddress,
-      carlsbadAddress,
+      banffAddress,
+      whistlerAddress,
+      ottawaAddress,
+      halifaxAddress,
+      charlottetownAddress,
+      niagaraAddress,
+      jasperAddress,
+      quebecCityAddress,
     ][randomInt(8)];
 
-export const yellowstoneAddress = {
-  placeName: 'Yellowstone National Park',
-  city: 'Yellowstone National Park',
-  county: 'Teton County',
-  state: 'WY',
-  street: '3200 Old Faithful Inn Rd',
-  zipCode: '82190',
-  latitude: 44.45992857666182,
-  longitude: -110.8310921148768,
+export const banffAddress = {
+  placeName: 'Banff National Park',
+  city: 'Banff',
+  county: 'Division No. 15',
+  state: 'AB',
+  street: '224 Banff Ave',
+  zipCode: 'T1L 1K2',
+  latitude: 51.1784,
+  longitude: -115.5708,
 };
 
-export const yosemiteAddress = {
-  placeName: 'Yosemite National Park',
-  city: 'Yosemite Valley',
-  county: 'Mariposa County',
-  state: 'CA',
-  street: '9035 Village Dr',
-  zipCode: '95389',
-  latitude: 37.7487501,
-  longitude: -119.5920354,
+export const whistlerAddress = {
+  placeName: 'Whistler Village',
+  city: 'Whistler',
+  county: 'Squamish-Lillooet',
+  state: 'BC',
+  street: '4293 Mountain Square',
+  zipCode: 'V8E 1B8',
+  latitude: 50.1163,
+  longitude: -122.9574,
 };
 
-export const rockyMountainAddress = {
-  placeName: 'Rocky Mountain National Park',
-  city: 'Estes Park',
-  county: 'Larimer County',
-  state: 'CO',
-  street: '1000 US-36',
-  zipCode: '80517',
-  latitude: 40.3800984,
-  longitude: -105.5709864,
+export const ottawaAddress = {
+  placeName: 'Parliament Hill',
+  city: 'Ottawa',
+  county: 'Ottawa',
+  state: 'ON',
+  street: '1 Wellington St',
+  zipCode: 'K1A 0A9',
+  latitude: 45.4236,
+  longitude: -75.7009,
 };
 
-export const moabAddress = {
-  placeName: 'Arches National Park',
-  city: 'Moab',
-  county: 'Grand County',
-  state: 'UT',
-  street: '25 E Center St',
-  zipCode: '84532',
-  latitude: 38.6190099,
-  longitude: -109.6969108,
+export const halifaxAddress = {
+  placeName: 'Halifax Waterfront',
+  city: 'Halifax',
+  county: 'Halifax',
+  state: 'NS',
+  street: '1675 Lower Water St',
+  zipCode: 'B3J 1S3',
+  latitude: 44.6488,
+  longitude: -63.5752,
 };
 
-export const acadiaAddress = {
-  placeName: 'Acadia National Park',
-  city: 'Bar Harbor',
-  county: 'Hancock County',
-  state: 'ME',
-  street: '25 Visitor Center Rd',
-  zipCode: '04609',
-  latitude: 44.4089658,
-  longitude: -68.3173111,
+export const charlottetownAddress = {
+  placeName: 'Province House',
+  city: 'Charlottetown',
+  county: 'Queens',
+  state: 'PE',
+  street: '165 Richmond St',
+  zipCode: 'C1A 1J1',
+  latitude: 46.2352,
+  longitude: -63.1264,
 };
 
-export const grandCanyonAddress = {
-  placeName: 'Grand Canyon National Park',
-  city: 'Grand Canyon Village',
-  county: 'Coconino County',
-  state: 'AZ',
-  street: 'S Entrance Rd',
-  zipCode: '86023',
-  latitude: 36.016779,
-  longitude: -112.15888,
+export const niagaraAddress = {
+  placeName: 'Niagara Falls',
+  city: 'Niagara Falls',
+  county: 'Niagara',
+  state: 'ON',
+  street: '6650 Niagara Pkwy',
+  zipCode: 'L2E 6X8',
+  latitude: 43.0896,
+  longitude: -79.0849,
 };
 
-export const glacierAddress = {
-  placeName: 'Glacier National Park',
-  city: 'West Glacier',
-  county: 'Glacier County',
-  state: 'MT',
-  street: '64 Grinnell Dr',
-  zipCode: '59936',
-  latitude: 53.7487218,
-  longitude: -142.0251025,
+export const jasperAddress = {
+  placeName: 'Jasper National Park',
+  city: 'Jasper',
+  county: 'Division No. 13',
+  state: 'AB',
+  street: '500 Connaught Dr',
+  zipCode: 'T0E 1E0',
+  latitude: 52.8737,
+  longitude: -117.8054,
 };
 
-export const carlsbadAddress = {
-  placeName: 'Carlsbad Caverns National Park',
-  city: 'Carlsbad',
-  county: 'Eddy County',
-  state: 'NM',
-  street: '727 Carlsbad Cavern Hwy',
-  zipCode: '88220',
-  latitude: 32.1754674,
-  longitude: -104.4491038,
+export const quebecCityAddress = {
+  placeName: 'Old Quebec',
+  city: 'Quebec City',
+  county: 'Capitale-Nationale',
+  state: 'QC',
+  street: '1 Rue des Carrières',
+  zipCode: 'G1R 4P5',
+  latitude: 46.8119,
+  longitude: -71.2057,
 };

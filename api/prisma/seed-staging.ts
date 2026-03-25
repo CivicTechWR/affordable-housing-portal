@@ -147,7 +147,6 @@ export const stagingSeed = async (
         FeatureFlagEnum.enableNonRegulatedListings,
         FeatureFlagEnum.enablePartnerDemographics,
         FeatureFlagEnum.enablePartnerSettings,
-        FeatureFlagEnum.enableRegions,
         FeatureFlagEnum.enableResources,
         FeatureFlagEnum.enableSection8Question,
         FeatureFlagEnum.enableSingleUseCode,
@@ -1302,40 +1301,42 @@ export const stagingSeed = async (
     ],
   ];
 
-  listingsToCreate.map(async (params, index) => {
-    console.log(`Adding listing - ${params[2].listing?.name}`);
-    const listingParams = params[2];
-    const listing = await listingFactory(params[0], params[1], {
-      amiChart: amiChart,
-      numberOfUnits: (!listingParams.unitGroups && index) || 0,
-      listing: listingParams.listing,
-      units: listingParams.units,
-      unitGroups: listingParams.unitGroups,
-      multiselectQuestions: listingParams.multiselectQuestions,
-      applications: listingParams.applications,
-      afsLastRunSetInPast: true,
-      userAccounts: listingParams.userAccounts,
-      optionalFeatures: listingParams.optionalFeatures,
-      propertyId: listingParams.propertyId,
-    });
-    const savedListing = await prismaClient.listings.create({
-      data: listing,
-    });
-    await prismaClient.userAccounts.create({
-      data: await userFactory({
-        roles: {
-          isAdmin: false,
-          isPartner: true,
-          isJurisdictionalAdmin: false,
-        },
-        email: `partner-user-${savedListing.name
-          .toLowerCase()
-          .replaceAll(' ', '-')}@example.com`,
-        confirmedAt: new Date(),
-        jurisdictionIds: [savedListing.jurisdictionId],
-        acceptedTerms: true,
-        listings: [savedListing.id],
-      }),
-    });
-  });
+  await Promise.all(
+    listingsToCreate.map(async (params, index) => {
+      console.log(`Adding listing - ${params[2].listing?.name}`);
+      const listingParams = params[2];
+      const listing = await listingFactory(params[0], params[1], {
+        amiChart: amiChart,
+        numberOfUnits: (!listingParams.unitGroups && index) || 0,
+        listing: listingParams.listing,
+        units: listingParams.units,
+        unitGroups: listingParams.unitGroups,
+        multiselectQuestions: listingParams.multiselectQuestions,
+        applications: listingParams.applications,
+        afsLastRunSetInPast: true,
+        userAccounts: listingParams.userAccounts,
+        optionalFeatures: listingParams.optionalFeatures,
+        propertyId: listingParams.propertyId,
+      });
+      const savedListing = await prismaClient.listings.create({
+        data: listing,
+      });
+      await prismaClient.userAccounts.create({
+        data: await userFactory({
+          roles: {
+            isAdmin: false,
+            isPartner: true,
+            isJurisdictionalAdmin: false,
+          },
+          email: `partner-user-${savedListing.name
+            .toLowerCase()
+            .replaceAll(' ', '-')}@example.com`,
+          confirmedAt: new Date(),
+          jurisdictionIds: [savedListing.jurisdictionId],
+          acceptedTerms: true,
+          listings: [savedListing.id],
+        }),
+      });
+    }),
+  );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react"
-import "mapbox-gl/dist/mapbox-gl.css"
-import { Map as MapGL, Marker, MarkerDragEvent } from "@vis.gl/react-mapbox"
+import "maplibre-gl/dist/maplibre-gl.css"
+import { Map as MapGL, Marker, MarkerDragEvent } from "@vis.gl/react-maplibre"
 import { Heading } from "@bloom-housing/ui-seeds"
 import { MultiLineAddress } from "./MultiLineAddress"
 import { useIntersect } from "../../.."
@@ -106,12 +106,12 @@ const Map = (props: MapProps) => {
         )}
         <MultiLineAddress address={props.address} />
       </div>
-      {(process.env.mapBoxToken || process.env.MAPBOX_TOKEN) && hasIntersected && (
+      {hasIntersected && (
         <MapGL
-          mapboxAccessToken={process.env.mapBoxToken || process.env.MAPBOX_TOKEN}
-          mapStyle="mapbox://styles/mapbox/streets-v11"
+          mapStyle="https://tiles.openfreemap.org/styles/liberty"
           style={{ height: "400px" }}
-          scrollZoom={false}
+          scrollZoom={true}
+          cooperativeGestures={true}
           initialViewState={viewport}
         >
           {marker.latitude &&

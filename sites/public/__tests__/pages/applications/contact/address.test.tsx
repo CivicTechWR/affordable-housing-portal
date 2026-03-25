@@ -65,8 +65,8 @@ describe("applications pages", () => {
       expect(screen.getByRole("textbox", { name: /street address/i })).toBeInTheDocument()
       expect(screen.getByRole("textbox", { name: /apt or unit #/i })).toBeInTheDocument()
       expect(screen.getByRole("textbox", { name: /city name/i })).toBeInTheDocument()
-      expect(screen.getByRole("combobox", { name: /state/i })).toBeInTheDocument()
-      expect(screen.getByRole("textbox", { name: /zip code/i })).toBeInTheDocument()
+      expect(screen.getByRole("combobox", { name: /province/i })).toBeInTheDocument()
+      expect(screen.getByRole("textbox", { name: /postal code/i })).toBeInTheDocument()
       expect(
         screen.getByRole("checkbox", { name: /send my mail to a different address/i })
       ).toBeInTheDocument()
@@ -184,8 +184,8 @@ describe("applications pages", () => {
       expect(screen.getByRole("textbox", { name: /street address/i })).toBeInTheDocument()
       expect(screen.getByRole("textbox", { name: /apt or unit #/i })).toBeInTheDocument()
       expect(screen.getByRole("textbox", { name: /city name/i })).toBeInTheDocument()
-      expect(screen.getByRole("combobox", { name: /state/i })).toBeInTheDocument()
-      expect(screen.getByRole("textbox", { name: /zip code/i })).toBeInTheDocument()
+      expect(screen.getByRole("combobox", { name: /province/i })).toBeInTheDocument()
+      expect(screen.getByRole("textbox", { name: /postal code/i })).toBeInTheDocument()
       expect(
         screen.getByRole("checkbox", { name: /send my mail to a different address/i })
       ).toBeInTheDocument()

@@ -1,6 +1,7 @@
+import { randomUUID } from 'crypto';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { randomBoolean } from './boolean-generator';
-import { randomAdjective, randomName } from './word-generator';
+import { randomAdjective } from './word-generator';
 import { featureFlagMap } from '../../src/enums/feature-flags/feature-flags-enum';
 
 export const createAllFeatureFlags = async (prismaClient: PrismaClient) => {
@@ -34,7 +35,7 @@ export const attachJurisdictionToFlags = async (
 };
 
 export const featureFlagFactory = (
-  name = randomName(),
+  name = `feature-flag-${randomUUID()}`,
   active = randomBoolean(),
   description = `${randomAdjective()} feature flag`,
   jurisdictionIds?: string[],

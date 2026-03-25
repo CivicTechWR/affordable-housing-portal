@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useMemo } from "react"
-import { useRouter } from "next/router"
 import Markdown from "markdown-to-jsx"
 import { t, ApplicationTimeline } from "@bloom-housing/ui-components"
 import { CardSection } from "@bloom-housing/ui-seeds/src/blocks/Card"
@@ -14,17 +13,15 @@ import {
   FeatureFlagEnum,
   ReviewOrderTypeEnum,
 } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
-import { Button, Heading, Link } from "@bloom-housing/ui-seeds"
+import { Heading, Link } from "@bloom-housing/ui-seeds"
 import FormsLayout from "../../../layouts/forms"
-import styles from "../../../layouts/application-form.module.scss"
 import { AppSubmissionContext } from "../../../lib/applications/AppSubmissionContext"
 import { UserStatus } from "../../../lib/constants"
 import { isFeatureFlagOn, isUnitGroupAppBase, isUnitGroupAppWaitlist } from "../../../lib/helpers"
 
 const ApplicationConfirmation = () => {
   const { application, listing, conductor } = useContext(AppSubmissionContext)
-  const { initialStateLoaded, profile } = useContext(AuthContext)
-  const router = useRouter()
+  const { profile } = useContext(AuthContext)
 
   const disableListingPreferences = isFeatureFlagOn(
     conductor.config,
@@ -74,7 +71,7 @@ const ApplicationConfirmation = () => {
       default:
         return { text: "" }
     }
-  }, [listing, conductor.config])
+  }, [listing, conductor.config, disableListingPreferences])
 
   useEffect(() => {
     pushGtmEvent<PageView>({
@@ -132,33 +129,6 @@ const ApplicationConfirmation = () => {
               </Markdown>
             </div>
           </CardSection>
-
-          {initialStateLoaded && !profile && (
-            <CardSection divider={"flush"} className={"border-none"}>
-              <div className="markdown markdown-informational">
-                <Markdown options={{ disableParsingRawHTML: true }}>
-                  {t("application.review.confirmation.createAccount")}
-                </Markdown>
-              </div>
-            </CardSection>
-          )}
-
-          {initialStateLoaded && !profile && (
-            <CardSection
-              className={`${styles["application-form-action-footer"]} border-none`}
-              divider={"flush"}
-            >
-              <Button
-                variant={"primary"}
-                onClick={() => {
-                  void router.push("/create-account")
-                }}
-                id={"app-confirmation-create-account"}
-              >
-                {t("account.createAccount")}
-              </Button>
-            </CardSection>
-          )}
 
           <CardSection divider={"flush"}>
             <Link href="/listings">{t("application.review.confirmation.browseMore")}</Link>

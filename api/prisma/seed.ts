@@ -36,7 +36,7 @@ async function main() {
     case 'staging':
       // Staging setup should have realistic looking data with a preset list of listings
       // along with all of the required tables (ami, users, etc)
-      stagingSeed(
+      await stagingSeed(
         prisma,
         jurisdictionName as string,
         publicSiteBaseURL,
@@ -47,7 +47,7 @@ async function main() {
     default:
       // Development is less realistic data, but can be more experimental and also should
       // be partially randomized so we cover all bases
-      devSeeding(prisma, jurisdictionName as string);
+      await devSeeding(prisma, jurisdictionName as string);
       break;
   }
 }

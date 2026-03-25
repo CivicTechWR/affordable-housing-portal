@@ -2,7 +2,7 @@
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) ![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white) ![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e) ![Testing-Library](https://img.shields.io/badge/-TestingLibrary-%23E33332?style=for-the-badge&logo=testing-library&logoColor=white) ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)
 
-This is the applicant-facing portal available to the general public. It displays listings and allows users to apply for those listings. Users are also able to create accounts they can use to view submitted applications. See the [root README](../../README.md) for a full project overview.
+This is the applicant-facing portal available to the general public. It displays listings and allows users to apply for those listings. Users can also sign in to view submitted applications tied to their existing accounts. See the [root README](../../README.md) for a full project overview.
 
 ## Getting Started
 
@@ -13,6 +13,13 @@ If you don't have yarn installed, you can install homebrew with [these instructi
 - `yarn install` at root to install dependencies
 - From within `sites/public` copy the `.env.template` to `.env` and edit variables appropriate to your local environment - some keys are secret and are internally available - the template file includes default values and descriptions of each variable
 - `yarn dev:all` at root will start up the backend at port 3100 and the public app at port 3000
+
+### Secrets / Infisical
+
+We use Infisical to manage and seed third-party API credentials and other secrets for this service. These secret values are not committed to the repository.
+
+- Install the Infisical CLI and authenticate with the team account (for example, run `infisical login`).
+- If you do not yet have access to the Infisical workspace, ping the appropriate Slack channel (e.g. `#project-accessible-housing-portal`) to request access and the credentials/invite. Once invited, re-run the login and fetch steps.
 
 ## Recommended Extension
 
