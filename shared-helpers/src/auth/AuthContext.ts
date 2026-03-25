@@ -417,7 +417,7 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
       ]
 
       // Check featureFlagOverrides first
-      const flagOverride = featureFlagOverrides.find((flag) => flag.name == featureFlag)
+      const flagOverride = featureFlagOverrides.find((flag) => flag.name === featureFlag)
       if (flagOverride !== undefined) {
         return flagOverride.active
       }
