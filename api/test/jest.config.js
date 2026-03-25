@@ -3,6 +3,7 @@ module.exports = {
   rootDir: '../',
   testEnvironment: 'node',
   testRegex: '\\.spec.ts$',
+  setupFiles: ['<rootDir>/test/jest.setup-buffer.ts'],
   transform: {
     '^.+\\.(t|j)s$': [
       'ts-jest',

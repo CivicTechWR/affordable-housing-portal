@@ -1,6 +1,5 @@
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
-import { ResponseError } from '@sendgrid/helpers/classes';
-import { MailDataRequired } from '@sendgrid/helpers/classes/mail';
+import { ConfigService } from '@nestjs/config';
 import fs from 'fs';
 import Handlebars from 'handlebars';
 import Polyglot from 'node-polyglot';
@@ -10,8 +9,8 @@ import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import advanced from 'dayjs/plugin/advancedFormat';
 import { LanguagesEnum, ReviewOrderTypeEnum } from '@prisma/client';
+import { ErrorResponse, Resend } from 'resend';
 import { JurisdictionService } from './jurisdiction.service';
-import { SendGridService } from './sendgrid.service';
 import { TranslationService } from './translation.service';
 import { Application } from '../dtos/applications/application.dto';
 import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
@@ -19,18 +18,19 @@ import { Listing } from '../dtos/listings/listing.dto';
 import { IdDTO } from '../dtos/shared/id.dto';
 import { User } from '../dtos/users/user.dto';
 import { FeatureFlagEnum } from '../enums/feature-flags/feature-flags-enum';
+import {
+  BatchHtmlEmailPayload,
+  BatchEmailResponse,
+  EmailAttachmentData,
+  HtmlEmailPayload,
+  SingleEmailResponse,
+} from '../types/email';
 import { doJurisdictionHaveFeatureFlagSet } from '../utilities/feature-flag-utilities';
 import { getPublicEmailURL } from '../utilities/get-public-email-url';
 import type { ApplicationStatusChangeItem } from '../utilities/applicationStatusChanges';
 dayjs.extend(utc);
 dayjs.extend(tz);
 dayjs.extend(advanced);
-
-type EmailAttachmentData = {
-  data: string;
-  name: string;
-  type: string;
-};
 
 type listingInfo = {
   id: string;
@@ -41,14 +41,17 @@ type listingInfo = {
 @Injectable()
 export class EmailService {
   polyglot: Polyglot;
+  private readonly resend: Resend;
+  private readonly resendRetryBaseDelayMs = 1000;
 
   constructor(
-    private readonly sendGrid: SendGridService,
+    configService: ConfigService,
     private readonly translationService: TranslationService,
     private readonly jurisdictionService: JurisdictionService,
     @Inject(Logger)
     private logger = new Logger(EmailService.name),
   ) {
+    this.resend = new Resend(configService.get<string>('EMAIL_API_KEY'));
     this.polyglot = new Polyglot({
       phrases: {},
     });
@@ -106,6 +109,18 @@ export class EmailService {
     return partials;
   }
 
+  /**
+   * Sends an email to one or more recipients. Array recipients are dispatched
+   * via the Resend batch API for fewer round-trips; attachments force a
+   * per-recipient fallback because the batch endpoint does not support them.
+   *
+   * @param to - A single email address or an array of addresses.
+   * @param from - The sender address (e.g. "App Name <no-reply@domain>").
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of retry attempts (default 3).
+   * @param attachment - Optional file attachment (forces per-recipient sends).
+   */
   private async send(
     to: string | string[],
     from: string,
@@ -114,40 +129,211 @@ export class EmailService {
     retry = 3,
     attachment?: EmailAttachmentData,
   ) {
-    const isMultipleRecipients = Array.isArray(to);
-    if (isMultipleRecipients && to.length === 0) return;
-    const emailParams: MailDataRequired = {
+    if (!Array.isArray(to)) {
+      await this.sendSingle(to, from, subject, body, retry, attachment);
+      return;
+    }
+
+    if (to.length === 0) return;
+
+    // If no attachments, we can use the batch API.
+    if (!attachment) {
+      await this.sendBatch(to, from, subject, body, retry);
+      return;
+    }
+
+    await Promise.all(
+      to.map((recipient) =>
+        this.sendSingle(recipient, from, subject, body, retry, attachment),
+      ),
+    );
+  }
+
+  /**
+   * Sends identical emails to multiple recipients via the Resend batch API.
+   * Automatically chunks into groups of 100 (Resend's per-request limit).
+   *
+   * @param to - Array of recipient email addresses.
+   * @param from - The sender address.
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of retry attempts (default 3).
+   */
+  private async sendBatch(
+    to: string[],
+    from: string,
+    subject: string,
+    body: string,
+    retry = 3,
+  ) {
+    const BATCH_LIMIT = 100;
+    for (let i = 0; i < to.length; i += BATCH_LIMIT) {
+      const chunk = to.slice(i, i + BATCH_LIMIT);
+      const payloads: BatchHtmlEmailPayload[] = chunk.map((recipient) => ({
+        to: recipient,
+        from,
+        subject,
+        html: body,
+      }));
+      await this.retrySendWithBackoff(chunk, retry, () =>
+        this.resend.batch.send(payloads),
+      );
+    }
+  }
+
+  /**
+   * Sends a single Resend email request and retries failed delivery attempts.
+   *
+   * @param to - The recipient email address.
+   * @param from - The sender address.
+   * @param subject - The email subject line.
+   * @param body - The rendered HTML body.
+   * @param retry - Number of retry attempts (default 3).
+   * @param attachment - Optional file attachment.
+   */
+  private async sendSingle(
+    to: string,
+    from: string,
+    subject: string,
+    body: string,
+    retry = 3,
+    attachment?: EmailAttachmentData,
+  ) {
+    // Build the base HTML payload expected by the Resend SDK.
+    const emailParams: HtmlEmailPayload = {
       to,
       from,
       subject,
       html: body,
     };
+
+    // Convert text attachments to a Buffer so binary-safe delivery matches the old transport.
     if (attachment) {
       emailParams.attachments = [
         {
-          content: Buffer.from(attachment.data).toString('base64'),
+          content: Buffer.from(attachment.data, 'utf8'),
           filename: attachment.name,
-          type: attachment.type,
-          disposition: 'attachment',
+          contentType: attachment.type,
         },
       ];
     }
-    const handleError = (error) => {
-      if (error instanceof ResponseError) {
-        const { response } = error;
-        const { body: errBody } = response;
-        console.error(
-          `Error sending email to: ${
-            isMultipleRecipients ? to.toString() : to
-          }! Error body:`,
-          errBody,
-        );
-        if (retry > 0) {
-          void this.send(to, from, subject, body, retry - 1);
+    await this.retrySendWithBackoff(to, retry, () =>
+      this.resend.emails.send(emailParams),
+    );
+  }
+
+  private async retrySendWithBackoff<
+    TResponse extends SingleEmailResponse | BatchEmailResponse,
+  >(
+    to: string | string[],
+    retry: number,
+    sendRequest: () => Promise<TResponse>,
+  ): Promise<TResponse | null> {
+    for (let attempt = 0; attempt <= retry; attempt++) {
+      const retriesRemaining = retry - attempt;
+
+      try {
+        const response = await sendRequest();
+
+        if (!response.error) return response;
+
+        this.logSendFailure(to, response.error, retriesRemaining);
+
+        if (
+          retriesRemaining === 0 ||
+          !this.shouldRetrySendFailure(response.error)
+        ) {
+          return null;
+        }
+      } catch (error) {
+        this.logSendFailure(to, error, retriesRemaining);
+
+        if (retriesRemaining === 0) {
+          return null;
         }
       }
-    };
-    await this.sendGrid.send(emailParams, isMultipleRecipients, handleError);
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.resendRetryBaseDelayMs * 2 ** attempt),
+      );
+    }
+
+    return null;
+  }
+
+  private shouldRetrySendFailure(error: ErrorResponse | Error | unknown) {
+    // Always retry on unknown errors.
+    if (!this.isResendErrorResponse(error) || error.statusCode === null) {
+      return true;
+    }
+
+    if (error.statusCode === 429) {
+      return true;
+    }
+
+    return error.statusCode < 400 || error.statusCode >= 500;
+  }
+
+  /**
+   * Logs a delivery failure with normalized recipient and provider error details.
+   *
+   * @param to - The recipient address(es) that failed.
+   * @param error - The Resend API error, thrown exception, or unknown value.
+   * @param retriesRemaining - How many retry attempts are left.
+   */
+  private logSendFailure(
+    to: string | string[],
+    error: ErrorResponse | Error | unknown,
+    retriesRemaining: number,
+  ) {
+    // Collapse array recipients into a readable log line.
+    const recipients = Array.isArray(to) ? to.join(', ') : to;
+
+    // Normalize the provider error into a single loggable string.
+    const errorMessage = this.getSendErrorMessage(error);
+
+    this.logger.error(
+      `Error sending email to ${recipients}. Retries remaining: ${retriesRemaining}. ${errorMessage}`,
+    );
+  }
+
+  /**
+   * Converts Resend and runtime errors into a consistent log message format.
+   *
+   * @param error - The Resend API error, thrown exception, or unknown value.
+   * @returns A human-readable error string suitable for logging.
+   */
+  private getSendErrorMessage(error: ErrorResponse | Error | unknown): string {
+    // Prefer structured provider metadata when Resend returns an API error object.
+    if (this.isResendErrorResponse(error)) {
+      return `${error.name}: ${error.message} (statusCode: ${
+        error.statusCode ?? 'unknown'
+      })`;
+    }
+
+    // Fall back to the native error message for thrown runtime errors.
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    // Keep logging resilient even for unexpected error shapes.
+    return 'Unknown email delivery error';
+  }
+
+  /**
+   * Detects whether an unknown value matches the Resend API error shape.
+   *
+   * @param error - The value to check.
+   * @returns `true` if the value has `message`, `name`, and `statusCode` properties.
+   */
+  private isResendErrorResponse(error: unknown): error is ErrorResponse {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      'name' in error &&
+      'statusCode' in error
+    );
   }
 
   // TODO: update this to be memoized based on jurisdiction and language

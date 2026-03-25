@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
+import { Logger } from '@nestjs/common';
 import {
   ApplicationStatusEnum,
   LanguagesEnum,
   ListingsStatusEnum,
   ReviewOrderTypeEnum,
 } from '@prisma/client';
-import { MailService } from '@sendgrid/mail';
+import { ErrorResponse } from 'resend';
 import { EmailService } from '../../../src/services/email.service';
-import { SendGridService } from '../../../src/services/sendgrid.service';
 import { TranslationService } from '../../../src/services/translation.service';
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { GoogleTranslateService } from '../../../src/services/google-translate.service';
@@ -17,11 +17,15 @@ import { banffAddress } from '../../../prisma/seed-helpers/address-factory';
 import { Application } from '../../../src/dtos/applications/application.dto';
 import { User } from '../../../src/dtos/users/user.dto';
 import { ApplicationCreate } from '../../../src/dtos/applications/application-create.dto';
-import { Logger } from '@nestjs/common';
 import { ApplicationStatusChangeItem } from 'src/utilities/applicationStatusChanges';
 import Listing from 'src/dtos/listings/listing.dto';
 
 let sendMock;
+let sendBatchMock;
+const loggerMock = {
+  error: jest.fn(),
+  log: jest.fn(),
+};
 const translationServiceMock = {
   getMergedTranslations: () => {
     return translationFactory().translations;
@@ -41,16 +45,12 @@ const jurisdictionServiceMock = {
 describe('Testing email service', () => {
   let service: EmailService;
   let module: TestingModule;
-  let sendGridService: SendGridService;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [ConfigModule],
       providers: [
         EmailService,
-        Logger,
-        SendGridService,
-        MailService,
         {
           provide: TranslationService,
           useValue: translationServiceMock,
@@ -59,6 +59,10 @@ describe('Testing email service', () => {
           provide: JurisdictionService,
           useValue: jurisdictionServiceMock,
         },
+        {
+          provide: Logger,
+          useValue: loggerMock,
+        },
         GoogleTranslateService,
       ],
     }).compile();
@@ -66,10 +70,20 @@ describe('Testing email service', () => {
 
   beforeEach(async () => {
     jest.useFakeTimers();
-    sendGridService = module.get<SendGridService>(SendGridService);
-    sendMock = jest.fn();
-    sendGridService.send = sendMock;
+    sendMock = jest
+      .fn()
+      .mockResolvedValue({ data: { id: 'email-id' }, error: null });
+    sendBatchMock = jest
+      .fn()
+      .mockResolvedValue({ data: [{ id: 'batch-email-id' }], error: null });
     service = await module.resolve(EmailService);
+    service['resend'].emails.send = sendMock;
+    service['resend'].batch.send = sendBatchMock;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   const user = {
@@ -82,7 +96,7 @@ describe('Testing email service', () => {
   it('testing welcome email', async () => {
     await service.welcome(
       'test',
-      user as unknown as User,
+      user,
       'http://localhost:3000',
       'http://localhost:3000/?token=',
     );
@@ -198,6 +212,7 @@ describe('Testing email service', () => {
   });
 
   it('should send csv data email', async () => {
+    sendMock.mockResolvedValue({ data: { id: 'email-id' }, error: null });
     await service.sendCSV(
       [{ name: 'test', id: '1234' }],
       user,
@@ -215,12 +230,105 @@ describe('Testing email service', () => {
     expect(sendMock.mock.calls[0][0].html).toContain('User Export');
     expect(sendMock.mock.calls[0][0].attachments).toEqual([
       {
-        type: 'text/csv',
-        content: expect.anything(),
-        disposition: 'attachment',
+        contentType: 'text/csv',
+        content: Buffer.from('csv data goes here', 'utf8'),
         filename: expect.anything(),
       },
     ]);
+  });
+
+  it('retries when Resend returns an API error', async () => {
+    jest.useRealTimers();
+    const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+    const resendError = {
+      message: 'rate limited',
+      name: 'rate_limit_exceeded',
+      statusCode: 429,
+    } satisfies ErrorResponse;
+
+    sendMock
+      .mockResolvedValueOnce({ data: null, error: resendError })
+      .mockResolvedValueOnce({ data: null, error: resendError })
+      .mockResolvedValueOnce({ data: { id: 'email-id' }, error: null });
+
+    await service.welcome(
+      'test',
+      user,
+      'http://localhost:3000',
+      'http://localhost:3000/?token=',
+    );
+
+    expect(sendMock).toHaveBeenCalledTimes(3);
+    expect(loggerMock.error).toHaveBeenCalledTimes(2);
+    expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('logs and continues when Resend returns a non-retryable 4xx error', async () => {
+    const resendError = {
+      message: 'API key is invalid',
+      name: 'validation_error',
+      statusCode: 401,
+    } satisfies ErrorResponse;
+
+    sendMock.mockResolvedValue({ data: null, error: resendError });
+
+    await expect(
+      service.welcome(
+        'test',
+        user,
+        'http://localhost:3000',
+        'http://localhost:3000/?token=',
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(loggerMock.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries with attachments intact when the transport throws', async () => {
+    jest.useRealTimers();
+    sendMock
+      .mockRejectedValueOnce(new Error('network failure'))
+      .mockResolvedValueOnce({ data: { id: 'email-id' }, error: null });
+
+    await service.sendCSV(
+      [{ name: 'test', id: '1234' }],
+      user,
+      'csv data goes here',
+      'User Export',
+      'an export of all users',
+    );
+
+    expect(sendMock).toHaveBeenCalledTimes(2);
+    expect(sendMock.mock.calls[0][0].attachments).toEqual([
+      {
+        content: Buffer.from('csv data goes here', 'utf8'),
+        contentType: 'text/csv',
+        filename: expect.anything(),
+      },
+    ]);
+    expect(sendMock.mock.calls[1][0].attachments).toEqual([
+      {
+        content: Buffer.from('csv data goes here', 'utf8'),
+        contentType: 'text/csv',
+        filename: expect.anything(),
+      },
+    ]);
+  });
+
+  it('sends array recipients via a single batch API call', async () => {
+    await service.requestApproval(
+      { id: 'jurisdiction-id', name: 'Jurisdiction' },
+      { id: 'listing-id', name: 'Listing' },
+      ['first@example.com', 'second@example.com'],
+      'http://localhost:3001',
+    );
+
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(sendBatchMock).toHaveBeenCalledTimes(1);
+    expect(sendBatchMock.mock.calls[0][0]).toHaveLength(2);
+    expect(sendBatchMock.mock.calls[0][0][0].to).toEqual('first@example.com');
+    expect(sendBatchMock.mock.calls[0][0][1].to).toEqual('second@example.com');
   });
 
   describe('application confirmation', () => {
@@ -463,9 +571,10 @@ describe('Testing email service', () => {
         'http://localhost:3001',
       );
 
-      expect(sendMock).toHaveBeenCalled();
-      const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('Listing approval requested');
       expect(emailMock.html).toMatch(
         `<img src="" alt="Affordable Housing Portal" height="137" width="auto" />`,
@@ -505,9 +614,10 @@ describe('Testing email service', () => {
         'http://localhost:3001',
       );
 
-      expect(sendMock).toHaveBeenCalled();
-      const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('Listing changes requested');
       expect(emailMock.html).toMatch(
         `<img src="" alt="Affordable Housing Portal" height="137" width="auto" />`,
@@ -550,9 +660,10 @@ describe('Testing email service', () => {
         'http://localhost:3000',
       );
 
-      expect(sendMock).toHaveBeenCalled();
-      const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual('New published listing');
       expect(emailMock.html).toMatch(
         `<img src="" alt="Affordable Housing Portal" height="137" width="auto" />`,
@@ -639,9 +750,10 @@ describe('Testing email service', () => {
         { en: emailArr },
       );
 
-      expect(sendMock).toHaveBeenCalled();
-      const emailMock = sendMock.mock.calls[0][0];
-      expect(emailMock.to).toEqual(emailArr);
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(sendBatchMock.mock.calls[0][0]).toHaveLength(emailArr.length);
+      const emailMock = sendBatchMock.mock.calls[0][0][0];
+      expect(emailMock.to).toEqual(emailArr[0]);
       expect(emailMock.subject).toEqual(
         'New Housing Lottery Results Available',
       );
@@ -675,6 +787,102 @@ describe('Testing email service', () => {
         'jurisdictionId',
         'es',
       );
+    });
+  });
+
+  describe('retry behavior', () => {
+    it('should retry sendSingle in a loop until attempts are exhausted', async () => {
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+      sendMock.mockRejectedValue(new Error('single send failed'));
+
+      const sendPromise = service['sendSingle'](
+        'applicant.email@example.com',
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        3,
+      );
+      await jest.runAllTimersAsync();
+      await sendPromise;
+
+      expect(sendMock).toHaveBeenCalledTimes(4);
+      expect(loggerMock.error).toHaveBeenCalledTimes(4);
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(3);
+      expect(setTimeoutSpy.mock.calls.map(([, delay]) => delay)).toEqual([
+        1000, 2000, 4000,
+      ]);
+      expect(loggerMock.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Retries remaining: 0'),
+      );
+    });
+
+    it('should retry sendBatch in a loop until attempts are exhausted', async () => {
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+      sendBatchMock.mockRejectedValue(new Error('batch send failed'));
+
+      const sendPromise = service['sendBatch'](
+        ['first@example.com', 'second@example.com'],
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        2,
+      );
+      await jest.runAllTimersAsync();
+      await sendPromise;
+
+      expect(sendBatchMock).toHaveBeenCalledTimes(3);
+      expect(loggerMock.error).toHaveBeenCalledTimes(3);
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
+      expect(setTimeoutSpy.mock.calls.map(([, delay]) => delay)).toEqual([
+        1000, 2000,
+      ]);
+      expect(loggerMock.error).toHaveBeenLastCalledWith(
+        expect.stringContaining('Retries remaining: 0'),
+      );
+    });
+
+    it('should not retry sendSingle for 4xx resend responses', async () => {
+      sendMock.mockResolvedValue({
+        data: null,
+        error: {
+          name: 'validation_error',
+          message: 'Bad request',
+          statusCode: 400,
+        } as ErrorResponse,
+      });
+
+      await service['sendSingle'](
+        'applicant.email@example.com',
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        3,
+      );
+
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not retry sendBatch for 4xx resend responses', async () => {
+      sendBatchMock.mockResolvedValue({
+        data: null,
+        error: {
+          name: 'validation_error',
+          message: 'Bad request',
+          statusCode: 400,
+        } as ErrorResponse,
+      });
+
+      await service['sendBatch'](
+        ['first@example.com', 'second@example.com'],
+        'noreply@example.com',
+        'Test subject',
+        '<p>Test body</p>',
+        2,
+      );
+
+      expect(sendBatchMock).toHaveBeenCalledTimes(1);
+      expect(loggerMock.error).toHaveBeenCalledTimes(1);
     });
   });
 });
