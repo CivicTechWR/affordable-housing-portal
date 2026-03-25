@@ -915,7 +915,7 @@ model CustomListingFeatures {
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
   displayName String
-  key         String
+  key         String  @unique
   category    String
   scope       CustomListingScope
 

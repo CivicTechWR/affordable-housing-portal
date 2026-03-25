@@ -3,7 +3,6 @@ import { PrismaService } from '../../../src/services/prisma.service';
 import { CustomFeatureService } from '../../../src/services/custom-feature.service';
 import { CustomListingFeatureCreate } from '../../../src/dtos/custom-listing-features/custom-listing-feature-create.dto';
 import { CustomListingFeatureUpdate } from '../../../src/dtos/custom-listing-features/custom-listing-feature-update.dto';
-import { CustomFeatureAssociate } from '../../../src/dtos/custom-listing-features/custom-feature-associate.dto';
 import { randomUUID } from 'crypto';
 import { CustomListingScope } from '@prisma/client';
 

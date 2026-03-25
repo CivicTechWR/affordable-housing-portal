@@ -36,6 +36,9 @@ CREATE INDEX "custom_listing_features_listings_listing_id_idx" ON "custom_listin
 -- CreateIndex
 CREATE INDEX "custom_listing_features_units_unit_id_idx" ON "custom_listing_features_units"("unit_id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "custom_listing_fields_key_key" ON "custom_listing_fields"("key");
+
 -- AddForeignKey
 ALTER TABLE "custom_listing_features_listings" ADD CONSTRAINT "custom_listing_features_listings_custom_listing_feature_id_fkey" FOREIGN KEY ("custom_listing_feature_id") REFERENCES "custom_listing_fields"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
