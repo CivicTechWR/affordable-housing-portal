@@ -229,18 +229,16 @@ export async function seedCustomListingFeatures(prisma: PrismaClient) {
   console.log('Seeding Custom Listing Features...');
 
   for (const feature of customListingFeatures) {
-    const existingFeature = await prisma.customListingFeatures.findFirst({
+    await prisma.customListingFeatures.upsert({
       where: { key: feature.key },
+      update: {
+        displayName: feature.displayName,
+        category: feature.category,
+        scope: feature.scope,
+      },
+      create: feature,
     });
-
-    if (!existingFeature) {
-      await prisma.customListingFeatures.create({
-        data: feature,
-      });
-      console.log(`  Created feature: ${feature.key}`);
-    } else {
-      console.log(`  Feature already exists: ${feature.key}`);
-    }
+    console.log(`  Upserted feature: ${feature.key}`);
   }
 
   console.log('Finished seeding Custom Listing Features.');
