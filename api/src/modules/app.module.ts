@@ -26,6 +26,7 @@ import { FeatureFlagModule } from './feature-flag.module';
 import { CronJobModule } from './cron-job.module';
 import { PropertyModule } from './property.module';
 import { AgencyModule } from './agency.module';
+import { CustomFeatureModule } from './custom-feature.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { AgencyModule } from './agency.module';
     CronJobModule,
     PropertyModule,
     AgencyModule,
+    CustomFeatureModule,
     ThrottlerModule.forRoot([
       {
         ttl: Number(process.env.THROTTLE_TTL),
@@ -70,6 +72,7 @@ import { AgencyModule } from './agency.module';
   exports: [
     PropertyModule,
     AgencyModule,
+    CustomFeatureModule,
     ListingModule,
     AmiChartModule,
     ReservedCommunityTypeModule,

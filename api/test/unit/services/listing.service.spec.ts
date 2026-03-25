@@ -576,6 +576,11 @@ describe('Testing listing service', () => {
         garage: false,
         carport: false,
       },
+      customListingFeatures: [
+        {
+          id: 'example-feature-id',
+        },
+      ],
       listingUtilities: {
         water: false,
         gas: true,
@@ -664,7 +669,6 @@ describe('Testing listing service', () => {
             },
           },
           listingsResult: true,
-          property: true,
           listingsLeasingAgentAddress: true,
           listingsApplicationPickUpAddress: true,
           listingsApplicationDropOffAddress: true,
@@ -3504,6 +3508,17 @@ describe('Testing listing service', () => {
               ...exampleAddress,
             },
           },
+          customListingFeatures: {
+            create: [
+              {
+                customListingFeature: {
+                  connect: {
+                    id: 'example-feature-id',
+                  },
+                },
+              },
+            ],
+          },
           listingFeatures: {
             create: {
               elevator: true,
@@ -4036,6 +4051,17 @@ describe('Testing listing service', () => {
               ...exampleAddress,
             },
           },
+          customListingFeatures: {
+            create: [
+              {
+                customListingFeature: {
+                  connect: {
+                    id: 'example-feature-id',
+                  },
+                },
+              },
+            ],
+          },
           listingFeatures: {
             create: {
               elevator: true,
@@ -4390,6 +4416,17 @@ describe('Testing listing service', () => {
             create: {
               ...exampleAddress,
             },
+          },
+          customListingFeatures: {
+            create: [
+              {
+                customListingFeature: {
+                  connect: {
+                    id: 'example-feature-id',
+                  },
+                },
+              },
+            ],
           },
           listingFeatures: {
             create: {
@@ -4981,6 +5018,15 @@ describe('Testing listing service', () => {
         wideDoorways: true,
         loweredCabinets: false,
       };
+      const nestedCustomFeaturesUpdate = [
+        {
+          customListingFeature: {
+            connect: {
+              id: 'example-feature-id',
+            },
+          },
+        },
+      ];
       const nestedNeighborhoodAmenities = {
         groceryStores: 'stores',
         pharmacies: 'pharmacies',
@@ -5039,6 +5085,21 @@ describe('Testing listing service', () => {
       expect(updateCall.data.listingFeatures.upsert.update).toEqual(
         nestedFeaturesUpdate,
       );
+      expect(updateCall.data.customListingFeatures).toEqual({
+        deleteMany: {
+          customListingFeatureId: {
+            notIn: ['example-feature-id'],
+          },
+        },
+        createMany: {
+          data: [
+            {
+              customListingFeatureId: 'example-feature-id',
+            },
+          ],
+          skipDuplicates: true,
+        },
+      });
       expect(
         updateCall.data.listingNeighborhoodAmenities.upsert.create,
       ).toEqual(nestedNeighborhoodAmenities);
