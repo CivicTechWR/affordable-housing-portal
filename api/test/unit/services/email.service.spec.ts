@@ -238,6 +238,8 @@ describe('Testing email service', () => {
   });
 
   it('retries when Resend returns an API error', async () => {
+    jest.useRealTimers();
+    const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
     const resendError = {
       message: 'rate limited',
       name: 'rate_limit_exceeded',
@@ -258,9 +260,10 @@ describe('Testing email service', () => {
 
     expect(sendMock).toHaveBeenCalledTimes(3);
     expect(loggerMock.error).toHaveBeenCalledTimes(2);
+    expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
   });
 
-  it('logs and continues when retries are exhausted', async () => {
+  it('logs and continues when Resend returns a non-retryable 4xx error', async () => {
     const resendError = {
       message: 'API key is invalid',
       name: 'validation_error',
@@ -278,11 +281,12 @@ describe('Testing email service', () => {
       ),
     ).resolves.toBeUndefined();
 
-    expect(sendMock).toHaveBeenCalledTimes(4);
-    expect(loggerMock.error).toHaveBeenCalledTimes(4);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(loggerMock.error).toHaveBeenCalledTimes(1);
   });
 
   it('retries with attachments intact when the transport throws', async () => {
+    jest.useRealTimers();
     sendMock
       .mockRejectedValueOnce(new Error('network failure'))
       .mockResolvedValueOnce({ data: { id: 'email-id' }, error: null });

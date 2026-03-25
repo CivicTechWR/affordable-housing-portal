@@ -267,6 +267,10 @@ export class EmailService {
       return true;
     }
 
+    if (error.statusCode === 429) {
+      return true;
+    }
+
     return error.statusCode < 400 || error.statusCode >= 500;
   }
 
