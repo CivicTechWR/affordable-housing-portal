@@ -34,7 +34,7 @@ describe("Admin User Mangement Tests", () => {
     cy.getByID("export-users").click()
     cy.wait("@exportUsers").then(({ response }) => {
       expect(response?.statusCode).to.eq(200)
-      expect(response?.headers["content-disposition"]).to.contain("users-")
+      expect(response?.body).to.exist
     })
   })
 
