@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { CustomListingFeature } from '../dtos/custom-listing-features/custom-listing-feature.dto';
+import { CustomListingFeatureCategory } from '../dtos/custom-listing-features/custom-listing-feature-category.dto';
 import { CustomListingFeatureCreate } from '../dtos/custom-listing-features/custom-listing-feature-create.dto';
 import { CustomListingFeatureUpdate } from '../dtos/custom-listing-features/custom-listing-feature-update.dto';
 import { mapTo } from '../utilities/mapTo';
 import { SuccessDTO } from '../dtos/shared/success.dto';
-import { CustomListingFeatures } from '@prisma/client';
+import { CustomListingFeatures, CustomListingScope } from '@prisma/client';
 
 /*
   this is the service for custom listing features
@@ -17,12 +18,32 @@ export class CustomListingFeatureService {
   constructor(private prisma: PrismaService) { }
 
   /*
-      this will get a set of custom listing features given the params passed in
+      this will return all custom listing features for a given scope,
+      grouped by category
     */
-  async list(): Promise<CustomListingFeature[]> {
-    const rawFeatures = await this.prisma.customListingFeatures.findMany();
-    return mapTo(CustomListingFeature, rawFeatures);
+  async findCategorizedByScope(
+    scope: CustomListingScope,
+  ): Promise<CustomListingFeatureCategory[]> {
+    const rawFeatures = await this.prisma.customListingFeatures.findMany({
+      where: { scope },
+      orderBy: { category: 'asc' },
+    });
+
+    const categoryMap = new Map<string, CustomListingFeatures[]>();
+    for (const feature of rawFeatures) {
+      const existing = categoryMap.get(feature.category) ?? [];
+      existing.push(feature);
+      categoryMap.set(feature.category, existing);
+    }
+
+    return Array.from(categoryMap.entries()).map(([name, features]) =>
+      mapTo(CustomListingFeatureCategory, {
+        name,
+        features: features.map((f) => mapTo(CustomListingFeature, f)),
+      }),
+    );
   }
+
 
   /*
       this will return 1 custom listing feature or error
