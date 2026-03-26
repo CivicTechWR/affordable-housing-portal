@@ -794,72 +794,12 @@ export const ListingView = (props: ListingProps) => {
               />
             </ListSection>
 
-            {listing.rentalAssistance && (
-              <ListSection
-                title={t("listings.sections.rentalAssistanceTitle")}
-                subtitle={listing.rentalAssistance}
-              />
-            )}
-
             {programsSection}
             {preferencesSection}
 
-            {(listing.creditHistory ||
-              listing.rentalHistory ||
-              listing.criminalBackground ||
-              buildingSelectionCriteria) && (
-              <ListSection
-                title={t("listings.sections.additionalEligibilityTitle")}
-                subtitle={t("listings.sections.additionalEligibilitySubtitle")}
-              >
-                <>
-                  {listing.creditHistory && (
-                    <InfoCard title={t("listings.creditHistory")}>
-                      <ExpandableText
-                        className="text-xs text-gray-700"
-                        buttonClassName="ml-4"
-                        markdownProps={{ disableParsingRawHTML: true }}
-                        strings={{
-                          readMore: t("t.more"),
-                          readLess: t("t.less"),
-                        }}
-                      >
-                        {listing.creditHistory}
-                      </ExpandableText>
-                    </InfoCard>
-                  )}
-                  {listing.rentalHistory && (
-                    <InfoCard title={t("listings.rentalHistory")}>
-                      <ExpandableText
-                        className="text-xs text-gray-700"
-                        buttonClassName="ml-4"
-                        markdownProps={{ disableParsingRawHTML: true }}
-                        strings={{
-                          readMore: t("t.more"),
-                          readLess: t("t.less"),
-                        }}
-                      >
-                        {listing.rentalHistory}
-                      </ExpandableText>
-                    </InfoCard>
-                  )}
-                  {listing.criminalBackground && (
-                    <InfoCard title={t("listings.criminalBackground")}>
-                      <ExpandableText
-                        className="text-xs text-gray-700"
-                        buttonClassName="ml-4"
-                        markdownProps={{ disableParsingRawHTML: true }}
-                        strings={{
-                          readMore: t("t.more"),
-                          readLess: t("t.less"),
-                        }}
-                      >
-                        {listing.criminalBackground}
-                      </ExpandableText>
-                    </InfoCard>
-                  )}
-                  {buildingSelectionCriteria}
-                </>
+            {buildingSelectionCriteria && (
+              <ListSection title={t("listings.buildingSelectionCriteria")} subtitle={""}>
+                {buildingSelectionCriteria}
               </ListSection>
             )}
           </ul>

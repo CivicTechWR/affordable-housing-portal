@@ -828,12 +828,8 @@ describe("ListingViewSeedsHelpers", () => {
       minimalEligibilitySectionsListing = {
         ...listing,
         buildingSelectionCriteria: undefined,
-        creditHistory: undefined,
-        criminalBackground: undefined,
         listingsBuildingSelectionCriteriaFile: undefined,
         listingMultiselectQuestions: [],
-        rentalAssistance: undefined,
-        rentalHistory: undefined,
         reservedCommunityTypes: undefined,
       }
     })
@@ -842,8 +838,6 @@ describe("ListingViewSeedsHelpers", () => {
       const mockListing: Listing = {
         ...listing,
         buildingSelectionCriteria: "Test criteria",
-        creditHistory: "Good credit required",
-        rentalAssistance: "Accepts Section 8",
       }
 
       const result = getEligibilitySections(jurisdiction, mockListing)
@@ -963,11 +957,7 @@ describe("ListingViewSeedsHelpers", () => {
         units: null,
         reservedCommunityTypes: null,
         listingMultiselectQuestions: [],
-        creditHistory: null,
-        rentalHistory: null,
         buildingSelectionCriteria: null,
-        rentalAssistance: null,
-        criminalBackground: null,
       })
       expect(eligibilitySections).toEqual([])
     })

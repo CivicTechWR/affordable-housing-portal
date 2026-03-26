@@ -529,12 +529,6 @@ describe("Listing Management Tests", () => {
     }
 
     // ----------
-    // Section - Additional eligibility rules
-    fillIfDataExists(cy, "creditHistory", listing.creditHistory, "type")
-    fillIfDataExists(cy, "rentalHistory", listing.rentalHistory, "type")
-    fillIfDataExists(cy, "criminalBackground", listing.criminalBackground, "type")
-
-    // ----------
     // Section - Building selection criteria
     // TODO - Test building selection criteria PDF
     if (
@@ -1051,18 +1045,6 @@ describe("Listing Management Tests", () => {
     }
 
     // ----------
-    // Section - Additional eligibility rules
-    verifyDetailDataIfExists(cy, "creditHistory", listing["creditHistory"])
-    verifyDetailDataIfExists(cy, "rentalHistory", listing["rentalHistory"])
-    verifyDetailDataIfExists(cy, "criminalBackground", listing["criminalBackground"])
-    // TODO - Allow for dynamic rental assistance text
-    verifyDetailDataIfExists(
-      cy,
-      "rentalAssistance",
-      "Housing Choice Vouchers, Section 8 and other valid rental assistance programs will be considered for this property. In the case of a valid rental subsidy, the required minimum income will be based on the portion of the rent that the tenant pays after use of the subsidy."
-    )
-
-    // ----------
     // Section - Building selection criteria
     if (!getFlagActive(listing, FeatureFlagEnum.disableBuildingSelectionCriteria)) {
       verifyDetailDataIfExists(
@@ -1492,13 +1474,6 @@ describe("Listing Management Tests", () => {
         })
       }
     }
-
-    // ----------
-    // Section - Additional eligibility rules
-    verifyDataIfExists(cy, "creditHistory", listing.creditHistory, "type")
-    verifyDataIfExists(cy, "rentalHistory", listing.rentalHistory, "type")
-    verifyDataIfExists(cy, "criminalBackground", listing.criminalBackground, "type")
-    verifyDataIfExists(cy, "rentalAssistance", listing.rentalAssistance, "type")
 
     // ----------
     // Section - Building selection criteria

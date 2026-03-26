@@ -304,11 +304,7 @@ describe('ListingCreateUpdateValidationPipe', () => {
 
       // Mock jurisdiction with custom required fields
       mockPrisma.jurisdictions.findFirst.mockResolvedValue({
-        requiredListingFields: [
-          'name',
-          'leasingAgentEmail',
-          'rentalAssistance',
-        ],
+        requiredListingFields: ['name', 'leasingAgentEmail'],
       });
 
       const expectedTransformedValue = {
@@ -317,7 +313,7 @@ describe('ListingCreateUpdateValidationPipe', () => {
         minimumImagesRequired: 0,
         units: [],
         unitGroups: [],
-        requiredFields: ['name', 'leasingAgentEmail', 'rentalAssistance'],
+        requiredFields: ['name', 'leasingAgentEmail'],
       };
       mockSuperTransform.mockResolvedValue(expectedTransformedValue);
 

@@ -370,22 +370,6 @@ class Listing extends AbstractDTO {
   costsNotIncluded?: string;
 
   @Expose()
-  @ValidateListingPublish('creditHistory', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  creditHistory?: string;
-
-  @Expose()
-  @ValidateListingPublish('criminalBackground', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  criminalBackground?: string;
-
-  @Expose()
   @ValidateListingPublish('depositMin', {
     groups: [ValidationsGroupsEnum.default],
   })
@@ -550,23 +534,6 @@ class Listing extends AbstractDTO {
   @IsString({ groups: [ValidationsGroupsEnum.default] })
   @ApiPropertyOptional()
   programRules?: string;
-
-  @Expose()
-  @ValidateListingPublish('rentalAssistance', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @MaxLength(4096, { groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  rentalAssistance?: string;
-
-  @Expose()
-  @ValidateListingPublish('rentalHistory', {
-    groups: [ValidationsGroupsEnum.default],
-  })
-  @IsString({ groups: [ValidationsGroupsEnum.default] })
-  @ApiPropertyOptional()
-  rentalHistory?: string;
 
   @Expose()
   @ValidateListingPublish('requiredDocuments', {

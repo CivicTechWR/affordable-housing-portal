@@ -789,7 +789,6 @@ model Jurisdictions {
   partnerTerms                        String?                     @map("partner_terms")
   publicUrl                           String                      @default("") @map("public_url")
   regions                             String[]                    @default([]) @map("regions")
-  rentalAssistanceDefault             String                      @map("rental_assistance_default")
   requiredListingFields               String[]                    @default([]) @map("required_listing_fields")
   visibleNeighborhoodAmenities        NeighborhoodAmenitiesEnum[] @default([groceryStores, publicTransportation, schools, parksAndCommunityCenters, pharmacies, healthCareResources]) @map("visible_neighborhood_amenities")
   whatToExpect                        String                      @default("Applicants will be contacted by the property agent in rank order until vacancies are filled. All of the information that you have provided will be verified and your eligibility confirmed. Your application will be removed from the waitlist if you have made any fraudulent statements. If we cannot verify a housing preference that you have claimed, you will not receive the preference but will not be otherwise penalized. Should your application be chosen, be prepared to fill out a more detailed application and provide required supporting documents.") @map("what_to_expect")
@@ -1169,8 +1168,6 @@ model Listings {
   contentUpdatedAt                     DateTime?                   @map("content_updated_at") @db.Timestamptz(6)
   copyOfId                             String?                     @map("copy_of_id") @db.Uuid
   costsNotIncluded                     String?                     @map("costs_not_included")
-  creditHistory                        String?                     @map("credit_history")
-  criminalBackground                   String?                     @map("criminal_background")
   customMapPin                         Boolean?                    @map("custom_map_pin")
   depositHelperText                    String?                     @map("deposit_helper_text")
   depositMax                           String?                     @map("deposit_max")
@@ -1227,8 +1224,6 @@ model Listings {
   propertyId                           String?                     @map("property_id") @db.Uuid
   publishedAt                          DateTime?                   @map("published_at") @db.Timestamptz(6)
   referralOpportunity                  Boolean?                    @map("referral_opportunity")
-  rentalAssistance                     String?                     @map("rental_assistance")
-  rentalHistory                        String?                     @map("rental_history")
   requestedChanges                     String?                     @map("requested_changes")
   requestedChangesDate                 DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("requested_changes_date") @db.Timestamptz(6)
   requestedChangesUserId               String?                     @map("requested_changes_user_id") @db.Uuid
@@ -1353,8 +1348,6 @@ model ListingSnapshot {
   contentUpdatedAt                        DateTime?                   @map("content_updated_at") @db.Timestamptz(6)
   copyOfId                                String?                     @map("copy_of_id") @db.Uuid
   costsNotIncluded                        String?                     @map("costs_not_included")
-  creditHistory                           String?                     @map("credit_history")
-  criminalBackground                      String?                     @map("criminal_background")
   customMapPin                            Boolean?                    @map("custom_map_pin")
   depositHelperText                       String?                     @map("deposit_helper_text")
   depositMax                              String?                     @map("deposit_max")
@@ -1410,8 +1403,6 @@ model ListingSnapshot {
   propertySnapshotId                      String?                     @map("property_snapshot_id") @db.Uuid
   publishedAt                             DateTime?                   @map("published_at") @db.Timestamptz(6)
   referralOpportunity                     Boolean?                    @map("referral_opportunity")
-  rentalAssistance                        String?                     @map("rental_assistance")
-  rentalHistory                           String?                     @map("rental_history")
   requestedChanges                        String?                     @map("requested_changes")
   requestedChangesDate                    DateTime?                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @map("requested_changes_date") @db.Timestamptz(6)
   requestedChangesUserId                  String?                     @map("requested_changes_user_id") @db.Uuid

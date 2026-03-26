@@ -40,7 +40,6 @@ export const listingFactory = async (
     closedAt?: Date;
     digitalApp?: boolean;
     includeBuildingFeatures?: boolean;
-    includeEligibilityRules?: boolean;
     includeReservedCommunityTypes?: boolean;
     listing?: Prisma.ListingsCreateInput;
     listingEvents?: Prisma.ListingEventsCreateWithoutListingsInput[];
@@ -228,7 +227,6 @@ export const listingFactory = async (
           },
         }
       : {},
-    ...additionalEligibilityRules(optionalParams?.includeEligibilityRules),
     ...buildingFeatures(optionalParams?.includeBuildingFeatures),
     ...featuresAndUtilites(
       optionalParams?.optionalFeatures,
@@ -238,18 +236,6 @@ export const listingFactory = async (
       ? listingsRequiredDocuments(optionalParams?.requiredDocumentsList)
       : {}),
     ...previousListing,
-  };
-};
-
-const additionalEligibilityRules = (includeEligibilityRules: boolean) => {
-  if (!includeEligibilityRules) return {};
-  return {
-    rentalHistory: 'Two years of rental history will be verified',
-    rentalAssistance: 'additional rental assistance',
-    creditHistory:
-      'A poor credit history may be grounds to deem an applicant ineligible for housing.',
-    criminalBackground:
-      'A criminal background investigation will be obtained on each applicant.  As criminal background checks are done county by county and will be ran for all counties in which the applicant lived,  Applicants will be disqualified for tenancy if they have been convicted of a felony or misdemeanor.  Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process. ',
   };
 };
 

@@ -573,14 +573,6 @@ export const getEligibilitySections = (
       ),
     })
   }
-  // Rental Assistance
-  if (listing.rentalAssistance) {
-    eligibilityFeatures.push({
-      header: t("listings.sections.rentalAssistanceTitle"),
-      subheader: listing.rentalAssistance,
-    })
-  }
-
   // Preferences
   const preferences = getFilteredMultiselectQuestions(
     listing.listingMultiselectQuestions,
@@ -649,39 +641,14 @@ export const getEligibilitySections = (
     )
   }
 
-  // Additional Eligibility Rules
+  // Building Selection Criteria
   if (
-    listing.creditHistory ||
-    listing.rentalHistory ||
-    listing.criminalBackground ||
-    ((listing.listingsBuildingSelectionCriteriaFile || listing.buildingSelectionCriteria) &&
-      !disableBuildingSelectionCriteria)
+    (listing.listingsBuildingSelectionCriteriaFile || listing.buildingSelectionCriteria) &&
+    !disableBuildingSelectionCriteria
   ) {
-    const cardContent: ContentCardProps[] = []
-    if (listing.creditHistory)
-      cardContent.push({
-        heading: t("listings.creditHistory"),
-        description: <ReadMore content={listing.creditHistory} />,
-      })
-    if (listing.rentalHistory)
-      cardContent.push({
-        heading: t("listings.rentalHistory"),
-        description: <ReadMore content={listing.rentalHistory} />,
-      })
-    if (listing.criminalBackground)
-      cardContent.push({
-        heading: t("listings.criminalBackground"),
-        description: <ReadMore content={listing.criminalBackground} />,
-      })
     eligibilityFeatures.push({
-      header: t("listings.sections.additionalEligibilityTitle"),
-      subheader: t("listings.sections.additionalEligibilitySubtitle"),
-      content: (
-        <>
-          <CardList cardContent={cardContent} />
-          {!disableBuildingSelectionCriteria && getBuildingSelectionCriteria(listing)}
-        </>
-      ),
+      header: t("listings.buildingSelectionCriteria"),
+      content: getBuildingSelectionCriteria(listing),
     })
   }
   return eligibilityFeatures

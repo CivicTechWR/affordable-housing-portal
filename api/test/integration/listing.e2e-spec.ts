@@ -260,7 +260,6 @@ describe('Listing Controller Tests', () => {
       name: `example listing ${randomName()}`,
       paperApplication: false,
       referralOpportunity: false,
-      rentalAssistance: 'rental assistance',
       reviewOrderType: ReviewOrderTypeEnum.firstComeFirstServe,
       ...(useUnitGroups
         ? {
@@ -419,15 +418,12 @@ describe('Listing Controller Tests', () => {
       applicationMailingAddressType: ApplicationAddressTypeEnum.leasingAgent,
       buildingSelectionCriteria: 'https://selection-criteria.com',
       costsNotIncluded: 'all costs included',
-      creditHistory: 'credit history',
-      criminalBackground: 'criminal background',
       depositHelperText: 'deposit helper text',
       disableUnitsAccordion: false,
       leasingAgentOfficeHours: 'leasing agent office hours',
       leasingAgentTitle: 'leasing agent title',
       postmarkedApplicationsReceivedByDate: new Date(),
       programRules: 'program rules',
-      rentalHistory: 'rental history',
       requiredDocuments: 'required docs',
       specialNotes: 'special notes',
       waitlistCurrentSize: 0,

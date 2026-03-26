@@ -41,7 +41,6 @@ const mockListing = (): Listing => {
       multiselectQuestions: [],
       publicUrl: '',
       emailFromAddress: '',
-      rentalAssistanceDefault: '',
       whatToExpect: '',
       whatToExpectAdditionalText: '',
     },
@@ -60,16 +59,12 @@ const mockListing = (): Listing => {
     servicesOffered: 'untranslated services offered',
     reservedCommunityDescription: 'untranslated reserved community description',
     requiredDocuments: 'untranslated required documents',
-    rentalHistory: 'untranslated rental history',
-    rentalAssistance: 'untranslated rental assistance',
     programRules: 'untranslated program rules',
     petPolicy: 'untranslated pet policy',
     leasingAgentOfficeHours: 'untranslated leasing agent office hours',
     depositMin: 'untranslated deposit minimum',
     depositMax: 'untranslated deposit maximum',
     depositHelperText: 'untranslated deposit helper text',
-    criminalBackground: 'untranslated criminal background',
-    creditHistory: 'untranslated credit history',
     costsNotIncluded: 'untranslated costs not included',
     applicationPickUpAddressOfficeHours:
       'untranslated application pick up address office hours',
@@ -121,16 +116,12 @@ const translatedStrings = [
   'translated application drop off address office hours',
   'translated application pick up address office hours',
   'translated costs not included',
-  'translated credit history',
-  'translated criminal background',
   'translated deposit helper text',
   'translated deposit maximum',
   'translated deposit minimum',
   'translated leasing agent office hours',
   'translated pet policy',
   'translated program rules',
-  'translated rental assistance',
-  'translated rental history',
   'translated required documents',
   'translated reserved community description',
   'translated services offered',
@@ -350,8 +341,6 @@ const validateTranslatedFields = (listing: Listing) => {
     'translated application drop off address office hours',
   );
   expect(listing.costsNotIncluded).toEqual('translated costs not included');
-  expect(listing.creditHistory).toEqual('translated credit history');
-  expect(listing.criminalBackground).toEqual('translated criminal background');
   expect(listing.depositHelperText).toEqual('translated deposit helper text');
   expect(listing.depositMax).toEqual('translated deposit maximum');
   expect(listing.depositMin).toEqual('translated deposit minimum');
@@ -360,8 +349,6 @@ const validateTranslatedFields = (listing: Listing) => {
   );
   expect(listing.petPolicy).toEqual('translated pet policy');
   expect(listing.programRules).toEqual('translated program rules');
-  expect(listing.rentalAssistance).toEqual('translated rental assistance');
-  expect(listing.rentalHistory).toEqual('translated rental history');
   expect(listing.requiredDocuments).toEqual('translated required documents');
   expect(listing.reservedCommunityDescription).toEqual(
     'translated reserved community description',

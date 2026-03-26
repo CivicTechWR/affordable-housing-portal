@@ -701,8 +701,6 @@ export const jurisdiction: Jurisdiction = {
   ],
   requiredListingFields: [],
   emailFromAddress: "Bloomington <bloom-no-reply@exygy.dev>",
-  rentalAssistanceDefault:
-    "Housing Choice Vouchers, Section 8 and other valid rental assistance programs will be considered for this property. In the case of a valid rental subsidy, the required minimum income will be based on the portion of the rent that the tenant pays after use of the subsidy.",
   whatToExpect:
     "Applicants will be contacted by the property agent in rank order until vacancies are filled. All of the information that you have provided will be verified and your eligibility confirmed. Your application will be removed from the waitlist if you have made any fraudulent statements. If we cannot verify a housing preference that you have claimed, you will not receive the preference but will not be otherwise penalized. Should your application be chosen, be prepared to fill out a more detailed application and provide required supporting documents.",
   whatToExpectAdditionalText:
@@ -874,8 +872,6 @@ export const listing: Listing = {
     "Tenant Selection Criteria will be available to all applicants upon request.",
   costsNotIncluded:
     "Resident responsible for PG&E, internet and phone.  Owner pays for water, trash, and sewage.  Residents encouraged to obtain renter's insurance but this is not a requirement.  Rent is due by the 5th of each month. Late fee $35 and returned check fee is $35 additional.",
-  creditHistory:
-    "Applications will be rated on a score system for housing. An applicant's score may be impacted by negative tenant peformance information provided to the credit reporting agency.  All applicants are expected have a passing acore of 70 points out of 100 to be considered for housing.  Applicants with no credit history will receive a maximum of 80 points to fairly outweigh positive and/or negative trades as would an applicant with established credit history. Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process.",
   depositMin: "1140.0",
   specialNotes: "Special notes description",
   programRules:
@@ -889,8 +885,6 @@ export const listing: Listing = {
   requiredDocuments: "Completed application and government issued IDs",
   createdAt: new Date("2019-07-08T15:37:19.565-07:00"),
   updatedAt: new Date("2019-07-09T14:35:11.142-07:00"),
-  criminalBackground:
-    "A criminal background investigation will be obtained on each applicant.  As criminal background checks are done county by county and will be ran for all counties in which the applicant lived,  Applicants will be disqualified for tenancy if they have been convicted of a felony or misdemeanor.  Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process. ",
   listingsLeasingAgentAddress: {
     id: "id",
     createdAt: new Date(),
@@ -1019,9 +1013,6 @@ export const listing: Listing = {
       },
     },
   ],
-  rentalAssistance: "Custom rental assistance",
-  rentalHistory:
-    "Two years of rental history will be verified with all applicable landlords.  Household family members and/or personal friends are not acceptable landlord references.  Two professional character references may be used in lieu of rental history for applicants with no prior rental history.  An unlawful detainer report will be processed thourhg the U.D. Registry, Inc. Applicants will be disqualified if they have any evictions filing within the last 7 years.  Refer to Tenant Selection Criteria or Qualification Criteria for details related to the qualification process.",
   householdSizeMin: 2,
   householdSizeMax: 3,
   smokingPolicy: "Non-smoking building",
@@ -1225,8 +1216,6 @@ export const mockBaseJurisdiction: Jurisdiction = {
   languages: [LanguagesEnum.en],
   publicUrl: "http://localhost:3000",
   emailFromAddress: "Alameda: Housing Bay Area <bloom-no-reply@exygy.dev>",
-  rentalAssistanceDefault:
-    "Housing Choice Vouchers, Section 8 and other valid rental assistance programs will be considered for this property. In the case of a valid rental subsidy, the required minimum income will be based on the portion of the rent that the tenant pays after use of the subsidy.",
   whatToExpect:
     "<p>If you are interested in applying for this property, please get in touch in one of these ways:</p><ul><li><p>Phone</p></li><li><p>Email</p></li><li><p>In-person</p></li><li><p>In some instances, the property has a link directly to an application</p></li></ul><p>Once you contact a property, ask if they have any available units if you are looking to move in immediately.</p><p><strong>Waitlists</strong>:</p><p>If none are available, but you are still interested in eventually living at the property, ask how you can be placed on their waitlist.</p>",
   whatToExpectAdditionalText:

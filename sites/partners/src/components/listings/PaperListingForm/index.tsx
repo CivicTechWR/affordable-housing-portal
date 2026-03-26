@@ -44,7 +44,6 @@ import ListingFormActions, { ListingFormActionsType } from "../ListingFormAction
 import { cleanRichText, getReadableErrorMessage } from "../PaperListingDetails/sections/helpers"
 import { getListingStatusTag } from "../helpers"
 import AdditionalDetails from "./sections/AdditionalDetails"
-import AdditionalEligibility from "./sections/AdditionalEligibility"
 import LeasingAgent from "./sections/LeasingAgent"
 import AdditionalFees from "./sections/AdditionalFees"
 import Units from "./sections/Units"
@@ -705,11 +704,6 @@ const ListingForm = ({
                             visibleNeighborhoodAmenities={
                               selectedJurisdictionData?.visibleNeighborhoodAmenities
                             }
-                          />
-                          <AdditionalEligibility
-                            defaultText={selectedJurisdictionData?.rentalAssistanceDefault}
-                            listing={listing}
-                            requiredFields={requiredFields}
                           />
                           {!doJurisdictionsHaveFeatureFlagOn(
                             FeatureFlagEnum.disableBuildingSelectionCriteria,

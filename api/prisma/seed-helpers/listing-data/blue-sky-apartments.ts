@@ -45,8 +45,6 @@ export const blueSkyApartments: Prisma.ListingsCreateInput = {
   },
   buildingSelectionCriteria: null,
   costsNotIncluded: null,
-  creditHistory: null,
-  criminalBackground: null,
   depositMin: '0',
   depositMax: '50',
   depositHelperText: "Deposit will not exceed one month's rent",
@@ -60,9 +58,6 @@ export const blueSkyApartments: Prisma.ListingsCreateInput = {
   name: 'Blue Sky Apartments',
   postmarkedApplicationsReceivedByDate: '2025-06-06T23:00:00.000Z',
   programRules: null,
-  rentalAssistance:
-    'Housing Choice Vouchers, Section 8 and other valid rental assistance programs will be considered for this property. ',
-  rentalHistory: null,
   requiredDocuments: null,
   specialNotes: null,
   waitlistCurrentSize: null,

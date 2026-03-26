@@ -27,22 +27,15 @@ describe("Admin User Mangement Tests", () => {
   })
 
   it("as admin user, should be able to download export", () => {
-    const convertToString = (value: number) => {
-      return value < 10 ? `0${value}` : `${value}`
-    }
+    cy.intercept("GET", "**/api/adapter/user/csv").as("exportUsers")
+
     cy.visit("/")
     cy.getByTestId("Users-1").click()
     cy.getByID("export-users").click()
-    const now = new Date()
-    const dateString = `${now.getFullYear()}-${convertToString(
-      now.getMonth() + 1
-    )}-${convertToString(now.getDate())}`
-    const csvName = `users-${dateString}_${convertToString(now.getHours())}_${convertToString(
-      now.getMinutes()
-    )}.csv`
-    const downloadFolder = Cypress.config("downloadsFolder")
-    const completeZipPath = `${downloadFolder}/${csvName}`
-    cy.readFile(completeZipPath)
+    cy.wait("@exportUsers").then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      expect(response?.body).to.exist
+    })
   })
 
   it("as admin user, should be able to create new admin", () => {

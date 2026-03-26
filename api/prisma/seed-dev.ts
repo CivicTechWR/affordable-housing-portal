@@ -165,7 +165,6 @@ export const devSeeding = async (
       amiChart: amiChart,
       numberOfUnits: index + 1,
       includeBuildingFeatures: index > 1,
-      includeEligibilityRules: index > 2,
       status:
         index < 4
           ? ListingsStatusEnum.active

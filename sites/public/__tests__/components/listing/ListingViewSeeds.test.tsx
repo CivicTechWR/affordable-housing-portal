@@ -61,8 +61,6 @@ describe("<ListingViewSeeds>", () => {
         <ListingViewSeeds
           listing={{
             ...listing,
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "What to expect additional text",
           }}
@@ -88,8 +86,6 @@ describe("<ListingViewSeeds>", () => {
         <ListingViewSeeds
           listing={{
             ...listing,
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "",
           }}
@@ -124,9 +120,6 @@ describe("<ListingViewSeeds>", () => {
         <ListingViewSeeds
           listing={{
             ...listing,
-            // removing other fields that have "read more" button
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "What to expect additional text",
           }}
@@ -210,8 +203,6 @@ describe("<ListingViewSeeds>", () => {
         <ListingViewSeeds
           listing={{
             ...listing,
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "What to expect additional text",
             listingType: EnumListingListingType.nonRegulated,
@@ -252,8 +243,6 @@ describe("<ListingViewSeeds>", () => {
         <ListingViewSeeds
           listing={{
             ...listing,
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "What to expect additional text",
             listingType: EnumListingListingType.nonRegulated,
@@ -298,8 +287,6 @@ describe("<ListingViewSeeds>", () => {
             ...listing,
             listingType: EnumListingListingType.nonRegulated,
             hasHudEbllClearance: true,
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "What to expect additional text",
           }}
@@ -342,8 +329,6 @@ describe("<ListingViewSeeds>", () => {
             ...listing,
             listingType: EnumListingListingType.regulated,
             hasHudEbllClearance: true,
-            creditHistory: "",
-            rentalHistory: "",
             whatToExpect: "Normal What to expect",
             whatToExpectAdditionalText: "What to expect additional text",
           }}
