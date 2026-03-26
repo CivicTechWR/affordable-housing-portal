@@ -32,8 +32,10 @@ describe("Admin User Mangement Tests", () => {
     cy.visit("/")
     cy.getByTestId("Users-1").click()
     cy.getByID("export-users").click()
-    cy.wait("@exportUsers").its("response.statusCode").should("eq", 200)
-    cy.getByTestId("toast-alert").should("contain", "Export successful")
+    cy.wait("@exportUsers").then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      expect(response?.headers["content-disposition"]).to.contain("users-")
+    })
   })
 
   it("as admin user, should be able to create new admin", () => {
