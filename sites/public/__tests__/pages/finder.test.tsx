@@ -516,10 +516,10 @@ describe("<RentalsFinder>", () => {
 
     const disclaimerPatterns = [
       /this website will show you regulated affordable rentals, meaning they are affordable because of governmental funding./i,
-      /with this funding, these kinds of rentals often have restrictions about who can live in a property./i,
-      /many buildings serve moderate- or lower-income households, so applicants cannot make more money than specific income limits./i,
+      /these rentals may have eligibility criteria such as income limits./i,
+      /^$/,
       /some buildings are only reserved for seniors./i,
-      /at these kinds of rentals, property management staff will help you determine your eligibility./i,
+      /at these kinds of rentals, property management will confirm eligibility./i,
     ]
 
     disclaimerItems.forEach((item, index) => {
@@ -642,10 +642,10 @@ describe("<RentalsFinder>", () => {
 
     const disclaimerPatterns = [
       /this website will show you regulated affordable rentals, meaning they are affordable because of governmental funding./i,
-      /with this funding, these kinds of rentals often have restrictions about who can live in a property./i,
-      /many buildings serve moderate- or lower-income households, so applicants cannot make more money than specific income limits./i,
+      /these rentals may have eligibility criteria such as income limits./i,
+      /^$/,
       /some buildings are only reserved for seniors./i,
-      /at these kinds of rentals, property management staff will help you determine your eligibility./i,
+      /at these kinds of rentals, property management will confirm eligibility./i,
     ]
 
     disclaimerItems.forEach((item, index) => {
