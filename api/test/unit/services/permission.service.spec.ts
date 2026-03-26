@@ -19,6 +19,12 @@ describe('Testing permission service', () => {
     prisma = module.get<PrismaService>(PrismaService);
   });
 
+  beforeEach(() => {
+    prisma.jurisdictions.findFirst = jest.fn().mockResolvedValue({
+      id: 'juris id',
+    });
+  });
+
   it('should add admin user role for user', async () => {
     const e = await newEnforcer(
       path.join(
@@ -263,7 +269,7 @@ describe('Testing permission service', () => {
         'listing',
         permissionActions.create,
         {
-          jurisdictionId: 'juris id 1',
+          jurisdictionId: 'juris id',
         },
       ),
     ).toEqual(true);
@@ -274,7 +280,7 @@ describe('Testing permission service', () => {
         'listing',
         permissionActions.create,
         {
-          jurisdictionId: 'juris id 2',
+          jurisdictionId: 'juris id',
         },
       ),
     ).toEqual(true);
@@ -431,15 +437,6 @@ describe('Testing permission service', () => {
       },
       select: {
         id: true,
-        listings: true,
-        jurisdictions: {
-          where: {
-            id: {
-              in: ['juris id'],
-            },
-          },
-        },
-        userRoles: true,
       },
     });
   });

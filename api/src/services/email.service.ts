@@ -364,7 +364,8 @@ export class EmailService {
         jurisdictionName: jurisdictionName,
       });
     }
-    return null;
+
+    return await this.jurisdictionService.findSingleton();
   }
 
   private async getEmailToSendFrom(

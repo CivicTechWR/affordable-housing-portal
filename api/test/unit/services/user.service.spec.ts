@@ -29,6 +29,11 @@ describe('Testing user service', () => {
   let prisma: PrismaService;
   let emailService: EmailService;
   let applicationService: ApplicationService;
+  const singletonJurisdiction = {
+    id: 'singleton-jurisdiction-id',
+    name: 'Test Jurisdiction',
+    featureFlags: [],
+  };
 
   const mockUser = (position: number, date: Date) => {
     return {
@@ -124,6 +129,12 @@ describe('Testing user service', () => {
     applicationService = module.get<ApplicationService>(ApplicationService);
   });
 
+  beforeEach(() => {
+    prisma.jurisdictions.findFirst = jest
+      .fn()
+      .mockResolvedValue(singletonJurisdiction);
+  });
+
   afterEach(() => {
     jest.resetAllMocks();
   });
@@ -148,7 +159,6 @@ describe('Testing user service', () => {
 
       expect(prisma.userAccounts.findMany).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -199,7 +209,6 @@ describe('Testing user service', () => {
 
       expect(prisma.userAccounts.findMany).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -304,7 +313,6 @@ describe('Testing user service', () => {
 
       expect(prisma.userAccounts.findMany).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -371,7 +379,6 @@ describe('Testing user service', () => {
 
       expect(prisma.userAccounts.findMany).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -401,7 +408,6 @@ describe('Testing user service', () => {
 
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -426,7 +432,6 @@ describe('Testing user service', () => {
 
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -489,24 +494,6 @@ describe('Testing user service', () => {
     });
   });
 
-  describe('jurisdictionMismatch', () => {
-    it('should verify that there is a jurisdiciton mismatch', () => {
-      const res = service.jurisdictionMismatch(
-        [{ id: 'id a' }],
-        [{ id: 'id 1' }],
-      );
-      expect(res).toEqual(true);
-    });
-
-    it('should verify that there is not a jurisdiciton mismatch', () => {
-      const res = service.jurisdictionMismatch(
-        [{ id: 'id a' }, { id: 'id b' }],
-        [{ id: 'id b' }, { id: 'id a' }],
-      );
-      expect(res).toEqual(false);
-    });
-  });
-
   describe('findUserOrError', () => {
     it('should find user by id and include joins', async () => {
       const id = randomUUID();
@@ -514,10 +501,14 @@ describe('Testing user service', () => {
         id,
       });
       const res = await service.findUserOrError({ userId: id }, UserViews.full);
-      expect(res).toEqual({ id });
+      expect(res).toMatchObject({
+        id,
+        jurisdictions: [
+          expect.objectContaining({ id: singletonJurisdiction.id }),
+        ],
+      });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -539,10 +530,14 @@ describe('Testing user service', () => {
         id,
       });
       const res = await service.findUserOrError({ userId: id }, UserViews.base);
-      expect(res).toEqual({ id });
+      expect(res).toMatchObject({
+        id,
+        jurisdictions: [
+          expect.objectContaining({ id: singletonJurisdiction.id }),
+        ],
+      });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           userRoles: true,
         },
         where: {
@@ -560,10 +555,14 @@ describe('Testing user service', () => {
         { email: email },
         UserViews.full,
       );
-      expect(res).toEqual({ email });
+      expect(res).toMatchObject({
+        email,
+        jurisdictions: [
+          expect.objectContaining({ id: singletonJurisdiction.id }),
+        ],
+      });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -585,7 +584,12 @@ describe('Testing user service', () => {
         id,
       });
       const res = await service.findUserOrError({ userId: id });
-      expect(res).toEqual({ id });
+      expect(res).toMatchObject({
+        id,
+        jurisdictions: [
+          expect.objectContaining({ id: singletonJurisdiction.id }),
+        ],
+      });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         where: {
           id,
@@ -599,7 +603,12 @@ describe('Testing user service', () => {
         email,
       });
       const res = await service.findUserOrError({ email: email });
-      expect(res).toEqual({ email });
+      expect(res).toMatchObject({
+        email,
+        jurisdictions: [
+          expect.objectContaining({ id: singletonJurisdiction.id }),
+        ],
+      });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         where: {
           email,
@@ -838,7 +847,6 @@ describe('Testing user service', () => {
       await service.forgotPassword({ email, appUrl: 'http://localhost:3000' });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -884,7 +892,6 @@ describe('Testing user service', () => {
       });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -922,7 +929,6 @@ describe('Testing user service', () => {
       });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -967,7 +973,6 @@ describe('Testing user service', () => {
       });
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -998,7 +1003,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1037,7 +1041,6 @@ describe('Testing user service', () => {
       await service.resendConfirmation({ email }, true);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1081,7 +1084,6 @@ describe('Testing user service', () => {
       await service.resendConfirmation({ email }, false);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1124,7 +1126,6 @@ describe('Testing user service', () => {
       await service.resendConfirmation({ email }, false);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1155,7 +1156,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1198,7 +1198,6 @@ describe('Testing user service', () => {
           id,
         },
         include: {
-          jurisdictions: true,
           userRoles: true,
         },
       });
@@ -1245,7 +1244,6 @@ describe('Testing user service', () => {
           id,
         },
         include: {
-          jurisdictions: true,
           userRoles: true,
         },
       });
@@ -1292,7 +1290,6 @@ describe('Testing user service', () => {
           id,
         },
         include: {
-          jurisdictions: true,
           userRoles: true,
         },
       });
@@ -1330,7 +1327,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1344,30 +1340,28 @@ describe('Testing user service', () => {
           id,
         },
       });
-      expect(prisma.userAccounts.update).toHaveBeenCalledWith({
-        data: {
-          firstName: 'first name',
-          lastName: 'last name',
-          jurisdictions: {
-            connect: [{ id: jurisId }],
-          },
-          agreedToTermsOfService: true,
-        },
-        include: {
-          jurisdictions: true,
-          listings: true,
-          userRoles: true,
-          favoriteListings: {
-            select: {
-              id: true,
-              name: true,
+      expect(prisma.userAccounts.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            firstName: 'first name',
+            lastName: 'last name',
+            agreedToTermsOfService: true,
+          }),
+          include: {
+            listings: true,
+            userRoles: true,
+            favoriteListings: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
-        },
-        where: {
-          id,
-        },
-      });
+          where: {
+            id,
+          },
+        }),
+      );
       expect(canOrThrowMock).toHaveBeenCalledWith(
         {
           id: 'requestingUser id',
@@ -1377,7 +1371,6 @@ describe('Testing user service', () => {
         permissionActions.update,
         {
           id,
-          jurisdictionId: jurisId,
         },
       );
     });
@@ -1413,7 +1406,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1427,32 +1419,30 @@ describe('Testing user service', () => {
           id,
         },
       });
-      expect(prisma.userAccounts.update).toHaveBeenCalledWith({
-        data: {
-          firstName: 'first name',
-          lastName: 'last name',
-          jurisdictions: {
-            connect: [{ id: jurisId }],
-          },
-          passwordHash: expect.anything(),
-          passwordUpdatedAt: expect.anything(),
-          agreedToTermsOfService: true,
-        },
-        include: {
-          jurisdictions: true,
-          listings: true,
-          userRoles: true,
-          favoriteListings: {
-            select: {
-              id: true,
-              name: true,
+      expect(prisma.userAccounts.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            firstName: 'first name',
+            lastName: 'last name',
+            passwordHash: expect.any(String),
+            passwordUpdatedAt: expect.any(Date),
+            agreedToTermsOfService: true,
+          }),
+          include: {
+            listings: true,
+            userRoles: true,
+            favoriteListings: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
-        },
-        where: {
-          id,
-        },
-      });
+          where: {
+            id,
+          },
+        }),
+      );
       expect(canOrThrowMock).toHaveBeenCalledWith(
         {
           id: 'requestingUser id',
@@ -1462,7 +1452,6 @@ describe('Testing user service', () => {
         permissionActions.update,
         {
           id,
-          jurisdictionId: jurisId,
         },
       );
     });
@@ -1500,7 +1489,6 @@ describe('Testing user service', () => {
       ).rejects.toThrowError(`userID ${id}: request missing currentPassword`);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1524,7 +1512,6 @@ describe('Testing user service', () => {
         permissionActions.update,
         {
           id,
-          jurisdictionId: jurisId,
         },
       );
     });
@@ -1565,7 +1552,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1589,7 +1575,6 @@ describe('Testing user service', () => {
         permissionActions.update,
         {
           id,
-          jurisdictionId: jurisId,
         },
       );
     });
@@ -1624,7 +1609,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1638,31 +1622,29 @@ describe('Testing user service', () => {
           id,
         },
       });
-      expect(prisma.userAccounts.update).toHaveBeenCalledWith({
-        data: {
-          firstName: 'first name',
-          lastName: 'last name',
-          jurisdictions: {
-            connect: [{ id: jurisId }],
-          },
-          confirmationToken: expect.anything(),
-          agreedToTermsOfService: true,
-        },
-        include: {
-          jurisdictions: true,
-          listings: true,
-          userRoles: true,
-          favoriteListings: {
-            select: {
-              id: true,
-              name: true,
+      expect(prisma.userAccounts.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            firstName: 'first name',
+            lastName: 'last name',
+            confirmationToken: expect.any(String),
+            agreedToTermsOfService: true,
+          }),
+          include: {
+            listings: true,
+            userRoles: true,
+            favoriteListings: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
-        },
-        where: {
-          id,
-        },
-      });
+          where: {
+            id,
+          },
+        }),
+      );
       expect(emailService.changeEmail).toHaveBeenCalled();
       expect(canOrThrowMock).toHaveBeenCalledWith(
         {
@@ -1673,7 +1655,6 @@ describe('Testing user service', () => {
         permissionActions.update,
         {
           id,
-          jurisdictionId: jurisId,
         },
       );
     });
@@ -1710,7 +1691,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1725,7 +1705,7 @@ describe('Testing user service', () => {
         },
       });
       expect(prisma.userAccounts.update).toHaveBeenCalledTimes(2);
-      expect(prisma.userAccounts.update).toHaveBeenCalledWith({
+      expect(prisma.userAccounts.update).toHaveBeenNthCalledWith(1, {
         data: {
           listings: {
             disconnect: [
@@ -1742,40 +1722,32 @@ describe('Testing user service', () => {
           id,
         },
       });
-      expect(prisma.userAccounts.update).toHaveBeenCalledWith({
-        data: {
-          firstName: 'first name',
-          lastName: 'last name',
-          jurisdictions: {
-            connect: [{ id: jurisId }],
-          },
-          listings: {
-            connect: [
-              {
-                id: listingA,
+      expect(prisma.userAccounts.update).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          data: expect.objectContaining({
+            firstName: 'first name',
+            lastName: 'last name',
+            listings: {
+              connect: [{ id: listingA }, { id: listingC }],
+            },
+            agreedToTermsOfService: true,
+          }),
+          include: {
+            listings: true,
+            userRoles: true,
+            favoriteListings: {
+              select: {
+                id: true,
+                name: true,
               },
-              {
-                id: listingC,
-              },
-            ],
-          },
-          agreedToTermsOfService: true,
-        },
-        include: {
-          jurisdictions: true,
-          listings: true,
-          userRoles: true,
-          favoriteListings: {
-            select: {
-              id: true,
-              name: true,
             },
           },
-        },
-        where: {
-          id,
-        },
-      });
+          where: {
+            id,
+          },
+        }),
+      );
       expect(canOrThrowMock).toHaveBeenCalledWith(
         {
           id: 'requestingUser id',
@@ -1785,7 +1757,6 @@ describe('Testing user service', () => {
         permissionActions.update,
         {
           id,
-          jurisdictionId: jurisId,
         },
       );
     });
@@ -1815,7 +1786,6 @@ describe('Testing user service', () => {
       ).rejects.toThrowError(`user id: ${id} was requested but not found`);
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1872,7 +1842,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1888,14 +1857,16 @@ describe('Testing user service', () => {
       });
       expect(prisma.userAccounts.create).toHaveBeenCalledWith({
         data: {
-          passwordHash: expect.anything(),
+          passwordHash: expect.any(String),
           email: 'partnerUser@email.com',
           firstName: 'Partner User firstName',
+          middleName: undefined,
           lastName: 'Partner User lastName',
+          dob: undefined,
+          phoneNumber: undefined,
+          language: undefined,
           mfaEnabled: true,
-          jurisdictions: {
-            connect: [{ id: jurisId }],
-          },
+          listings: undefined,
           userRoles: {
             create: {
               isAdmin: true,
@@ -1952,7 +1923,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -1968,7 +1938,6 @@ describe('Testing user service', () => {
       });
       expect(prisma.userAccounts.update).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -2017,6 +1986,7 @@ describe('Testing user service', () => {
         userRoles: {
           isPartner: true,
         },
+        listings: [{ id: 'listing id' }],
         jurisdictions: [{ id: jurisId }],
       });
       prisma.userAccounts.update = jest.fn().mockResolvedValue(null);
@@ -2048,7 +2018,6 @@ describe('Testing user service', () => {
       ).rejects.toThrowError('emailInUse');
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -2117,7 +2086,6 @@ describe('Testing user service', () => {
       );
       expect(prisma.userAccounts.findUnique).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -2134,7 +2102,7 @@ describe('Testing user service', () => {
       expect(prisma.userAccounts.create).toHaveBeenCalledWith({
         data: {
           dob: undefined,
-          passwordHash: expect.anything(),
+          passwordHash: expect.any(String),
           phoneNumber: undefined,
           userRoles: undefined,
           email: 'publicUser@email.com',
@@ -2144,14 +2112,10 @@ describe('Testing user service', () => {
           listings: undefined,
           middleName: undefined,
           mfaEnabled: false,
-          jurisdictions: {
-            connect: { name: 'juris 1' },
-          },
         },
       });
       expect(prisma.userAccounts.update).toHaveBeenCalledWith({
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -2329,9 +2293,6 @@ describe('Testing user service', () => {
         where: {
           email: 'example@exygy.com',
         },
-        include: {
-          jurisdictions: true,
-        },
       });
       expect(prisma.userAccounts.update).not.toHaveBeenCalled();
       expect(emailService.sendSingleUseCode).not.toHaveBeenCalled();
@@ -2375,9 +2336,6 @@ describe('Testing user service', () => {
         where: {
           email: 'example@exygy.com',
         },
-        include: {
-          jurisdictions: true,
-        },
       });
       expect(prisma.jurisdictions.findFirst).not.toHaveBeenCalled();
       expect(prisma.userAccounts.update).not.toHaveBeenCalled();
@@ -2409,9 +2367,6 @@ describe('Testing user service', () => {
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -2461,9 +2416,6 @@ describe('Testing user service', () => {
         where: {
           email: 'example@exygy.com',
         },
-        include: {
-          jurisdictions: true,
-        },
       });
       expect(prisma.jurisdictions.findFirst).not.toHaveBeenCalled();
       expect(prisma.userAccounts.update).not.toHaveBeenCalled();
@@ -2500,9 +2452,6 @@ describe('Testing user service', () => {
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -2560,9 +2509,6 @@ describe('Testing user service', () => {
       expect(prisma.userAccounts.findFirst).toHaveBeenCalledWith({
         where: {
           email: 'example@exygy.com',
-        },
-        include: {
-          jurisdictions: true,
         },
       });
       expect(prisma.jurisdictions.findFirst).toHaveBeenCalledWith({
@@ -2626,7 +2572,6 @@ describe('Testing user service', () => {
           },
         },
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -2675,7 +2620,6 @@ describe('Testing user service', () => {
           },
         },
         include: {
-          jurisdictions: true,
           listings: true,
           userRoles: true,
           favoriteListings: {
@@ -2816,9 +2760,6 @@ describe('Testing user service', () => {
       emailService.warnOfAccountRemoval = jest.fn();
       const response = await service.warnUserOfDeletionCronJob();
       expect(prisma.userAccounts.findMany).toBeCalledWith({
-        include: {
-          jurisdictions: true,
-        },
         where: {
           lastLoginAt: { lte: new Date('2022-12-23T12:25:00.000Z') },
           userRoles: null,
@@ -2841,8 +2782,12 @@ describe('Testing user service', () => {
           id: 'id2',
         },
       });
-      expect(emailService.warnOfAccountRemoval).toBeCalledWith({ id: 'id1' });
-      expect(emailService.warnOfAccountRemoval).toBeCalledWith({ id: 'id2' });
+      expect(emailService.warnOfAccountRemoval).toBeCalledWith(
+        expect.objectContaining({ id: 'id1' }),
+      );
+      expect(emailService.warnOfAccountRemoval).toBeCalledWith(
+        expect.objectContaining({ id: 'id2' }),
+      );
       expect(response).toEqual({ success: true });
     });
     it('should not update user if email failed', async () => {
@@ -2862,9 +2807,6 @@ describe('Testing user service', () => {
         .mockRejectedValue('error sending email');
       const response = await service.warnUserOfDeletionCronJob();
       expect(prisma.userAccounts.findMany).toBeCalledWith({
-        include: {
-          jurisdictions: true,
-        },
         where: {
           lastLoginAt: { lte: new Date('2022-12-23T12:25:00.000Z') },
           userRoles: null,

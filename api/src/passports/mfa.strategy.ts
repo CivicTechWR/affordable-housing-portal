@@ -46,7 +46,6 @@ export class MfaStrategy extends PassportStrategy(Strategy, 'mfa') {
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: true,
       },
       where: {
         email: dto.email,
@@ -96,7 +95,20 @@ export class MfaStrategy extends PassportStrategy(Strategy, 'mfa') {
     if (!rawUser.mfaEnabled) {
       // if user is not an mfaEnabled user
       await this.updateStoredUser(null, null, null, 0, rawUser.id);
-      return mapTo(User, rawUser);
+      const siteJurisdiction = await this.prisma.jurisdictions.findFirst({
+        include: {
+          featureFlags: {
+            select: {
+              name: true,
+              active: true,
+            },
+          },
+        },
+      });
+      return mapTo(User, {
+        ...rawUser,
+        jurisdictions: siteJurisdiction ? [siteJurisdiction] : [],
+      });
     }
 
     let authSuccess = true;
@@ -162,7 +174,20 @@ export class MfaStrategy extends PassportStrategy(Strategy, 'mfa') {
       rawUser.failedLoginAttemptsCount,
       rawUser.id,
     );
-    return mapTo(User, rawUser);
+    const siteJurisdiction = await this.prisma.jurisdictions.findFirst({
+      include: {
+        featureFlags: {
+          select: {
+            name: true,
+            active: true,
+          },
+        },
+      },
+    });
+    return mapTo(User, {
+      ...rawUser,
+      jurisdictions: siteJurisdiction ? [siteJurisdiction] : [],
+    });
   }
 
   async updateFailedLoginCount(count: number, userId: string): Promise<void> {

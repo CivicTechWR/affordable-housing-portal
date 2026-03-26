@@ -38,6 +38,7 @@ import { SuccessDTO } from '../dtos/shared/success.dto';
 import { EmailAndAppUrl } from '../dtos/users/email-and-app-url.dto';
 import { ConfirmationRequest } from '../dtos/users/confirmation-request.dto';
 import { IdDTO } from '../dtos/shared/id.dto';
+import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import { UserInvite } from '../dtos/users/user-invite.dto';
 import { UserCreate } from '../dtos/users/user-create.dto';
 import { EmailService } from './email.service';
@@ -61,7 +62,6 @@ import { ApplicationService } from './application.service';
 
 const views: Partial<Record<UserViews, Prisma.UserAccountsInclude>> = {
   base: {
-    jurisdictions: true,
     userRoles: true,
   },
 };
@@ -117,6 +117,75 @@ export class UserService {
     );
   }
 
+  /**
+   * Loads the singleton jurisdiction used as the implicit site context for users.
+   *
+   * @returns An array containing the singleton jurisdiction, or an empty array when none exists.
+   */
+  private async getProjectedJurisdictions(): Promise<Jurisdiction[]> {
+    const siteJurisdiction = await this.prisma.jurisdictions.findFirst({
+      include: {
+        featureFlags: true,
+      },
+    });
+
+    return siteJurisdiction ? mapTo(Jurisdiction, [siteJurisdiction]) : [];
+  }
+
+  /**
+   * Reattaches the singleton jurisdiction to a user-shaped object for compatibility.
+   *
+   * @param rawUser - The raw user record to decorate.
+   * @returns The user record with a synthetic `jurisdictions` array, or `null` when no user was provided.
+   */
+  private async attachProjectedJurisdictionsToUser<T extends object>(
+    rawUser: T | null,
+  ): Promise<(T & { jurisdictions: Jurisdiction[] }) | null> {
+    if (!rawUser) {
+      return null;
+    }
+
+    const existingJurisdictions = (
+      rawUser as { jurisdictions?: Jurisdiction[] }
+    ).jurisdictions;
+    if (existingJurisdictions) {
+      return rawUser as T & { jurisdictions: Jurisdiction[] };
+    }
+
+    const jurisdictions = await this.getProjectedJurisdictions();
+
+    return {
+      ...rawUser,
+      jurisdictions,
+    };
+  }
+
+  /**
+   * Reattaches the singleton jurisdiction to multiple user-shaped objects for compatibility.
+   *
+   * @param rawUsers - The raw user records to decorate.
+   * @returns The user records with a synthetic `jurisdictions` array on each item.
+   */
+  private async attachProjectedJurisdictionsToUsers<T extends object>(
+    rawUsers: T[],
+  ): Promise<Array<T & { jurisdictions: Jurisdiction[] }>> {
+    if (
+      rawUsers.every(
+        (rawUser) =>
+          !!(rawUser as { jurisdictions?: Jurisdiction[] }).jurisdictions,
+      )
+    ) {
+      return rawUsers as Array<T & { jurisdictions: Jurisdiction[] }>;
+    }
+
+    const jurisdictions = await this.getProjectedJurisdictions();
+
+    return rawUsers.map((rawUser) => ({
+      ...rawUser,
+      jurisdictions,
+    }));
+  }
+
   /*
     this will get a set of users given the params passed in
     Only users with a user role of admin or jurisdictional admin can get the list of available users.
@@ -148,7 +217,10 @@ export class UserService {
       where: whereClause,
     });
 
-    const users = mapTo(User, rawUsers);
+    const users = mapTo(
+      User,
+      await this.attachProjectedJurisdictionsToUsers(rawUsers),
+    );
 
     const paginationInfo = buildPaginationMetaInfo(params, count, users.length);
 
@@ -182,32 +254,14 @@ export class UserService {
       UserViews.full,
     );
 
-    if (dto.jurisdictions?.length) {
-      // if the incoming dto has jurisdictions make sure the user has access to update users in that jurisdiction
-      await Promise.all(
-        dto.jurisdictions.map(async (jurisdiction) => {
-          await this.permissionService.canOrThrow(
-            requestingUser,
-            'user',
-            permissionActions.update,
-            {
-              id: dto.id,
-              jurisdictionId: jurisdiction.id,
-            },
-          );
-        }),
-      );
-    } else {
-      // if the incoming dto has no jurisdictions make sure the user has access to update the user
-      await this.permissionService.canOrThrow(
-        requestingUser,
-        'userProfile',
-        permissionActions.update,
-        {
-          id: dto.id,
-        },
-      );
-    }
+    await this.permissionService.canOrThrow(
+      requestingUser,
+      'user',
+      permissionActions.update,
+      {
+        id: dto.id,
+      },
+    );
 
     let passwordHash: string;
     let passwordUpdatedAt: Date;
@@ -243,9 +297,7 @@ export class UserService {
       );
 
       await this.emailService.changeEmail(
-        dto.jurisdictions && dto.jurisdictions[0]
-          ? dto.jurisdictions[0].name
-          : jurisdictionName,
+        storedUser.jurisdictions?.[0]?.name || jurisdictionName,
         mapTo(User, storedUser),
         dto.appUrl,
         confirmationUrl,
@@ -275,27 +327,13 @@ export class UserService {
       }
     }
 
-    // disconnect existing connected listings/jurisdictions
+    // disconnect existing connected listings
     if (storedUser.listings?.length) {
       await this.prisma.userAccounts.update({
         data: {
           listings: {
             disconnect: storedUser.listings.map((listing) => ({
               id: listing.id,
-            })),
-          },
-        },
-        where: {
-          id: dto.id,
-        },
-      });
-    }
-    if (storedUser.jurisdictions?.length) {
-      await this.prisma.userAccounts.update({
-        data: {
-          jurisdictions: {
-            disconnect: storedUser.jurisdictions.map((jurisdiction) => ({
-              id: jurisdiction.id,
             })),
           },
         },
@@ -324,20 +362,13 @@ export class UserService {
               connect: dto.listings.map((listing) => ({ id: listing.id })),
             }
           : undefined,
-        jurisdictions: dto.jurisdictions
-          ? {
-              connect: dto.jurisdictions.map((jurisdiction) => ({
-                id: jurisdiction.id,
-              })),
-            }
-          : undefined,
       },
       where: {
         id: dto.id,
       },
     });
 
-    return mapTo(User, res);
+    return mapTo(User, await this.attachProjectedJurisdictionsToUser(res));
   }
 
   /*
@@ -565,10 +596,13 @@ export class UserService {
         email: dto.email,
       },
     });
+    const projectedExistingUser = await this.attachProjectedJurisdictionsToUser(
+      existingUser,
+    );
 
-    if (existingUser) {
+    if (projectedExistingUser) {
       // if attempting to recreate an existing user
-      if (!existingUser.userRoles && 'userRoles' in dto) {
+      if (!projectedExistingUser.userRoles && 'userRoles' in dto) {
         // existing user && public user && user will get roles -> trying to grant partner access to a public user
         const res = await this.prisma.userAccounts.update({
           include: views.full,
@@ -582,46 +616,53 @@ export class UserService {
               connect: dto.listings.map((listing) => ({ id: listing.id })),
             },
             confirmationToken:
-              existingUser.confirmationToken ||
-              this.createConfirmationToken(existingUser.id, existingUser.email),
+              projectedExistingUser.confirmationToken ||
+              this.createConfirmationToken(
+                projectedExistingUser.id,
+                projectedExistingUser.email,
+              ),
             confirmedAt: null,
           },
           where: {
-            id: existingUser.id,
+            id: projectedExistingUser.id,
           },
         });
-        return mapTo(User, res);
+        return mapTo(User, await this.attachProjectedJurisdictionsToUser(res));
       } else if (
-        existingUser?.userRoles?.isPartner &&
+        projectedExistingUser.userRoles?.isPartner &&
         'userRoles' in dto &&
-        dto?.userRoles?.isPartner &&
-        this.jurisdictionMismatch(dto.jurisdictions, existingUser.jurisdictions)
+        dto.userRoles?.isPartner
       ) {
-        // recreating a partner with jurisdiction mismatch -> giving partner a new jurisdiction
-        const jursidictions = existingUser.jurisdictions
-          .map((juris) => ({ id: juris.id }))
-          .concat(dto.jurisdictions);
+        const existingListings = projectedExistingUser.listings ?? [];
+        const incomingListings = dto.listings ?? [];
+        const hasNewListings = incomingListings.some(
+          (listing) =>
+            !existingListings.some(
+              (existingListing) => existingListing.id === listing.id,
+            ),
+        );
 
-        const listings = existingUser.listings
-          .map((juris) => ({ id: juris.id }))
-          .concat(dto.listings);
+        if (!hasNewListings) {
+          throw new ConflictException('emailInUse');
+        }
+
+        const listings = existingListings
+          .map((listing) => ({ id: listing.id }))
+          .concat(incomingListings);
 
         const res = await this.prisma.userAccounts.update({
           include: views.full,
           data: {
-            jurisdictions: {
-              connect: jursidictions.map((juris) => ({ id: juris.id })),
-            },
             listings: {
               connect: listings.map((listing) => ({ id: listing.id })),
             },
           },
           where: {
-            id: existingUser.id,
+            id: projectedExistingUser.id,
           },
         });
 
-        return mapTo(User, res);
+        return mapTo(User, await this.attachProjectedJurisdictionsToUser(res));
       } else {
         // existing user && ((partner user -> trying to recreate user) || (public user -> trying to recreate a public user))
         throw new ConflictException('emailInUse');
@@ -637,30 +678,6 @@ export class UserService {
       passwordHash = await passwordToHash((dto as UserCreate).password);
     }
 
-    let jurisdictions:
-      | {
-          jurisdictions: Prisma.JurisdictionsCreateNestedManyWithoutUser_accountsInput;
-        }
-      | Record<string, never> = dto.jurisdictions
-      ? {
-          jurisdictions: {
-            connect: dto.jurisdictions.map((juris) => ({
-              id: juris.id,
-            })),
-          },
-        }
-      : {};
-
-    if (!forPartners && jurisdictionName) {
-      jurisdictions = {
-        jurisdictions: {
-          connect: {
-            name: jurisdictionName,
-          },
-        },
-      };
-    }
-
     let newUser = await this.prisma.userAccounts.create({
       data: {
         passwordHash: passwordHash,
@@ -672,7 +689,6 @@ export class UserService {
         phoneNumber: dto.phoneNumber,
         language: dto.language,
         mfaEnabled: forPartners,
-        ...jurisdictions,
         userRoles:
           'userRoles' in dto
             ? {
@@ -707,11 +723,7 @@ export class UserService {
 
     // Public user that needs email
     if (!forPartners && sendWelcomeEmail) {
-      const fullJurisdiction = await this.prisma.jurisdictions.findFirst({
-        where: {
-          name: jurisdictionName as string,
-        },
-      });
+      const fullJurisdiction = await this.prisma.jurisdictions.findFirst();
 
       if (fullJurisdiction?.allowSingleUseCodeLogin) {
         this.requestSingleUseCode(dto, req);
@@ -721,8 +733,8 @@ export class UserService {
           confirmationToken,
         );
         await this.emailService.welcome(
-          jurisdictionName,
-          mapTo(User, newUser),
+          jurisdictionName || fullJurisdiction?.name,
+          mapTo(User, await this.attachProjectedJurisdictionsToUser(newUser)),
           dto.appUrl,
           confirmationUrl,
         );
@@ -733,8 +745,8 @@ export class UserService {
         confirmationToken,
       );
       await this.emailService.invitePartnerUser(
-        dto.jurisdictions,
-        mapTo(User, newUser),
+        [],
+        mapTo(User, await this.attachProjectedJurisdictionsToUser(newUser)),
         this.configService.get('PARTNERS_PORTAL_URL'),
         confirmationUrl,
       );
@@ -744,7 +756,7 @@ export class UserService {
       await this.connectUserWithExistingApplications(newUser.email, newUser.id);
     }
 
-    return mapTo(User, newUser);
+    return mapTo(User, await this.attachProjectedJurisdictionsToUser(newUser));
   }
 
   /*
@@ -784,15 +796,9 @@ export class UserService {
     takes in a userId or email to find by, and a boolean to indicate if joins should be included
   */
   async findUserOrError(findBy: findByOptions, view?: UserViews) {
-    const where: Prisma.UserAccountsWhereUniqueInput = {
-      id: undefined,
-      email: undefined,
-    };
-    if (findBy.userId) {
-      where.id = findBy.userId;
-    } else if (findBy.email) {
-      where.email = findBy.email;
-    }
+    const where: Prisma.UserAccountsWhereUniqueInput = findBy.userId
+      ? { id: findBy.userId }
+      : { email: findBy.email };
     const rawUser = await this.prisma.userAccounts.findUnique({
       include: view ? views[view] : undefined,
       where,
@@ -808,7 +814,7 @@ export class UserService {
       throw new NotFoundException(`user ${str} was requested but not found`);
     }
 
-    return rawUser;
+    return await this.attachProjectedJurisdictionsToUser(rawUser);
   }
 
   async authorizeAction(
@@ -822,35 +828,19 @@ export class UserService {
       );
     }
 
-    if (!requestingUser.userRoles?.isJurisdictionalAdmin) {
-      // if its an admin, partner, or a user without roles
-      await this.permissionService.canOrThrow(requestingUser, 'user', action, {
-        id: targetUser.id,
-      });
-    } else if (targetUser.userRoles?.isAdmin) {
+    if (
+      requestingUser.userRoles?.isJurisdictionalAdmin &&
+      targetUser.userRoles?.isAdmin
+    ) {
       // if its a jurisdictional admin trying to perform an action on an admin user
       throw new ForbiddenException(
         `a jurisdictional admin is attempting to ${action} an admin user`,
       );
-    } else {
-      // jurisdictional admins should only be allowed to perform an action on a user if they share a jurisdiction
-      const requesterJurisdictions = requestingUser.jurisdictions?.map(
-        (juris) => juris.id,
-      );
-      const targetJurisdictions = targetUser.jurisdictions?.map(
-        (juris) => juris.id,
-      );
-
-      if (
-        !requesterJurisdictions.some((juris) =>
-          targetJurisdictions.includes(juris),
-        )
-      ) {
-        throw new ForbiddenException(
-          `a jurisdictional admin is attempting to ${action} a user they do not share a jurisdiction with`,
-        );
-      }
     }
+
+    await this.permissionService.canOrThrow(requestingUser, 'user', action, {
+      id: targetUser.id,
+    });
   }
 
   /*
@@ -877,27 +867,6 @@ export class UserService {
   */
   getPartnersConfirmationUrl(appUrl: string, confirmationToken: string) {
     return `${appUrl}/users/confirm?token=${confirmationToken}`;
-  }
-
-  /*
-    verify that there is a jurisdictional difference between the incoming user and the existing user
-  */
-  jurisdictionMismatch(
-    incomingJurisdictions: IdDTO[],
-    existingJurisdictions: IdDTO[],
-  ): boolean {
-    return (
-      incomingJurisdictions.reduce((misMatched, jurisdiction) => {
-        if (
-          !existingJurisdictions?.some(
-            (existingJuris) => existingJuris.id === jurisdiction.id,
-          )
-        ) {
-          misMatched.push(jurisdiction.id);
-        }
-        return misMatched;
-      }, []).length > 0
-    );
   }
 
   containsInvalidCharacters(value: string): boolean {
@@ -931,9 +900,6 @@ export class UserService {
   ): Promise<SuccessDTO> {
     const user = await this.prisma.userAccounts.findFirst({
       where: { email: dto.email },
-      include: {
-        jurisdictions: true,
-      },
     });
     if (!user) {
       return { success: true };
@@ -989,7 +955,7 @@ export class UserService {
     });
 
     await this.emailService.sendSingleUseCode(
-      mapTo(User, user),
+      mapTo(User, await this.attachProjectedJurisdictionsToUser(user)),
       singleUseCode,
       juris.name,
     );
@@ -1008,7 +974,7 @@ export class UserService {
       UserViews.favorites,
     );
 
-    return mapTo(IdDTO, rawUser.favoriteListings);
+    return mapTo(IdDTO, rawUser.favoriteListings) as IdDTO[];
   }
 
   async modifyFavoriteListings(dto: UserFavoriteListing, requestingUser: User) {
@@ -1048,7 +1014,10 @@ export class UserService {
       },
     });
 
-    return mapTo(User, rawResults);
+    return mapTo(
+      User,
+      await this.attachProjectedJurisdictionsToUser(rawResults),
+    );
   }
 
   private async deleteUserAndRelatedInfo(
@@ -1162,9 +1131,6 @@ export class UserService {
         .subtract(warnDateNumber, 'days')
         .toDate();
       const users = await this.prisma.userAccounts.findMany({
-        include: {
-          jurisdictions: true,
-        },
         where: {
           lastLoginAt: { lte: warnDate },
           userRoles: null,
@@ -1174,7 +1140,9 @@ export class UserService {
       this.logger.warn(`warning ${users.length} users of account deletion`);
       for (const user of users) {
         try {
-          await this.emailService.warnOfAccountRemoval(mapTo(User, user));
+          await this.emailService.warnOfAccountRemoval(
+            mapTo(User, await this.attachProjectedJurisdictionsToUser(user)),
+          );
           await this.prisma.userAccounts.update({
             data: { wasWarnedOfDeletion: true },
             where: { id: user.id },

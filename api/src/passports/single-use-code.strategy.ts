@@ -74,7 +74,6 @@ export class SingleUseCodeStrategy extends PassportStrategy(
       include: {
         userRoles: true,
         listings: true,
-        jurisdictions: true,
       },
       where: {
         email: dto.email,
@@ -150,7 +149,20 @@ export class SingleUseCodeStrategy extends PassportStrategy(
       rawUser.failedLoginAttemptsCount,
       rawUser.id,
     );
-    return mapTo(User, rawUser);
+    const siteJurisdiction = await this.prisma.jurisdictions.findFirst({
+      include: {
+        featureFlags: {
+          select: {
+            name: true,
+            active: true,
+          },
+        },
+      },
+    });
+    return mapTo(User, {
+      ...rawUser,
+      jurisdictions: siteJurisdiction ? [siteJurisdiction] : [],
+    });
   }
 
   async updateFailedLoginCount(count: number, userId: string): Promise<void> {
