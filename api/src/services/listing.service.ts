@@ -129,6 +129,11 @@ includeViews.base = {
   listingFeatures: true,
   listingUtilities: true,
   listingNeighborhoodAmenities: true,
+  customListingFeatures: {
+    include: {
+      customListingFeature: true,
+    },
+  },
   units: {
     include: {
       unitTypes: true,
