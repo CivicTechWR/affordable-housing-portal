@@ -720,7 +720,7 @@ describe("listing data", () => {
       ).toBeInTheDocument()
     })
 
-    describe("should display Additional Eligibility Rules section", () => {
+    describe("should display Building Selection Criteria section", () => {
       it("should display data with selection criteria", () => {
         render(
           <ListingContext.Provider
@@ -732,31 +732,9 @@ describe("listing data", () => {
           </ListingContext.Provider>
         )
 
-        expect(screen.getByText("Additional eligibility rules")).toBeInTheDocument()
-        expect(screen.getByText("Credit history")).toBeInTheDocument()
         expect(
-          // Look only for part of the text to verify that content rendered properly
-          screen.getByText(
-            /Applications will be rated on a score system for housing. An applicant's score may be impacted by negative tenant peformance information provided to the credit reporting agency./
-          )
+          screen.getByRole("heading", { level: 2, name: "Building selection criteria" })
         ).toBeInTheDocument()
-        expect(screen.getByText("Rental history")).toBeInTheDocument()
-        expect(
-          // Look only for part of the text to verify that content rendered properly
-          screen.getByText(
-            /Two years of rental history will be verified with all applicable landlords./
-          )
-        ).toBeInTheDocument()
-        expect(screen.getByText("Criminal background")).toBeInTheDocument()
-        expect(
-          // Look only for part of the text to verify that content rendered properly
-          screen.getByText(
-            /A criminal background investigation will be obtained on each applicant./
-          )
-        ).toBeInTheDocument()
-        expect(screen.getByText("Rental assistance")).toBeInTheDocument()
-        expect(screen.getByText("Custom rental assistance")).toBeInTheDocument()
-        expect(screen.getByText("Building selection criteria")).toBeInTheDocument()
         expect(screen.getByText("URL")).toBeInTheDocument()
         expect(
           screen.getByText(

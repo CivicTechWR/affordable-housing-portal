@@ -40,7 +40,6 @@ export const listingFactory = async (
     closedAt?: Date;
     digitalApp?: boolean;
     includeBuildingFeatures?: boolean;
-    includeEligibilityRules?: boolean;
     includeReservedCommunityTypes?: boolean;
     listing?: Prisma.ListingsCreateInput;
     listingEvents?: Prisma.ListingEventsCreateWithoutListingsInput[];
@@ -228,7 +227,6 @@ export const listingFactory = async (
           },
         }
       : {},
-    ...additionalEligibilityRules(optionalParams?.includeEligibilityRules),
     ...buildingFeatures(optionalParams?.includeBuildingFeatures),
     ...featuresAndUtilites(
       optionalParams?.optionalFeatures,
@@ -239,10 +237,6 @@ export const listingFactory = async (
       : {}),
     ...previousListing,
   };
-};
-
-const additionalEligibilityRules = (_includeEligibilityRules: boolean) => {
-  return {};
 };
 
 const buildingFeatures = (includeBuildingFeatures: boolean) => {

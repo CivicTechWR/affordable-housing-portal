@@ -140,7 +140,6 @@ describe("add listing", () => {
     expect(screen.getByRole("heading", { level: 2, name: "Housing programs" }))
     expect(screen.getByRole("heading", { level: 2, name: "Additional fees" }))
     expect(screen.getByRole("heading", { level: 2, name: "Building features" }))
-    expect(screen.getByRole("heading", { level: 2, name: "Additional eligibility rules" }))
     expect(screen.getByRole("heading", { level: 2, name: "Additional details" }))
 
     // Application Process tab
@@ -401,10 +400,6 @@ describe("add listing", () => {
       "Parking fee",
       "Pets policy",
       "Services offered",
-      "Credit history",
-      "Rental history",
-      "Criminal background",
-      "Rental assistance",
       "Required documents",
       "Important program rules",
       "Special notes",
@@ -512,10 +507,6 @@ describe("add listing", () => {
       "Smoking policy",
       "Pets policy",
       "Services offered",
-      "Credit history",
-      "Rental history",
-      "Criminal background",
-      "Rental assistance",
       "Required documents",
       "Important program rules",
       "Special notes",
