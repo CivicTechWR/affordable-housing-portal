@@ -26,7 +26,7 @@ import { FeatureFlagModule } from './feature-flag.module';
 import { CronJobModule } from './cron-job.module';
 import { PropertyModule } from './property.module';
 import { AgencyModule } from './agency.module';
-import { CustomFeatureModule } from './custom-feature.module';
+import { CustomFeatureModule } from './custom-listing-feature.module';
 
 @Module({
   imports: [
@@ -93,4 +93,4 @@ import { CustomFeatureModule } from './custom-feature.module';
     FeatureFlagModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

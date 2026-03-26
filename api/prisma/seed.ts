@@ -8,7 +8,7 @@ import { devSeeding } from './seed-dev';
 import { unitTypeFactoryAll } from './seed-helpers/unit-type-factory';
 import { unitAccessibilityPriorityTypeFactoryAll } from './seed-helpers/unit-accessibility-priority-type-factory';
 import { reservedCommunityTypeFactoryAll } from './seed-helpers/reserved-community-type-factory';
-import { seedCustomListingFeatures } from './seed-helpers/starter-seed/custom-feature-seed';
+import { seedCustomListingFeatures } from './seed-helpers/starter-seed/custom-listing-feature-seed';
 
 const options: { [name: string]: { type: 'string' | 'boolean' } } = {
   environment: { type: 'string' },

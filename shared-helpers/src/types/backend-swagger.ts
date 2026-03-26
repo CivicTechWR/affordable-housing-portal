@@ -74,12 +74,12 @@ export function getConfigs(
 
 export const basePath = ""
 
-export interface IList<T> extends Array<T> {}
-export interface List<T> extends Array<T> {}
+export interface IList<T> extends Array<T> { }
+export interface List<T> extends Array<T> { }
 export interface IDictionary<TValue> {
   [key: string]: TValue
 }
-export interface Dictionary<TValue> extends IDictionary<TValue> {}
+export interface Dictionary<TValue> extends IDictionary<TValue> { }
 
 export interface IListResult<T> {
   items?: T[]
@@ -7621,6 +7621,24 @@ export interface ListingFeaturesConfiguration {
 
   /** Flat list of features (use this or the categories, not both) */
   fields?: ListingFeatureField[]
+}
+
+export enum CustomListingScope {
+  // Replace these with your actual Prisma enum values
+  PROPERTY = 'PROPERTY',
+  UNIT = 'UNIT',
+}
+export interface CustomListingFeature {
+  displayName: string;
+  key: string;
+  category: string;
+  scope: CustomListingScope;
+  id: string;
+}
+
+export interface CustomListingFeatureCategory {
+  name: string;
+  features: CustomListingFeature[];
 }
 
 export interface JurisdictionCreate {

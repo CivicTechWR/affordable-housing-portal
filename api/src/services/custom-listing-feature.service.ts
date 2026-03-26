@@ -13,8 +13,8 @@ import { CustomListingFeatures } from '@prisma/client';
 */
 
 @Injectable()
-export class CustomFeatureService {
-  constructor(private prisma: PrismaService) {}
+export class CustomListingFeatureService {
+  constructor(private prisma: PrismaService) { }
 
   /*
       this will get a set of custom listing features given the params passed in
