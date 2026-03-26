@@ -304,10 +304,7 @@ describe('ListingCreateUpdateValidationPipe', () => {
 
       // Mock jurisdiction with custom required fields
       mockPrisma.jurisdictions.findFirst.mockResolvedValue({
-        requiredListingFields: [
-          'name',
-          'leasingAgentEmail',
-        ],
+        requiredListingFields: ['name', 'leasingAgentEmail'],
       });
 
       const expectedTransformedValue = {
