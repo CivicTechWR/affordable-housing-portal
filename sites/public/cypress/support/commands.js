@@ -17,13 +17,13 @@ Cypress.Commands.add("signIn", (email, password) => {
 Cypress.Commands.add("signOut", () => {
   // TODO: once the favorites feature is being tested, this is Sign out-4:
   if (Cypress.env("showSeedsDesign")) {
-    cy.get(`[data-testid="My account"]`).trigger("click")
-    cy.get(`[data-testid="Sign out"]`).trigger("click")
+    cy.get(`[data-testid="My account"]`).click()
+    cy.get(`[data-testid="Sign out"]`).should("be.visible").click()
   } else {
     // data-testid for SiteHeader in this path is set in ui-components
     // See https://github.com/bloom-housing/ui-components/blob/c35c094554e8199f202d67a405272035189060ec/src/headers/SiteHeader.tsx#L175
     cy.get(`[data-testid="My account-2"]`).trigger("mouseover")
-    cy.get(`[data-testid="Sign out-3"]`).trigger("click")
+    cy.get(`[data-testid="Sign out-3"]`).should("be.visible").click({ force: true })
   }
 })
 
@@ -378,23 +378,21 @@ Cypress.Commands.add("step8PreferredUnits", (application, autofill) => {
 })
 
 Cypress.Commands.add("step9Accessibility", (application, autofill) => {
-  if (!autofill) {
-    if (application.accessibility.mobility) {
-      cy.getByTestId("app-ada-mobility").check()
-    }
-    if (application.accessibility.vision) {
-      cy.getByTestId("app-ada-vision").check()
-    }
-    if (application.accessibility.hearing) {
-      cy.getByTestId("app-ada-hearing").check()
-    }
-    if (
-      !application.accessibility.hearing &&
-      !application.accessibility.hearing &&
-      !application.accessibility.mobility
-    ) {
-      cy.getByTestId("app-ada-none").check()
-    }
+  if (application.accessibility.mobility) {
+    cy.getByTestId("app-ada-mobility").check()
+  }
+  if (application.accessibility.vision) {
+    cy.getByTestId("app-ada-vision").check()
+  }
+  if (application.accessibility.hearing) {
+    cy.getByTestId("app-ada-hearing").check()
+  }
+  if (
+    !application.accessibility.hearing &&
+    !application.accessibility.vision &&
+    !application.accessibility.mobility
+  ) {
+    cy.getByTestId("app-ada-none").check()
   }
 
   cy.goNext()

@@ -153,18 +153,22 @@ export async function fetchBaseListingData(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   req: any
 ) {
-  let listings
-  let pagination
+  let listings = []
+  let pagination = null
   try {
-    const { id: jurisdictionId, featureFlags } = await fetchJurisdictionByName(req)
+    const jurisdiction = await fetchJurisdictionByName(req)
 
-    if (!jurisdictionId) {
-      return listings
+    if (!jurisdiction?.id) {
+      return {
+        items: listings,
+        meta: pagination,
+      }
     }
+
     let filter: ListingFilterParams[] = [
       {
         $comparison: EnumListingFilterParamsComparison["="],
-        jurisdiction: jurisdictionId,
+        jurisdiction: jurisdiction.id,
       },
     ]
 
@@ -185,8 +189,9 @@ export async function fetchBaseListingData(
     }
 
     const enablePagination =
-      featureFlags.find((flag) => flag.name === FeatureFlagEnum.enableListingPagination)?.active ||
-      false
+      jurisdiction.featureFlags.find(
+        (flag) => flag.name === FeatureFlagEnum.enableListingPagination
+      )?.active || false
 
     if (page && enablePagination) {
       params.page = page
