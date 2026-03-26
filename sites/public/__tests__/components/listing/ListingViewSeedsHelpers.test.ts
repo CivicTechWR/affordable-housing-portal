@@ -865,7 +865,7 @@ describe("ListingViewSeedsHelpers", () => {
       })
     })
 
-    it("should return programs with program copy when swapCommunityTypeWithPrograms is false", () => {
+    it("should not return programs section when swapCommunityTypeWithPrograms is false", () => {
       const eligibilitySections = getEligibilitySections(
         {
           ...jurisdiction,
@@ -900,13 +900,12 @@ describe("ListingViewSeedsHelpers", () => {
         }
       )
 
-      expect(eligibilitySections).toContainEqual({
-        header: "Housing programs",
-        note: "One or more questions in the application will help to determine whether or not you are eligible for the housing programs listed above. After you have submitted your application, the property manager will ask you to verify your housing program eligibility by providing documentation or another form of verification.",
-        subheader:
-          "Some or all of the units for this property are reserved for persons who qualify for the particular housing program(s) listed below. You may need to qualify for one of these programs in order to be eligible for a unit at this property.",
-        content: expect.anything(),
-      })
+      expect(eligibilitySections).not.toContainEqual(
+        expect.objectContaining({ header: "Housing programs" })
+      )
+      expect(eligibilitySections).not.toContainEqual(
+        expect.objectContaining({ header: "Community types" })
+      )
     })
 
     it("should return programs with community type copy when swapCommunityTypeWithPrograms is true", () => {

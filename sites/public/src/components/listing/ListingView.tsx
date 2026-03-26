@@ -235,12 +235,14 @@ export const ListingView = (props: ListingProps) => {
     })
   }
 
-  if (listingPrograms && listingPrograms?.length > 0) {
+  const swapCommunityTypeWithPrograms = isFeatureFlagOn(
+    jurisdiction,
+    FeatureFlagEnum.swapCommunityTypeWithPrograms
+  )
+
+  if (swapCommunityTypeWithPrograms && listingPrograms && listingPrograms?.length > 0) {
     programsSection = (
-      <ListSection
-        title={t("listings.sections.housingProgramsTitle")}
-        subtitle={t("listings.sections.housingProgramsSubtitle")}
-      >
+      <ListSection title={t("t.communityTypes")} subtitle={t("listings.communityTypesDescription")}>
         <>
           {getMultiselectQuestionData(MultiselectQuestionsApplicationSectionEnum.programs).map(
             (msq, index) => {
@@ -259,7 +261,7 @@ export const ListingView = (props: ListingProps) => {
               )
             }
           )}
-          <p className="text-gray-750 text-sm">{t("listings.remainingUnitsAfterPrograms")}</p>
+          <p className="text-gray-750 text-sm">{t("listings.communityTypesNote")}</p>
         </>
       </ListSection>
     )
