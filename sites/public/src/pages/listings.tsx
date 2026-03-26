@@ -11,10 +11,8 @@ import {
   isFiltered,
 } from "../components/browse/FilterDrawerHelpers"
 import { ListingBrowse, TabsIndexEnum } from "../components/browse/ListingBrowse"
-import { ListingBrowseDeprecated } from "../components/browse/ListingBrowseDeprecated"
 import { isFeatureFlagOn } from "../lib/helpers"
 import {
-  fetchClosedListings,
   fetchJurisdictionByName,
   fetchMultiselectProgramData,
   fetchOpenListings,
@@ -22,7 +20,6 @@ import {
 
 export interface ListingsProps {
   openListings: Listing[]
-  closedListings: Listing[]
   paginationData: {
     currentPage: number
     itemCount: number
@@ -38,21 +35,14 @@ export interface ListingsProps {
 export default function ListingsPage(props: ListingsProps) {
   return (
     <>
-      {process.env.showNewSeedsDesigns ? (
-        <ListingBrowse
-          listings={props.openListings}
-          tab={TabsIndexEnum.open}
-          jurisdiction={props.jurisdiction}
-          multiselectData={props.multiselectData}
-          paginationData={props.paginationData}
-          areFiltersActive={props.areFiltersActive}
-        />
-      ) : (
-        <ListingBrowseDeprecated
-          openListings={props.openListings}
-          closedListings={props.closedListings}
-        />
-      )}
+      <ListingBrowse
+        listings={props.openListings}
+        tab={TabsIndexEnum.open}
+        jurisdiction={props.jurisdiction}
+        multiselectData={props.multiselectData}
+        paginationData={props.paginationData}
+        areFiltersActive={props.areFiltersActive}
+      />
     </>
   )
 }
@@ -60,7 +50,6 @@ export default function ListingsPage(props: ListingsProps) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getServerSideProps(context: { req: any; query: any }) {
   let openListings
-  let closedListings
   let areFiltersActive = false
 
   if (isFiltered(context.query)) {
@@ -70,7 +59,6 @@ export async function getServerSideProps(context: { req: any; query: any }) {
     areFiltersActive = true
   } else {
     openListings = await fetchOpenListings(context.req, Number(context.query.page) || 1)
-    closedListings = await fetchClosedListings(context.req, Number(context.query.page) || 1)
   }
   const jurisdiction = await fetchJurisdictionByName(context.req)
   const multiselectData = isFeatureFlagOn(
@@ -83,7 +71,6 @@ export async function getServerSideProps(context: { req: any; query: any }) {
   return {
     props: {
       openListings: openListings?.items || [],
-      closedListings: closedListings?.items || [],
       paginationData: openListings?.items?.length ? openListings.meta : null,
       jurisdiction: jurisdiction,
       multiselectData: multiselectData,
