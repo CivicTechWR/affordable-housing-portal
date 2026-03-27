@@ -104,7 +104,7 @@ export const devSeeding = async (
     }),
   });
   await prismaClient.translations.create({
-    data: translationFactory({ language: LanguagesEnum.es }),
+    data: translationFactory({ language: LanguagesEnum.fr }),
   });
   await prismaClient.translations.create({
     data: translationFactory(),

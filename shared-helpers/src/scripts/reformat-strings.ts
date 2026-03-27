@@ -3,10 +3,7 @@
 // example: `ts-node reformat-strings > flattened-keys.json`
 
 const englishTranslations = require("../locales/general.json")
-const spanishTranslations = require("../locales/es.json")
-const chineseTranslations = require("../locales/zh.json")
-const vietnameseTranslations = require("../locales/vi.json")
-const tagalogTranslations = require("../locales/tl.json")
+const frenchTranslations = require("../locales/fr.json")
 
 function main() {
   type TranslationsType = {
@@ -15,10 +12,7 @@ function main() {
 
   const allTranslations = [
     { translationKeys: englishTranslations, language: "English" },
-    { translationKeys: spanishTranslations, language: "Spanish" },
-    { translationKeys: chineseTranslations, language: "Chinese" },
-    { translationKeys: vietnameseTranslations, language: "Vietnamese" },
-    { translationKeys: tagalogTranslations, language: "Tagalog" },
+    { translationKeys: frenchTranslations, language: "French" },
   ]
 
   const addEntry = (

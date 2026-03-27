@@ -241,11 +241,11 @@ const translations = (
         signIn: 'Sign in to Affordable Housing Portal',
       },
     };
-  } else if (language === LanguagesEnum.es) {
+  } else if (language === LanguagesEnum.fr) {
     return {
       t: {
-        hello: 'Hola',
-        seeListing: 'VER EL LISTADO',
+        hello: 'Bonjour',
+        seeListing: "VOIR L'ANNONCE",
       },
       footer: {
         line1: 'Affordable Housing Portal',
@@ -254,82 +254,35 @@ const translations = (
       confirmation: {
         eligible: {
           waitlist:
-            'Los solicitantes que reúnan los requisitos quedarán en la lista de espera por orden de recepción de solicitud hasta que se cubran todos los lugares.',
+            "Les candidats éligibles seront placés sur la liste d'attente par ordre d'arrivée jusqu'à ce que tous les places soient pourvus.",
           waitlistContact:
-            'Es posible que se comuniquen con usted mientras esté en la lista de espera para confirmar que desea permanecer en la lista.',
+            "Vous pourriez être contacté(e) pendant que vous êtes sur la liste d'attente pour confirmer que vous souhaitez y rester.",
           waitlistPreference:
-            'Las preferencias de vivienda, si corresponde, afectarán al orden de la lista de espera.',
+            "Les préférences de logement, le cas échéant, affecteront l'ordre de la liste d'attente.",
         },
         interview:
-          'Si se comunican con usted para una entrevista, se le pedirá que complete una solicitud más detallada y presente documentos de respaldo.',
-        whatHappensNext: '¿Qué sucede luego?',
-        needToMakeUpdates: '¿Necesita hacer modificaciones?',
-        applicationsClosed: 'Solicitud <br />cerrada',
-        applicationsRanked: 'Solicitud <br />clasificada',
-        applicationReceived: 'Aplicación <br />recibida',
-        yourConfirmationNumber: 'Su número de confirmación',
-        gotYourConfirmationNumber: 'Recibimos tu solicitud para:',
+          'Si vous êtes contacté(e) pour un entretien, on vous demandera de remplir une demande plus détaillée et de fournir des documents justificatifs.',
+        whatHappensNext: 'Que se passe-t-il ensuite ?',
+        needToMakeUpdates: 'Besoin de faire des mises à jour ?',
+        applicationsClosed: 'Candidature <br />fermée',
+        applicationsRanked: 'Candidature <br />classée',
+        applicationReceived: 'Candidature <br />reçue',
+        yourConfirmationNumber: 'Votre numéro de confirmation',
+        gotYourConfirmationNumber: 'Nous avons reçu votre candidature pour :',
       },
       leasingAgent: {
-        officeHours: 'Horario de atención',
-        propertyManager: 'Administrador de propiedades',
+        officeHours: 'Heures de bureau',
+        propertyManager: 'Gestionnaire immobilier',
         contactAgentToUpdateInfo:
-          'Si necesita modificar información en su solicitud, no haga una solicitud nueva. Comuníquese con el agente de este listado.',
-      },
-      lotteryAvailable: {
-        header: 'Nuevos resultados de la lotería de vivienda disponibles',
-        resultsAvailable:
-          'Los resultados están disponibles para una lotería de vivienda para %{listingName}. Consulte su cuenta del portal de vivienda para obtener más información.',
-        signIn: 'Inicie sesión para ver sus resultados',
-        whatHappensHeader: '¿Qué pasa después?',
-        whatHappensContent:
-          'El administrador de la propiedad comenzará a comunicarse con los solicitantes en el orden de clasificación de la lotería, dentro de cada preferencia de la lotería. Cuando todas las unidades estén ocupadas, el administrador de la propiedad dejará de comunicarse con los solicitantes. Es posible que todas las unidades estén ocupadas antes de que el administrador de la propiedad alcance su clasificación. Si esto sucede, no se comunicarán con usted.',
-        otherOpportunities1:
-          'Para ver otras oportunidades de vivienda, visite %{appUrl}. Puede registrarse para recibir notificaciones de nuevas oportunidades de solicitud',
-        otherOpportunities2: 'aquí',
-        otherOpportunities3:
-          'Si desea obtener información sobre cómo funcionan las loterías, consulte la sección de lotería del',
-        otherOpportunities4: 'Housing Portal Centro de ayuda',
-      },
-      accountRemoval: {
-        subject: 'Eliminación programada de cuenta debido a inactividad',
-        courtesyText:
-          'Este es un correo electrónico de cortesía para informarle que, debido a que su cuenta del Portal de Vivienda Asequible ha estado inactiva durante 3 años, se eliminará en 30 días según nuestros Términos de Uso y Política de Privacidad. Si desea conservar su cuenta, inicie sesión durante el próximo mes y la consideraremos activa de nuevo.',
-        signIn: 'Iniciar sesión en el Portal de Vivienda Asequible',
+          "Si vous devez modifier des informations sur votre demande, ne soumettez pas une nouvelle demande. Contactez plutôt l'agent de cette annonce.",
       },
       register: {
-        welcome: 'Bienvenido',
+        welcome: 'Bienvenue',
         welcomeMessage:
-          'Gracias por crear su cuenta en %{appUrl}. Ahora le resultará más fácil iniciar, guardar y enviar solicitudes en línea para los anuncios que aparecen en el sitio.',
-        confirmMyAccount: 'Confirmar mi cuenta',
+          "Merci d'avoir créé votre compte sur %{appUrl}. Il vous sera désormais plus facile de commencer, sauvegarder et soumettre des candidatures en ligne pour les annonces qui apparaissent sur le site.",
+        confirmMyAccount: 'Confirmer mon compte',
         toConfirmAccountMessage:
-          'Para completar la creación de su cuenta, haga clic en el siguiente enlace:',
-      },
-      applicationUpdate: {
-        subject: 'Actualización de la aplicación para %{listingName}',
-        title: 'Su aplicación ha sido actualizada para %{listingName}',
-        greeting: 'Hola',
-        updateNotice:
-          'Se ha realizado una actualización en su solicitud de vivienda para %{listingName}.',
-        summaryTitle: 'Resumen de cambios:',
-        statusChange:
-          'El estado de su solicitud ha cambiado de %{from} a %{to}',
-        accessibleWaitListChange:
-          'Su número de lista de espera accesible es %{value}',
-        conventionalWaitListChange:
-          'Su número de lista de espera convencional es %{value}',
-        statusLabel: 'Estado de la solicitud',
-        contactNotice:
-          'No se requiere ninguna acción adicional en este momento. Si tiene alguna pregunta sobre esta actualización, comuníquese con nosotros en',
-        viewPrompt: 'Para ver su solicitud, haga clic en el siguiente enlace:',
-        viewLink: 'Ver mi solicitud',
-        applicationStatus: {
-          submitted: 'Enviada',
-          declined: 'Rechazada',
-          receivedUnit: 'Unidad recibida',
-          waitlist: 'Lista de espera',
-          waitlistDeclined: 'Lista de espera - Rechazada',
-        },
+          'Pour compléter la création de votre compte, veuillez cliquer sur le lien ci-dessous :',
       },
     };
   }

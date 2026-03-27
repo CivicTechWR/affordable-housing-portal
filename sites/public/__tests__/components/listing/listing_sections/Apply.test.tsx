@@ -358,7 +358,7 @@ describe("<Apply>", () => {
                   id: "id",
                   createdAt: new Date(),
                   updatedAt: new Date(),
-                  language: LanguagesEnum.es,
+                  language: LanguagesEnum.fr,
                   assets: {
                     id: "id",
                     createdAt: new Date(),

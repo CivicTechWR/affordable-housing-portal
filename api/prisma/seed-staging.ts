@@ -160,12 +160,7 @@ export const stagingSeed = async (
         FeatureFlagEnum.enableWhatToExpectAdditionalField,
       ],
       requiredListingFields: ['name', 'listingsBuildingAddress'],
-      languages: [
-        LanguagesEnum.en,
-        LanguagesEnum.es,
-        LanguagesEnum.ar,
-        LanguagesEnum.bn,
-      ],
+      languages: [LanguagesEnum.en, LanguagesEnum.fr],
       listingFeaturesConfiguration: defaultListingFeatureConfiguration,
     }),
   });
@@ -183,7 +178,7 @@ export const stagingSeed = async (
         FeatureFlagEnum.enablePartnerDemographics,
         FeatureFlagEnum.enablePartnerSettings,
       ],
-      languages: [LanguagesEnum.en, LanguagesEnum.es, LanguagesEnum.vi],
+      languages: [LanguagesEnum.en, LanguagesEnum.fr],
       listingFeaturesConfiguration: defaultListingFeatureConfiguration,
     }),
   });
@@ -462,7 +457,7 @@ export const stagingSeed = async (
     }),
   });
   await prismaClient.translations.create({
-    data: translationFactory({ language: LanguagesEnum.es }),
+    data: translationFactory({ language: LanguagesEnum.fr }),
   });
   await prismaClient.translations.create({
     data: translationFactory(),

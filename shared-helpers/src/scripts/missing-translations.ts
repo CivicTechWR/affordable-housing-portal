@@ -2,26 +2,14 @@
 // Prints out keys/strings that exist in the english file but not in a foreign language translation file
 // example: `ts-node missing-translations > missing-foreign-keys.json`
 const englishTranslations = require("../locales/general.json")
-const spanishTranslations = require("../locales/es.json")
-const chineseTranslations = require("../locales/zh.json")
-const vietnameseTranslations = require("../locales/vi.json")
-const tagalogTranslations = require("../locales/tl.json")
-const arabicTranslations = require("../locales/ar.json")
-const bengaliTranslations = require("../locales/bn.json")
+const frenchTranslations = require("../locales/fr.json")
 
 function main() {
   type TranslationsType = {
     [key: string]: string
   }
 
-  const allTranslations = [
-    { translationKeys: spanishTranslations, language: "Spanish" },
-    { translationKeys: chineseTranslations, language: "Chinese" },
-    { translationKeys: vietnameseTranslations, language: "Vietnamese" },
-    { translationKeys: tagalogTranslations, language: "Tagalog" },
-    { translationKeys: arabicTranslations, language: "Arabic" },
-    { translationKeys: bengaliTranslations, language: "Bengali" },
-  ]
+  const allTranslations = [{ translationKeys: frenchTranslations, language: "French" }]
 
   const findMissingStrings = (
     baseTranslations: TranslationsType,

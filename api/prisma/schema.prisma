@@ -2253,12 +2253,7 @@ enum IncomePeriodEnum {
 
 enum LanguagesEnum {
   en
-  es
-  vi
-  zh
-  tl
-  bn
-  ar
+  fr
 
   @@map("languages_enum")
 }

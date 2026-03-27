@@ -35,7 +35,7 @@ describe('Testing translations service', () => {
       .mockResolvedValueOnce(translations);
 
     const result = await service.getTranslationByLanguageAndJurisdiction(
-      LanguagesEnum.es,
+      LanguagesEnum.fr,
       jurisdictionId,
     );
 
@@ -83,27 +83,27 @@ describe('Testing translations service', () => {
     const englishJurisdictionValue = {
       value: 'jurisdiction english',
     };
-    const spanishJurisdictionValue = {
-      value: 'jurisdiction spanish',
+    const frenchJurisdictionValue = {
+      value: 'jurisdiction french',
     };
-    const spanishNullValue = {
+    const frenchNullValue = {
       value: 'null jurisdiction',
-      extraValue: 'extra spanish',
+      extraValue: 'extra french',
     };
     prisma.translations.findFirst = jest
       .fn()
-      .mockResolvedValueOnce({ translations: spanishJurisdictionValue })
-      .mockResolvedValueOnce({ translations: spanishNullValue })
+      .mockResolvedValueOnce({ translations: frenchJurisdictionValue })
+      .mockResolvedValueOnce({ translations: frenchNullValue })
       .mockResolvedValueOnce({ translations: englishJurisdictionValue })
       .mockResolvedValueOnce({ translations: nullJurisdiction });
     const result = await service.getMergedTranslations(
       randomUUID(),
-      LanguagesEnum.es,
+      LanguagesEnum.fr,
     );
     expect(prisma.translations.findFirst).toBeCalledTimes(4);
     expect(result).toEqual({
-      value: 'jurisdiction spanish',
-      extraValue: 'extra spanish',
+      value: 'jurisdiction french',
+      extraValue: 'extra french',
     });
   });
 });

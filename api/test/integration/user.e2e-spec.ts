@@ -1098,13 +1098,13 @@ describe('User Controller Tests', () => {
           wasWarnedOfDeletion: true,
         }),
       });
-      // Public User that should be warned in spanish
+      // Public User that should be warned in french
       userE = await prisma.userAccounts.create({
         data: await userFactory({
           firstName: 'E',
           confirmedAt: new Date(),
           lastLoginAt: dayjs(new Date()).subtract(4, 'years').toDate(),
-          language: LanguagesEnum.es,
+          language: LanguagesEnum.fr,
         }),
       });
     });
@@ -1145,7 +1145,7 @@ describe('User Controller Tests', () => {
         expect.objectContaining({
           email: userE.email,
           id: userE.id,
-          language: LanguagesEnum.es,
+          language: LanguagesEnum.fr,
         }),
       );
     });
