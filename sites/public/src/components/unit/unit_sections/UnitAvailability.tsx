@@ -19,7 +19,7 @@ type UnitAvailabilityProps = {
 export const UnitAvailability = ({ unit }: UnitAvailabilityProps) => {
   // Cast to access status if it exists at runtime even though
   // it's not yet in the generated TypeScript interface
-  const status = (unit as Record<string, unknown>).status as string | undefined
+  const status = (unit as unknown as Record<string, unknown>).status as string | undefined
 
   if (!status || status === "unknown") return null
 
