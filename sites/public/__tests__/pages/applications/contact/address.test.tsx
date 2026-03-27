@@ -80,7 +80,7 @@ describe("applications pages", () => {
       expect(screen.getByRole("checkbox", { name: /^text$/i })).toBeInTheDocument()
 
       expect(
-        screen.getByRole("group", { name: /^do you work in %{county} County?\?$/i })
+        screen.getByRole("group", { name: /^do you work in the %{county} region\?$/i })
       ).toBeInTheDocument()
       expect(screen.getByText(/tbd/i)).toBeInTheDocument()
       expect(screen.getByRole("radio", { name: /^yes$/i })).toBeInTheDocument()
@@ -199,7 +199,7 @@ describe("applications pages", () => {
       expect(screen.getByRole("checkbox", { name: /^text$/i })).toBeInTheDocument()
 
       expect(
-        screen.queryByRole("group", { name: /^do you work in %{county} County?\?$/i })
+        screen.queryByRole("group", { name: /^do you work in the %{county} region\?$/i })
       ).not.toBeInTheDocument()
       expect(screen.queryByText(/tbd/i)).not.toBeInTheDocument()
       expect(screen.queryByRole("radio", { name: /^yes$/i })).not.toBeInTheDocument()

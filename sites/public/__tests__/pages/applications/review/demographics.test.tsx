@@ -108,7 +108,7 @@ describe("applications pages", () => {
   it("should show full list of how did you hear fields", () => {
     render(<ApplicationDemographics />)
     expect(screen.getByText("How did you hear about this listing?")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Alameda County HCD Website" })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "Union Co-operative" })).toBeInTheDocument()
     expect(screen.getByRole("checkbox", { name: "Developer website" })).toBeInTheDocument()
     expect(screen.getByRole("checkbox", { name: "Flyer" })).toBeInTheDocument()
     expect(screen.getByRole("checkbox", { name: "Email alert" })).toBeInTheDocument()
@@ -143,7 +143,7 @@ describe("applications pages", () => {
       </AppSubmissionContext.Provider>
     )
     expect(screen.getByText("How did you hear about this listing?")).toBeInTheDocument()
-    expect(screen.getByRole("checkbox", { name: "Alameda County HCD Website" })).toBeInTheDocument()
+    expect(screen.getByRole("checkbox", { name: "Union Co-operative" })).toBeInTheDocument()
     expect(screen.getByRole("checkbox", { name: "Developer website" })).toBeInTheDocument()
     expect(screen.getByRole("checkbox", { name: "Flyer" })).toBeInTheDocument()
     expect(screen.getByRole("checkbox", { name: "Email alert" })).toBeInTheDocument()
