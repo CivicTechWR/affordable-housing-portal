@@ -692,21 +692,6 @@ model FeatureFlags {
   @@map("feature_flags")
 }
 
-// GeneratedListingTranslation Section
-model GeneratedListingTranslations {
-  id        String   @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
-
-  jurisdictionId String        @map("jurisdiction_id") @db.VarChar
-  language       LanguagesEnum
-  listingId      String        @map("listing_id") @db.VarChar
-  timestamp      DateTime      @db.Timestamp(6)
-  translations   Json
-
-  @@map("generated_listing_translations")
-}
-
 // HouseholdMember Section
 model HouseholdMember {
   id        String   @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid

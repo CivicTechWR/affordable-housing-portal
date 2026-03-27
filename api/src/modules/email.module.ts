@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { EmailService } from '../services/email.service';
 import { JurisdictionService } from '../services/jurisdiction.service';
 import { TranslationService } from '../services/translation.service';
-import { GoogleTranslateService } from '../services/google-translate.service';
 
 @Module({
   imports: [],
@@ -13,7 +12,6 @@ import { GoogleTranslateService } from '../services/google-translate.service';
     JurisdictionService,
     TranslationService,
     ConfigService,
-    GoogleTranslateService,
     Logger,
   ],
   exports: [EmailService],

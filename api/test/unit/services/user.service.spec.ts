@@ -16,7 +16,6 @@ import { ApplicationService } from '../../../src/services/application.service';
 import { CronJobService } from '../../../src/services/cron-job.service';
 import { EmailService } from '../../../src/services/email.service';
 import { GeocodingService } from '../../../src/services/geocoding.service';
-import { GoogleTranslateService } from '../../../src/services/google-translate.service';
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { PermissionService } from '../../../src/services/permission.service';
 import { PrismaService } from '../../../src/services/prisma.service';
@@ -70,10 +69,6 @@ describe('Testing user service', () => {
     return toReturn;
   };
 
-  const googleTranslateServiceMock = {
-    isConfigured: () => true,
-    fetch: jest.fn(),
-  };
   const LoggerServiceMock = {
     warn: jest.fn(),
     error: jest.fn(),
@@ -95,10 +90,6 @@ describe('Testing user service', () => {
         GeocodingService,
         SchedulerRegistry,
         CronJobService,
-        {
-          provide: GoogleTranslateService,
-          useValue: googleTranslateServiceMock,
-        },
         {
           provide: PermissionService,
           useValue: {

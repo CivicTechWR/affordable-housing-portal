@@ -23,7 +23,6 @@ import { EmailService } from '../../../src/services/email.service';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { GoogleTranslateService } from '../../../src/services/google-translate.service';
 import { Application } from '../../../src/dtos/applications/application.dto';
 import MultiselectQuestion from '../../../src/dtos/multiselect-questions/multiselect-question.dto';
 import { OrderByEnum } from '../../../src/enums/shared/order-by-enum';
@@ -79,7 +78,6 @@ describe('Testing lottery service', () => {
         ConfigService,
         Logger,
         SchedulerRegistry,
-        GoogleTranslateService,
         CronJobService,
       ],
       imports: [HttpModule],

@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   Header,
-  Headers,
   Param,
   ParseUUIDPipe,
   Post,
@@ -26,7 +25,6 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { Request as ExpressRequest, Response } from 'express';
-import { LanguagesEnum } from '@prisma/client';
 import { ActivityLogMetadata } from '../decorators/activity-log-metadata.decorator';
 import { PermissionAction } from '../decorators/permission-action.decorator';
 import { PermissionTypeDecorator } from '../decorators/permission-type.decorator';
@@ -143,13 +141,11 @@ export class ListingController {
   @UsePipes(new ValidationPipe(defaultValidationPipeOptions))
   @ApiOkResponse({ type: String })
   async retrieveForExternalConsumption(
-    @Headers('language') language: LanguagesEnum,
     @Param('id', new ParseUUIDPipe({ version: '4' })) listingId: string,
     @Query() queryParams: ListingsRetrieveParams,
   ) {
     return await this.listingService.findOneAndExternalize(
       listingId,
-      language,
       queryParams.view,
     );
   }
@@ -251,14 +247,9 @@ export class ListingController {
   @UsePipes(new ValidationPipe(defaultValidationPipeOptions))
   @ApiOkResponse({ type: Listing })
   async retrieve(
-    @Headers('language') language: LanguagesEnum,
     @Param('id', new ParseUUIDPipe({ version: '4' })) listingId: string,
     @Query() queryParams: ListingsRetrieveParams,
   ) {
-    return await this.listingService.findOne(
-      listingId,
-      language,
-      queryParams.view,
-    );
+    return await this.listingService.findOne(listingId, queryParams.view);
   }
 }

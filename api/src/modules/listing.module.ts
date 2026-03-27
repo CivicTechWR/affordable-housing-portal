@@ -10,8 +10,6 @@ import { PrismaModule } from './prisma.module';
 import { ListingController } from '../controllers/listing.controller';
 import { ListingService } from '../services/listing.service';
 import { ListingCsvExporterService } from '../services/listing-csv-export.service';
-import { GoogleTranslateService } from '../services/google-translate.service';
-import { TranslationService } from '../services/translation.service';
 
 @Module({
   imports: [
@@ -24,14 +22,7 @@ import { TranslationService } from '../services/translation.service';
     PrismaModule,
   ],
   controllers: [ListingController],
-  providers: [
-    ConfigService,
-    GoogleTranslateService,
-    ListingService,
-    ListingCsvExporterService,
-    Logger,
-    TranslationService,
-  ],
+  providers: [ConfigService, ListingService, ListingCsvExporterService, Logger],
   exports: [ListingService],
 })
 export class ListingModule {}

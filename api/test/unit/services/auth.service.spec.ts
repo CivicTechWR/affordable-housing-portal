@@ -21,7 +21,6 @@ import {
 import { CronJobService } from '../../../src/services/cron-job.service';
 import { EmailService } from '../../../src/services/email.service';
 import { GeocodingService } from '../../../src/services/geocoding.service';
-import { GoogleTranslateService } from '../../../src/services/google-translate.service';
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
 import { PermissionService } from '../../../src/services/permission.service';
 import { PrismaService } from '../../../src/services/prisma.service';
@@ -73,7 +72,6 @@ describe('Testing auth service', () => {
         TranslationService,
         JurisdictionService,
         SmsService,
-        GoogleTranslateService,
         PermissionService,
       ],
     }).compile();

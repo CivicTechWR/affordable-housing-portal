@@ -22,7 +22,6 @@ import { EmailService } from '../../../src/services/email.service';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
-import { GoogleTranslateService } from '../../../src/services/google-translate.service';
 import {
   constructMultiselectQuestionHeaders,
   getExportHeaders,
@@ -58,7 +57,6 @@ describe('Testing application export service', () => {
         Logger,
         SchedulerRegistry,
         CronJobService,
-        GoogleTranslateService,
       ],
       imports: [HttpModule],
     }).compile();
