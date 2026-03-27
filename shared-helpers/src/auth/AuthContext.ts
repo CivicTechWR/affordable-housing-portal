@@ -404,7 +404,26 @@ export const AuthProvider: FunctionComponent<React.PropsWithChildren> = ({ child
       if (jurisdictionId) {
         jurisdictions = jurisdictions?.filter((j) => j.id === jurisdictionId)
       }
-      // Return true only if all jurisdictions have the flag turned on
+
+      const featureFlagOverrides = [
+        {
+          name: "disableListingPreferences",
+          active: true,
+        },
+        {
+          name: "disableBuildingSelectionCriteria",
+          active: true,
+        },
+      ]
+
+      // Check featureFlagOverrides first
+      const flagOverride = featureFlagOverrides.find((flag) => flag.name === featureFlag)
+      if (flagOverride !== undefined) {
+        return flagOverride.active
+      }
+
+      // If not in override and if onlyIfAllJurisdictionsHaveItEnabled,
+      // return if all jurisdictions have the flag turned on
       if (onlyIfAllJurisdictionsHaveItEnabled) {
         return jurisdictions.every(
           (j) => j.featureFlags?.find((flag) => flag.name === featureFlag)?.active || false
