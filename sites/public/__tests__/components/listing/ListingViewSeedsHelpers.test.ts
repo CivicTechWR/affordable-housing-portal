@@ -202,7 +202,7 @@ describe("ListingViewSeedsHelpers", () => {
             } as PaperApplication,
             {
               id: "2",
-              language: LanguagesEnum.es,
+              language: LanguagesEnum.fr,
               assets: { fileId: "456" } as Asset,
             } as PaperApplication,
           ],
@@ -221,7 +221,7 @@ describe("ListingViewSeedsHelpers", () => {
           paperApplications: [
             {
               id: "1",
-              language: LanguagesEnum.es,
+              language: LanguagesEnum.fr,
               assets: { fileId: "456" } as Asset,
             } as PaperApplication,
             {

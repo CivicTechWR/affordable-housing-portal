@@ -771,7 +771,7 @@ describe('Testing email service', () => {
 
       await service.lotteryPublishedApplicant(
         { name: 'listing name', id: 'listingId', juris: 'jurisdictionId' },
-        { en: emailArr, es: ['spanish@example.com'] },
+        { en: emailArr, fr: ['french@example.com'] },
       );
 
       expect(getMergedTranslationsSpy).toHaveBeenCalledTimes(2);
@@ -783,7 +783,7 @@ describe('Testing email service', () => {
       expect(getMergedTranslationsSpy).toHaveBeenNthCalledWith(
         2,
         'jurisdictionId',
-        'es',
+        'fr',
       );
     });
   });

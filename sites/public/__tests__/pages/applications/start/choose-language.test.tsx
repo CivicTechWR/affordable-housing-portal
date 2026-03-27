@@ -22,7 +22,7 @@ describe("Choose Language Page", () => {
       commonDigitalApplication: true,
       applicationDueDate: new Date("2099-12-31T00:00:00.000Z"),
       applicationConfig: {
-        languages: [LanguagesEnum.en, LanguagesEnum.es],
+        languages: [LanguagesEnum.en, LanguagesEnum.fr],
       },
     }
     const conductor = {

@@ -19,7 +19,7 @@ describe("DetailApplicationData", () => {
         <ApplicationContext.Provider
           value={{
             ...application,
-            language: LanguagesEnum.es,
+            language: LanguagesEnum.fr,
             submissionDate: new Date("January 28, 2025 13:09:00"),
           }}
         >

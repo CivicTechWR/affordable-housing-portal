@@ -9290,12 +9290,7 @@ export enum ApplicationMethodsTypeEnum {
 
 export enum LanguagesEnum {
   "en" = "en",
-  "es" = "es",
-  "vi" = "vi",
-  "zh" = "zh",
-  "tl" = "tl",
-  "bn" = "bn",
-  "ar" = "ar",
+  "fr" = "fr",
 }
 
 export enum ListingEventsTypeEnum {

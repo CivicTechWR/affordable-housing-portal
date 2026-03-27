@@ -24,7 +24,7 @@ export const jurisdictionFactory = (
 ): Prisma.JurisdictionsCreateInput => ({
   name: jurisdictionName,
   notificationsSignUpUrl: 'https://www.example.com',
-  languages: optionalFields?.languages || [LanguagesEnum.en, LanguagesEnum.es],
+  languages: optionalFields?.languages || [LanguagesEnum.en, LanguagesEnum.fr],
   partnerTerms: 'Example Terms',
   publicUrl: optionalFields?.publicSiteBaseURL
     ? optionalFields.publicSiteBaseURL

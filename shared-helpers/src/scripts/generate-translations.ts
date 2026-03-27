@@ -2,28 +2,22 @@
 // Prints out a combination of an inputted csv file and existing translations file
 // The CSV of the new translations must be in the format "key,value"
 // Temporarily update the ui-components tsconfig to include `"module": "commonjs"`
-// example: `ts-node generate-translations es new-spanish.csv > merged-spanish-translations.json`
+// example: `ts-node generate-translations fr new-french.csv > merged-french-translations.json`
 const fs = require("fs")
 const general = require("../locales/general.json")
-const es = require("../locales/es.json")
-const zh = require("../locales/zh.json")
-const vi = require("../locales/vi.json")
-const tl = require("../locales/tl.json")
+const fr = require("../locales/fr.json")
 
 function main() {
   if (process.argv.length < 4) {
     console.log(
-      "usage: ts-node generate-translations es new-spanish.csv > merged-spanish-translations.json"
+      "usage: ts-node generate-translations fr new-french.csv > merged-french-translations.json"
     )
     process.exit(1)
   }
 
   const languageMap = {
     general: general,
-    es: es,
-    zh: zh,
-    vi: vi,
-    tl: tl,
+    fr: fr,
   }
 
   const [language, filePath] = process.argv.slice(2)

@@ -988,7 +988,7 @@ describe('Lottery Controller Tests', () => {
             status: ApplicationStatusEnum.submitted,
             confirmationCode: 'EFGH5678',
             submissionType: ApplicationSubmissionTypeEnum.electronical,
-            language: LanguagesEnum.es,
+            language: LanguagesEnum.fr,
             userAccounts: {
               create: {
                 email: 'applicant2@email.com',
