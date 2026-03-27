@@ -1,0 +1,18 @@
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--seeds-spacer-header) var(--seeds-spacer-section);
+  @media (--sm-only) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-item-label {
+  font-weight: var(--seeds-font-weight-bold);
+  color: var(--seeds-text-color-darker);
+  margin-block-end: var(--seeds-spacer-text);
+}
+
+.detail-item-value {
+  color: var(--seeds-text-color);
+}
