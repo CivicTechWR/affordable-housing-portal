@@ -17,7 +17,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       baseURL: process.env.BACKEND_API_BASE,
       headers: {
         jurisdictionName: req.headers.jurisdictionname,
-        language: req.headers.language,
         appUrl: req.headers.appurl,
         "x-forwarded-for": req.headers["x-forwarded-for"] || "",
         passkey: process.env.API_PASS_KEY,

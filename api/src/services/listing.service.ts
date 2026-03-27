@@ -11,7 +11,6 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import {
-  LanguagesEnum,
   ListingEventsTypeEnum,
   ListingsStatusEnum,
   MarketingTypeEnum,
@@ -28,7 +27,6 @@ import { EmailService } from './email.service';
 import { MultiselectQuestionService } from './multiselect-question.service';
 import { PermissionService } from './permission.service';
 import { PrismaService } from './prisma.service';
-import { TranslationService } from './translation.service';
 import { AmiChart } from '../dtos/ami-charts/ami-chart.dto';
 import { Jurisdiction } from '../dtos/jurisdictions/jurisdiction.dto';
 import { Listing } from '../dtos/listings/listing.dto';
@@ -214,7 +212,6 @@ export class ListingService implements OnModuleInit {
     private multiselectQuestionService: MultiselectQuestionService,
     private permissionService: PermissionService,
     private prisma: PrismaService,
-    private translationService: TranslationService,
   ) {}
 
   onModuleInit() {
@@ -1078,16 +1075,11 @@ export class ListingService implements OnModuleInit {
   */
   async findOne(
     listingId: string,
-    lang: LanguagesEnum = LanguagesEnum.en,
     view: ListingViews = ListingViews.full,
   ): Promise<Listing> {
     const listingRaw = await this.findOrThrow(listingId, view);
 
-    let result = mapTo(Listing, listingRaw);
-
-    if (lang !== LanguagesEnum.en) {
-      result = await this.translationService.translateListing(result, lang);
-    }
+    const result = mapTo(Listing, listingRaw);
 
     if (result.unitGroups.length > 0) {
       addUnitGroupsSummarized(result);
@@ -1101,16 +1093,14 @@ export class ListingService implements OnModuleInit {
   /**
    *
    * @param listingId id for the listing we are querying for
-   * @param lang language that the translated listing should come back as
    * @param view the form the listing should come back as (what data is returned)
    * @returns an externalized version of the listing as a json object
    */
   async findOneAndExternalize(
     listingId: string,
-    lang: LanguagesEnum = LanguagesEnum.en,
     view: ListingViews = ListingViews.full,
   ): Promise<string> {
-    const listing: any = await this.findOne(listingId, lang, view);
+    const listing: any = await this.findOne(listingId, view);
     if (!listing) {
       return '';
     }

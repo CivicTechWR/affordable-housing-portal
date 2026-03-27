@@ -35,10 +35,8 @@ import { UnitGroup } from '../../../src/dtos/unit-groups/unit-group.dto';
 import { UnitTypeSort } from '../../../src/utilities/unit-utilities';
 import { Listing } from '../../../src/dtos/listings/listing.dto';
 import { ListingViews } from '../../../src/enums/listings/view-enum';
-import { TranslationService } from '../../../src/services/translation.service';
 import { ListingCreate } from '../../../src/dtos/listings/listing-create.dto';
 import { ListingUpdate } from '../../../src/dtos/listings/listing-update.dto';
-import { GoogleTranslateService } from '../../../src/services/google-translate.service';
 import { ApplicationFlaggedSetService } from '../../../src/services/application-flagged-set.service';
 import { User } from '../../../src/dtos/users/user.dto';
 import { EmailService } from '../../../src/services/email.service';
@@ -227,11 +225,6 @@ describe('Testing listing service', () => {
   let prisma: PrismaService;
   let config: ConfigService;
 
-  const googleTranslateServiceMock = {
-    isConfigured: () => true,
-    fetch: jest.fn(),
-  };
-
   const httpServiceMock = {
     request: jest.fn().mockReturnValue(
       of({
@@ -256,13 +249,8 @@ describe('Testing listing service', () => {
       providers: [
         ListingService,
         PrismaService,
-        TranslationService,
         ApplicationService,
         GeocodingService,
-        {
-          provide: GoogleTranslateService,
-          useValue: googleTranslateServiceMock,
-        },
         {
           provide: HttpService,
           useValue: httpServiceMock,
@@ -2290,7 +2278,7 @@ describe('Testing listing service', () => {
     it('should return records from findOne() with base view', async () => {
       prisma.listings.findUnique = jest.fn().mockResolvedValue(mockListing(0));
 
-      await service.findOne('listingId', LanguagesEnum.en, ListingViews.base);
+      await service.findOne('listingId', ListingViews.base);
 
       expect(prisma.listings.findUnique).toHaveBeenCalledWith({
         where: {
@@ -2340,7 +2328,7 @@ describe('Testing listing service', () => {
     it('should return records from findOne() with name view', async () => {
       prisma.listings.findUnique = jest.fn().mockResolvedValue(mockListing(0));
 
-      await service.findOne('listingId', LanguagesEnum.en, ListingViews.name);
+      await service.findOne('listingId', ListingViews.name);
 
       expect(prisma.listings.findUnique).toHaveBeenCalledWith({
         where: {
@@ -2365,11 +2353,7 @@ describe('Testing listing service', () => {
 
       await expect(
         async () =>
-          await service.findOne(
-            'a different listingId',
-            LanguagesEnum.en,
-            ListingViews.full,
-          ),
+          await service.findOne('a different listingId', ListingViews.full),
       ).rejects.toThrowError();
 
       expect(prisma.listings.findUnique).toHaveBeenCalledWith({
@@ -2473,7 +2457,6 @@ describe('Testing listing service', () => {
 
       const listing: Listing = await service.findOne(
         'listingId',
-        LanguagesEnum.en,
         ListingViews.base,
       );
 
@@ -2852,7 +2835,6 @@ describe('Testing listing service', () => {
 
       const listing: Listing = await service.findOne(
         'listingId',
-        LanguagesEnum.en,
         ListingViews.full,
       );
 
@@ -2996,7 +2978,6 @@ describe('Testing listing service', () => {
 
       const listing: Listing = await service.findOne(
         'listingId',
-        LanguagesEnum.en,
         ListingViews.base,
       );
 

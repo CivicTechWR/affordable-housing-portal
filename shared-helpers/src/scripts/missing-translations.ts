@@ -40,7 +40,7 @@ function main() {
 
   let missingTranslations = false
   console.log(
-    "Save the below data including the t_ headers per-language in a csv, and pass it to get-machine-translations.ts to get machine translated strings in the correct format."
+    "The below data shows missing translation keys per-language that need to be manually translated."
   )
   allTranslations.forEach((foreignKeys) => {
     console.log("--------------------")

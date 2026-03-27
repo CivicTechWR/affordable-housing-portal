@@ -11,7 +11,6 @@ import { ErrorResponse } from 'resend';
 import { EmailService } from '../../../src/services/email.service';
 import { TranslationService } from '../../../src/services/translation.service';
 import { JurisdictionService } from '../../../src/services/jurisdiction.service';
-import { GoogleTranslateService } from '../../../src/services/google-translate.service';
 import { translationFactory } from '../../../prisma/seed-helpers/translation-factory';
 import { banffAddress } from '../../../prisma/seed-helpers/address-factory';
 import { Application } from '../../../src/dtos/applications/application.dto';
@@ -63,7 +62,6 @@ describe('Testing email service', () => {
           provide: Logger,
           useValue: loggerMock,
         },
-        GoogleTranslateService,
       ],
     }).compile();
   });

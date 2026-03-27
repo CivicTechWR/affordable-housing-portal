@@ -33,16 +33,10 @@ const loadListing = async (
   stateFunction,
   conductor,
   context,
-  language,
   listingsService: ListingsService,
   jurisdictionsService: JurisdictionsService
 ) => {
-  const listingResponse = await listingsService.retrieve(
-    { id: listingId },
-    {
-      headers: { language },
-    }
-  )
+  const listingResponse = await listingsService.retrieve({ id: listingId })
 
   const jurisdictionResponse = await jurisdictionsService.retrieve({
     jurisdictionId: listingResponse.jurisdictions.id,
@@ -94,7 +88,6 @@ const ApplicationChooseLanguage = () => {
         setListing,
         conductor,
         context,
-        "en",
         listingsService,
         jurisdictionsService
       )
@@ -143,7 +136,6 @@ const ApplicationChooseLanguage = () => {
         setListing,
         conductor,
         context,
-        language,
         listingsService,
         jurisdictionsService
       ).then(() => {
