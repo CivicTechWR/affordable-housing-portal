@@ -1,6 +1,9 @@
 import React from "react"
 import Head from "next/head"
-import { UnitTypeEnum } from "@bloom-housing/shared-helpers/src/types/backend-swagger"
+import {
+  UnitTypeEnum,
+  UnitRentTypeEnum,
+} from "@bloom-housing/shared-helpers/src/types/backend-swagger"
 import Layout from "../layouts/application"
 import { UnitView } from "../components/unit/UnitView"
 
@@ -40,7 +43,7 @@ const mockUnit = {
     id: "rent-type-1",
     createdAt: new Date(),
     updatedAt: new Date(),
-    name: "fixed",
+    name: UnitRentTypeEnum.fixed,
   },
   unitAccessibilityPriorityTypes: {
     id: "access-1",
