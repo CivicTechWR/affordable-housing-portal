@@ -28,6 +28,8 @@ export default async function ListingsPage() {
       sqft: 100,
       imageUrl: "https://picsum.photos/id/1/200/300",
       timeAgo: "2 days ago",
+      lat: 43.4643,
+      lng: -80.5204,
     },
   ];
 
