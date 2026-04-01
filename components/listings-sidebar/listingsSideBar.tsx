@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -60,7 +62,15 @@ export function ListingsSidebar({
               className="overflow-hidden border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             >
               <div className="relative aspect-[16/9] bg-gray-200">
-                {/* Image Placeholder */}
+                {listing.imageUrl && (
+                  <Image
+                    src={listing.imageUrl}
+                    alt={`${listing.address}, ${listing.city}`}
+                    fill
+                    sizes="(max-width: 1280px) 100vw, 340px"
+                    className="object-cover"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 {/*
                                 descope favouriting for now
