@@ -1,7 +1,0 @@
-**/*.hbs
-.github
-ui-components/CHANGELOG.md
-sites/public/CHANGELOG.md
-sites/partners/CHANGELOG.md
-shared-helpers/CHANGELOG.md
-*.csv
