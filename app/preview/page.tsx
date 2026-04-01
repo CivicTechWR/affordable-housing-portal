@@ -33,6 +33,8 @@ const previewListings: Listing[] = [
     baths: 1,
     sqft: 840,
     timeAgo: "2 days ago",
+    lat: 43.4636,
+    lng: -80.5264,
   },
   {
     id: "listing-2",
@@ -43,6 +45,8 @@ const previewListings: Listing[] = [
     baths: 2,
     sqft: 1040,
     timeAgo: "5 hours ago",
+    lat: 43.4516,
+    lng: -80.4925,
   },
   {
     id: "listing-3",
@@ -53,6 +57,8 @@ const previewListings: Listing[] = [
     baths: 1,
     sqft: 610,
     timeAgo: "Just listed",
+    lat: 43.4668,
+    lng: -80.5087,
   },
   {
     id: "listing-4",
@@ -63,6 +69,8 @@ const previewListings: Listing[] = [
     baths: 2,
     sqft: 1220,
     timeAgo: "1 week ago",
+    lat: 43.3601,
+    lng: -80.3149,
   },
 ];
 

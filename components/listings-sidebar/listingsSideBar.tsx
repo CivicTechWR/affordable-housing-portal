@@ -19,6 +19,8 @@ export interface Listing {
   sqft: number;
   imageUrl?: string;
   timeAgo: string;
+  lat: number;
+  lng: number;
 }
 
 export function ListingsSidebar({
