@@ -1,12 +1,12 @@
 "use client";
-import { Button } from '@/components/ui/button';
-import { DatePicker, DatePickerProps } from '../date-picker/date-picker';
-import { PriceRangeInput, PriceRangeInputProps } from '../price-range-input/PriceRangeInput';
-import { ToggleFilter, ToggleFilterProps } from '../toggle-filter/ToggleFilter';
-import { FeatureAccordion, DynamicFilterGroup } from '../feature-accordian/FeatureAccordian';
-import { ComponentProps } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useListingFilters } from './useListingFilter';
+import { Button } from "@/components/ui/button";
+import { DatePicker, DatePickerProps } from "../date-picker/date-picker";
+import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
+import { ToggleFilter, ToggleFilterProps } from "../toggle-filter/ToggleFilter";
+import { FeatureAccordion, DynamicFilterGroup } from "../feature-accordian/FeatureAccordian";
+import { ComponentProps } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useListingFilters } from "./useListingFilter";
 
 // --- Interfaces ---
 export interface ListingFiltersProps {
@@ -15,23 +15,18 @@ export interface ListingFiltersProps {
 
 // --- Component ---
 
-export function ListingFilters({
-  dynamicGroups = [],
-
-}: ListingFiltersProps) {
-  
+export function ListingFilters({ dynamicGroups = [] }: ListingFiltersProps) {
   const {
     getBedroomToggleProps,
     getPriceRangeInputProps,
-getBathroomToggleProps,
+    getBathroomToggleProps,
     getFeatureCheckboxProps,
     getDatePickerProps,
     clearFilters,
   } = useListingFilters();
-  
+
   return (
     <div className="w-full max-w-sm p-4 space-y-8">
-
       {/* --- RENT PRICE --- */}
       <PriceRangeInput {...getPriceRangeInputProps()} />
 
@@ -46,10 +41,7 @@ getBathroomToggleProps,
       </div>
 
       {/* --- DYNAMIC METADATA FILTERS --- */}
-      <FeatureAccordion 
-        groups={dynamicGroups} 
-        getCheckboxProps={getFeatureCheckboxProps} 
-      />
+      <FeatureAccordion groups={dynamicGroups} getCheckboxProps={getFeatureCheckboxProps} />
 
       {/* --- ACTIONS --- */}
       <div className="flex items-center gap-4 pt-4 mt-6 border-t">
@@ -57,7 +49,6 @@ getBathroomToggleProps,
           Clear
         </Button>
       </div>
-
     </div>
   );
 }

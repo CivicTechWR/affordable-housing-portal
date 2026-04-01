@@ -71,6 +71,6 @@ export async function POST(request: NextRequest) {
 
   return Response.json(
     { message: "Listing created", data: { id: "placeholder-id", ...body } },
-    { status: 201 }
+    { status: 201 },
   );
 }
