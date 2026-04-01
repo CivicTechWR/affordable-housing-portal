@@ -1,11 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { DatePicker, DatePickerProps } from "../date-picker/date-picker";
-import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
-import { ToggleFilter, ToggleFilterProps } from "../toggle-filter/ToggleFilter";
+import { DatePicker } from "../date-picker/date-picker";
+import { PriceRangeInput } from "../price-range-input/PriceRangeInput";
+import { ToggleFilter } from "../toggle-filter/ToggleFilter";
 import { FeatureAccordion, DynamicFilterGroup } from "../feature-accordian/FeatureAccordian";
-import { ComponentProps } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useListingFilters } from "./useListingFilter";
 
 // --- Interfaces ---

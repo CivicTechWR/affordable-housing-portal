@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "settings": {
+    "next": {
+      "rootDir": "."
+    }
+  },
+  "env": {
+    "builtin": true,
+    "browser": true
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "node_modules/**",
+    "next-env.d.ts"
+  ],
+  "overrides": [
+    {
+      "files": ["app/api/**/*.ts", "next.config.ts", "instrumentation.ts", "proxy.ts"],
+      "env": {
+        "node": true,
+        "browser": false
+      }
+    }
+  ]
+}

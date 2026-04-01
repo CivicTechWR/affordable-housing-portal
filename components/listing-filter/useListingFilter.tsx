@@ -6,7 +6,7 @@ export function useListingFilters() {
   // 1. nuqs replaces the useReducer
   const [filters, setFilters] = useQueryStates(listingSearchParamsParsers);
   const getSearchInputProps = useCallback(
-    (onChangeInput?: (e: string) => void) => ({
+    () => ({
       value: filters.location ? filters.location : "Waterloo, ON",
       onChange: async (e: string) => {
         await setFilters({ location: e });
@@ -52,7 +52,7 @@ export function useListingFilters() {
       onValueChange: async (val: string) =>
         await setFilters({
           // nuqs handles the type conversion back to integer via your cache definition
-          bedrooms: val === "" ? null : parseInt(val, 10),
+          bathrooms: val === "" ? null : parseInt(val, 10),
         }),
     }),
     [filters.bathrooms, setFilters],
@@ -113,7 +113,7 @@ export function useListingFilters() {
     // 2. Return the complete package expected by your new component
     return {
       selected: filters.moveInDate ? filters.moveInDate : undefined,
-      onSelect: async (d?: Date) => await setFilters({ moveInDate: d }),
+      onSelect: async (d?: Date) => await setFilters({ moveInDate: d ?? null }),
       formattedText,
     };
   }, [filters.moveInDate, setFilters]);

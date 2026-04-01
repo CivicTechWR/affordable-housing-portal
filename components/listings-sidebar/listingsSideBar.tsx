@@ -41,7 +41,9 @@ export function ListingsSidebar({
           <SelectContent>
             <SelectGroup>
               {sortOptions.map((option) => (
-                <SelectItem value={option.value}>{option.label}</SelectItem>
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
               ))}
             </SelectGroup>
           </SelectContent>
@@ -58,7 +60,7 @@ export function ListingsSidebar({
               <div className="relative aspect-[16/9] bg-gray-200">
                 {/* Image Placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                {/* 
+                {/*
                                 descope favouriting for now
                                 <ToggleIconButton 
                                     icon={<HugeiconsIcon icon={Heart} strokeWidth={2} />}
