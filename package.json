@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "oxlint",
+    "format": "oxfmt"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
@@ -30,8 +31,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.1",
+    "oxlint": "^0.15.0",
+    "oxfmt": "^0.15.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
