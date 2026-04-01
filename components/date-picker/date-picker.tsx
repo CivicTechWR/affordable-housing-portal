@@ -5,7 +5,7 @@ import { Calendar01FreeIcons } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 export interface DatePickerProps {
-  selected?: Date;
+  selected?: Date | undefined;
   onSelect: (date?: Date) => void;
   formattedText: string;
 }

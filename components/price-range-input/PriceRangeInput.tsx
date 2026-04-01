@@ -1,4 +1,3 @@
-import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRightIcon } from "@hugeicons/core-free-icons";

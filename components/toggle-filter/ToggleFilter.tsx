@@ -3,8 +3,8 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 // 1. Explicitly declare the exact props instead of importing the massive union type
 export type ToggleFilterProps = {
   title: string;
-  options?: string[];
-  value?: string;
+  options?: string[] | undefined;
+  value?: string | undefined;
   onValueChange: (value: string) => void;
 };
 
@@ -14,13 +14,15 @@ export function ToggleFilter({
   value,
   onValueChange,
 }: ToggleFilterProps) {
+  const selectedValue = value === undefined ? {} : { value };
+
   return (
     <div className="space-y-4">
       <h3 className="font-medium leading-none">{title}</h3>
 
       <ToggleGroup
         type="single"
-        value={value}
+        {...selectedValue}
         onValueChange={onValueChange}
         className="justify-start"
       >
