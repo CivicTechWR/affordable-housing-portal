@@ -42,9 +42,7 @@ export function MapView({ listings }: { listings: Listing[] }) {
           >
             <div
               className={`cursor-pointer rounded-full border border-white px-2 py-1 text-[10px] font-bold shadow-lg transition-transform hover:scale-110 ${
-                selectedId === listing.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-[#3b444b] text-white"
+                selectedId === listing.id ? "bg-blue-600 text-white" : "bg-[#3b444b] text-white"
               }`}
             >
               ${listing.price.toLocaleString()}
