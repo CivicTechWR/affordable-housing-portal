@@ -1,1 +1,0 @@
-web: yarn db:migration:run && yarn start:prod

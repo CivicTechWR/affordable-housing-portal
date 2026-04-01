@@ -1,105 +1,46 @@
 {
-  "name": "affordable-housing-portal",
-  "version": "4.4.0",
-  "author": "CivicTechWR",
-  "description": "Affordable Housing Portal - a system to manage processes for affordable housing",
-  "workspaces": {
-    "packages": [
-      "sites/public",
-      "sites/partners",
-      "shared-helpers"
-    ],
-    "nohoist": [
-      "**/@anchan828/nest-sendgrid"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/CivicTechWR/affordable-housing-portal.git"
-  },
-  "license": "Apache-2.0",
+  "name": "affordable-housing-platform-frontend",
+  "version": "0.1.0",
   "private": true,
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
-  },
   "scripts": {
-    "dev:app:public": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn dev",
-    "test:app:public": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn test",
-    "test:app:public:headless": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn test:headless",
-    "test:app:public:unit": "cd sites/public && yarn test:unit:coverage",
-    "build:app:public": "cd sites/public && yarn build",
-    "dev:app:partners": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/partners && yarn dev",
-    "test:app:partners": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/partners && yarn test",
-    "test:app:partners:headless": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/partners && yarn test:headless",
-    "test:app:partners:unit": "cd sites/partners && yarn test:unit:coverage",
-    "build:app:partners": "cd sites/partners && yarn build",
-    "dev:backend": "cd api && yarn dev",
-    "dev:backend:secrets": "cd api && yarn dev:secrets",
-    "dev:app:public:secrets": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/public && yarn dev:secrets",
-    "dev:app:partners:secrets": "wait-on \"http-get://127.0.0.1:${PORT:-3100}/\" && cd sites/partners && yarn dev:secrets",
-    "dev:all": "concurrently --names \" BACKEND_API,APP_PUBLIC,APP_PARTNERS\" --prefix \"{name}\" \"yarn dev:backend\" \"yarn dev:app:public\" \"yarn dev:app:partners\"",
-    "dev:all:secrets": "concurrently --names \" BACKEND_API,APP_PUBLIC,APP_PARTNERS\" --prefix \"{name}\" \"yarn dev:backend:secrets\" \"yarn dev:app:public:secrets\" \"yarn dev:app:partners:secrets\"",
-    "dev:frontend": "concurrently --names \" APP_PUBLIC,APP_PARTNERS\" --prefix \"{name}\" \"yarn dev:app:public\" \"yarn dev:app:partners\"",
-    "dev:partners": "concurrently \"yarn dev:backend\" \"yarn dev:app:partners\"",
-    "dev:public": "concurrently \"yarn dev:backend\" \"yarn dev:app:public\"",
-    "test:shared-helpers": "cd shared-helpers && yarn && yarn test",
-    "test:shared-helpers:missing-translations": "cd shared-helpers && yarn && yarn test:missing-translations",
-    "test:apps": "concurrently \"yarn dev:backend\" \"yarn test:app:public\"",
-    "test:apps:headless": "concurrently \"yarn dev:backend\" \"yarn test:app:public:headless\"",
-    "lint": "eslint '**/*.ts' '**/*.tsx' '**/*.js' --max-warnings 40 && cd api && yarn lint --max-warnings 2",
-    "test:backend:new": "cd api && yarn test --detectOpenHandles",
-    "test:backend:new:e2e": "cd api && yarn jest --config ./test/jest-e2e.config.js --detectOpenHandles",
-    "test:backend:new:cov": "cd api && yarn jest --config ./test/jest-with-coverage.config.js --detectOpenHandles --logHeapUsage",
-    "test:backend:new:dbsetup": "cd api && yarn db:migration:run",
-    "test:backend:new:dbsetup:withseed": "cd api && yarn db:migration:run && yarn db:seed:staging --jurisdictionName Bloomington",
-    "backend:new:install": "cd api && yarn install",
-    "prettier": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\"",
-    "ui-load-test": "ruby ./utilities/ui-load-tester.rb"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@hugeicons/core-free-icons": "^4.1.1",
+    "@hugeicons/react": "^1.1.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "next": "16.2.1",
+    "nuqs": "^2.8.9",
+    "radix-ui": "^1.4.3",
+    "react": "19.2.4",
+    "react-day-picker": "^9.14.0",
+    "react-dom": "19.2.4",
+    "react-resizable-panels": "^4.8.0",
+    "shadcn": "^4.1.1",
+    "tailwind-merge": "^3.5.0",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^13.1.0",
-    "@commitlint/config-conventional": "^13.1.0",
-    "@types/jest": "^26.0.14",
-    "@typescript-eslint/eslint-plugin": "^5.12.1",
-    "@typescript-eslint/parser": "^7.18.0",
-    "commitizen": "^4.3.1",
-    "concurrently": "^5.3.0",
-    "eslint": "^8.0.1",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jsx-a11y": "^6.10.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.37.1",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "husky": "^4.3.0",
-    "jest": "^26.5.3",
-    "lint-staged": "^10.4.0",
-    "prettier": "^2.8.8",
-    "react": "19.2.3",
-    "react-test-renderer": "19.2.3",
-    "ts-jest": "^26.4.1",
-    "ts-node": "^10.0.0",
-    "typescript": "4.9.5",
-    "wait-on": "^5.2.0"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
-  "prettier": {
-    "singleQuote": false,
-    "printWidth": 100,
-    "semi": false
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "echo '\n(1) Verifying conventional commit format... \n   (If this fails, install commitizen and commit with 'git cz' to automate the formatting!)\n----------' && commitlint -E HUSKY_GIT_PARAMS && echo '\n(2) Linting...\n----------' && lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx}": "eslint"
-  },
-  "resolutions": {
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "@fortawesome/react-fontawesome": "3.1.0",
-    "**/proper-lockfile/signal-exit": "3.0.7"
-  }
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
 }

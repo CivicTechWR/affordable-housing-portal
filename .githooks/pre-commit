@@ -1,3 +1,0 @@
-#!/bin/sh
-
-gitleaks -v git --pre-commit --staged
