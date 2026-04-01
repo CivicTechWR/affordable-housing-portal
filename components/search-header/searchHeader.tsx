@@ -17,18 +17,16 @@ import { useListingFilters } from "../listing-filter/useListingFilter";
 import { Toggle } from "radix-ui";
 import { ToggleFilter } from "../toggle-filter/ToggleFilter";
 
-
 export function SearchHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const
-    {
-      getPriceRangeInputProps,
-      getBedroomToggleProps,
-      getBathroomToggleProps,
-      getSearchInputProps,
-    } = useListingFilters();
+  const {
+    getPriceRangeInputProps,
+    getBedroomToggleProps,
+    getBathroomToggleProps,
+    getSearchInputProps,
+  } = useListingFilters();
 
   const [isPending, startTransition] = useTransition();
   const minPrice = searchParams.get("minPrice") || "0";
@@ -42,15 +40,12 @@ export function SearchHeader() {
         <Input
           {...getSearchInputProps()}
           onChange={(e) => getSearchInputProps().onChange(e.target.value)}
-
         />
       </div>
 
       {/* Price Range Selects */}
       <div className="flex items-center gap-1">
-        <PriceRangeInput
-          {...getPriceRangeInputProps()}
-        />
+        <PriceRangeInput {...getPriceRangeInputProps()} />
       </div>
 
       {/* Property Filters */}
@@ -82,7 +77,9 @@ export function SearchHeader() {
       </div> */}
 
       {/* Subtle loading indicator for route transitions */}
-      {isPending && <div className="absolute top-0 left-0 w-full h-[2px] bg-green-500 animate-pulse" />}
+      {isPending && (
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-green-500 animate-pulse" />
+      )}
     </header>
   );
 }
