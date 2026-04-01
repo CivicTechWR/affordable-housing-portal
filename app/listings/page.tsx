@@ -26,7 +26,8 @@ export default async function ListingsPage() {
       beds: 3,
       baths: 2,
       sqft: 100,
-      imageUrl: "https://picsum.photos/id/1/200/300",
+      imageUrl:
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&h=340&fit=crop",
       timeAgo: "2 days ago",
       lat: 43.4643,
       lng: -80.5204,
