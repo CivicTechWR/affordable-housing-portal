@@ -6,7 +6,10 @@ import { Heart } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { FeatureAccordion, type DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
+import {
+  FeatureAccordion,
+  type DynamicFilterGroup,
+} from "@/components/feature-accordian/FeatureAccordian";
 import { DatePicker } from "@/components/date-picker/date-picker";
 import { LabeledCheckbox } from "@/components/labeled-checkbox/LabeledCheckbox";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
@@ -32,8 +35,7 @@ const previewListings: Listing[] = [
     beds: 2,
     baths: 1,
     sqft: 840,
-    imageUrl:
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=340&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=340&fit=crop",
     timeAgo: "2 days ago",
     lat: 43.4636,
     lng: -80.5264,
@@ -46,8 +48,7 @@ const previewListings: Listing[] = [
     beds: 3,
     baths: 2,
     sqft: 1040,
-    imageUrl:
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=340&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=340&fit=crop",
     timeAgo: "5 hours ago",
     lat: 43.4516,
     lng: -80.4925,
@@ -60,8 +61,7 @@ const previewListings: Listing[] = [
     beds: 1,
     baths: 1,
     sqft: 610,
-    imageUrl:
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=340&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=340&fit=crop",
     timeAgo: "Just listed",
     lat: 43.4668,
     lng: -80.5087,
@@ -74,8 +74,7 @@ const previewListings: Listing[] = [
     beds: 3,
     baths: 2,
     sqft: 1220,
-    imageUrl:
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=340&fit=crop",
+    imageUrl: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&h=340&fit=crop",
     timeAgo: "1 week ago",
     lat: 43.3601,
     lng: -80.3149,
@@ -182,7 +181,9 @@ export default function PreviewPage() {
           <NuqsAdapter>
             <div className="overflow-hidden rounded-3xl border border-slate-200">
               <Suspense
-                fallback={<div className="flex h-16 items-center border-b border-slate-200 bg-white px-4" />}
+                fallback={
+                  <div className="flex h-16 items-center border-b border-slate-200 bg-white px-4" />
+                }
               >
                 <SearchHeader />
               </Suspense>

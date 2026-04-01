@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  ArrowRight02Icon,
-  GridViewIcon,
-  MapsLocation01Icon,
-} from "@hugeicons/core-free-icons";
+import { ArrowRight02Icon, GridViewIcon, MapsLocation01Icon } from "@hugeicons/core-free-icons";
 
 const routes = [
   {
