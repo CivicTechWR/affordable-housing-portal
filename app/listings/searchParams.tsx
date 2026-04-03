@@ -6,9 +6,9 @@ import {
   parseAsArrayOf,
   parseAsStringEnum,
   parseAsIsoDateTime,
-} from "nuqs/server";
+} from 'nuqs/server';
 
-const sortOptions = ["newest", "price_asc", "price_desc"];
+const sortOptions = ['newest', 'price_asc', 'price_desc'];
 
 // 1. Define the raw parsers as a standalone object
 export const listingSearchParamsParsers = {
@@ -18,9 +18,8 @@ export const listingSearchParamsParsers = {
   bedrooms: parseAsInteger,
   bathrooms: parseAsFloat,
   moveInDate: parseAsIsoDateTime,
-  sort: parseAsStringEnum(sortOptions).withDefault("newest"),
-  features: parseAsArrayOf(parseAsString).withDefault([]),
-};
+  sort: parseAsStringEnum(sortOptions).withDefault('newest'),
+  features: parseAsArrayOf(parseAsString).withDefault([]),};
 
 // 2. Pass the parsers into the server cache
 export const listingSearchParamsCache = createSearchParamsCache(listingSearchParamsParsers);
