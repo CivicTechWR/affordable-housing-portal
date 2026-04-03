@@ -12,6 +12,8 @@ export interface Listing {
     beds: string | number;
     baths: number;
     sqft: number;
+    lat: number;
+    lng: number;
     imageUrl?: string;
     timeAgo: string;
 }
