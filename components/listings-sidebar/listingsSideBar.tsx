@@ -1,8 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-// Assuming these are used elsewhere or you plan to use them, keeping the imports intact
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
-import { SortOptions } from "../sort-options/SortOptions";
 
 export interface Listing {
     id: string;
