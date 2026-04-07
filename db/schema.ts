@@ -22,7 +22,7 @@ export const userStatusEnum = pgEnum("user_status", [
   "deactivated",
 ]);
 export const listingStatusEnum = pgEnum("listing_status", ["draft", "published", "archived"]);
-export const listingFieldTypeEnum = pgEnum("listing_field_type", [
+export const customListingFieldTypeEnum = pgEnum("listing_field_type", [
   "boolean",
   "number",
   "text",
@@ -44,12 +44,12 @@ export type SavedSearchFilters = {
   [key: string]: unknown;
 };
 
-export type ListingFieldOption = {
+export type CustomListingFieldOption = {
   label: string;
   value: string;
 };
 
-export type ListingFieldValue = boolean | number | string | string[] | null;
+export type CustomListingFieldValue = boolean | number | string | string[] | null;
 
 export const users = pgTable(
   "users",
@@ -58,8 +58,8 @@ export const users = pgTable(
     externalAuthId: text("external_auth_id"),
     email: text("email").notNull(),
     fullName: text("full_name").notNull(),
-    role: userRoleEnum("role").notNull().default("user"),
-    status: userStatusEnum("status").notNull().default("invited"),
+    role: userRoleEnum("role").notNull(),
+    status: userStatusEnum("status").notNull(),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -75,13 +75,51 @@ export const users = pgTable(
   ],
 );
 
-export const listings = pgTable(
-  "listings",
+export const properties = pgTable(
+  "properties",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     ownerUserId: uuid("owner_user_id")
       .notNull()
       .references(() => users.id, { onDelete: "restrict" }),
+    name: text("name").notNull(),
+    street1: text("street_1").notNull(),
+    street2: text("street_2"),
+    city: text("city").notNull(),
+    province: text("province").notNull(),
+    postalCode: text("postal_code").notNull(),
+    country: text("country").notNull(),
+    neighborhood: text("neighborhood"),
+    latitude: doublePrecision("latitude"),
+    longitude: doublePrecision("longitude"),
+    contactName: text("contact_name"),
+    contactEmail: text("contact_email"),
+    contactPhone: text("contact_phone"),
+    createdByUserId: uuid("created_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    updatedByUserId: uuid("updated_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    index("properties_owner_user_id_idx").on(table.ownerUserId),
+    index("properties_city_idx").on(table.city),
+  ],
+);
+
+export const listings = pgTable(
+  "listings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    propertyId: uuid("property_id")
+      .notNull()
+      .references(() => properties.id, { onDelete: "restrict" }),
     createdByUserId: uuid("created_by_user_id")
       .notNull()
       .references(() => users.id, { onDelete: "restrict" }),
@@ -90,16 +128,8 @@ export const listings = pgTable(
       .references(() => users.id, { onDelete: "restrict" }),
     title: text("title").notNull(),
     description: text("description"),
-    status: listingStatusEnum("status").notNull().default("draft"),
-    street1: text("street_1").notNull(),
-    street2: text("street_2"),
-    city: text("city").notNull(),
-    province: text("province").notNull(),
-    postalCode: text("postal_code").notNull(),
-    country: text("country").notNull().default("CA"),
-    neighborhood: text("neighborhood"),
-    latitude: doublePrecision("latitude"),
-    longitude: doublePrecision("longitude"),
+    status: listingStatusEnum("status").notNull(),
+    unitNumber: text("unit_number"),
     bedrooms: integer("bedrooms").notNull(),
     bathrooms: doublePrecision("bathrooms").notNull(),
     squareFeet: integer("square_feet"),
@@ -110,9 +140,6 @@ export const listings = pgTable(
     applicationEmail: text("application_email"),
     applicationPhone: text("application_phone"),
     applicationInstructions: text("application_instructions"),
-    contactName: text("contact_name"),
-    contactEmail: text("contact_email"),
-    contactPhone: text("contact_phone"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -122,9 +149,8 @@ export const listings = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    index("listings_owner_user_id_idx").on(table.ownerUserId),
+    index("listings_property_id_idx").on(table.propertyId),
     index("listings_status_published_at_idx").on(table.status, table.publishedAt),
-    index("listings_city_idx").on(table.city),
     index("listings_monthly_rent_cents_idx").on(table.monthlyRentCents),
     index("listings_bedrooms_bathrooms_idx").on(table.bedrooms, table.bathrooms),
     index("listings_available_on_idx").on(table.availableOn),
@@ -140,7 +166,7 @@ export const listingImages = pgTable(
       .references(() => listings.id, { onDelete: "cascade" }),
     imageUrl: text("image_url").notNull(),
     altText: text("alt_text"),
-    sortOrder: integer("sort_order").notNull().default(0),
+    sortOrder: integer("sort_order").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("listing_images_listing_id_idx").on(table.listingId)],
@@ -182,22 +208,22 @@ export const savedSearches = pgTable(
   (table) => [index("saved_searches_user_id_idx").on(table.userId)],
 );
 
-export const listingFieldDefinitions = pgTable(
+export const customListingFields = pgTable(
   "listing_field_definitions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     key: text("key").notNull(),
     label: text("label").notNull(),
     description: text("description"),
-    fieldType: listingFieldTypeEnum("field_type").notNull(),
-    category: text("category").notNull().default("custom"),
+    fieldType: customListingFieldTypeEnum("field_type").notNull(),
+    category: text("category").notNull(),
     helpText: text("help_text"),
     placeholder: text("placeholder"),
-    isPublic: boolean("is_public").notNull().default(true),
-    isFilterable: boolean("is_filterable").notNull().default(false),
-    isRequired: boolean("is_required").notNull().default(false),
-    sortOrder: integer("sort_order").notNull().default(0),
-    options: jsonb("options").$type<ListingFieldOption[]>(),
+    isPublic: boolean("is_public").notNull(),
+    isFilterable: boolean("is_filterable").notNull(),
+    isRequired: boolean("is_required").notNull(),
+    sortOrder: integer("sort_order").notNull(),
+    options: jsonb("options").$type<CustomListingFieldOption[]>(),
     createdByUserId: uuid("created_by_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -217,7 +243,7 @@ export const listingFieldDefinitions = pgTable(
   ],
 );
 
-export const listingFieldValues = pgTable(
+export const customListingFieldValues = pgTable(
   "listing_field_values",
   {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -226,8 +252,8 @@ export const listingFieldValues = pgTable(
       .references(() => listings.id, { onDelete: "cascade" }),
     fieldDefinitionId: uuid("field_definition_id")
       .notNull()
-      .references(() => listingFieldDefinitions.id, { onDelete: "cascade" }),
-    value: jsonb("value").$type<ListingFieldValue>().notNull(),
+      .references(() => customListingFields.id, { onDelete: "cascade" }),
+    value: jsonb("value").$type<CustomListingFieldValue>().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
@@ -246,6 +272,8 @@ export const listingFieldValues = pgTable(
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Property = typeof properties.$inferSelect;
+export type NewProperty = typeof properties.$inferInsert;
 export type Listing = typeof listings.$inferSelect;
 export type NewListing = typeof listings.$inferInsert;
 export type ListingImage = typeof listingImages.$inferSelect;
@@ -254,7 +282,7 @@ export type SavedListing = typeof savedListings.$inferSelect;
 export type NewSavedListing = typeof savedListings.$inferInsert;
 export type SavedSearch = typeof savedSearches.$inferSelect;
 export type NewSavedSearch = typeof savedSearches.$inferInsert;
-export type ListingFieldDefinition = typeof listingFieldDefinitions.$inferSelect;
-export type NewListingFieldDefinition = typeof listingFieldDefinitions.$inferInsert;
-export type ListingFieldValueRecord = typeof listingFieldValues.$inferSelect;
-export type NewListingFieldValueRecord = typeof listingFieldValues.$inferInsert;
+export type CustomListingField = typeof customListingFields.$inferSelect;
+export type NewCustomListingField = typeof customListingFields.$inferInsert;
+export type CustomListingFieldValueRecord = typeof customListingFieldValues.$inferSelect;
+export type NewCustomListingFieldValueRecord = typeof customListingFieldValues.$inferInsert;
