@@ -40,6 +40,7 @@ export type SavedSearchFilters = {
   minPrice?: number | null;
   moveInDate?: string | null;
   sort?: "newest" | "price_asc" | "price_desc" | null;
+  /** Allow additional keys for admin-configured custom listing fields (EAV). */
   [key: string]: unknown;
 };
 
@@ -61,7 +62,10 @@ export const users = pgTable(
     status: userStatusEnum("status").notNull().default("invited"),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => [
     uniqueIndex("users_external_auth_id_unique").on(table.externalAuthId),
@@ -112,7 +116,10 @@ export const listings = pgTable(
     publishedAt: timestamp("published_at", { withTimezone: true }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => [
     index("listings_owner_user_id_idx").on(table.ownerUserId),
@@ -167,7 +174,10 @@ export const savedSearches = pgTable(
     name: text("name").notNull(),
     filters: jsonb("filters").$type<SavedSearchFilters>().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => [index("saved_searches_user_id_idx").on(table.userId)],
 );
@@ -195,7 +205,10 @@ export const listingFieldDefinitions = pgTable(
       onDelete: "set null",
     }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => [
     uniqueIndex("listing_field_definitions_key_unique").on(table.key),
@@ -216,7 +229,10 @@ export const listingFieldValues = pgTable(
       .references(() => listingFieldDefinitions.id, { onDelete: "cascade" }),
     value: jsonb("value").$type<ListingFieldValue>().notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => [
     uniqueIndex("listing_field_values_listing_field_unique").on(
