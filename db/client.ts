@@ -26,10 +26,8 @@ function getDatabaseUrl() {
 }
 
 function createSqlClient() {
-  // prepare: false disables prepared statements, which is required when
-  // connecting through a connection pooler (e.g. PgBouncer) in transaction mode.
-  // If you connect directly to Postgres without a pooler, you can remove this
-  // flag to enable prepared statements for better query performance.
+  // prepare: false disables prepared statements, required when connecting
+  // through a connection pooler (e.g. PgBouncer) in transaction mode.
   return postgres(getDatabaseUrl(), {
     prepare: false,
   });
