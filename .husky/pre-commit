@@ -1,2 +1,2 @@
-docker run -v ./:/code zricethezav/gitleaks:latest git /code --staged
+npx gitleaks-secret-scanner git /code
 
