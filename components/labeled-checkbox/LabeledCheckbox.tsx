@@ -1,5 +1,5 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { ComponentProps } from "react";
+import { Checkbox } from '@/components/ui/checkbox';
+import { ComponentProps } from 'react';
 
 export interface LabeledCheckboxProps extends ComponentProps<typeof Checkbox> {
   label: string;
