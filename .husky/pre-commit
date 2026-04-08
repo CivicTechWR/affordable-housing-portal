@@ -1,0 +1,2 @@
+docker run -v ./:/code zricethezav/gitleaks:latest git /code --staged
+
