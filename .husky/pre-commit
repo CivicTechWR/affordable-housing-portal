@@ -1,2 +1,1 @@
-npx gitleaks-secret-scanner git /code
-
+node_modules/.bin/gitleaks-secret-scanner gitleaks-secret-scanner git /code
