@@ -8,18 +8,14 @@ import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
 import { ListingsDisplayMode, ListingsSidebar } from "@/components/listings-sidebar/listingsSideBar";
 import { MapView } from "@/components/map-view/mapView";
-import { ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
+import { DisplayMode, ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
 import { SortOptions } from '@/components/sort-options/SortOptions';
 import { ToggleIconButton } from '@/components/toggle-icon-button/ToggleIconButton';
 import { useState } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { FilterMailIcon } from '@hugeicons/core-free-icons';
 
-export enum DisplayMode {
-    LIST = 'list',
-    MAP_LIST = 'map_list',
-    MAP = 'map',
-}
+
 export default function ListingsDashboard() {
     // Await the params in Next.js 15+ and set defaults
     // Await the params in Next.js 15+
@@ -36,6 +32,8 @@ export default function ListingsDashboard() {
             sqft: 100,
             imageUrl: "https://picsum.photos/id/1/200/300",
             timeAgo: "2 days ago",
+            lat: 43.45055954361165,
+            lng: -80.49228395260133,
             features: [
                 {
                     categoryName: "Accessibility",
@@ -55,6 +53,7 @@ export default function ListingsDashboard() {
             ],
         },
     ]
+
 
     // Accessing the data
     const {
@@ -78,6 +77,15 @@ export default function ListingsDashboard() {
                         priceRangeProps={priceRangeProps}
                         bedroomToggleProps={bedroomToggleProps}
                         bathroomToggleProps={bathroomToggleProps}
+                        displayModeProps={{
+                            displayModes: [
+                                {value: DisplayMode.LIST, label: "List"},
+                                {value: DisplayMode.MAP, label: "Map"},
+                                {value: DisplayMode.MAP_LIST, label: "Split"}
+                            ],
+                            onChange: (value: string) => setDisplayMode(value as DisplayMode),
+                            value: displayMode,
+                        }}
                     />
                     <div className="flex">
                         <h2>Filters</h2>
@@ -95,7 +103,7 @@ export default function ListingsDashboard() {
                         </div>
                         <ListingsSidebar listings={listings} mode={displayMode === DisplayMode.LIST ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
                     </div>
-                    <MapView listings={listings} />
+                    {displayMode === DisplayMode.MAP || DisplayMode.MAP_LIST && <MapView listings={listings} />}
                     {isFilterOpen &&
                         <ListingFilters
                             bathroomToggleProps={bathroomToggleProps}
@@ -105,6 +113,7 @@ export default function ListingsDashboard() {
                             datePickerProps={datePickerProps}
                             clearFilters={clearFilters}
                             dynamicGroups={dynamicGroups}
+
                         />
                     }
                 </main>

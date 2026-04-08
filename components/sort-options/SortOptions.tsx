@@ -13,7 +13,7 @@ export function SortOptions({ sortOptions, onChange }: { sortOptions: SortOption
                     <SelectContent>
                         <SelectGroup>
                             {sortOptions.map((option) => (
-                                <SelectItem value={option.value}>{option.label}</SelectItem>
+                                <SelectItem key={option.value} id={option.value} value={option.value}>{option.label}</SelectItem>
                             ))}
                         </SelectGroup>
                     </SelectContent>

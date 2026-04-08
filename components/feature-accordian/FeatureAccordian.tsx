@@ -34,7 +34,6 @@ export function FeatureAccordion({ groups, getCheckboxProps }: FeatureAccordionP
           <AccordionContent>
             <div className="grid grid-cols-2 gap-4 pt-2">
               
-              {/* --- THE CLEANED UP MAPPING --- */}
               {group.options.map((option) => (
                 <LabeledCheckbox 
                   key={option.id}

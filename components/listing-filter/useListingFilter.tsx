@@ -45,19 +45,34 @@ export function useListingFilters() {
     const bedroomToggleProps = useMemo(() => ({
         type: "single" as const,
         title: "Bedrooms",
-        value: filters.bedrooms?.toString(),
-        onValueChange: async (val: string) => await setFilters({
+        value: filters.bedrooms?.toString || undefined,
+        options: [
+            { value: "1", label: "1" },
+            { value: "2", label: "2" },
+            { value: "3", label: "3" },
+            { value: "4+", label: "4+" },
+        ],
+        onValueChange: async (val: string) => {
+            await setFilters({
             bedrooms: val === "" ? null : parseInt(val, 10)
-        }),
+        })
+    },
     }), [filters.bedrooms, setFilters]);
 
     const bathroomToggleProps = useMemo(() => ({
         type: "single" as const,
         title: "Bathrooms",
-        value: filters.bathrooms?.toString(),
-        onValueChange: async (val: string) => await setFilters({
+        value: filters.bathrooms?.toString() || undefined,
+        options: [
+            { value: "1", label: "1" },
+            { value: "2", label: "2" },
+            { value: "3", label: "3" },
+            { value: "4+", label: "4+" },
+        ],
+        onValueChange: async (val: string) => {
+            await setFilters({
             bathrooms: val === "" ? null : parseInt(val, 10) // Fixed: was bedrooms
-        }),
+        })},
     }), [filters.bathrooms, setFilters]);
 
     const datePickerProps = useMemo(() => ({
