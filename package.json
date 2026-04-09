@@ -9,6 +9,8 @@
     "build:secrets": "infisical run --env=dev -- next build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node --env-file-if-exists=.env.local --experimental-strip-types db/seed.ts",
+    "db:seed:secrets": "infisical run --env=dev -- node --experimental-strip-types db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "start": "next start",
     "start:secrets": "infisical run --env=dev -- next start",
