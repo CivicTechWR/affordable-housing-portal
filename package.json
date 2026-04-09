@@ -14,8 +14,8 @@
     "format": "oxfmt . -c .oxfmtrc.json",
     "format:check": "oxfmt --check . -c .oxfmtrc.json",
     "test": "jest",
-    "test:unit": "jest -- -t \\.unit\\.test\\.",
-    "test:integration": "jest -- -t \\.integration\\.test\\."
+    "test:unit": "jest --testPathPattern=\\.unit\\.test\\.",
+    "test:integration": "jest --testPathPattern=\\.integration\\.test\\."
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
