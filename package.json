@@ -13,7 +13,10 @@
     "lint:fix": "oxlint . -c .oxlintrc.json --fix",
     "format": "oxfmt . -c .oxfmtrc.json",
     "format:check": "oxfmt --check . -c .oxfmtrc.json",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=\\.unit\\.test\\.",
+    "test:integration": "jest --testPathPattern=\\.integration\\.test\\."
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
@@ -37,14 +40,20 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
     "gitleaks-secret-scanner": "^2.1.1",
     "husky": "^9.1.7",
     "oxfmt": "^0.43.0",
     "oxlint": "^1.58.0",
     "tailwindcss": "^4.2.2",
+    "ts-jest": "^29.4.9",
     "typescript": "^6.0.2"
   },
   "ignoreScripts": [
