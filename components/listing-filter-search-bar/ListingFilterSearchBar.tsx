@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/field";
 import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
 import { ToggleFilter, ToggleFilterProps } from "../toggle-filter/ToggleFilter";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 export enum DisplayMode {
     LIST = 'list',
     MAP_LIST = 'map_list',
@@ -39,7 +41,10 @@ export function ListingFilterSearchBar({
         
         {/* Search: Grows to fill available space up to a point */}
         <div className="flex-1 max-w-sm">
-          <Input {...searchInputProps} className="h-10" />
+          <div className="relative">
+            <HugeiconsIcon icon={Search01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Input {...searchInputProps} className="h-10 pl-9" />
+          </div>
         </div>
 
         {/* Price Range: Constrained so it doesn't take 1/3 of the page */}

@@ -1,24 +1,20 @@
 "use client";
 
-// app/listings/page.tsx
-// types/listings.ts
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
-import { ListingsDisplayMode, ListingCardGallery } from "@/components/listing-card-list/listingsCardList";
+import { ListingsDisplayMode } from "@/components/listing-card-list/listingsCardList";
 import { MapView } from "@/components/map-view/mapView";
 import { DisplayMode, ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
-import { SortOptions } from '@/components/sort-options/SortOptions';
 import { ToggleIconButton } from '@/components/toggle-icon-button/ToggleIconButton';
-import { useState } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { FilterMailIcon } from '@hugeicons/core-free-icons';
+import { useState } from 'react';
+import { ListingsPanel } from '@/components/listings-panel/ListingsPanel';
 
 
 export default function ListingsDashboard() {
-    // Await the params in Next.js 15+ and set defaults
-    // Await the params in Next.js 15+
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
     const listings = [
@@ -41,7 +37,7 @@ export default function ListingsDashboard() {
                     { name: "wheelchair", description: "description of this" },
                     { name: "ramp", description: "description of this" }]
                 }]
-        },]
+        }]
 
     const dynamicGroups: DynamicFilterGroup[] = [
         {
@@ -54,8 +50,6 @@ export default function ListingsDashboard() {
         },
     ]
 
-
-    // Accessing the data
     const {
         sortOptionProps,
         bedroomToggleProps,
@@ -67,7 +61,7 @@ export default function ListingsDashboard() {
         clearFilters,
         activeFilterCount,
     } = useListingFilters();
-    console.log('displayMode', displayMode);
+
     return (
         <NuqsAdapter>
             <div className="flex h-screen flex-col">
@@ -87,9 +81,8 @@ export default function ListingsDashboard() {
                             value: displayMode,
                         }}
                     />
-                    <div className="flex">
-                        <h2>Filters</h2>
-                        <div className="relative">
+                    <div className="flex items-center gap-2 shrink-0">
+                        <div className="relative sm:hidden">
                             <ToggleIconButton
                                 isActive={isFilterOpen}
                                 icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
@@ -100,19 +93,38 @@ export default function ListingsDashboard() {
                                 </span>
                             )}
                         </div>
+                        <div className="hidden sm:block relative">
+                            <button
+                                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                                    isFilterOpen
+                                        ? "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
+                                        : "border-border bg-background hover:bg-accent"
+                                }`}
+                            >
+                                All Filters
+                                {activeFilterCount > 0 && (
+                                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                                        {activeFilterCount}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </header>
                 <main className="flex flex-1 overflow-hidden">
-                    {displayMode !== DisplayMode.MAP &&
-                        <div className={`flex flex-col h-full bg-background min-w-[240px] sm:min-w-[260px] lg:min-w-[290px] ${displayMode === DisplayMode.LIST ? 'flex-1' : ''}`}>
-                            <div className="p-4 border-b flex justify-between items-center bg-background sticky top-0 z-10">
-                                <SortOptions {...sortOptionProps} />
-                            </div>
-                            <ListingCardGallery listings={listings} mode={[DisplayMode.LIST, DisplayMode.MAP_LIST].includes(displayMode) ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
-                        </div>
-                    }
+                    {displayMode !== DisplayMode.MAP ? (
+                        <ListingsPanel
+                            listings={listings}
+                            displayMode={displayMode}
+                            isFilterOpen={isFilterOpen}
+                            activeFilterCount={activeFilterCount}
+                            setIsFilterOpen={setIsFilterOpen}
+                            sortOptionProps={sortOptionProps}
+                        />
+                    ) : null}
                     {([DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode)) && <MapView listings={listings} />}
-                    {isFilterOpen &&
+                    {isFilterOpen && (
                         <ListingFilters
                             bathroomToggleProps={bathroomToggleProps}
                             bedroomToggleProps={bedroomToggleProps}
@@ -121,9 +133,8 @@ export default function ListingsDashboard() {
                             datePickerProps={datePickerProps}
                             clearFilters={clearFilters}
                             dynamicGroups={dynamicGroups}
-
                         />
-                    }
+                    )}
                 </main>
             </div>
         </NuqsAdapter>

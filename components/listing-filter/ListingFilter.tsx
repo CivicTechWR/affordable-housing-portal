@@ -31,28 +31,24 @@ export function ListingFilters({
 }: ListingFiltersProps) {
 
   return (
-    <div className="w-full max-w-sm p-4 space-y-8">
+    <div className="w-full max-w-sm border p-4 space-y-6">
+      <h2 className="text-lg font-semibold text-foreground">Filters</h2>
 
-      {/* --- RENT PRICE --- */}
       <PriceRangeInput {...priceRangeProps} />
 
-      {/* --- BEDROOMS & BATHROOMS --- */}
       <ToggleFilter {...bedroomToggleProps} />
       <ToggleFilter {...bathroomToggleProps} />
 
-      {/* --- MOVE-IN DATE --- */}
       <div className="space-y-4">
         <DatePicker {...datePickerProps} />
       </div>
 
-      {/* --- DYNAMIC METADATA FILTERS --- */}
       <FeatureAccordion
         groups={dynamicGroups}
         getCheckboxProps={getFeatureCheckboxProps}
       />
 
-      {/* --- ACTIONS --- */}
-      <div className="flex items-center gap-4 pt-4 mt-6 border-t">
+      <div className="flex items-center gap-4 pt-4 border-t">
         <Button variant="outline" className="flex-1" onClick={clearFilters}>
           Clear
         </Button>
