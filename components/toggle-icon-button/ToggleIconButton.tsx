@@ -8,13 +8,11 @@ interface ToggleIconButtonProps extends React.ComponentPropsWithoutRef<typeof Bu
   // We pass the icon component itself, not an element, so we can inject classes into it
   icon: React.ReactElement; 
   isActive: boolean;
-  activeClassName?: string;
 }
 
 export function ToggleIconButton({ 
   icon, 
   isActive, 
-  activeClassName = "text-primary",
   className, 
   ...props 
 }: ToggleIconButtonProps) {
