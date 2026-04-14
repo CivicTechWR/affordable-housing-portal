@@ -16,14 +16,24 @@ type SeedCustomListingField = Pick<
   | "sortOrder"
 >;
 
+/**
+ * `description` — Shown to **tenants and applicants** browsing listings.
+ *   Explains what the accessibility feature is in plain language.
+ *
+ * `helpText` — Shown to **property managers** filling in the listing form.
+ *   Guides them on when to select the option and what qualifies.
+ */
 export const customListingFieldSeed = [
+  // ── ENTRY & EXTERIOR ────────────────────────────────────────────────
   {
     key: "main_entrance_is_barrier_free",
     label: "Main Entrance is Barrier-Free",
-    description: null,
+    description:
+      "The main building entrance has no steps or barriers and can be accessed without assistance.",
     fieldType: "boolean",
     category: "ENTRY & EXTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the main entrance is step-free and navigable by wheelchair users without assistance.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -34,10 +44,12 @@ export const customListingFieldSeed = [
   {
     key: "accessible_tenant_parking_available",
     label: "Accessible Tenant Parking Available",
-    description: null,
+    description:
+      "Designated accessible parking spaces are available for tenants with mobility needs.",
     fieldType: "boolean",
     category: "ENTRY & EXTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the property has designated accessible parking spaces reserved for tenants.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -48,10 +60,11 @@ export const customListingFieldSeed = [
   {
     key: "on_site_parking",
     label: "On-Site Parking",
-    description: null,
+    description: "Parking is available on the property grounds.",
     fieldType: "boolean",
     category: "ENTRY & EXTERIOR",
-    helpText: null,
+    helpText:
+      "Select if any tenant parking is available on the property, regardless of accessibility features.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -62,10 +75,10 @@ export const customListingFieldSeed = [
   {
     key: "accessible_guest_parking",
     label: "Accessible Guest Parking",
-    description: null,
+    description: "Designated accessible parking spaces are available for visitors.",
     fieldType: "boolean",
     category: "ENTRY & EXTERIOR",
-    helpText: null,
+    helpText: "Select if there are accessible parking spaces available for guests and visitors.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -74,12 +87,13 @@ export const customListingFieldSeed = [
     options: null,
   },
   {
-    key: "proximity_to_bus_transit",
-    label: "Proximity to Bus/Transit",
-    description: null,
+    key: "close_to_bus_transit",
+    label: "Close to Bus/Transit",
+    description: "Public transit stops are within a short distance of the property.",
     fieldType: "boolean",
     category: "ENTRY & EXTERIOR",
-    helpText: null,
+    helpText:
+      "Select if a bus stop or transit station is within a 5-minute walk (approximately 400 metres).",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -90,10 +104,12 @@ export const customListingFieldSeed = [
   {
     key: "good_pedestrian_access",
     label: "Good Pedestrian Access",
-    description: null,
+    description:
+      "Sidewalks and pathways to and around the property are well-maintained and accessible.",
     fieldType: "boolean",
     category: "ENTRY & EXTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the surrounding sidewalks and pathways are paved, even, and suitable for wheelchair or mobility-aid users.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -101,13 +117,16 @@ export const customListingFieldSeed = [
     sortOrder: 6,
     options: null,
   },
+
+  // ── BUILDING AMENITIES ──────────────────────────────────────────────
   {
     key: "elevator_in_building",
     label: "Elevator in Building",
-    description: null,
+    description: "The building has at least one elevator for accessing upper floors.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if the building has a working elevator. Not applicable for single-storey buildings.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -118,10 +137,11 @@ export const customListingFieldSeed = [
   {
     key: "cellphone_elevator_control",
     label: "Cellphone Elevator Control",
-    description: null,
+    description: "The elevator can be operated via a smartphone app for hands-free use.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if the elevator supports smartphone-based controls (e.g., Bluetooth or app-based operation).",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -132,10 +152,11 @@ export const customListingFieldSeed = [
   {
     key: "accessible_shared_laundry",
     label: "Accessible Shared Laundry",
-    description: null,
+    description: "Shared laundry facilities are accessible to people with mobility aids.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if the shared laundry room is step-free with front-loading machines at a reachable height.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -146,10 +167,12 @@ export const customListingFieldSeed = [
   {
     key: "braille_signage",
     label: "Braille Signage",
-    description: null,
+    description:
+      "Signs in common areas include Braille for wayfinding by visually impaired residents.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if common-area signs (e.g., floor numbers, room labels) include Braille text.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -160,10 +183,12 @@ export const customListingFieldSeed = [
   {
     key: "tactile_cues_textures_domes",
     label: "Tactile Cues (Textures/Domes)",
-    description: null,
+    description:
+      "Textured ground surfaces or truncated domes are used to guide visually impaired residents.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if the building uses tactile walking surface indicators such as textured tiles or truncated domes at key transition points.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -174,10 +199,11 @@ export const customListingFieldSeed = [
   {
     key: "lowered_mailboxes",
     label: "Lowered Mailboxes",
-    description: null,
+    description: "Mailboxes are mounted at a height reachable from a seated position.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if mailboxes are installed no higher than 1,200 mm (48 inches) from the floor.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -188,10 +214,12 @@ export const customListingFieldSeed = [
   {
     key: "accessible_guest_intercom",
     label: "Accessible Guest Intercom",
-    description: null,
+    description:
+      "The guest intercom is positioned and designed for use by people with various accessibility needs.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if the intercom is mounted at wheelchair-accessible height and has clear visual or audible feedback.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -202,10 +230,11 @@ export const customListingFieldSeed = [
   {
     key: "automated_building_doors",
     label: "Automated Building Doors",
-    description: null,
+    description: "Common-area doors open automatically via push button or sensor.",
     fieldType: "boolean",
     category: "BUILDING AMENITIES",
-    helpText: null,
+    helpText:
+      "Select if building entrance and common-area doors have automatic openers (push-button or motion-sensor activated).",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -213,13 +242,16 @@ export const customListingFieldSeed = [
     sortOrder: 14,
     options: null,
   },
+
+  // ── UNIT INTERIOR ───────────────────────────────────────────────────
   {
     key: "unit_entrance_is_barrier_free",
     label: "Unit Entrance is Barrier-Free",
-    description: null,
+    description: "The entrance to the unit has no steps or raised thresholds.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the unit's front door threshold is flush or ramped so it can be crossed without stepping over a barrier.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -230,10 +262,12 @@ export const customListingFieldSeed = [
   {
     key: "ceiling_lift_ready",
     label: "Ceiling Lift Ready",
-    description: null,
+    description:
+      "The unit has structural reinforcement to support the installation of a ceiling-mounted lift.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if ceiling joists or tracks are reinforced or pre-installed to accommodate a ceiling lift system.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -244,10 +278,11 @@ export const customListingFieldSeed = [
   {
     key: "automated_unit_doors",
     label: "Automated Unit Doors",
-    description: null,
+    description: "Interior doors within the unit open automatically or with power-assist.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if any interior doors (e.g., bedroom, bathroom) have automatic or power-assisted openers.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -258,10 +293,11 @@ export const customListingFieldSeed = [
   {
     key: "no_stairs_within_unit",
     label: "No Stairs Within Unit",
-    description: null,
+    description: "The entire unit is on a single level with no internal stairs.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if all rooms in the unit are accessible without climbing any stairs or steps.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -272,10 +308,12 @@ export const customListingFieldSeed = [
   {
     key: "wide_doorways",
     label: "Wide Doorways",
-    description: null,
+    description:
+      "Interior doorways are wide enough to accommodate wheelchairs and mobility devices.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if interior doorways are at least 810 mm (32 inches) wide in clear opening width.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -286,10 +324,11 @@ export const customListingFieldSeed = [
   {
     key: "lever_door_handles",
     label: "Lever Door Handles",
-    description: null,
+    description: "Doors use lever-style handles that are easier to operate than round knobs.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if doors have lever handles rather than round knobs, making them operable with minimal grip strength.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -300,10 +339,12 @@ export const customListingFieldSeed = [
   {
     key: "lowered_light_switches",
     label: "Lowered Light Switches",
-    description: null,
+    description:
+      "Light switches are positioned at a lower height, reachable from a seated position.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if light switches are mounted no higher than 1,100 mm (44 inches) from the floor.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -314,10 +355,11 @@ export const customListingFieldSeed = [
   {
     key: "hard_flooring",
     label: "Hard Flooring",
-    description: null,
+    description: "The unit has hard-surface flooring such as hardwood, laminate, or tile.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the majority of the unit has hard flooring, which is easier to navigate with mobility aids.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -328,10 +370,11 @@ export const customListingFieldSeed = [
   {
     key: "carpeted_floors",
     label: "Carpeted Floors",
-    description: null,
+    description: "The unit has carpeted flooring.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the majority of the unit has carpet. Low-pile carpet is generally preferred for wheelchair users.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -342,10 +385,11 @@ export const customListingFieldSeed = [
   {
     key: "air_conditioning",
     label: "Air Conditioning",
-    description: null,
+    description: "The unit is equipped with air conditioning for temperature control.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText: null,
+    helpText:
+      "Select if the unit has any form of air conditioning (central, window, or portable).",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -353,13 +397,17 @@ export const customListingFieldSeed = [
     sortOrder: 24,
     options: null,
   },
+
+  // ── KITCHEN & BATH ──────────────────────────────────────────────────
   {
     key: "lowered_kitchen_counters",
     label: "Lowered Kitchen Counters",
-    description: null,
+    description:
+      "Kitchen countertops are set at a lower height to be usable from a seated position.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if kitchen counters are installed at approximately 865 mm (34 inches) or have a lowered section.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -370,10 +418,11 @@ export const customListingFieldSeed = [
   {
     key: "lowered_cabinets",
     label: "Lowered Cabinets",
-    description: null,
+    description: "Kitchen cabinets are mounted lower for easier reach from a seated position.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if upper cabinets are mounted lower than standard height or pull-down shelving is provided.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -384,10 +433,12 @@ export const customListingFieldSeed = [
   {
     key: "front_stove_controls",
     label: "Front Stove Controls",
-    description: null,
+    description:
+      "Stove controls are located on the front panel, eliminating the need to reach over burners.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if stove/range controls are on the front of the appliance rather than the back panel.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -398,10 +449,12 @@ export const customListingFieldSeed = [
   {
     key: "convection_cooktop",
     label: "Convection Cooktop",
-    description: null,
+    description:
+      "The kitchen has an induction or convection cooktop, which is safer as surfaces stay cool to the touch.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the unit has an induction or convection cooktop instead of a traditional gas or electric coil range.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -412,10 +465,11 @@ export const customListingFieldSeed = [
   {
     key: "front_dishwasher_controls",
     label: "Front Dishwasher Controls",
-    description: null,
+    description: "Dishwasher controls are on the front panel for easier access.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the dishwasher has front-mounted controls rather than top-edge controls hidden by the counter.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -426,10 +480,12 @@ export const customListingFieldSeed = [
   {
     key: "bottom_door_freezer",
     label: "Bottom-Door Freezer",
-    description: null,
+    description:
+      "The refrigerator has the freezer compartment on the bottom, putting the fridge at a more accessible height.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the fridge has a bottom-mount freezer, making the refrigerator section easier to reach.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -440,10 +496,11 @@ export const customListingFieldSeed = [
   {
     key: "non_digital_appliances",
     label: "Non-Digital Appliances",
-    description: null,
+    description: "Appliances use tactile dials or buttons rather than touchscreen controls.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if major appliances (stove, microwave, washer) use physical knobs or buttons rather than flat digital touchscreens.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -454,10 +511,12 @@ export const customListingFieldSeed = [
   {
     key: "barrier_free_bathroom",
     label: "Barrier-Free Bathroom",
-    description: null,
+    description:
+      "The bathroom has no steps or raised thresholds and provides space for wheelchair manoeuvring.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the bathroom entrance and interior are step-free with enough turning radius for a wheelchair (at least 1,500 mm / 60 inches).",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -468,10 +527,11 @@ export const customListingFieldSeed = [
   {
     key: "lowered_bathroom_counters",
     label: "Lowered Bathroom Counters",
-    description: null,
+    description: "Bathroom countertops and sinks are set at a lower height for seated use.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the bathroom vanity or sink is mounted at approximately 865 mm (34 inches) or lower.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -482,10 +542,12 @@ export const customListingFieldSeed = [
   {
     key: "accessible_height_toilet",
     label: "Accessible Height Toilet",
-    description: null,
+    description:
+      "The toilet seat is set at a comfort height suitable for transfers from a wheelchair.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the toilet seat is between 430–480 mm (17–19 inches) from the floor.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -496,10 +558,11 @@ export const customListingFieldSeed = [
   {
     key: "roll_in_shower",
     label: "Roll-In Shower",
-    description: null,
+    description: "The shower has no curb, allowing direct wheelchair entry.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the shower is curbless (zero-threshold) so a wheelchair or shower chair can roll in directly.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -510,10 +573,11 @@ export const customListingFieldSeed = [
   {
     key: "walk_in_shower",
     label: "Walk-In Shower",
-    description: null,
+    description: "The shower has a low or no threshold for easy step-in access.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if the shower has a low threshold (under 13 mm / 0.5 inches) but is not fully curbless.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -524,10 +588,11 @@ export const customListingFieldSeed = [
   {
     key: "grab_bars_general",
     label: "Grab Bars (General)",
-    description: null,
+    description: "Grab bars are installed in the bathroom for support and fall prevention.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText: null,
+    helpText:
+      "Select if grab bars are installed near the toilet, shower, or bathtub. Include reinforced walls ready for grab bar installation.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -535,13 +600,17 @@ export const customListingFieldSeed = [
     sortOrder: 37,
     options: null,
   },
+
+  // ── SAFETY & SENSORY ────────────────────────────────────────────────
   {
     key: "smoke_co_detectors_w_strobe",
     label: "Smoke & CO Detectors w/ Strobe",
-    description: null,
+    description:
+      "Smoke and carbon monoxide detectors include flashing strobe lights for hearing-impaired residents.",
     fieldType: "boolean",
     category: "SAFETY & SENSORY",
-    helpText: null,
+    helpText:
+      "Select if smoke and CO detectors are equipped with visual strobe alerts in addition to audible alarms.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -552,10 +621,10 @@ export const customListingFieldSeed = [
   {
     key: "sprinkler_system",
     label: "Sprinkler System",
-    description: null,
+    description: "The unit or building is equipped with an automatic fire sprinkler system.",
     fieldType: "boolean",
     category: "SAFETY & SENSORY",
-    helpText: null,
+    helpText: "Select if the building or unit has an automatic fire sprinkler system installed.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -566,10 +635,11 @@ export const customListingFieldSeed = [
   {
     key: "service_animals_allowed",
     label: "Service Animals Allowed",
-    description: null,
+    description: "Service animals are permitted in the unit and on the property.",
     fieldType: "boolean",
     category: "SAFETY & SENSORY",
-    helpText: null,
+    helpText:
+      "Select if the property accommodates service animals regardless of any pet policy restrictions.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
