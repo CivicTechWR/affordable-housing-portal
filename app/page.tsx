@@ -23,7 +23,7 @@ export default function Home() {
       <div className="w-full max-w-md space-y-6">
         <div className="space-y-1">
           <h1 className="font-heading text-lg font-semibold text-foreground">
-            Affordable Housing Portal
+            WR Housing Bridge
           </h1>
           <p className="text-sm text-muted-foreground">Dev navigation</p>
         </div>
