@@ -40,11 +40,10 @@ export function SiteFooter() {
           </ul>
         </div>
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wider">Connect</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wider">Civic Tech WR</h3>
           <ul className="space-y-2 text-sm text-primary-foreground/80">
             <li><a href="https://civictechwr.org" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground transition-colors">Civic Tech WR</a></li>
-            <li><a href="https://civictechwr.org" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground transition-colors">Volunteer</a></li>
-            <li><a href="https://civictechwr.org" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground transition-colors">GitHub</a></li>
+            <li><a href="https://github.com/CivicTechWR/affordable-housing-portal" target="_blank" rel="noopener noreferrer" className="hover:text-primary-foreground transition-colors">GitHub</a></li>
           </ul>
         </div>
       </div>
