@@ -2,6 +2,9 @@
   "name": "affordable-housing-platform-frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.6.0"
+  },
   "scripts": {
     "dev": "next dev",
     "dev:secrets": "infisical run --env=dev -- next dev",
