@@ -12,6 +12,7 @@
     "build/**",
     "coverage/**",
     "node_modules/**",
+    "drizzle/**",
     "next-env.d.ts"
   ]
 }
