@@ -40,7 +40,7 @@ function createDatabase() {
     globalForDatabase.__ahpSqlClient = sqlClient;
   }
 
-  return drizzle(sqlClient, { schema });
+  return drizzle({ client: sqlClient, schema });
 }
 
 export const db = globalForDatabase.__ahpDatabase ?? createDatabase();

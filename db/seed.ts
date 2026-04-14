@@ -19,7 +19,7 @@ async function main() {
     prepare: false,
   });
 
-  const db = drizzle(sql);
+  const db = drizzle({ client: sql });
 
   try {
     for (const field of customListingFieldSeed) {
