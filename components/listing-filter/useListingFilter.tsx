@@ -43,9 +43,8 @@ export function useListingFilters() {
     }), [filters.minPrice, filters.maxPrice, setFilters]);
 
     const bedroomToggleProps = useMemo(() => ({
-        type: "single" as const,
         title: "Bedrooms",
-        value: filters.bedrooms?.toString || undefined,
+        value: filters.bedrooms?.toString() || undefined,
         options: [
             { value: "1", label: "1" },
             { value: "2", label: "2" },
@@ -54,13 +53,12 @@ export function useListingFilters() {
         ],
         onValueChange: async (val: string) => {
             await setFilters({
-            bedrooms: val === "" ? null : parseInt(val, 10)
-        })
-    },
+                bedrooms: val === "" ? null : parseInt(val, 10),
+            });
+        },
     }), [filters.bedrooms, setFilters]);
 
     const bathroomToggleProps = useMemo(() => ({
-        type: "single" as const,
         title: "Bathrooms",
         value: filters.bathrooms?.toString() || undefined,
         options: [
@@ -71,8 +69,9 @@ export function useListingFilters() {
         ],
         onValueChange: async (val: string) => {
             await setFilters({
-            bathrooms: val === "" ? null : parseInt(val, 10) // Fixed: was bedrooms
-        })},
+                bathrooms: val === "" ? null : parseInt(val, 10),
+            });
+        },
     }), [filters.bathrooms, setFilters]);
 
     const datePickerProps = useMemo(() => ({
