@@ -53,7 +53,7 @@ export function useListingFilters() {
         ],
         onValueChange: async (val: string) => {
             await setFilters({
-                bedrooms: val === "" ? null : parseInt(val, 10),
+                bedrooms: val === "" ? null : val,
             });
         },
     }), [filters.bedrooms, setFilters]);
@@ -69,7 +69,7 @@ export function useListingFilters() {
         ],
         onValueChange: async (val: string) => {
             await setFilters({
-                bathrooms: val === "" ? null : parseInt(val, 10),
+                bathrooms: val === "" ? null : val,
             });
         },
     }), [filters.bathrooms, setFilters]);

@@ -24,7 +24,7 @@ export function ToggleFilter({
       <FieldLabel className="font-medium leading-none">{title}</FieldLabel>
       <ToggleGroup
         type="single"
-        value={value}
+        value={value ?? ""}
         onValueChange={(val) => {
           if (val) onValueChange(val);
         }}

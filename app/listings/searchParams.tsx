@@ -15,8 +15,8 @@ export const listingSearchParamsParsers = {
   location: parseAsString,
   minPrice: parseAsInteger,
   maxPrice: parseAsInteger,
-  bedrooms: parseAsInteger,
-  bathrooms: parseAsFloat,
+  bedrooms: parseAsString,
+  bathrooms: parseAsString,
   moveInDate: parseAsIsoDateTime,
   sort: parseAsStringEnum(sortOptions).withDefault('newest'),
   features: parseAsArrayOf(parseAsString).withDefault([]),};
