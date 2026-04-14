@@ -71,7 +71,7 @@ export default function ListingsDashboard() {
     return (
         <NuqsAdapter>
             <div className="flex h-screen flex-col">
-                <header className="flex h-16 items-center border-b bg-white px-4 shrink-0">
+                <header className="flex h-16 items-center border-b bg-background px-4 shrink-0">
                     <ListingFilterSearchBar
                         searchInputProps={searchInputProps}
                         priceRangeProps={priceRangeProps}
@@ -95,7 +95,7 @@ export default function ListingsDashboard() {
                                 icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
                                 onClick={() => setIsFilterOpen(!isFilterOpen)} />
                             {activeFilterCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
                                     {activeFilterCount}
                                 </span>
                             )}
@@ -104,8 +104,8 @@ export default function ListingsDashboard() {
                 </header>
                 <main className="flex flex-1 overflow-hidden">
                     {displayMode !== DisplayMode.MAP &&
-                        <div className={`flex flex-col h-full bg-white min-w-[240px] sm:min-w-[260px] lg:min-w-[290px] ${displayMode === DisplayMode.LIST ? 'flex-1' : ''}`}>
-                            <div className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
+                        <div className={`flex flex-col h-full bg-background min-w-[240px] sm:min-w-[260px] lg:min-w-[290px] ${displayMode === DisplayMode.LIST ? 'flex-1' : ''}`}>
+                            <div className="p-4 border-b flex justify-between items-center bg-background sticky top-0 z-10">
                                 <SortOptions {...sortOptionProps} />
                             </div>
                             <ListingCardGallery listings={listings} mode={[DisplayMode.LIST, DisplayMode.MAP_LIST].includes(displayMode) ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />

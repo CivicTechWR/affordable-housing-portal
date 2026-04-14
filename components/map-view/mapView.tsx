@@ -66,7 +66,7 @@ export function MapView({ listings }: { listings: Listing[] }) {
               <div className="text-sm font-semibold">
                 {selectedListing.address}, {selectedListing.city}
               </div>
-              <div className="mt-1 flex gap-2 text-xs text-gray-600">
+              <div className="mt-1 flex gap-2 text-xs text-muted-foreground">
                 <span>
                   <strong>{selectedListing.beds}</strong> bed
                 </span>

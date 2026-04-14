@@ -6,7 +6,6 @@ import { ToggleFilter, ToggleFilterProps } from '../toggle-filter/ToggleFilter';
 import { FeatureAccordion, DynamicFilterGroup } from '../feature-accordian/FeatureAccordian';
 import { ComponentProps } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useListingFilters } from './useListingFilter';
 
 // --- Interfaces ---
 export interface ListingFiltersProps {

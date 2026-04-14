@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { HugeiconsIcon } from "@hugeicons/react";
 
 interface ToggleIconButtonProps extends React.ComponentPropsWithoutRef<typeof Button> {
   // We pass the icon component itself, not an element, so we can inject classes into it
@@ -15,7 +14,7 @@ interface ToggleIconButtonProps extends React.ComponentPropsWithoutRef<typeof Bu
 export function ToggleIconButton({ 
   icon, 
   isActive, 
-  activeClassName = "text-green-600", // Default to your brand color
+  activeClassName = "text-primary",
   className, 
   ...props 
 }: ToggleIconButtonProps) {
@@ -24,8 +23,8 @@ export function ToggleIconButton({
       variant="outline"
       size="icon"
       className={cn(
-        "rounded-full bg-white transition-colors duration-300 hover:bg-gray-50",
-        isActive && "border-green-200 bg-green-50 hover:bg-green-100", // Optional: tint the button background
+        "rounded-full bg-background transition-colors duration-300 hover:bg-accent",
+        isActive && "border-primary/30 bg-primary/10 hover:bg-primary/20",
         className
       )}
       {...props}

@@ -14,7 +14,7 @@ export function SearchHeader() {
   } = useListingFilters();
 
   return (
-    <header className="flex h-16 items-center border-b bg-white px-4 gap-4 shrink-0">
+    <header className="flex h-16 items-center border-b bg-background px-4 gap-4 shrink-0">
       {/* Search Input with Icon */}
       <div className="relative w-full max-w-sm">
         <Input

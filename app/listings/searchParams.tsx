@@ -2,7 +2,6 @@ import {
   createSearchParamsCache,
   parseAsString,
   parseAsInteger,
-  parseAsFloat,
   parseAsArrayOf,
   parseAsStringEnum,
   parseAsIsoDateTime,
