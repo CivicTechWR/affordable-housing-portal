@@ -388,8 +388,7 @@ export const customListingFieldSeed = [
     description: "The unit is equipped with air conditioning for temperature control.",
     fieldType: "boolean",
     category: "UNIT INTERIOR",
-    helpText:
-      "Select if the unit has any form of air conditioning (central, window, or portable).",
+    helpText: "Select if the unit has any form of air conditioning (central, window, or portable).",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
@@ -546,8 +545,7 @@ export const customListingFieldSeed = [
       "The toilet seat is set at a comfort height suitable for transfers from a wheelchair.",
     fieldType: "boolean",
     category: "KITCHEN & BATH",
-    helpText:
-      "Select if the toilet seat is between 430–480 mm (17–19 inches) from the floor.",
+    helpText: "Select if the toilet seat is between 430–480 mm (17–19 inches) from the floor.",
     placeholder: null,
     isPublic: true,
     isFilterable: true,
