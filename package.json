@@ -2,9 +2,6 @@
   "name": "affordable-housing-platform-frontend",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=22.6.0"
-  },
   "scripts": {
     "dev": "next dev",
     "dev:secrets": "infisical run --env=dev -- next dev",
@@ -50,6 +47,9 @@
     "oxlint": "^1.58.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2"
+  },
+  "engines": {
+    "node": ">=22.6.0"
   },
   "ignoreScripts": [
     "sharp",
