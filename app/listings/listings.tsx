@@ -95,7 +95,7 @@ export default function ListingsDashboard() {
                                 icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
                                 onClick={() => setIsFilterOpen(!isFilterOpen)} />
                             {activeFilterCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                                     {activeFilterCount}
                                 </span>
                             )}

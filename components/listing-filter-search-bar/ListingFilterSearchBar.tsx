@@ -3,9 +3,7 @@
 import { ComponentProps } from "react";
 import { Input } from "@/components/ui/input";
 import {
-  Field,
   FieldGroup,
-  FieldLabel
 } from "@/components/ui/field";
 import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
 import { ToggleFilter, ToggleFilterProps } from "../toggle-filter/ToggleFilter";

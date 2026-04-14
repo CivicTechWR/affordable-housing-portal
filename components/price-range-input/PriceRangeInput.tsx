@@ -1,14 +1,9 @@
 import {
     Field,
-    FieldDescription,
-    FieldGroup,
     FieldLabel,
-    FieldLegend,
     FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowRightIcon } from '@hugeicons/core-free-icons';
 
 export interface PriceRangeInputProps {
     min?: number;
