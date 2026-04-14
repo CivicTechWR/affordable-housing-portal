@@ -1,23 +1,25 @@
 "use client";
 
-import { FilterButton } from "@/components/filter-button/FilterButton";
+import { SortOptions as SortOptionsType, SortOptions as SortOptionsComponent } from "@/components/sort-options/SortOptions";
+import { FilterButton, FilterButtonProps } from "@/components/filter-button/FilterButton";
+import { Listing } from "@/components/listing-card-list/listingsCardList";
 
 interface ListingsPanelHeaderProps {
-    activeFilterCount: number;
-    isFilterOpen: boolean;
-    onFilterClick: () => void;
+    listings: Listing[];
+    filterButtonProps: FilterButtonProps;
+    sortOptionProps: { sortOptions: SortOptionsType[]; onChange: (value: string) => void };
 }
 
 export function ListingsPanelHeader({
-    activeFilterCount,
-    isFilterOpen,
-    onFilterClick,
+    listings,
+    filterButtonProps,
+    sortOptionProps,
 }: ListingsPanelHeaderProps) {
     return (
-        <FilterButton
-            activeFilterCount={activeFilterCount}
-            isFilterOpen={isFilterOpen}
-            onFilterClick={onFilterClick}
-        />
+        <div className="sticky top-0 z-10 bg-background border-b p-4 flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">{listings.length} listing{listings.length !== 1 ? 's' : ''} found</span>
+            <SortOptionsComponent {...sortOptionProps} />
+            <FilterButton {...filterButtonProps} />
+        </div>
     );
 }

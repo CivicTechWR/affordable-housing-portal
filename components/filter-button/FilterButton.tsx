@@ -4,7 +4,7 @@ import { ToggleIconButton } from "@/components/toggle-icon-button/ToggleIconButt
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FilterMailIcon } from "@hugeicons/core-free-icons";
 
-interface FilterButtonProps {
+export interface FilterButtonProps {
     activeFilterCount: number;
     isFilterOpen: boolean;
     onFilterClick: () => void;

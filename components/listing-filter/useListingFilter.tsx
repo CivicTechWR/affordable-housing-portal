@@ -1,6 +1,7 @@
 import { listingSearchParamsParsers } from '@/app/listings/searchParams';
 import { useQueryStates } from 'nuqs';
 import { useCallback, useMemo } from 'react';
+import { FilterButtonProps } from '@/components/filter-button/FilterButton';
 
 export function useListingFilters() {
     const [filters, setFilters] = useQueryStates(listingSearchParamsParsers);
@@ -119,7 +120,15 @@ export function useListingFilters() {
         return count;
     }, [filters.bedrooms, filters.bathrooms, filters.minPrice, filters.maxPrice, filters.moveInDate, filters.features]);
 
-    // --- 4. Actions ---
+    // --- 4. Getters ---
+
+    const getFilterButtonProps = useCallback((isFilterOpen: boolean, onFilterClick: () => void): FilterButtonProps => ({
+        activeFilterCount,
+        isFilterOpen,
+        onFilterClick,
+    }), [activeFilterCount]);
+
+    // --- 5. Actions ---
 
     const clearFilters = useCallback(async () => {
         await setFilters({
@@ -142,6 +151,7 @@ export function useListingFilters() {
         bathroomToggleProps,
         datePickerProps,
         getFeatureCheckboxProps,
+        getFilterButtonProps,
         clearFilters,
     };
 }

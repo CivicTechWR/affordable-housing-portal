@@ -56,9 +56,9 @@ export default function ListingsDashboard() {
         getFeatureCheckboxProps,
         datePickerProps,
         clearFilters,
-        activeFilterCount,
+        getFilterButtonProps,
     } = useListingFilters();
-    const onFilterClick = () => setIsFilterOpen(!isFilterOpen);
+    const filterButtonProps = getFilterButtonProps(isFilterOpen, () => setIsFilterOpen(!isFilterOpen));
 
     return (
         <NuqsAdapter>
@@ -79,20 +79,14 @@ export default function ListingsDashboard() {
                             value: displayMode,
                         }}
                     />
-                    <FilterButton
-                                activeFilterCount={activeFilterCount}
-                                isFilterOpen={isFilterOpen}
-                                onFilterClick={onFilterClick}
-                            />
+                    <FilterButton {...filterButtonProps} />
                 </header>
                 <main className="flex flex-1 overflow-hidden">
                     {displayMode !== DisplayMode.MAP ? (
                         <ListingsPanel
                             listings={listings}
                             displayMode={displayMode}
-                            isFilterOpen={isFilterOpen}
-                            activeFilterCount={activeFilterCount}
-                            onFilterClick={onFilterClick}
+                            filterButtonProps={filterButtonProps}
                             sortOptionProps={sortOptionProps}
                         />
                     ) : null}
