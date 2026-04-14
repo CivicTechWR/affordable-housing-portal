@@ -24,9 +24,9 @@ export function ListingsCard({
     timeAgo
 }: ListingsCardProps) {
     return (
-        <Card key={id} className="overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+        <Card key={id} className="w-[200px] h-[240px] sm:w-[220px] sm:h-[270px] lg:w-[250px] lg:h-[300px] overflow-hidden hover:shadow-md transition-all cursor-pointer group">
             {/* Image Container */}
-            <div className="relative w-full aspect-video bg-gray-100">
+            <div className="relative w-full h-[130px] sm:h-[145px] lg:h-[160px] bg-gray-100">
                 {imageUrl ? (
                     <img
                         src={imageUrl}

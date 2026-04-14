@@ -20,12 +20,12 @@ export enum ListingsDisplayMode {
     FULLSCREEN = 'fullscreen',
 }
 
-interface ListingsSidebarProps {
+interface ListingCardGalleryProps {
     listings: Listing[];
     mode: ListingsDisplayMode;
 }
 
-export function ListingsSidebar({ listings, mode }: ListingsSidebarProps) {
+export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) {
     const isFullscreen = mode === ListingsDisplayMode.FULLSCREEN;
 
     return (
@@ -35,7 +35,7 @@ export function ListingsSidebar({ listings, mode }: ListingsSidebarProps) {
                 // Switched from space-y-4 to a cohesive grid system for both modes
                 className={`p-4 grid gap-4 ${
                     isFullscreen
-                        ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                        ? "grid-cols-[200px] sm:grid-cols-[220px_220px] lg:grid-cols-[250px_250px_250px] xl:grid-cols-[250px_250px_250px_250px]"
                         : "grid-cols-1" 
                 }`}
             >

@@ -106,7 +106,20 @@ export function useListingFilters() {
         };
     }, [filters.features, setFilters]);
 
-    // --- 3. Actions ---
+    // --- 3. Derived State ---
+
+    const activeFilterCount = useMemo(() => {
+        let count = 0;
+        if (filters.bedrooms) count++;
+        if (filters.bathrooms) count++;
+        if (filters.minPrice) count++;
+        if (filters.maxPrice) count++;
+        if (filters.moveInDate) count++;
+        if (filters.features && filters.features.length > 0) count++;
+        return count;
+    }, [filters.bedrooms, filters.bathrooms, filters.minPrice, filters.maxPrice, filters.moveInDate, filters.features]);
+
+    // --- 4. Actions ---
 
     const clearFilters = useCallback(async () => {
         await setFilters({
@@ -121,13 +134,14 @@ export function useListingFilters() {
 
     return {
         ...filters,
+        activeFilterCount,
         sortOptionProps,
         searchInputProps,
         priceRangeProps,
         bedroomToggleProps,
         bathroomToggleProps,
         datePickerProps,
-        getFeatureCheckboxProps, // Still a getter because of the 'id' param
+        getFeatureCheckboxProps,
         clearFilters,
     };
 }

@@ -6,7 +6,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
-import { ListingsDisplayMode, ListingsSidebar } from "@/components/listings-sidebar/listingsSideBar";
+import { ListingsDisplayMode, ListingCardGallery } from "@/components/listing-card-list/listingsCardList";
 import { MapView } from "@/components/map-view/mapView";
 import { DisplayMode, ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
 import { SortOptions } from '@/components/sort-options/SortOptions';
@@ -65,6 +65,7 @@ export default function ListingsDashboard() {
         getFeatureCheckboxProps,
         datePickerProps,
         clearFilters,
+        activeFilterCount,
     } = useListingFilters();
     console.log('displayMode', displayMode);
     return (
@@ -78,9 +79,9 @@ export default function ListingsDashboard() {
                         bathroomToggleProps={bathroomToggleProps}
                         displayModeProps={{
                             displayModes: [
-                                {value: DisplayMode.LIST, label: "List"},
-                                {value: DisplayMode.MAP, label: "Map"},
-                                {value: DisplayMode.MAP_LIST, label: "Split"}
+                                { value: DisplayMode.LIST, label: "List" },
+                                { value: DisplayMode.MAP, label: "Map" },
+                                { value: DisplayMode.MAP_LIST, label: "Split" }
                             ],
                             onChange: (value: string) => setDisplayMode(value as DisplayMode),
                             value: displayMode,
@@ -88,20 +89,28 @@ export default function ListingsDashboard() {
                     />
                     <div className="flex">
                         <h2>Filters</h2>
-                        <ToggleIconButton
-                            isActive={isFilterOpen}
-                            icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
-                            onClick={() => setIsFilterOpen(!isFilterOpen)} />
+                        <div className="relative">
+                            <ToggleIconButton
+                                isActive={isFilterOpen}
+                                icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
+                                onClick={() => setIsFilterOpen(!isFilterOpen)} />
+                            {activeFilterCount > 0 && (
+                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                    {activeFilterCount}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </header>
                 <main className="flex flex-1 overflow-hidden">
-                    {/* The Sidebar stays relatively static but scrolls */}
-                    <div className="flex flex-col h-full bg-white">
-                        <div className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-                            <SortOptions {...sortOptionProps} />
+                    {displayMode !== DisplayMode.MAP &&
+                        <div className={`flex flex-col h-full bg-white min-w-[240px] sm:min-w-[260px] lg:min-w-[290px] ${displayMode === DisplayMode.LIST ? 'flex-1' : ''}`}>
+                            <div className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
+                                <SortOptions {...sortOptionProps} />
+                            </div>
+                            <ListingCardGallery listings={listings} mode={[DisplayMode.LIST, DisplayMode.MAP_LIST].includes(displayMode) ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
                         </div>
-                        <ListingsSidebar listings={listings} mode={[DisplayMode.LIST, DisplayMode.MAP_LIST].includes(displayMode) ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
-                    </div>
+                    }
                     {([DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode)) && <MapView listings={listings} />}
                     {isFilterOpen &&
                         <ListingFilters
