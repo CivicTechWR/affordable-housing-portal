@@ -4,12 +4,9 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
-import { ListingsDisplayMode } from "@/components/listing-card-list/listingsCardList";
 import { MapView } from "@/components/map-view/mapView";
 import { DisplayMode, ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
-import { ToggleIconButton } from '@/components/toggle-icon-button/ToggleIconButton';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { FilterMailIcon } from '@hugeicons/core-free-icons';
+import { FilterButton } from '@/components/filter-button/FilterButton';
 import { useState } from 'react';
 import { ListingsPanel } from '@/components/listings-panel/ListingsPanel';
 
@@ -61,6 +58,7 @@ export default function ListingsDashboard() {
         clearFilters,
         activeFilterCount,
     } = useListingFilters();
+    const onFilterClick = () => setIsFilterOpen(!isFilterOpen);
 
     return (
         <NuqsAdapter>
@@ -81,36 +79,11 @@ export default function ListingsDashboard() {
                             value: displayMode,
                         }}
                     />
-                    <div className="flex items-center gap-2 shrink-0">
-                        <div className="relative sm:hidden">
-                            <ToggleIconButton
-                                isActive={isFilterOpen}
-                                icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
-                                onClick={() => setIsFilterOpen(!isFilterOpen)} />
-                            {activeFilterCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                                    {activeFilterCount}
-                                </span>
-                            )}
-                        </div>
-                        <div className="hidden sm:block relative">
-                            <button
-                                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                                    isFilterOpen
-                                        ? "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
-                                        : "border-border bg-background hover:bg-accent"
-                                }`}
-                            >
-                                All Filters
-                                {activeFilterCount > 0 && (
-                                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
-                                        {activeFilterCount}
-                                    </span>
-                                )}
-                            </button>
-                        </div>
-                    </div>
+                    <FilterButton
+                                activeFilterCount={activeFilterCount}
+                                isFilterOpen={isFilterOpen}
+                                onFilterClick={onFilterClick}
+                            />
                 </header>
                 <main className="flex flex-1 overflow-hidden">
                     {displayMode !== DisplayMode.MAP ? (
@@ -119,7 +92,7 @@ export default function ListingsDashboard() {
                             displayMode={displayMode}
                             isFilterOpen={isFilterOpen}
                             activeFilterCount={activeFilterCount}
-                            setIsFilterOpen={setIsFilterOpen}
+                            onFilterClick={onFilterClick}
                             sortOptionProps={sortOptionProps}
                         />
                     ) : null}

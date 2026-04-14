@@ -32,10 +32,9 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
         // Added h-full and w-full so it fills the parent column and enables actual scrolling
         <ScrollArea className="flex-1 h-full w-full">
             <div
-                // Switched from space-y-4 to a cohesive grid system for both modes
                 className={`p-4 grid gap-4 ${
                     isFullscreen
-                        ? "grid-cols-[200px] sm:grid-cols-[220px_220px] lg:grid-cols-[250px_250px_250px] xl:grid-cols-[250px_250px_250px_250px]"
+                        ? "grid-cols-[260px] sm:grid-cols-[290px_290px] lg:grid-cols-[320px_320px_320px] xl:grid-cols-[320px_320px_320px_320px]"
                         : "grid-cols-1" 
                 }`}
             >
@@ -51,6 +50,7 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
                         sqft={listing.sqft}
                         timeAgo={listing.timeAgo}
                         imageUrl={listing.imageUrl}
+                        variant={isFullscreen ? "vertical" : "horizontal"}
                     />
                 ))}
             </div>
