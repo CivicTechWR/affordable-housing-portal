@@ -33,7 +33,7 @@ lib/                  → Utilities
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 20+
+- [Node.js](https://nodejs.org/) 22.6+
 - npm
 
 ### Install Dependencies
