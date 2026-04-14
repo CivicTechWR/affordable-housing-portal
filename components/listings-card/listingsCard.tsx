@@ -26,7 +26,7 @@ export function ListingsCard({
     return (
         <Card key={id} className="overflow-hidden hover:shadow-md transition-all cursor-pointer group">
             {/* Image Container */}
-            <div className="relative w-full h-48 bg-gray-100">
+            <div className="relative w-full aspect-video bg-gray-100">
                 {imageUrl ? (
                     <img
                         src={imageUrl}

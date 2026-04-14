@@ -66,12 +66,11 @@ export default function ListingsDashboard() {
         datePickerProps,
         clearFilters,
     } = useListingFilters();
-
+    console.log('displayMode', displayMode);
     return (
         <NuqsAdapter>
             <div className="flex h-screen flex-col">
                 <header className="flex h-16 items-center border-b bg-white px-4 shrink-0">
-
                     <ListingFilterSearchBar
                         searchInputProps={searchInputProps}
                         priceRangeProps={priceRangeProps}
@@ -101,9 +100,9 @@ export default function ListingsDashboard() {
                         <div className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
                             <SortOptions {...sortOptionProps} />
                         </div>
-                        <ListingsSidebar listings={listings} mode={displayMode === DisplayMode.LIST ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
+                        <ListingsSidebar listings={listings} mode={[DisplayMode.LIST, DisplayMode.MAP_LIST].includes(displayMode) ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
                     </div>
-                    {displayMode === DisplayMode.MAP || DisplayMode.MAP_LIST && <MapView listings={listings} />}
+                    {([DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode)) && <MapView listings={listings} />}
                     {isFilterOpen &&
                         <ListingFilters
                             bathroomToggleProps={bathroomToggleProps}
