@@ -1,36 +1,43 @@
+import { Field, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRightIcon } from "@hugeicons/core-free-icons";
-// If you defined this interface in your hook file, you can import it.
-// Otherwise, here is the exact shape it expects:
+
 export interface PriceRangeInputProps {
   min?: number;
   max?: number;
   step?: number;
-  onValueChange: (min: number, max: number) => Promise<void>;
+  onMinChange: (min: number | undefined) => Promise<void>;
+  onMaxChange: (max: number | undefined) => Promise<void>;
 }
 
-export function PriceRangeInput({ min = 0, max = 5000, onValueChange }: PriceRangeInputProps) {
+export function PriceRangeInput({ min, max, onMinChange, onMaxChange }: PriceRangeInputProps) {
   return (
-    <div className="space-y-4">
-      <h3 className="font-medium leading-none">Rent Price</h3>
-
-      {/* Use the value prop to drive the UI text */}
-      <div className="flex justify-between text-sm text-muted-foreground">
+    <FieldSet className="flex-row">
+      <Field>
+        <FieldLabel>Min Price</FieldLabel>
         <Input
           type="number"
           value={min}
           placeholder="Min"
-          onChange={(e) => onValueChange(parseInt(e.target.value) || 0, max)}
+          onChange={(e) => {
+            const val = e.target.value ? parseInt(e.target.value) : undefined;
+            onMinChange(val);
+          }}
         />
-        <HugeiconsIcon icon={ArrowRightIcon} strokeWidth={2} className="text-muted-foreground" />
+      </Field>
+
+      <Field>
+        <FieldLabel>Max Price</FieldLabel>
+
         <Input
           type="number"
           value={max}
           placeholder="Max"
-          onChange={(e) => onValueChange(min, parseInt(e.target.value) || 0)}
+          onChange={(e) => {
+            const val = e.target.value ? parseInt(e.target.value) : undefined;
+            onMaxChange(val);
+          }}
         />
-      </div>
-    </div>
+      </Field>
+    </FieldSet>
   );
 }

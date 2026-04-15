@@ -7,6 +7,12 @@
     "dev:secrets": "infisical run --env=dev -- next dev",
     "build": "next build",
     "build:secrets": "infisical run --env=dev -- next build",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node --env-file-if-exists=.env.local --experimental-strip-types db/seed.ts",
+    "db:seed:secrets": "infisical run --env=dev -- node --experimental-strip-types db/seed.ts",
+    "db:studio": "drizzle-kit studio",
     "start": "next start",
     "start:secrets": "infisical run --env=dev -- next start",
     "lint": "oxlint . -c .oxlintrc.json",
@@ -25,9 +31,12 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.45.2",
+    "embla-carousel-react": "^8.6.0",
     "maplibre-gl": "^5.21.1",
     "next": "^16.2.2",
     "nuqs": "^2.8.9",
+    "postgres": "^3.4.8",
     "radix-ui": "^1.4.3",
     "react": "^19.2.4",
     "react-day-picker": "^9.14.0",
@@ -46,15 +55,26 @@
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "jest": "^30.3.0",
-    "jest-environment-jsdom": "^30.3.0",
+    "dotenv": "^17.4.0",
+    "drizzle-kit": "^0.31.10",
     "gitleaks-secret-scanner": "^2.1.1",
     "husky": "^9.1.7",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "lint-staged": "^15.4.3",
     "oxfmt": "^0.43.0",
     "oxlint": "^1.58.0",
     "tailwindcss": "^4.2.2",
     "ts-jest": "^29.4.9",
     "typescript": "^6.0.2"
+  },
+  "overrides": {
+    "gitleaks-secret-scanner": {
+      "tar": "^7.5.13"
+    }
+  },
+  "engines": {
+    "node": ">=22.6.0"
   },
   "ignoreScripts": [
     "sharp",
