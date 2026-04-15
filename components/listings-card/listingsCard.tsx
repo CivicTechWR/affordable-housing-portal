@@ -1,4 +1,5 @@
 import { Card, CardContent } from "../ui/card";
+import Image from "next/image";
 
 interface ListingsCardProps {
   id: string;
@@ -64,10 +65,12 @@ export function ListingsCard({
     >
       <div className={`relative ${v.image} bg-muted`}>
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
             alt={`${address}, ${city}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            fill
+            sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div

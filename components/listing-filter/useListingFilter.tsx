@@ -38,14 +38,15 @@ export function useListingFilters() {
       onMinChange: async (min: number | undefined) => {
         if (min && filters.maxPrice && min > filters.maxPrice) {
           await setFilters({ minPrice: min, maxPrice: min });
+          return;
         }
         await setFilters({ minPrice: min });
       },
       onMaxChange: async (max: number | undefined) => {
         if (max && filters.minPrice && max < filters.minPrice) {
           await setFilters({ maxPrice: max, minPrice: max });
+          return;
         }
-
         await setFilters({ maxPrice: max });
       },
     }),
@@ -93,7 +94,7 @@ export function useListingFilters() {
   const datePickerProps = useMemo(
     () => ({
       selected: filters.moveInDate || undefined,
-      onSelect: async (d?: Date) => await setFilters({ moveInDate: d }),
+      onSelect: async (d?: Date) => await setFilters({ moveInDate: d ?? null }),
       formattedText: filters.moveInDate
         ? filters.moveInDate.toLocaleDateString("en-US", {
             year: "numeric",

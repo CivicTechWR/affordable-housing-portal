@@ -24,7 +24,7 @@ export default function ListingsDashboard() {
       beds: 3,
       baths: 2,
       sqft: 100,
-      imageUrl: "https://picsum.photos/id/1/200/300",
+      // imageUrl: "https://picsum.photos/id/1/200/300",
       timeAgo: "2 days ago",
       lat: 43.45055954361165,
       lng: -80.49228395260133,
@@ -68,7 +68,7 @@ export default function ListingsDashboard() {
   );
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-full flex-col">
       <header className="flex h-16 items-center border-b bg-background px-4 shrink-0">
         <ListingFilterSearchBar
           searchInputProps={searchInputProps}

@@ -19,9 +19,7 @@ export function ToggleFilter({ title, options, value, onValueChange }: ToggleFil
       <ToggleGroup
         type="single"
         value={value ?? ""}
-        onValueChange={(val) => {
-          if (val) onValueChange(val);
-        }}
+        onValueChange={onValueChange}
         className="justify-start"
       >
         {options.map((option) => (
