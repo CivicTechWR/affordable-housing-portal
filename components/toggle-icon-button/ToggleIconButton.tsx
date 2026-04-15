@@ -6,16 +6,11 @@ import { cn } from "@/lib/utils";
 
 interface ToggleIconButtonProps extends React.ComponentPropsWithoutRef<typeof Button> {
   // We pass the icon component itself, not an element, so we can inject classes into it
-  icon: React.ReactElement; 
+  icon: React.ReactElement;
   isActive: boolean;
 }
 
-export function ToggleIconButton({ 
-  icon, 
-  isActive, 
-  className, 
-  ...props 
-}: ToggleIconButtonProps) {
+export function ToggleIconButton({ icon, isActive, className, ...props }: ToggleIconButtonProps) {
   return (
     <Button
       variant="outline"
@@ -23,7 +18,7 @@ export function ToggleIconButton({
       className={cn(
         "rounded-full bg-background transition-colors duration-300 hover:bg-accent",
         isActive && "border-primary/30 bg-primary/10 hover:bg-primary/20",
-        className
+        className,
       )}
       {...props}
     >
