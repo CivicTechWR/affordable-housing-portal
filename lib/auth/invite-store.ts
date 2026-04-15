@@ -6,6 +6,13 @@ import { db } from "@/db";
 import { userInvites, users } from "@/db/schema";
 import { hashOpaqueToken } from "@/lib/auth/token";
 
+export class InviteUnavailableError extends Error {
+  constructor() {
+    super("Invite is no longer valid.");
+    this.name = "InviteUnavailableError";
+  }
+}
+
 export async function getPendingInviteByToken(token: string) {
   const tokenHash = hashOpaqueToken(token);
   const [invite] = await db
@@ -51,7 +58,7 @@ export async function acceptInvite(params: {
       .returning({ id: userInvites.id });
 
     if (acceptedInvites.length === 0) {
-      throw new Error("Invite is no longer valid.");
+      throw new InviteUnavailableError();
     }
 
     await tx

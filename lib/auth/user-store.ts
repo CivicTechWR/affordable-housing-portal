@@ -11,6 +11,20 @@ export async function getUserForAuth(email: string) {
   return user ?? null;
 }
 
+export async function getUserForSession(userId: string) {
+  const [user] = await db
+    .select({
+      id: users.id,
+      role: users.role,
+      status: users.status,
+    })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  return user ?? null;
+}
+
 export function isUserAllowedToSignIn(status: UserStatus) {
   return status === "active";
 }

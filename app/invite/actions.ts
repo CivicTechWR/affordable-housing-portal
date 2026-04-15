@@ -3,7 +3,11 @@
 import { redirect } from "next/navigation";
 
 import { signIn } from "@/auth";
-import { acceptInvite, getPendingInviteByToken } from "@/lib/auth/invite-store";
+import {
+  acceptInvite,
+  getPendingInviteByToken,
+  InviteUnavailableError,
+} from "@/lib/auth/invite-store";
 import { hashPassword } from "@/lib/auth/password";
 import { acceptInviteSchema } from "@/lib/auth/validation";
 
@@ -37,11 +41,21 @@ export async function acceptInviteAction(
 
   const passwordHash = await hashPassword(parsed.data.password);
 
-  await acceptInvite({
-    inviteId: pendingInvite.invite.id,
-    userId: pendingInvite.user.id,
-    passwordHash,
-  });
+  try {
+    await acceptInvite({
+      inviteId: pendingInvite.invite.id,
+      userId: pendingInvite.user.id,
+      passwordHash,
+    });
+  } catch (error) {
+    if (error instanceof InviteUnavailableError) {
+      return {
+        error: "This invite is invalid or has expired.",
+      };
+    }
+
+    throw error;
+  }
 
   await signIn("credentials", {
     email: pendingInvite.user.email,

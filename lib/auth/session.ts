@@ -1,6 +1,7 @@
 import "server-only";
 
 import { auth } from "@/auth";
+import { isUserAllowedToSignIn } from "@/lib/auth/user-store";
 
 type SessionGuardResult = {
   response: Response | null;
@@ -10,7 +11,11 @@ type SessionGuardResult = {
 export async function requireSession() {
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (
+    !session?.user?.id ||
+    session.user.status === undefined ||
+    !isUserAllowedToSignIn(session.user.status)
+  ) {
     return {
       response: new Response("Unauthorized", { status: 401 }),
       session: null,
