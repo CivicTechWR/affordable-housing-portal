@@ -28,7 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "1.0.0-beta.21",
+    "drizzle-orm": "^0.45.2",
     "maplibre-gl": "^5.21.1",
     "next": "^16.2.2",
     "nuqs": "^2.8.9",
