@@ -29,13 +29,14 @@ export function FeatureAccordion({ groups, getCheckboxProps }: FeatureAccordionP
   if (!groups || groups.length === 0) return null;
 
   return (
-    <Accordion type="multiple" className="max-w-lg">
+    <Accordion type="multiple" className="w-full">
       {groups.map((group) => (
         <AccordionItem key={group.groupId} value={group.groupId}>
-          <AccordionTrigger className="text-md">{group.groupLabel}</AccordionTrigger>
+          <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+            {group.groupLabel}
+          </AccordionTrigger>
           <AccordionContent>
             <div className="grid grid-cols-2 gap-4 pt-2">
-              {/* --- THE CLEANED UP MAPPING --- */}
               {group.options.map((option) => (
                 <LabeledCheckbox
                   key={option.id}
