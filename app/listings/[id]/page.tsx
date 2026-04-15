@@ -116,10 +116,15 @@ export default async function ListingDetailsPage({ params }: Readonly<PageProps>
             <CardContent>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {details.images.map((image, index) => (
-                  <figure key={`${image.url}-${index}`} className="overflow-hidden rounded-md border border-border">
+                  <figure
+                    key={`${image.url}-${index}`}
+                    className="overflow-hidden rounded-md border border-border"
+                  >
                     <img
                       src={image.url}
-                      alt={image.caption || `${details.address}, ${details.city} image ${index + 1}`}
+                      alt={
+                        image.caption || `${details.address}, ${details.city} image ${index + 1}`
+                      }
                       className="h-44 w-full object-cover"
                     />
                     {image.caption && (
@@ -142,7 +147,9 @@ export default async function ListingDetailsPage({ params }: Readonly<PageProps>
             <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {propertyRows.map((row) => (
                 <div key={row.label} className="rounded-md border border-border bg-background p-3">
-                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">{row.label}</dt>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {row.label}
+                  </dt>
                   <dd className="mt-1 text-sm font-medium text-foreground">{row.value}</dd>
                 </div>
               ))}
