@@ -1,12 +1,14 @@
-// app/listings/page.tsx
-// types/listings.ts
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
-import ListingsDashboard from './listings';
+import { Suspense } from "react";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import ListingsDashboard from "./listings";
+import ListingsSkeleton from "@/components/listings-skeleton/ListingsSkeleton";
 
 export default async function ListingsPage() {
-    return (
-        <NuqsAdapter>
-            <ListingsDashboard />
-        </NuqsAdapter>
-    );
+  return (
+    <NuqsAdapter>
+      <Suspense fallback={<ListingsSkeleton />}>
+        <ListingsDashboard />
+      </Suspense>
+    </NuqsAdapter>
+  );
 }
