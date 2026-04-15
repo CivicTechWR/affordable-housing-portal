@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { Map, Marker, Popup } from "@vis.gl/react-maplibre";
-import type { Listing } from "@/components/listings-sidebar/ListingCardGallery";
+import type { Listing } from "@/components/listing-card-list/listingsCardList";
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
