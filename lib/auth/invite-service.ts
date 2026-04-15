@@ -1,0 +1,103 @@
+import "server-only";
+
+import { randomUUID } from "node:crypto";
+
+import { and, eq, gt, isNull } from "drizzle-orm";
+
+import { db } from "@/db";
+import { userInvites, users, type UserRole } from "@/db/schema";
+import { sendInviteEmail } from "@/lib/auth/invite-email";
+import { createOpaqueToken, hashOpaqueToken } from "@/lib/auth/token";
+
+const INVITE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
+
+export async function createInvite(params: {
+  email: string;
+  fullName: string;
+  role: UserRole;
+  invitedByUserId: string;
+  sendInviteEmail?: boolean;
+}) {
+  const normalizedEmail = params.email.trim().toLowerCase();
+  const now = new Date();
+  const token = createOpaqueToken();
+  const tokenHash = hashOpaqueToken(token);
+  const expiresAt = new Date(now.getTime() + INVITE_TTL_MS);
+
+  const result = await db.transaction(async (tx) => {
+    const [existingUser] = await tx
+      .select()
+      .from(users)
+      .where(eq(users.email, normalizedEmail))
+      .limit(1);
+
+    const userId = existingUser?.id ?? randomUUID();
+
+    if (existingUser) {
+      await tx
+        .update(users)
+        .set({
+          fullName: params.fullName,
+          role: params.role,
+          status: existingUser.passwordHash ? existingUser.status : "invited",
+        })
+        .where(eq(users.id, existingUser.id));
+    } else {
+      await tx.insert(users).values({
+        id: userId,
+        email: normalizedEmail,
+        fullName: params.fullName,
+        role: params.role,
+        status: "invited",
+      });
+    }
+
+    await tx
+      .update(userInvites)
+      .set({
+        expiresAt: now,
+      })
+      .where(
+        and(
+          eq(userInvites.userId, userId),
+          isNull(userInvites.acceptedAt),
+          gt(userInvites.expiresAt, now),
+        ),
+      );
+
+    const [invite] = await tx
+      .insert(userInvites)
+      .values({
+        userId,
+        email: normalizedEmail,
+        tokenHash,
+        expiresAt,
+        sentAt: params.sendInviteEmail ? now : null,
+        createdByUserId: params.invitedByUserId,
+      })
+      .returning();
+
+    return {
+      invite,
+      userId,
+      email: normalizedEmail,
+    };
+  });
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? process.env.AUTH_URL ?? "http://localhost:3000";
+  const inviteUrl = new URL(`/invite?token=${token}`, baseUrl).toString();
+
+  if (params.sendInviteEmail) {
+    await sendInviteEmail({
+      email: result.email,
+      fullName: params.fullName,
+      inviteUrl,
+    });
+  }
+
+  return {
+    ...result,
+    inviteUrl,
+  };
+}

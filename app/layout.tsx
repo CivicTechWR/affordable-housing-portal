@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SessionDock } from "@/components/auth/session-dock";
 import { SiteHeader } from "@/components/site-header/SiteHeader";
 import { SiteFooter } from "@/components/site-footer/SiteFooter";
 import "./globals.css";
@@ -26,7 +27,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
+        <SessionDock />
         <SiteHeader />
         <div className="flex-1">{children}</div>
         <SiteFooter />

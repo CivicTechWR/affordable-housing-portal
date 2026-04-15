@@ -1,140 +1,9 @@
 {
-  "id": "115f82fc-10e4-48b1-922a-dd59c8c17179",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "b38a49a1-7304-4016-b07d-dbd8f443abe0",
+  "prevId": "dd7ff7a0-cf7c-4817-be6f-03718983e6f0",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.listing_field_values": {
-      "name": "listing_field_values",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "listing_id": {
-          "name": "listing_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "field_definition_id": {
-          "name": "field_definition_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "value": {
-          "name": "value",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "listing_field_values_listing_field_unique": {
-          "name": "listing_field_values_listing_field_unique",
-          "columns": [
-            {
-              "expression": "listing_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "field_definition_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "listing_field_values_listing_id_idx": {
-          "name": "listing_field_values_listing_id_idx",
-          "columns": [
-            {
-              "expression": "listing_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "listing_field_values_field_definition_id_idx": {
-          "name": "listing_field_values_field_definition_id_idx",
-          "columns": [
-            {
-              "expression": "field_definition_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "listing_field_values_listing_id_listings_id_fk": {
-          "name": "listing_field_values_listing_id_listings_id_fk",
-          "tableFrom": "listing_field_values",
-          "tableTo": "listings",
-          "columnsFrom": [
-            "listing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "listing_field_values_field_definition_id_listing_field_definitions_id_fk": {
-          "name": "listing_field_values_field_definition_id_listing_field_definitions_id_fk",
-          "tableFrom": "listing_field_values",
-          "tableTo": "listing_field_definitions",
-          "columnsFrom": [
-            "field_definition_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.listing_field_definitions": {
       "name": "listing_field_definitions",
       "schema": "",
@@ -522,6 +391,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "custom_fields": {
+          "name": "custom_fields",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
         "published_at": {
           "name": "published_at",
           "type": "timestamp with time zone",
@@ -635,6 +511,21 @@
           "isUnique": false,
           "concurrently": false,
           "method": "btree",
+          "with": {}
+        },
+        "listings_custom_fields_gin_idx": {
+          "name": "listings_custom_fields_gin_idx",
+          "columns": [
+            {
+              "expression": "custom_fields",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
           "with": {}
         }
       },
@@ -1066,6 +957,163 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.user_invites": {
+      "name": "user_invites",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sent_at": {
+          "name": "sent_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "accepted_at": {
+          "name": "accepted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by_user_id": {
+          "name": "created_by_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "user_invites_token_hash_unique": {
+          "name": "user_invites_token_hash_unique",
+          "columns": [
+            {
+              "expression": "token_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_invites_user_id_idx": {
+          "name": "user_invites_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_invites_email_idx": {
+          "name": "user_invites_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_invites_created_by_user_id_idx": {
+          "name": "user_invites_created_by_user_id_idx",
+          "columns": [
+            {
+              "expression": "created_by_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "user_invites_user_id_users_id_fk": {
+          "name": "user_invites_user_id_users_id_fk",
+          "tableFrom": "user_invites",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "user_invites_created_by_user_id_users_id_fk": {
+          "name": "user_invites_created_by_user_id_users_id_fk",
+          "tableFrom": "user_invites",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -1095,6 +1143,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "role": {
           "name": "role",
           "type": "user_role",
@@ -1108,6 +1162,12 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "invite_accepted_at": {
+          "name": "invite_accepted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         },
         "last_login_at": {
           "name": "last_login_at",

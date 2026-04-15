@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
 
+import { createInvite } from "@/lib/auth/invite-service";
+import { requireAdminSession } from "@/lib/auth/session";
+
 /**
  * GET /api/admin/accounts
  *
@@ -13,7 +16,12 @@ import { NextRequest } from "next/server";
  *   - ?search=email-or-name
  */
 export async function GET(request: NextRequest) {
-  // TODO: authenticate request (admin only)
+  const { response } = await requireAdminSession();
+
+  if (response) {
+    return response;
+  }
+
   const { searchParams } = request.nextUrl;
 
   const page = Number(searchParams.get("page") ?? 1);
@@ -52,16 +60,43 @@ export async function GET(request: NextRequest) {
  * }
  */
 export async function POST(request: NextRequest) {
-  // TODO: authenticate request (admin only)
+  const { response, session } = await requireAdminSession();
+
+  if (response || !session) {
+    return response ?? new Response("Forbidden", { status: 403 });
+  }
+
   const body = await request.json();
 
-  // TODO: validate body schema
-  // TODO: create account in database
-  // TODO: optionally send invite email
-  void body;
+  if (typeof body?.email !== "string" || typeof body?.name !== "string") {
+    return Response.json({ message: "Email and name are required." }, { status: 400 });
+  }
+
+  const role = body?.role;
+
+  if (role !== "admin" && role !== "partner" && role !== "user") {
+    return Response.json({ message: "Role must be admin, partner, or user." }, { status: 400 });
+  }
+
+  const invite = await createInvite({
+    email: body.email,
+    fullName: body.name,
+    role,
+    invitedByUserId: session.user.id,
+    sendInviteEmail: body.sendInviteEmail === true,
+  });
 
   return Response.json(
-    { message: "Account created", data: { id: "placeholder-id", ...body } },
+    {
+      message: "Account invited",
+      data: {
+        id: invite.userId,
+        email: invite.email,
+        name: body.name,
+        role,
+        inviteUrl: invite.inviteUrl,
+      },
+    },
     { status: 201 },
   );
 }

@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 
+import { requireListingWriteSession } from "@/lib/auth/session";
+
 /**
  * GET /api/listings
  *
@@ -62,7 +64,12 @@ export async function GET(request: NextRequest) {
  * }
  */
 export async function POST(request: NextRequest) {
-  // TODO: authenticate request (housing provider / admin)
+  const { response } = await requireListingWriteSession();
+
+  if (response) {
+    return response;
+  }
+
   const body = await request.json();
 
   // TODO: validate body schema
