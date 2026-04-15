@@ -1,81 +1,116 @@
 import { listingSearchParamsParsers } from "@/app/listings/searchParams";
 import { useQueryStates } from "nuqs";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import { FilterButtonProps } from "@/components/filter-button/FilterButton";
 
 export function useListingFilters() {
-  // 1. nuqs replaces the useReducer
   const [filters, setFilters] = useQueryStates(listingSearchParamsParsers);
-  const getSearchInputProps = useCallback(
+
+  // --- 1. Static Props (Variables) ---
+  const sortOptionProps = useMemo(
     () => ({
-      value: filters.location ? filters.location : "Waterloo, ON",
-      onChange: async (e: string) => {
-        await setFilters({ location: e });
+      sortOptions: [
+        { value: "newest", label: "Newest" },
+        { value: "oldest", label: "Oldest" },
+        { value: "price_asc", label: "Price: Low to High" },
+        { value: "price_desc", label: "Price: High to Low" },
+      ],
+      onChange: async (value: string) => await setFilters({ sort: value }),
+    }),
+    [filters.sort, setFilters],
+  );
+
+  const searchInputProps = useMemo(
+    () => ({
+      value: filters.location || "Waterloo, ON",
+      onChange: async (e: React.ChangeEvent<HTMLInputElement>) => {
+        await setFilters({ location: e.target.value });
       },
     }),
     [filters.location, setFilters],
   );
 
-  // 2. Prop Getters map UI events directly to URL mutations
-  const getPriceRangeInputProps = useCallback(
+  const priceRangeProps = useMemo(
     () => ({
-      // Provide fallbacks if the URL is empty
-      min: filters.minPrice || 0,
-      max: filters.maxPrice || 5000,
+      min: filters.minPrice || undefined,
+      max: filters.maxPrice || undefined,
       step: 100,
-      onValueChange: async (min: number, max: number) => {
-        await setFilters({
-          minPrice: min,
-          maxPrice: max,
-        });
+      onMinChange: async (min: number | undefined) => {
+        if (min && filters.maxPrice && min > filters.maxPrice) {
+          await setFilters({ minPrice: min, maxPrice: min });
+          return;
+        }
+        await setFilters({ minPrice: min });
+      },
+      onMaxChange: async (max: number | undefined) => {
+        if (max && filters.minPrice && max < filters.minPrice) {
+          await setFilters({ maxPrice: max, minPrice: max });
+          return;
+        }
+        await setFilters({ maxPrice: max });
       },
     }),
     [filters.minPrice, filters.maxPrice, setFilters],
   );
 
-  const getBedroomToggleProps = useCallback(
+  const bedroomToggleProps = useMemo(
     () => ({
-      type: "single" as const,
-      value: filters.bedrooms?.toString(),
-      onValueChange: async (val: string) =>
+      title: "Bedrooms",
+      value: filters.bedrooms?.toString() || undefined,
+      options: [
+        { value: "1", label: "1" },
+        { value: "2", label: "2" },
+        { value: "3", label: "3" },
+        { value: "4+", label: "4+" },
+      ],
+      onValueChange: async (val: string) => {
         await setFilters({
-          // nuqs handles the type conversion back to integer via your cache definition
-          bedrooms: val === "" ? null : parseInt(val, 10),
-        }),
+          bedrooms: val === "" ? null : val,
+        });
+      },
     }),
     [filters.bedrooms, setFilters],
   );
 
-  const getBathroomToggleProps = useCallback(
+  const bathroomToggleProps = useMemo(
     () => ({
-      type: "single" as const,
-      value: filters.bathrooms?.toString(),
-      onValueChange: async (val: string) =>
+      title: "Bathrooms",
+      value: filters.bathrooms?.toString() || undefined,
+      options: [
+        { value: "1", label: "1" },
+        { value: "2", label: "2" },
+        { value: "3", label: "3" },
+        { value: "4+", label: "4+" },
+      ],
+      onValueChange: async (val: string) => {
         await setFilters({
-          // nuqs handles the type conversion back to integer via your cache definition
-          bathrooms: val === "" ? null : parseInt(val, 10),
-        }),
+          bathrooms: val === "" ? null : val,
+        });
+      },
     }),
     [filters.bathrooms, setFilters],
   );
 
-  // 3. Derived actions
-  const clearFilters = useCallback(async () => {
-    // Setting to null removes the parameters from the URL
-    await setFilters({
-      minPrice: null,
-      maxPrice: null,
-      bedrooms: null,
-      bathrooms: null,
-      moveInDate: null,
-      features: null,
-    });
-  }, [setFilters]);
+  const datePickerProps = useMemo(
+    () => ({
+      selected: filters.moveInDate || undefined,
+      onSelect: async (d?: Date) => await setFilters({ moveInDate: d ?? null }),
+      formattedText: filters.moveInDate
+        ? filters.moveInDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "",
+    }),
+    [filters.moveInDate, setFilters],
+  );
+
+  // --- 2. Dynamic Getters (Functions) ---
+
   const getFeatureCheckboxProps = useCallback(
     (id: string) => {
-      // Default to an empty array if the URL parameter doesn't exist yet
       const currentFeatures = filters.features || [];
-
-      // It is checked if the ID exists in the URL array
       const isChecked = currentFeatures.includes(id);
 
       return {
@@ -83,13 +118,9 @@ export function useListingFilters() {
         checked: isChecked,
         onCheckedChange: async (checked: boolean) => {
           if (checked) {
-            // Add the feature to the array
             await setFilters({ features: [...currentFeatures, id] });
           } else {
-            // Remove the feature from the array
             const nextFeatures = currentFeatures.filter((f) => f !== id);
-
-            // If the array is empty, pass null to completely remove '?features=' from the URL
             await setFilters({
               features: nextFeatures.length > 0 ? nextFeatures : null,
             });
@@ -100,32 +131,61 @@ export function useListingFilters() {
     [filters.features, setFilters],
   );
 
-  const getDatePickerProps = useCallback(() => {
-    // 1. Calculate the derived text
-    const formattedText = filters.moveInDate
-      ? filters.moveInDate.toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      : "Pick a moveInDate";
+  // --- 3. Derived State ---
 
-    // 2. Return the complete package expected by your new component
-    return {
-      selected: filters.moveInDate ? filters.moveInDate : undefined,
-      onSelect: async (d?: Date) => await setFilters({ moveInDate: d ?? null }),
-      formattedText,
-    };
-  }, [filters.moveInDate, setFilters]);
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.bedrooms) count++;
+    if (filters.bathrooms) count++;
+    if (filters.minPrice) count++;
+    if (filters.maxPrice) count++;
+    if (filters.moveInDate) count++;
+    if (filters.features && filters.features.length > 0) count++;
+    return count;
+  }, [
+    filters.bedrooms,
+    filters.bathrooms,
+    filters.minPrice,
+    filters.maxPrice,
+    filters.moveInDate,
+    filters.features,
+  ]);
+
+  // --- 4. Getters ---
+
+  const getFilterButtonProps = useCallback(
+    (isFilterOpen: boolean, onFilterClick: () => void): FilterButtonProps => ({
+      activeFilterCount,
+      isFilterOpen,
+      onFilterClick,
+    }),
+    [activeFilterCount],
+  );
+
+  // --- 5. Actions ---
+
+  const clearFilters = useCallback(async () => {
+    await setFilters({
+      minPrice: null,
+      maxPrice: null,
+      bedrooms: null,
+      bathrooms: null,
+      moveInDate: null,
+      features: null,
+    });
+  }, [setFilters]);
 
   return {
     ...filters,
-    getDatePickerProps,
-    getSearchInputProps,
-    getPriceRangeInputProps,
+    activeFilterCount,
+    sortOptionProps,
+    searchInputProps,
+    priceRangeProps,
+    bedroomToggleProps,
+    bathroomToggleProps,
+    datePickerProps,
     getFeatureCheckboxProps,
-    getBedroomToggleProps,
-    getBathroomToggleProps,
+    getFilterButtonProps,
     clearFilters,
   };
 }
