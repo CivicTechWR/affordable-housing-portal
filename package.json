@@ -59,6 +59,11 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2"
   },
+  "overrides": {
+    "gitleaks-secret-scanner": {
+      "tar": "^7.5.13"
+    }
+  },
   "engines": {
     "node": ">=22.6.0"
   },
