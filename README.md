@@ -33,7 +33,7 @@ lib/                  → Utilities
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 20+
+- [Node.js](https://nodejs.org/) 22.6+
 - npm
 
 ### Install Dependencies
@@ -49,6 +49,15 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## Database
+
+The app now includes a Drizzle + Postgres schema for users, listings, saved listings, saved searches, and admin-configurable listing fields.
+
+1. Copy `.env.example` to `.env.local` or provide `DATABASE_URL` through Infisical.
+2. Generate migrations after schema changes with `npm run db:generate`.
+3. Apply migrations with `npm run db:migrate`.
+4. Inspect the schema with `npm run db:studio`.
 
 ## Contributing
 

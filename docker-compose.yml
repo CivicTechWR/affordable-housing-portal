@@ -1,0 +1,9 @@
+services:
+  ahp:
+    container_name: ahp
+    build: .
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      INFISICAL_TOKEN: ${INFISICAL_TOKEN}
+      PORT: ${PORT:-3100}
