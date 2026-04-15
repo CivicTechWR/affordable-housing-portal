@@ -35,6 +35,25 @@ export async function acceptInvite(params: {
   const now = new Date();
 
   await db.transaction(async (tx) => {
+    const acceptedInvites = await tx
+      .update(userInvites)
+      .set({
+        acceptedAt: now,
+      })
+      .where(
+        and(
+          eq(userInvites.id, params.inviteId),
+          eq(userInvites.userId, params.userId),
+          isNull(userInvites.acceptedAt),
+          gt(userInvites.expiresAt, now),
+        ),
+      )
+      .returning({ id: userInvites.id });
+
+    if (acceptedInvites.length === 0) {
+      throw new Error("Invite is no longer valid.");
+    }
+
     await tx
       .update(users)
       .set({
@@ -43,12 +62,5 @@ export async function acceptInvite(params: {
         inviteAcceptedAt: now,
       })
       .where(eq(users.id, params.userId));
-
-    await tx
-      .update(userInvites)
-      .set({
-        acceptedAt: now,
-      })
-      .where(eq(userInvites.id, params.inviteId));
   });
 }

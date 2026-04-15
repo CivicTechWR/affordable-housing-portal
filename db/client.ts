@@ -36,9 +36,7 @@ function createSqlClient() {
 function createDatabase() {
   const sqlClient = globalForDatabase.__ahpSqlClient ?? createSqlClient();
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDatabase.__ahpSqlClient = sqlClient;
-  }
+  globalForDatabase.__ahpSqlClient = sqlClient;
 
   return drizzle(sqlClient, { schema });
 }
@@ -51,10 +49,7 @@ function getDatabase() {
   }
 
   const database = createDatabase();
-
-  if (process.env.NODE_ENV !== "production") {
-    globalForDatabase.__ahpDatabase = database;
-  }
+  globalForDatabase.__ahpDatabase = database;
 
   return database;
 }
