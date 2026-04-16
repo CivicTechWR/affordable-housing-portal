@@ -18,16 +18,24 @@ export default function ListingsDashboard() {
   const listings = [
     {
       id: "1",
-      price: 100000,
+      title: "Sunny Downtown Loft",
+      price: 185000,
       address: "123 Main St",
       city: "Waterloo",
       beds: 3,
       baths: 2,
-      sqft: 100,
-      // imageUrl: "https://picsum.photos/id/1/200/300",
+      sqft: 1100,
       timeAgo: "2 days ago",
       lat: 43.45055954361165,
       lng: -80.49228395260133,
+      accessibilityFeatures: [
+        "Main Entrance is Barrier-Free",
+        "Elevator in Building",
+        "Braille Signage",
+        "Automated Building Doors",
+        "Lowered Light Switches",
+        "Accessible Guest Parking",
+      ],
       features: [
         {
           categoryName: "Accessibility",
@@ -38,6 +46,20 @@ export default function ListingsDashboard() {
           ],
         },
       ],
+    },
+    {
+      id: "2",
+      title: "Cozy Suburb Apartment",
+      price: 145000,
+      address: "456 King St N",
+      city: "Waterloo",
+      beds: 1,
+      baths: 1,
+      sqft: 650,
+      timeAgo: "5 hours ago",
+      lat: 43.468,
+      lng: -80.525,
+      accessibilityFeatures: ["Main Entrance is Barrier-Free", "Unit Entrance is Barrier-Free"],
     },
   ];
 
