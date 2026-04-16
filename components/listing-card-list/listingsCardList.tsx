@@ -3,6 +3,8 @@ import { ListingsCard } from "../listings-card/listingsCard";
 
 export interface Listing {
   id: string;
+  title?: string;
+  accessibilityFeatures?: string[];
   price: number;
   address: string;
   city: string;
@@ -42,6 +44,8 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
           <ListingsCard
             key={listing.id}
             id={listing.id}
+            title={listing.title}
+            accessibilityFeatures={listing.accessibilityFeatures}
             price={listing.price}
             address={listing.address}
             city={listing.city}

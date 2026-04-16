@@ -1,8 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import { Card, CardContent } from "../ui/card";
+import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
 interface ListingsCardProps {
   id: string;
+  title?: string;
+  accessibilityFeatures?: string[];
   price: number;
   address: string;
   city: string;
@@ -16,9 +22,9 @@ interface ListingsCardProps {
 
 const variants = {
   vertical: {
-    card: "w-[260px] h-[300px] sm:w-[290px] sm:h-[330px] lg:w-[320px] lg:h-[360px]",
-    image: "w-full h-[160px] sm:h-[175px] lg:h-[190px]",
-    content: "p-4",
+    card: "w-[260px] sm:w-[290px] lg:w-[320px] flex flex-col min-h-[300px]",
+    image: "w-full h-[160px] sm:h-[175px] lg:h-[190px] shrink-0",
+    content: "p-4 flex flex-col flex-1",
     price: "text-xl",
     address: "text-sm",
     stats: "text-sm gap-x-3",
@@ -29,10 +35,10 @@ const variants = {
     noImageText: "text-sm",
   },
   horizontal: {
-    card: "w-full h-[120px] sm:h-[140px] flex flex-row",
-    image: "w-[100px] sm:w-[120px] shrink-0",
-    content: "p-3 flex-1 min-w-0 flex flex-col justify-center",
-    price: "text-base",
+    card: "w-full min-h-[120px] flex flex-row",
+    image: "w-[100px] sm:w-[130px] shrink-0 rounded-l-lg overflow-hidden",
+    content: "p-3 sm:p-4 flex-1 min-w-0 flex flex-col justify-center",
+    price: "text-lg",
     address: "text-xs",
     stats: "text-xs gap-x-2",
     statGap: "gap-0.5",
@@ -45,6 +51,8 @@ const variants = {
 
 export function ListingsCard({
   id,
+  title,
+  accessibilityFeatures,
   price,
   address,
   city,
@@ -55,8 +63,14 @@ export function ListingsCard({
   timeAgo,
   variant = "vertical",
 }: ListingsCardProps) {
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
   const v = variants[variant];
   const isHorizontal = variant === "horizontal";
+
+  const safeFeatures = accessibilityFeatures || [];
+  const MAX_FEATURES = 3;
+  const hasMoreFeatures = safeFeatures.length > MAX_FEATURES;
+  const featuresToShow = showAllFeatures ? safeFeatures : safeFeatures.slice(0, MAX_FEATURES);
 
   return (
     <Card
@@ -90,9 +104,15 @@ export function ListingsCard({
       </div>
 
       <CardContent className={v.content}>
-        <div className={isHorizontal ? "mb-1" : "mb-3"}>
-          <div className={`${v.price} font-bold text-foreground tracking-tight`}>
+        <div className={isHorizontal ? "mb-2" : "mb-3"}>
+          <div
+            className={`${v.price} font-bold text-foreground tracking-tight flex items-baseline gap-1`}
+          >
             ${price.toLocaleString()}
+            <span className="text-sm font-normal text-muted-foreground">/mo</span>
+          </div>
+          <div className="font-semibold line-clamp-1 mt-0.5 text-base">
+            {title || "Untitled Listing"}
           </div>
           <div
             className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
@@ -101,7 +121,7 @@ export function ListingsCard({
           </div>
         </div>
 
-        <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground`}>
+        <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground mb-auto`}>
           <span className={`flex items-center ${v.statGap}`}>
             <strong className="text-foreground">{beds}</strong> bds
           </span>
@@ -111,9 +131,37 @@ export function ListingsCard({
           </span>
           <span className="text-border">|</span>
           <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{sqft}</strong> sqft
+            <strong className="text-foreground">{sqft || "-"}</strong> sqft
           </span>
         </div>
+
+        {safeFeatures.length > 0 && (
+          <div className={`mt-3 pt-3 border-t ${isHorizontal ? "hidden sm:block" : ""}`}>
+            <div className="flex flex-wrap gap-1.5 items-center">
+              {featuresToShow.map((f) => (
+                <Badge
+                  variant="secondary"
+                  key={f}
+                  className="font-normal text-[10px] px-1.5 py-0 border-transparent bg-secondary/60"
+                >
+                  {f}
+                </Badge>
+              ))}
+              {hasMoreFeatures && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowAllFeatures(!showAllFeatures);
+                  }}
+                  className="text-[10px] text-primary hover:underline font-medium px-1"
+                >
+                  {showAllFeatures ? "Show less" : `+${safeFeatures.length - MAX_FEATURES} more`}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
