@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardContent } from "../ui/card";
 import Image from "next/image";
 
@@ -59,62 +60,64 @@ export function ListingsCard({
   const isHorizontal = variant === "horizontal";
 
   return (
-    <Card
-      key={id}
-      className={`${v.card} overflow-hidden hover:shadow-md transition-all cursor-pointer group`}
-    >
-      <div className={`relative ${v.image} bg-muted`}>
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={`${address}, ${city}`}
-            fill
-            sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
+    <Link key={id} href={`/listings/${id}`} className="block">
+      <Card
+        key={id}
+        className={`${v.card} overflow-hidden hover:shadow-md transition-all cursor-pointer group`}
+      >
+        <div className={`relative ${v.image} bg-muted`}>
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={`${address}, ${city}`}
+              fill
+              sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div
+              className={`w-full h-full flex items-center justify-center text-muted-foreground ${v.noImageText}`}
+            >
+              {isHorizontal ? "No Image" : "No Image Available"}
+            </div>
+          )}
           <div
-            className={`w-full h-full flex items-center justify-center text-muted-foreground ${v.noImageText}`}
+            className={`absolute ${v.badge} bg-black/70 backdrop-blur-sm rounded flex items-center z-10`}
           >
-            {isHorizontal ? "No Image" : "No Image Available"}
-          </div>
-        )}
-        <div
-          className={`absolute ${v.badge} bg-black/70 backdrop-blur-sm rounded flex items-center z-10`}
-        >
-          <div className={`${v.badgeDot} rounded-full bg-primary`} />
-          <span className={`${v.badgeText} text-white font-semibold tracking-wide uppercase`}>
-            {timeAgo}
-          </span>
-        </div>
-      </div>
-
-      <CardContent className={v.content}>
-        <div className={isHorizontal ? "mb-1" : "mb-3"}>
-          <div className={`${v.price} font-bold text-foreground tracking-tight`}>
-            ${price.toLocaleString()}
-          </div>
-          <div
-            className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
-          >
-            {address}, {city}
+            <div className={`${v.badgeDot} rounded-full bg-primary`} />
+            <span className={`${v.badgeText} text-white font-semibold tracking-wide uppercase`}>
+              {timeAgo}
+            </span>
           </div>
         </div>
 
-        <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground`}>
-          <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{beds}</strong> bds
-          </span>
-          <span className="text-border">|</span>
-          <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{baths}</strong> ba
-          </span>
-          <span className="text-border">|</span>
-          <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{sqft}</strong> sqft
-          </span>
-        </div>
-      </CardContent>
-    </Card>
+        <CardContent className={v.content}>
+          <div className={isHorizontal ? "mb-1" : "mb-3"}>
+            <div className={`${v.price} font-bold text-foreground tracking-tight`}>
+              ${price.toLocaleString()}
+            </div>
+            <div
+              className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
+            >
+              {address}, {city}
+            </div>
+          </div>
+
+          <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground`}>
+            <span className={`flex items-center ${v.statGap}`}>
+              <strong className="text-foreground">{beds}</strong> bds
+            </span>
+            <span className="text-border">|</span>
+            <span className={`flex items-center ${v.statGap}`}>
+              <strong className="text-foreground">{baths}</strong> ba
+            </span>
+            <span className="text-border">|</span>
+            <span className={`flex items-center ${v.statGap}`}>
+              <strong className="text-foreground">{sqft}</strong> sqft
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
