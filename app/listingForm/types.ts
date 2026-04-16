@@ -49,6 +49,19 @@ export const listingFormSchema = z.object({
 
 export type ListingFormData = z.infer<typeof listingFormSchema>;
 
+/**
+ * TEMPORARY MOCK — This hardcoded data will be replaced by the
+ * `customListingFields` API endpoint once the backend is wired up.
+ * The canonical source of truth for accessibility feature definitions
+ * lives in `db/seeds/custom-listing-fields.ts` and the database.
+ *
+ * Known discrepancies with the seed data:
+ *   - id uses display labels instead of stable keys
+ *   - "Proximity to Bus/Transit" vs seed's "Close to Bus/Transit"
+ *   - descriptions differ from seed data
+ *
+ * See: useAccessibilityFeaturesQuery.ts
+ */
 export const ACCESSIBILITY_FEATURE_GROUPS = [
   {
     groupId: "entry_exterior",
