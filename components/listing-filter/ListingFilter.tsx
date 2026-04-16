@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { DatePicker, DatePickerProps } from "../date-picker/date-picker";
 import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
-import { ToggleFilter, ToggleFilterProps } from "../toggle-filter/ToggleFilter";
+import { ToggleField, ToggleFieldProps } from "../toggle-field/ToggleField";
 import { FeatureAccordion, DynamicFilterGroup } from "../feature-accordian/FeatureAccordian";
 import { ComponentProps } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,9 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 // --- Interfaces ---
 export interface ListingFiltersProps {
   dynamicGroups: DynamicFilterGroup[];
-  bedroomToggleProps: ToggleFilterProps;
+  bedroomToggleProps: ToggleFieldProps;
   priceRangeProps: PriceRangeInputProps;
-  bathroomToggleProps: ToggleFilterProps;
+  bathroomToggleProps: ToggleFieldProps;
   getFeatureCheckboxProps: (id: string) => ComponentProps<typeof Checkbox>;
   datePickerProps: DatePickerProps;
   clearFilters: () => Promise<void>;
@@ -35,8 +35,8 @@ export function ListingFilters({
 
       <PriceRangeInput {...priceRangeProps} />
 
-      <ToggleFilter {...bedroomToggleProps} />
-      <ToggleFilter {...bathroomToggleProps} />
+      <ToggleField {...bedroomToggleProps} allowEmpty />
+      <ToggleField {...bathroomToggleProps} allowEmpty />
 
       <div className="space-y-4">
         <DatePicker {...datePickerProps} />
