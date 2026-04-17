@@ -42,7 +42,12 @@ export function ListingFormLayout({
           {footer && <div className="flex justify-end gap-4 pt-8 mt-10 border-t">{footer}</div>}
         </div>
 
-        {previewContent && <div className="order-1 lg:order-2">{previewContent}</div>}
+        {previewContent && (
+          <div className="order-1 lg:order-2">
+            {" "}
+            <div className="sticky top-6">{previewContent}</div>
+          </div>
+        )}
       </div>
     </div>
   );

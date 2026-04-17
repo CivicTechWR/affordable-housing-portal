@@ -3,10 +3,8 @@
 import { useListingForm } from "./useListingForm";
 import { ListingFormFields } from "@/components/listing-form-fields/ListingFormFields";
 import { ListingFormFeatures } from "@/components/listing-form-features/ListingFormFeatures";
-import { ListingPreview } from "@/components/listing-preview/ListingPreview";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { ListingFormData } from "./types";
 import { ListingFormLayout } from "@/components/listing-form-layout/ListingFormLayout";
 import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingFormSkeleton";
 
@@ -57,19 +55,16 @@ export default function ListingForm({ listingId }: ListingFormProps) {
       }
       formContent={
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="listing-form" onSubmit={form.handleSubmit(onSubmit)}>
             <ListingFormFields control={form.control} />
             <ListingFormFeatures control={form.control} />
           </form>
         </Form>
       }
-      previewContent={<ListingPreview formData={liveFormData as ListingFormData} />}
+      previewContent={<div>Placeholder: {JSON.stringify(liveFormData)}</div>}
       footer={
         <>
-          <Button variant="outline" type="button" size="lg">
-            Cancel
-          </Button>
-          <Button type="submit" size="lg">
+          <Button type="submit" form="listing-form" size="lg">
             {isEditMode ? "Save Changes" : "Create Listing"}
           </Button>
         </>
