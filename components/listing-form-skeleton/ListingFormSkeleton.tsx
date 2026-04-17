@@ -1,37 +1,48 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { ListingFormLayout, FormSection } from "@/components/listing-form-layout/ListingFormLayout";
+import { CORE_FIELD_CATEGORIES } from "@/app/listingForm/fieldDefinitions";
 
 export function ListingFormSkeleton() {
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 space-y-8 animate-pulse">
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-1/3" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="space-y-2">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ))}
-      </div>
-
-      <div className="space-y-4 pt-6 border-t">
-        <Skeleton className="h-6 w-1/4" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ))}
+    <ListingFormLayout
+      header={
+        <div className="space-y-3">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-5 w-96" />
         </div>
-      </div>
-
-      <div className="pt-6 border-t space-y-4">
-        <Skeleton className="h-10 w-full md:w-32" />
-      </div>
-    </div>
+      }
+      formContent={
+        <>
+          {CORE_FIELD_CATEGORIES.map((cat) => (
+            <FormSection key={cat.key} title={cat.displayName} description={cat.description}>
+              {Array.from({ length: cat.key === "listing_details" ? 8 : 6 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+            </FormSection>
+          ))}
+          <FormSection isSeparated title="Accessibility Features">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-start space-x-3">
+                <Skeleton className="h-5 w-5 rounded shrink-0" />
+                <div className="space-y-2 w-full">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            ))}
+          </FormSection>
+        </>
+      }
+      previewContent={<Skeleton className="h-[600px] w-full rounded-xl bg-muted/60" />}
+      footer={
+        <>
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-32" />
+        </>
+      }
+    />
   );
 }

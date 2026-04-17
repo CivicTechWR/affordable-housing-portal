@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FormSection } from "@/components/listing-form-layout/ListingFormLayout";
 
 export interface ListingFormFieldsProps {
   control: Control<ListingFormData>;
@@ -158,18 +159,14 @@ export function ListingFormFields({ control }: ListingFormFieldsProps) {
   }));
 
   return (
-    <div className="space-y-8">
+    <>
       {fieldsByCategory.map((cat) => (
-        <div key={cat.key}>
-          <h3 className="text-lg font-medium">{cat.displayName}</h3>
-          <p className="text-sm text-muted-foreground mb-4">{cat.description}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {cat.fields.map((def) => (
-              <FieldRenderer key={def.key} def={def} control={control} />
-            ))}
-          </div>
-        </div>
+        <FormSection key={cat.key} title={cat.displayName} description={cat.description}>
+          {cat.fields.map((def) => (
+            <FieldRenderer key={def.key} def={def} control={control} />
+          ))}
+        </FormSection>
       ))}
-    </div>
+    </>
   );
 }
