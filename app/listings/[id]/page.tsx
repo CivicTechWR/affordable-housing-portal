@@ -91,6 +91,7 @@ export default async function ListingDetailsPage({ params }: Readonly<PageProps>
             images={details.images}
             altPrefix={`${details.address}, ${details.city}`}
           />
+        )}
 
         <Card>
           <CardHeader>
@@ -100,7 +101,6 @@ export default async function ListingDetailsPage({ params }: Readonly<PageProps>
             <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {propertyRows.map((row) => (
                 <div key={row.label} className="rounded-md border border-border bg-background p-3">
-
                   <dt className="text-xs uppercase tracking-wide text-muted-foreground">
                     {row.label}
                   </dt>
