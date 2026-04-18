@@ -1,3 +1,11 @@
 node_modules/.bin/gitleaks-secret-scanner
 npx lint-staged
 npm run typecheck
+
+changed_api_contract_files="$(git diff --cached --name-only --diff-filter=ACMRD | grep -E '^(app/api(/.*)?/route\.ts|shared/schemas/.*\.ts)$' || true)"
+
+if [ -n "$changed_api_contract_files" ]; then
+  echo "Detected API route/schema changes; regenerating OpenAPI spec..."
+  npm run openapi:generate
+  git add public/openapi.json
+fi

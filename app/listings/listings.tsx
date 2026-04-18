@@ -17,7 +17,7 @@ export default function ListingsDashboard() {
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
   const listings = [
     {
-      id: "1",
+      id: "11111111-1111-4111-8111-111111111111",
       price: 100000,
       address: "123 Main St",
       city: "Waterloo",

@@ -70,25 +70,7 @@ const authConfig = {
       if (user) {
         token.role = user.role;
         token.status = user.status;
-
-        return token;
       }
-
-      if (!token.sub) {
-        return token;
-      }
-
-      const currentUser = await getUserForSession(token.sub);
-
-      if (!currentUser) {
-        delete token.role;
-        delete token.status;
-
-        return token;
-      }
-
-      token.role = currentUser.role;
-      token.status = currentUser.status;
 
       return token;
     },

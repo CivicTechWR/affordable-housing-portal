@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const nonEmptyString = z.string().trim().min(1);
+const listingStatusSchema = z.enum(["draft", "published", "archived"]);
 
 export const listingIdParamSchema = z.uuid("Invalid listing id.");
 export const listingRouteParamsSchema = z.object({
@@ -16,7 +17,7 @@ export const listingSearchQuerySchema = z.object({
     .string()
     .regex(/^[1-9]\d*$/)
     .optional(),
-  status: nonEmptyString.optional(),
+  status: listingStatusSchema.optional(),
   neighborhood: nonEmptyString.optional(),
   bedrooms: z.string().regex(/^\d+$/).optional(),
   maxRent: z.string().regex(/^\d+$/).optional(),
@@ -80,8 +81,6 @@ const listingContactSchema = z.object({
 });
 
 const listingApplicationMethodSchema = z.enum(["internal", "external_link", "paper"]);
-
-const listingStatusSchema = z.enum(["draft", "published", "archived"]);
 
 const listingPayloadSchema = z.object({
   name: nonEmptyString,

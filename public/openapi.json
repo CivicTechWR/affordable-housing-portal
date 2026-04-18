@@ -134,7 +134,10 @@
             "name": "status",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string",
+              "enum": ["draft", "published", "archived"]
+            }
           },
           {
             "name": "neighborhood",
