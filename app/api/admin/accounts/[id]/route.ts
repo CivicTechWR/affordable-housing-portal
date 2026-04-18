@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 
+import { requireAdminSession } from "@/lib/auth/session";
+
 type RouteParams = { params: Promise<{ id: string }> };
 
 /**
@@ -12,7 +14,12 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
-  // TODO: authenticate request (admin only)
+  const { response } = await requireAdminSession();
+
+  if (response) {
+    return response;
+  }
+
   // TODO: fetch account from database
   // TODO: return 404 if not found
 
@@ -45,7 +52,12 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
-  // TODO: authenticate request (admin only)
+  const { response } = await requireAdminSession();
+
+  if (response) {
+    return response;
+  }
+
   const body = await request.json();
 
   // TODO: validate body schema
@@ -68,7 +80,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
-  // TODO: authenticate request (admin only)
+  const { response } = await requireAdminSession();
+
+  if (response) {
+    return response;
+  }
+
   // TODO: soft-delete account in database
   // TODO: revoke active sessions
 

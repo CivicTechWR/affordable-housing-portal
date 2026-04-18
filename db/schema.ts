@@ -52,6 +52,8 @@ export type CustomListingFieldOption = {
 
 export type CustomListingFieldValue = boolean | number | string | string[] | null;
 export type ListingCustomFields = Record<string, CustomListingFieldValue>;
+export type UserRole = (typeof userRoleEnum.enumValues)[number];
+export type UserStatus = (typeof userStatusEnum.enumValues)[number];
 
 export const users = pgTable(
   "users",
@@ -60,8 +62,10 @@ export const users = pgTable(
     externalAuthId: text("external_auth_id"),
     email: text("email").notNull(),
     fullName: text("full_name").notNull(),
+    passwordHash: text("password_hash"),
     role: userRoleEnum("role").notNull(),
     status: userStatusEnum("status").notNull(),
+    inviteAcceptedAt: timestamp("invite_accepted_at", { withTimezone: true }),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -74,6 +78,31 @@ export const users = pgTable(
     uniqueIndex("users_email_unique").on(table.email),
     index("users_role_idx").on(table.role),
     index("users_status_idx").on(table.status),
+  ],
+);
+
+export const userInvites = pgTable(
+  "user_invites",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("user_invites_token_hash_unique").on(table.tokenHash),
+    index("user_invites_user_id_idx").on(table.userId),
+    index("user_invites_email_idx").on(table.email),
+    index("user_invites_created_by_user_id_idx").on(table.createdByUserId),
   ],
 );
 
@@ -252,6 +281,8 @@ export const customListingFields = pgTable(
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type UserInvite = typeof userInvites.$inferSelect;
+export type NewUserInvite = typeof userInvites.$inferInsert;
 export type Property = typeof properties.$inferSelect;
 export type NewProperty = typeof properties.$inferInsert;
 export type Listing = typeof listings.$inferSelect;

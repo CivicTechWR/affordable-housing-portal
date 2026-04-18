@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 
+import { requireListingWriteSession } from "@/lib/auth/session";
+
 type RouteParams = { params: Promise<{ id: string }> };
 
 type ListingFeature = {
@@ -87,7 +89,12 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
-  // TODO: authenticate request (must own listing or be admin)
+  const { response } = await requireListingWriteSession();
+
+  if (response) {
+    return response;
+  }
+
   const body = await request.json();
 
   // TODO: validate body schema
@@ -109,7 +116,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
 
-  // TODO: authenticate request (must own listing or be admin)
+  const { response } = await requireListingWriteSession();
+
+  if (response) {
+    return response;
+  }
+
   // TODO: soft-delete / archive listing in database
 
   return Response.json({

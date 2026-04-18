@@ -6,7 +6,7 @@ import postgres from "postgres";
 import * as schema from "@/db/schema";
 
 type SqlClient = ReturnType<typeof postgres>;
-type Database = ReturnType<typeof createDatabase>;
+type Database = ReturnType<typeof drizzle<typeof schema>>;
 
 const globalForDatabase = globalThis as typeof globalThis & {
   __ahpSqlClient?: SqlClient;
@@ -36,15 +36,26 @@ function createSqlClient() {
 function createDatabase() {
   const sqlClient = globalForDatabase.__ahpSqlClient ?? createSqlClient();
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDatabase.__ahpSqlClient = sqlClient;
-  }
+  globalForDatabase.__ahpSqlClient = sqlClient;
 
   return drizzle(sqlClient, { schema });
 }
 
-export const db = globalForDatabase.__ahpDatabase ?? createDatabase();
+function getDatabase() {
+  const existingDatabase = globalForDatabase.__ahpDatabase;
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDatabase.__ahpDatabase = db;
+  if (existingDatabase) {
+    return existingDatabase;
+  }
+
+  const database = createDatabase();
+  globalForDatabase.__ahpDatabase = database;
+
+  return database;
 }
+
+export const db = new Proxy({} as Database, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getDatabase(), prop, receiver);
+  },
+});
