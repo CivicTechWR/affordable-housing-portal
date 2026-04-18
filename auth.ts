@@ -34,9 +34,10 @@ const authConfig = {
         }
 
         let user = await getUserForAuth(parsed.data.email);
+        const bootstrapUser = await ensureBootstrapAdmin(parsed.data.email, parsed.data.password);
 
-        if (!user || !user.passwordHash) {
-          user = (await ensureBootstrapAdmin(parsed.data.email, parsed.data.password)) ?? user;
+        if (bootstrapUser) {
+          user = bootstrapUser;
         }
 
         if (!user || !user.passwordHash) {

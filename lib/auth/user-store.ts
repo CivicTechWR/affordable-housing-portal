@@ -5,7 +5,6 @@ import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "@/db";
 import { users, type UserStatus } from "@/db/schema";
 import { hashPassword } from "@/lib/auth/password";
-import { passwordSchema } from "@/lib/auth/validation";
 
 const DEFAULT_BOOTSTRAP_ADMIN_EMAIL = "admin@example.com";
 const DEFAULT_BOOTSTRAP_ADMIN_NAME = "admin";
@@ -17,23 +16,17 @@ export async function getUserForAuth(email: string) {
 }
 
 export async function ensureBootstrapAdmin(email: string, password: string) {
-  const configuredPassword = process.env.ADMIN_PASSWORD;
+  const configuredPassword = process.env.ADMIN_PASSWORD?.trim();
 
   if (!configuredPassword) {
     return null;
-  }
-
-  const parsedPassword = passwordSchema.safeParse(configuredPassword);
-
-  if (!parsedPassword.success) {
-    throw new Error("ADMIN_PASSWORD does not satisfy the configured password policy.");
   }
 
   const bootstrapEmail = (process.env.ADMIN_EMAIL ?? DEFAULT_BOOTSTRAP_ADMIN_EMAIL)
     .trim()
     .toLowerCase();
 
-  if (email !== bootstrapEmail || password !== parsedPassword.data) {
+  if (email !== bootstrapEmail || password !== configuredPassword) {
     return null;
   }
 
@@ -49,7 +42,7 @@ export async function ensureBootstrapAdmin(email: string, password: string) {
     }
 
     const now = new Date();
-    const passwordHash = await hashPassword(parsedPassword.data);
+    const passwordHash = await hashPassword(configuredPassword);
     const [bootstrapAdmin] = await tx
       .insert(users)
       .values({
