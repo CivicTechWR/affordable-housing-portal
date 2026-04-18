@@ -94,11 +94,13 @@ const authConfig = {
       return token;
     },
     session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub ?? "";
-        session.user.role = parseUserRole(token.role);
-        session.user.status = parseUserStatus(token.status);
+      if (!session.user || !token.sub) {
+        return session;
       }
+
+      session.user.id = token.sub;
+      session.user.role = parseUserRole(token.role);
+      session.user.status = parseUserStatus(token.status);
 
       return session;
     },

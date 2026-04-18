@@ -18,7 +18,12 @@ export async function getPendingInviteByToken(token: string) {
   const [invite] = await db
     .select({
       invite: userInvites,
-      user: users,
+      user: {
+        id: users.id,
+        email: users.email,
+        fullName: users.fullName,
+        status: users.status,
+      },
     })
     .from(userInvites)
     .innerJoin(users, eq(userInvites.userId, users.id))

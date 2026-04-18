@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 
 import { createInvite } from "@/lib/auth/invite-service";
 import { requireAdminSession } from "@/lib/auth/session";
+import { createAccountInviteSchema } from "@/lib/auth/validation";
 
 /**
  * GET /api/admin/accounts
@@ -67,23 +68,21 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
+  const parsed = createAccountInviteSchema.safeParse(body);
 
-  if (typeof body?.email !== "string" || typeof body?.name !== "string") {
-    return Response.json({ message: "Email and name are required." }, { status: 400 });
-  }
-
-  const role = body?.role;
-
-  if (role !== "admin" && role !== "partner" && role !== "user") {
-    return Response.json({ message: "Role must be admin, partner, or user." }, { status: 400 });
+  if (!parsed.success) {
+    return Response.json(
+      { message: parsed.error.issues[0]?.message ?? "Invalid account invite payload." },
+      { status: 400 },
+    );
   }
 
   const invite = await createInvite({
-    email: body.email,
-    fullName: body.name,
-    role,
+    email: parsed.data.email,
+    fullName: parsed.data.name,
+    role: parsed.data.role,
     invitedByUserId: session.user.id,
-    sendInviteEmail: body.sendInviteEmail === true,
+    sendInviteEmail: parsed.data.sendInviteEmail === true,
   });
 
   return Response.json(
@@ -92,8 +91,8 @@ export async function POST(request: NextRequest) {
       data: {
         id: invite.userId,
         email: invite.email,
-        name: body.name,
-        role,
+        name: parsed.data.name,
+        role: parsed.data.role,
         inviteUrl: invite.inviteUrl,
       },
     },
