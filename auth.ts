@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 
 import { userRoleEnum, userStatusEnum, type UserRole, type UserStatus } from "@/db/schema";
 import {
+  ensureBootstrapAdmin,
   getUserForAuth,
   getUserForSession,
   isUserAllowedToSignIn,
@@ -32,7 +33,11 @@ const authConfig = {
           return null;
         }
 
-        const user = await getUserForAuth(parsed.data.email);
+        let user = await getUserForAuth(parsed.data.email);
+
+        if (!user || !user.passwordHash) {
+          user = (await ensureBootstrapAdmin(parsed.data.email, parsed.data.password)) ?? user;
+        }
 
         if (!user || !user.passwordHash) {
           return null;

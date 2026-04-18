@@ -59,6 +59,8 @@ The app now includes a Drizzle + Postgres schema for users, listings, saved list
 3. Apply migrations with `npm run db:migrate`.
 4. Inspect the schema with `npm run db:studio`.
 
+If you set `ADMIN_PASSWORD`, the app enables a one-time bootstrap admin sign-in for `ADMIN_EMAIL` (default `admin@example.com`) until an admin user has a stored local password. This is intended for first-run setup and local/dev recovery from external-auth-only data.
+
 ## Contributing
 
 Contributions are welcomed! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to participate. By contributing, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).

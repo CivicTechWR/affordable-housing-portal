@@ -72,10 +72,14 @@ export async function createInvite(params: {
         email: normalizedEmail,
         tokenHash,
         expiresAt,
-        sentAt: params.sendInviteEmail ? now : null,
+        sentAt: null,
         createdByUserId: params.invitedByUserId,
       })
       .returning();
+
+    if (!invite) {
+      throw new Error("Failed to create invite.");
+    }
 
     return {
       invite,
@@ -94,6 +98,17 @@ export async function createInvite(params: {
       fullName: params.fullName,
       inviteUrl,
     });
+
+    const sentAt = new Date();
+    const [invite] = await db
+      .update(userInvites)
+      .set({
+        sentAt,
+      })
+      .where(eq(userInvites.id, result.invite.id))
+      .returning();
+
+    result.invite = invite ?? { ...result.invite, sentAt };
   }
 
   return {
