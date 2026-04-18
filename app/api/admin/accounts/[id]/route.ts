@@ -1,96 +1,86 @@
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { route, routeOperation } from "next-rest-framework";
 
 import { requireAdminSession } from "@/lib/auth/session";
+import {
+  adminAccountParamsSchema,
+  updateAdminAccountSchema,
+} from "@/shared/schemas/admin-account-management";
 
-type RouteParams = { params: Promise<{ id: string }> };
+export const { GET, PUT, DELETE } = route({
+  getAdminAccountById: routeOperation({
+    method: "GET",
+  })
+    .input({
+      params: adminAccountParamsSchema,
+    })
+    .handler(async (_request, { params }) => {
+      const { response } = await requireAdminSession();
 
-/**
- * GET /api/admin/accounts/:id
- *
- * Returns a single account by ID, including profile details,
- * role, associated organization, and account status.
- * Admin-only endpoint.
- */
-export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+      if (response) {
+        return response;
+      }
 
-  const { response } = await requireAdminSession();
+      return NextResponse.json({
+        data: {
+          id: params.id,
+          email: null,
+          name: null,
+          role: null,
+          organization: null,
+          status: null,
+          listingsCount: 0,
+          lastLoginAt: null,
+          createdAt: null,
+          updatedAt: null,
+        },
+      });
+    }),
 
-  if (response) {
-    return response;
-  }
+  updateAdminAccountById: routeOperation({
+    method: "PUT",
+  })
+    .input({
+      params: adminAccountParamsSchema,
+      contentType: "application/json",
+      body: updateAdminAccountSchema,
+    })
+    .handler(async (request, { params }) => {
+      const { response } = await requireAdminSession();
 
-  // TODO: fetch account from database
-  // TODO: return 404 if not found
+      if (response) {
+        return response;
+      }
 
-  return Response.json({
-    data: {
-      id,
-      email: null,
-      name: null,
-      role: null,
-      organization: null,
-      status: null,
-      listingsCount: 0,
-      lastLoginAt: null,
-      createdAt: null,
-      updatedAt: null,
-    },
-  });
-}
+      const body = await request.json();
 
-/**
- * PUT /api/admin/accounts/:id
- *
- * Updates an account. Admin-only endpoint.
- *
- * Accepts a partial body. Common operations:
- *   - Change role
- *   - Suspend / reactivate account
- *   - Update organization association
- */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+      // TODO: update account in database
 
-  const { response } = await requireAdminSession();
+      return NextResponse.json({
+        message: "Account updated",
+        data: { id: params.id, ...body },
+      });
+    }),
 
-  if (response) {
-    return response;
-  }
+  deactivateAdminAccountById: routeOperation({
+    method: "DELETE",
+  })
+    .input({
+      params: adminAccountParamsSchema,
+    })
+    .handler(async (_request, { params }) => {
+      const { response } = await requireAdminSession();
 
-  const body = await request.json();
+      if (response) {
+        return response;
+      }
 
-  // TODO: validate body schema
-  // TODO: update account in database
-  void body;
+      // TODO: soft-delete account in database
+      // TODO: revoke active sessions
 
-  return Response.json({
-    message: "Account updated",
-    data: { id },
-  });
-}
-
-/**
- * DELETE /api/admin/accounts/:id
- *
- * Deactivates (soft-deletes) an account. Admin-only endpoint.
- * Does not permanently erase data — the account is marked
- * as deactivated and the user can no longer sign in.
- */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const { response } = await requireAdminSession();
-
-  if (response) {
-    return response;
-  }
-
-  // TODO: soft-delete account in database
-  // TODO: revoke active sessions
-
-  return Response.json({
-    message: "Account deactivated",
-    data: { id },
-  });
-}
+      return NextResponse.json({
+        message: "Account deactivated",
+        data: { id: params.id },
+      });
+    }),
+});

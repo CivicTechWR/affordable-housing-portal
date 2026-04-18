@@ -1,5 +1,3 @@
-import "server-only";
-
 import { randomUUID } from "node:crypto";
 
 import { and, eq, gt, isNull } from "drizzle-orm";

@@ -1,0 +1,427 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Affordable Housing Portal API",
+    "description": "REST API for account management and listings in the Affordable Housing Portal.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/admin/accounts": {
+      "get": {
+        "operationId": "getAdminAccounts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["admin", "partner", "user"] }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["invited", "active", "suspended", "deactivated"]
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createAdminAccount",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminAccountRequestBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/accounts/{id}": {
+      "get": {
+        "operationId": "getAdminAccountById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateAdminAccountById",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminAccountByIdRequestBody"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deactivateAdminAccountById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ]
+      }
+    },
+    "/api/listings": {
+      "get": {
+        "operationId": "getListings",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "neighborhood",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "bedrooms",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "maxRent",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "accessibility",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["true", "false"] }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createListing",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateListingRequestBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/listings/{id}": {
+      "get": {
+        "operationId": "getListingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateListingById",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateListingByIdRequestBody"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteListingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateAdminAccountRequestBody": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string", "enum": ["admin", "partner", "user"] },
+          "sendInviteEmail": { "type": "boolean" }
+        },
+        "required": ["email", "name", "role"]
+      },
+      "CreateListingRequestBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": { "type": "string" },
+              "city": { "type": "string" },
+              "province": { "type": "string" },
+              "postalCode": { "type": "string" }
+            },
+            "required": ["street", "city", "province", "postalCode"]
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bedrooms": { "type": "number" },
+                "bathrooms": { "type": "number" },
+                "sqft": { "type": "number" },
+                "rent": { "type": "number" },
+                "availableDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                }
+              },
+              "required": ["bedrooms", "bathrooms", "sqft", "rent", "availableDate"]
+            }
+          },
+          "amenities": { "type": "array", "items": { "type": "string" } },
+          "accessibilityFeatures": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "applicationMethod": {
+            "type": "string",
+            "enum": ["internal", "external_link", "paper"]
+          },
+          "externalApplicationUrl": { "type": "string" },
+          "eligibilityCriteria": {
+            "type": "object",
+            "properties": {
+              "maxIncome": { "type": "number" },
+              "minAge": { "type": "number" },
+              "housingType": { "type": "string" }
+            }
+          },
+          "images": { "type": "array", "items": { "type": "string" } },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              "phone": { "type": "string" }
+            },
+            "required": ["name", "email", "phone"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "address",
+          "units",
+          "amenities",
+          "accessibilityFeatures",
+          "applicationMethod",
+          "eligibilityCriteria",
+          "images",
+          "contact",
+          "status"
+        ]
+      },
+      "ErrorMessage": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } },
+        "additionalProperties": false
+      },
+      "UpdateAdminAccountByIdRequestBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string", "enum": ["admin", "partner", "user"] },
+          "status": {
+            "type": "string",
+            "enum": ["invited", "active", "suspended", "deactivated"]
+          },
+          "organization": { "nullable": true, "type": "string" }
+        }
+      },
+      "UpdateListingByIdRequestBody": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "address": {
+            "type": "object",
+            "properties": {
+              "street": { "type": "string" },
+              "city": { "type": "string" },
+              "province": { "type": "string" },
+              "postalCode": { "type": "string" }
+            },
+            "required": ["street", "city", "province", "postalCode"]
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "bedrooms": { "type": "number" },
+                "bathrooms": { "type": "number" },
+                "sqft": { "type": "number" },
+                "rent": { "type": "number" },
+                "availableDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                }
+              },
+              "required": ["bedrooms", "bathrooms", "sqft", "rent", "availableDate"]
+            }
+          },
+          "amenities": { "type": "array", "items": { "type": "string" } },
+          "accessibilityFeatures": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "applicationMethod": {
+            "type": "string",
+            "enum": ["internal", "external_link", "paper"]
+          },
+          "externalApplicationUrl": { "type": "string" },
+          "eligibilityCriteria": {
+            "type": "object",
+            "properties": {
+              "maxIncome": { "type": "number" },
+              "minAge": { "type": "number" },
+              "housingType": { "type": "string" }
+            }
+          },
+          "images": { "type": "array", "items": { "type": "string" } },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              "phone": { "type": "string" }
+            },
+            "required": ["name", "email", "phone"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "archived"]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,3 @@
-import "server-only";
-
 import { Resend } from "resend";
 
 function getResendKey() {

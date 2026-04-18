@@ -27,7 +27,24 @@ components/           → React components
 └── ...               → Other shared components
 
 lib/                  → Utilities
+shared/               → Shared runtime schemas and TypeScript types
 ```
+
+## Shared Schemas and Types
+
+Use `shared/schemas/*.ts` for contracts that must stay consistent across frontend and backend code.
+
+- Define request/response contracts once with `zod`.
+- Export inferred TypeScript types with `z.infer<typeof schema>`.
+- Reuse schemas in `next-rest-framework` route `.input(...)` validation.
+
+## API Docs (OpenAPI)
+
+API routes use `next-rest-framework` for request validation and OpenAPI generation.
+
+- Docs UI endpoint: `/api/docs`
+- Generate spec: `npm run openapi:generate`
+- Validate spec is up to date: `npm run openapi:validate`
 
 ## Quick Start
 

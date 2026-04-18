@@ -1,39 +1,19 @@
-import { NextRequest } from "next/server";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { route, routeOperation } from "next-rest-framework";
 
+import { db } from "@/db";
+import { listings, properties } from "@/db/schema";
 import { requireListingWriteSession } from "@/lib/auth/session";
-
-type RouteParams = { params: Promise<{ id: string }> };
-
-type ListingFeature = {
-  name: string;
-  description: string;
-};
-
-type ListingFeatureCategory = {
-  categoryName: string;
-  features: ListingFeature[];
-};
-
-type ListingImage = {
-  url: string;
-  caption: string;
-};
-
-type ListingDetails = {
-  id: string;
-  price: number;
-  address: string;
-  city: string;
-  beds: number;
-  baths: number;
-  sqft: number;
-  images: ListingImage[];
-  timeAgo: string;
-  features: ListingFeatureCategory[];
-};
+import {
+  type ListingDetails,
+  listingRouteParamsSchema,
+  type ListingIdParam,
+  updateListingSchema,
+} from "@/shared/schemas/listings";
 
 const details: ListingDetails = {
-  id: "1",
+  id: "11111111-1111-4111-8111-111111111111",
   price: 100000,
   address: "123 Main St",
   city: "Waterloo",
@@ -59,73 +39,102 @@ const details: ListingDetails = {
   ],
 };
 
-/**
- * GET /api/listings/:id
- *
- * Returns a single listing by ID, including full detail:
- * units, eligibility criteria, accessibility features,
- * application instructions, and contact info.
- */
-export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+export const { GET, PUT, DELETE } = route({
+  getListingById: routeOperation({
+    method: "GET",
+  })
+    .input({
+      params: listingRouteParamsSchema,
+    })
+    .handler((_request, { params }) => {
+      const { id } = params;
 
-  if (id !== details.id) {
-    return Response.json({ message: "Listing not found" }, { status: 404 });
+      if (id !== details.id) {
+        return NextResponse.json({ message: "Listing not found" }, { status: 404 });
+      }
+
+      return NextResponse.json({
+        data: details,
+      });
+    }),
+
+  updateListingById: routeOperation({
+    method: "PUT",
+  })
+    .input({
+      params: listingRouteParamsSchema,
+      contentType: "application/json",
+      body: updateListingSchema,
+    })
+    .handler(async (request, { params }) => {
+      const { response } = await requireOwnedListingForWrite(params.id);
+
+      if (response) {
+        return response;
+      }
+
+      const body = await request.json();
+
+      // TODO: update listing in database
+
+      return NextResponse.json({
+        message: "Listing updated",
+        data: { id: params.id, ...body },
+      });
+    }),
+
+  deleteListingById: routeOperation({
+    method: "DELETE",
+  })
+    .input({
+      params: listingRouteParamsSchema,
+    })
+    .handler(async (_request, { params }) => {
+      const { response } = await requireOwnedListingForWrite(params.id);
+
+      if (response) {
+        return response;
+      }
+
+      // TODO: soft-delete / archive listing in database
+
+      return NextResponse.json({
+        message: "Listing deleted",
+        data: { id: params.id },
+      });
+    }),
+});
+
+async function requireOwnedListingForWrite(listingId: ListingIdParam) {
+  const { response, session, authzUser } = await requireListingWriteSession();
+
+  if (response || !session || !authzUser) {
+    return {
+      response: response ?? new NextResponse("Forbidden", { status: 403 }),
+    };
   }
 
-  return Response.json({
-    data: details,
-  });
-}
+  const [listing] = await db
+    .select({
+      id: listings.id,
+      ownerUserId: properties.ownerUserId,
+    })
+    .from(listings)
+    .innerJoin(properties, eq(listings.propertyId, properties.id))
+    .where(eq(listings.id, listingId))
+    .limit(1);
 
-/**
- * PUT /api/listings/:id
- *
- * Updates an existing listing. Requires authentication
- * (the owning housing provider or an admin).
- *
- * Accepts a partial body — only provided fields are updated.
- */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const { response } = await requireListingWriteSession();
-
-  if (response) {
-    return response;
+  if (!listing) {
+    return {
+      response: new NextResponse("Listing not found", { status: 404 }),
+    };
   }
 
-  const body = await request.json();
-
-  // TODO: validate body schema
-  // TODO: update listing in database
-  void body;
-
-  return Response.json({
-    message: "Listing updated",
-    data: { id },
-  });
-}
-
-/**
- * DELETE /api/listings/:id
- *
- * Deletes (or archives) a listing. Requires authentication
- * (the owning housing provider or an admin).
- */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const { response } = await requireListingWriteSession();
-
-  if (response) {
-    return response;
+  if (authzUser.role !== "admin" && listing.ownerUserId !== session.user.id) {
+    return {
+      response: new NextResponse("Forbidden", { status: 403 }),
+    };
   }
 
-  // TODO: soft-delete / archive listing in database
-
-  return Response.json({
-    message: "Listing deleted",
-    data: { id },
-  });
+  return { response: null };
 }

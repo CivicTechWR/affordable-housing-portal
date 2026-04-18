@@ -1,8 +1,7 @@
 import NextAuth from "next-auth";
-import type { NextAuthConfig, Session } from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { userRoleEnum, userStatusEnum, type UserRole, type UserStatus } from "@/db/schema";
 import {
   ensureBootstrapAdmin,
   getUserForAuth,
@@ -99,24 +98,37 @@ const authConfig = {
       }
 
       session.user.id = token.sub;
-      session.user.role = parseUserRole(token.role);
-      session.user.status = parseUserStatus(token.status);
 
       return session;
     },
-    authorized({ auth: currentAuth, request }) {
+    async authorized({ auth: currentAuth, request }) {
       const pathname = request.nextUrl.pathname;
-      const isActiveUser =
-        currentAuth?.user?.status !== undefined && isUserAllowedToSignIn(currentAuth.user.status);
+      const userId = currentAuth?.user?.id;
+
+      if (
+        !pathname.startsWith("/api/admin") &&
+        !pathname.startsWith("/admin") &&
+        !(pathname.startsWith("/api/listings") && request.method !== "GET")
+      ) {
+        return true;
+      }
+
+      if (!userId) {
+        return false;
+      }
+
+      const currentUser = await getUserForSession(userId);
+
+      if (!currentUser || !isUserAllowedToSignIn(currentUser.status)) {
+        return false;
+      }
 
       if (pathname.startsWith("/api/admin") || pathname.startsWith("/admin")) {
-        return isActiveUser && currentAuth.user.role === "admin";
+        return currentUser.role === "admin";
       }
 
       if (pathname.startsWith("/api/listings") && request.method !== "GET") {
-        return (
-          isActiveUser && (currentAuth.user.role === "admin" || currentAuth.user.role === "partner")
-        );
+        return currentUser.role === "admin" || currentUser.role === "partner";
       }
 
       return true;
@@ -125,15 +137,3 @@ const authConfig = {
 } satisfies NextAuthConfig;
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig);
-
-function parseUserRole(value: Session["user"]["role"] | unknown): UserRole | undefined {
-  return typeof value === "string" && userRoleEnum.enumValues.includes(value as UserRole)
-    ? (value as UserRole)
-    : undefined;
-}
-
-function parseUserStatus(value: Session["user"]["status"] | unknown): UserStatus | undefined {
-  return typeof value === "string" && userStatusEnum.enumValues.includes(value as UserStatus)
-    ? (value as UserStatus)
-    : undefined;
-}
