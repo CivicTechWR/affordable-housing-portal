@@ -1,31 +1,4 @@
 node_modules/.bin/gitleaks-secret-scanner
 npx lint-staged
 npm run typecheck
-
-cleanup_openapi_snapshot() {
-  if [ -n "${openapi_snapshot_dir:-}" ] && [ -d "$openapi_snapshot_dir" ]; then
-    rm -rf "$openapi_snapshot_dir"
-    openapi_snapshot_dir=""
-  fi
-}
-
-changed_api_contract_files="$(git diff --cached --name-only --diff-filter=ACMRD | grep -E '^(app/api(/.*)?/route\.ts|shared/schemas/.*\.ts)$' || true)"
-
-if [ -n "$changed_api_contract_files" ]; then
-  echo "Detected API route/schema changes; regenerating OpenAPI spec from the staged index..."
-  openapi_snapshot_dir="$(mktemp -d)"
-  trap 'cleanup_openapi_snapshot' EXIT
-
-  git checkout-index --all --force --prefix="$openapi_snapshot_dir/"
-  ln -s "$PWD/node_modules" "$openapi_snapshot_dir/node_modules"
-
-  (
-    cd "$openapi_snapshot_dir"
-    npm run openapi:generate
-  )
-
-  cp "$openapi_snapshot_dir/public/openapi.json" public/openapi.json
-  git add public/openapi.json
-  trap - EXIT
-  cleanup_openapi_snapshot
-fi
+node --import=tsx ./scripts/generate-openapi-from-staged-index.ts

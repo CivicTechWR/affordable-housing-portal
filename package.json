@@ -24,8 +24,8 @@
     "test": "jest",
     "test:unit": "jest --testPathPattern=\\.unit\\.test\\.",
     "test:integration": "jest --testPathPattern=\\.integration\\.test\\.",
-    "openapi:generate": "NODE_OPTIONS='--import=tsx' next-rest-framework generate --configPath /api/docs",
-    "openapi:validate": "NODE_OPTIONS='--import=tsx' next-rest-framework validate --configPath /api/docs"
+    "openapi:generate": "node --import=tsx ./scripts/openapi.ts generate",
+    "openapi:validate": "node --import=tsx ./scripts/openapi.ts validate"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
