@@ -23,9 +23,7 @@
     "prepare": "husky",
     "test": "jest",
     "test:unit": "jest --testPathPattern=\\.unit\\.test\\.",
-    "test:integration": "jest --testPathPattern=\\.integration\\.test\\.",
-    "openapi:generate": "node --import=tsx ./scripts/openapi.ts generate",
-    "openapi:validate": "node --import=tsx ./scripts/openapi.ts validate"
+    "test:integration": "jest --testPathPattern=\\.integration\\.test\\."
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
@@ -73,7 +71,6 @@
     "oxlint": "^1.58.0",
     "tailwindcss": "^4.2.2",
     "ts-jest": "^29.4.9",
-    "tsx": "^4.20.6",
     "typescript": "^6.0.2"
   },
   "overrides": {

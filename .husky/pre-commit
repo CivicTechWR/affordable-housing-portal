@@ -1,4 +1,3 @@
 node_modules/.bin/gitleaks-secret-scanner
 npx lint-staged
 npm run typecheck
-node --import=tsx ./scripts/generate-openapi-from-staged-index.ts

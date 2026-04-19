@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const nonEmptyString = z.string().trim().min(1);
 const listingStatusSchema = z.enum(["draft", "published", "archived"]);
+const hasAtLeastOneField = (value: Record<string, unknown>) => Object.keys(value).length > 0;
 
 export const listingIdParamSchema = z.uuid("Invalid listing id.");
 export const listingParamsSchema = z.object({
@@ -151,10 +152,46 @@ export const createListingSchema = listingPayloadSchema.superRefine((value, cont
 });
 
 export const updateListingSchema = updateListingPayloadSchema.superRefine((value, context) => {
-  if (Object.keys(value).length === 0) {
+  if (!hasAtLeastOneField(value)) {
     context.addIssue({
       code: "custom",
       message: "At least one field is required.",
+    });
+  }
+
+  if (value.address && !hasAtLeastOneField(value.address)) {
+    context.addIssue({
+      code: "custom",
+      message: "Address update must include at least one field.",
+      path: ["address"],
+    });
+  }
+
+  if (value.eligibilityCriteria && !hasAtLeastOneField(value.eligibilityCriteria)) {
+    context.addIssue({
+      code: "custom",
+      message: "Eligibility criteria update must include at least one field.",
+      path: ["eligibilityCriteria"],
+    });
+  }
+
+  if (value.contact && !hasAtLeastOneField(value.contact)) {
+    context.addIssue({
+      code: "custom",
+      message: "Contact update must include at least one field.",
+      path: ["contact"],
+    });
+  }
+
+  if (value.units) {
+    value.units.forEach((unit, index) => {
+      if (!hasAtLeastOneField(unit)) {
+        context.addIssue({
+          code: "custom",
+          message: "Each unit update must include at least one field.",
+          path: ["units", index],
+        });
+      }
     });
   }
 
