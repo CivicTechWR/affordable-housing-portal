@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createResendClient, getEmailFromAddress } from "@/lib/email";
 
 export async function sendInviteEmail(params: {
