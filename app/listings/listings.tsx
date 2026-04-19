@@ -25,7 +25,8 @@ export default function ListingsDashboard() {
       beds: 3,
       baths: 2,
       sqft: 100,
-      imageUrl: "https://picsum.photos/id/1/200/300",
+      imageUrl:
+        "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
       timeAgo: "2 days ago",
       lat: 43.45055954361165,
       lng: -80.49228395260133,

@@ -25,10 +25,22 @@ const details: ListingDetails = {
   baths: 2,
   sqft: 100,
   images: [
-    { url: "https://picsum.photos/id/1048/1200/800", caption: "Front exterior of the building" },
-    { url: "https://picsum.photos/id/1068/1200/800", caption: "Living room with natural light" },
-    { url: "https://picsum.photos/id/1084/1200/800", caption: "Primary bedroom" },
-    { url: "https://picsum.photos/id/1025/1200/800", caption: "Accessible entry pathway" },
+    {
+      url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
+      caption: "Open-concept living area and kitchen",
+    },
+    {
+      url: "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
+      caption: "Bright apartment living room and dining area",
+    },
+    {
+      url: "https://images.pexels.com/photos/7614411/pexels-photo-7614411.jpeg?cs=srgb&dl=pexels-artbovich-7614411.jpg&fm=jpg",
+      caption: "Primary bedroom",
+    },
+    {
+      url: "https://images.pexels.com/photos/26732551/pexels-photo-26732551.jpeg?cs=srgb&dl=pexels-pu-ca-adryan-163345030-26732551.jpg&fm=jpg",
+      caption: "Modern apartment sitting room",
+    },
   ],
   timeAgo: "2 days ago",
   features: [
