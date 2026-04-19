@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ListingsCardProps {
   id: string;
@@ -73,96 +74,98 @@ export function ListingsCard({
   const featuresToShow = showAllFeatures ? safeFeatures : safeFeatures.slice(0, MAX_FEATURES);
 
   return (
-    <Card
-      key={id}
-      className={`${v.card} overflow-hidden hover:shadow-md transition-all cursor-pointer group`}
-    >
-      <div className={`relative ${v.image} bg-muted`}>
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={`${address}, ${city}`}
-            fill
-            sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
+    <Link key={id} href={`/listings/${id}`} className="block">
+      <Card
+        key={id}
+        className={`${v.card} overflow-hidden hover:shadow-md transition-all cursor-pointer group`}
+      >
+        <div className={`relative ${v.image} bg-muted`}>
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={`${address}, ${city}`}
+              fill
+              sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div
+              className={`w-full h-full flex items-center justify-center text-muted-foreground ${v.noImageText}`}
+            >
+              {isHorizontal ? "No Image" : "No Image Available"}
+            </div>
+          )}
           <div
-            className={`w-full h-full flex items-center justify-center text-muted-foreground ${v.noImageText}`}
+            className={`absolute ${v.badge} bg-black/70 backdrop-blur-sm rounded flex items-center z-10`}
           >
-            {isHorizontal ? "No Image" : "No Image Available"}
-          </div>
-        )}
-        <div
-          className={`absolute ${v.badge} bg-black/70 backdrop-blur-sm rounded flex items-center z-10`}
-        >
-          <div className={`${v.badgeDot} rounded-full bg-primary`} />
-          <span className={`${v.badgeText} text-white font-semibold tracking-wide uppercase`}>
-            {timeAgo}
-          </span>
-        </div>
-      </div>
-
-      <CardContent className={v.content}>
-        <div className={isHorizontal ? "mb-2" : "mb-3"}>
-          <div
-            className={`${v.price} font-bold text-foreground tracking-tight flex items-baseline gap-1`}
-          >
-            ${price.toLocaleString()}
-            <span className="text-sm font-normal text-muted-foreground">/mo</span>
-          </div>
-          <div className="font-semibold line-clamp-1 mt-0.5 text-base">
-            {title || "Untitled Listing"}
-          </div>
-          <div
-            className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
-          >
-            {address}, {city}
+            <div className={`${v.badgeDot} rounded-full bg-primary`} />
+            <span className={`${v.badgeText} text-white font-semibold tracking-wide uppercase`}>
+              {timeAgo}
+            </span>
           </div>
         </div>
 
-        <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground mb-auto`}>
-          <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{beds}</strong> bds
-          </span>
-          <span className="text-border">|</span>
-          <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{baths}</strong> ba
-          </span>
-          <span className="text-border">|</span>
-          <span className={`flex items-center ${v.statGap}`}>
-            <strong className="text-foreground">{sqft || "-"}</strong> sqft
-          </span>
-        </div>
-
-        {safeFeatures.length > 0 && (
-          <div className={`mt-3 pt-3 border-t ${isHorizontal ? "hidden sm:block" : ""}`}>
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {featuresToShow.map((f) => (
-                <Badge
-                  variant="secondary"
-                  key={f}
-                  className="font-normal text-[10px] px-1.5 py-0 border-transparent bg-secondary/60"
-                >
-                  {f}
-                </Badge>
-              ))}
-              {hasMoreFeatures && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowAllFeatures(!showAllFeatures);
-                  }}
-                  className="text-[10px] text-primary hover:underline font-medium px-1"
-                >
-                  {showAllFeatures ? "Show less" : `+${safeFeatures.length - MAX_FEATURES} more`}
-                </button>
-              )}
+        <CardContent className={v.content}>
+          <div className={isHorizontal ? "mb-2" : "mb-3"}>
+            <div
+              className={`${v.price} font-bold text-foreground tracking-tight flex items-baseline gap-1`}
+            >
+              ${price.toLocaleString()}
+              <span className="text-sm font-normal text-muted-foreground">/mo</span>
+            </div>
+            <div className="font-semibold line-clamp-1 mt-0.5 text-base">
+              {title || "Untitled Listing"}
+            </div>
+            <div
+              className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
+            >
+              {address}, {city}
             </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground mb-auto`}>
+            <span className={`flex items-center ${v.statGap}`}>
+              <strong className="text-foreground">{beds}</strong> bds
+            </span>
+            <span className="text-border">|</span>
+            <span className={`flex items-center ${v.statGap}`}>
+              <strong className="text-foreground">{baths}</strong> ba
+            </span>
+            <span className="text-border">|</span>
+            <span className={`flex items-center ${v.statGap}`}>
+              <strong className="text-foreground">{sqft || "-"}</strong> sqft
+            </span>
+          </div>
+
+          {safeFeatures.length > 0 && (
+            <div className={`mt-3 pt-3 border-t ${isHorizontal ? "hidden sm:block" : ""}`}>
+              <div className="flex flex-wrap gap-1.5 items-center">
+                {featuresToShow.map((f) => (
+                  <Badge
+                    variant="secondary"
+                    key={f}
+                    className="font-normal text-[10px] px-1.5 py-0 border-transparent bg-secondary/60"
+                  >
+                    {f}
+                  </Badge>
+                ))}
+                {hasMoreFeatures && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowAllFeatures(!showAllFeatures);
+                    }}
+                    className="text-[10px] text-primary hover:underline font-medium px-1"
+                  >
+                    {showAllFeatures ? "Show less" : `+${safeFeatures.length - MAX_FEATURES} more`}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

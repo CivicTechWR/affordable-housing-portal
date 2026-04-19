@@ -6,7 +6,21 @@
       "idx": 0,
       "version": "7",
       "when": 1775602503771,
-      "tag": "0000_init",
+      "tag": "20260416010101_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776377621958,
+      "tag": "20260417021410_listing_custom_fields_jsonb",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776413258324,
+      "tag": "20260417080738_local_auth_invites",
       "breakpoints": true
     }
   ]

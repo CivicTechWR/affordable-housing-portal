@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -40,7 +41,7 @@ export type SavedSearchFilters = {
   minPrice?: number | null;
   moveInDate?: string | null;
   sort?: "newest" | "price_asc" | "price_desc" | null;
-  /** Allow additional keys for admin-configured custom listing fields (EAV). */
+  /** Allow additional keys for admin-configured custom listing fields. */
   [key: string]: unknown;
 };
 
@@ -50,6 +51,9 @@ export type CustomListingFieldOption = {
 };
 
 export type CustomListingFieldValue = boolean | number | string | string[] | null;
+export type ListingCustomFields = Record<string, CustomListingFieldValue>;
+export type UserRole = (typeof userRoleEnum.enumValues)[number];
+export type UserStatus = (typeof userStatusEnum.enumValues)[number];
 
 export const users = pgTable(
   "users",
@@ -58,8 +62,10 @@ export const users = pgTable(
     externalAuthId: text("external_auth_id"),
     email: text("email").notNull(),
     fullName: text("full_name").notNull(),
+    passwordHash: text("password_hash"),
     role: userRoleEnum("role").notNull(),
     status: userStatusEnum("status").notNull(),
+    inviteAcceptedAt: timestamp("invite_accepted_at", { withTimezone: true }),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
@@ -72,6 +78,31 @@ export const users = pgTable(
     uniqueIndex("users_email_unique").on(table.email),
     index("users_role_idx").on(table.role),
     index("users_status_idx").on(table.status),
+  ],
+);
+
+export const userInvites = pgTable(
+  "user_invites",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+    createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("user_invites_token_hash_unique").on(table.tokenHash),
+    index("user_invites_user_id_idx").on(table.userId),
+    index("user_invites_email_idx").on(table.email),
+    index("user_invites_created_by_user_id_idx").on(table.createdByUserId),
   ],
 );
 
@@ -140,6 +171,10 @@ export const listings = pgTable(
     applicationEmail: text("application_email"),
     applicationPhone: text("application_phone"),
     applicationInstructions: text("application_instructions"),
+    customFields: jsonb("custom_fields")
+      .$type<ListingCustomFields>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -154,6 +189,7 @@ export const listings = pgTable(
     index("listings_monthly_rent_cents_idx").on(table.monthlyRentCents),
     index("listings_bedrooms_bathrooms_idx").on(table.bedrooms, table.bathrooms),
     index("listings_available_on_idx").on(table.availableOn),
+    index("listings_custom_fields_gin_idx").using("gin", table.customFields),
   ],
 );
 
@@ -243,35 +279,10 @@ export const customListingFields = pgTable(
   ],
 );
 
-export const customListingFieldValues = pgTable(
-  "listing_field_values",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    listingId: uuid("listing_id")
-      .notNull()
-      .references(() => listings.id, { onDelete: "cascade" }),
-    fieldDefinitionId: uuid("field_definition_id")
-      .notNull()
-      .references(() => customListingFields.id, { onDelete: "cascade" }),
-    value: jsonb("value").$type<CustomListingFieldValue>().notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [
-    uniqueIndex("listing_field_values_listing_field_unique").on(
-      table.listingId,
-      table.fieldDefinitionId,
-    ),
-    index("listing_field_values_listing_id_idx").on(table.listingId),
-    index("listing_field_values_field_definition_id_idx").on(table.fieldDefinitionId),
-  ],
-);
-
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type UserInvite = typeof userInvites.$inferSelect;
+export type NewUserInvite = typeof userInvites.$inferInsert;
 export type Property = typeof properties.$inferSelect;
 export type NewProperty = typeof properties.$inferInsert;
 export type Listing = typeof listings.$inferSelect;
@@ -284,5 +295,3 @@ export type SavedSearch = typeof savedSearches.$inferSelect;
 export type NewSavedSearch = typeof savedSearches.$inferInsert;
 export type CustomListingField = typeof customListingFields.$inferSelect;
 export type NewCustomListingField = typeof customListingFields.$inferInsert;
-export type CustomListingFieldValueRecord = typeof customListingFieldValues.$inferSelect;
-export type NewCustomListingFieldValueRecord = typeof customListingFieldValues.$inferInsert;

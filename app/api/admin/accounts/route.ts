@@ -1,5 +1,9 @@
 import { NextRequest } from "next/server";
 
+import { createInvite } from "@/lib/auth/invite-service";
+import { requireAdminSession } from "@/lib/auth/session";
+import { createAccountInviteSchema } from "@/lib/auth/validation";
+
 /**
  * GET /api/admin/accounts
  *
@@ -13,7 +17,12 @@ import { NextRequest } from "next/server";
  *   - ?search=email-or-name
  */
 export async function GET(request: NextRequest) {
-  // TODO: authenticate request (admin only)
+  const { response } = await requireAdminSession();
+
+  if (response) {
+    return response;
+  }
+
   const { searchParams } = request.nextUrl;
 
   const page = Number(searchParams.get("page") ?? 1);
@@ -52,16 +61,41 @@ export async function GET(request: NextRequest) {
  * }
  */
 export async function POST(request: NextRequest) {
-  // TODO: authenticate request (admin only)
-  const body = await request.json();
+  const { response, session } = await requireAdminSession();
 
-  // TODO: validate body schema
-  // TODO: create account in database
-  // TODO: optionally send invite email
-  void body;
+  if (response || !session) {
+    return response ?? new Response("Forbidden", { status: 403 });
+  }
+
+  const body = await request.json();
+  const parsed = createAccountInviteSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return Response.json(
+      { message: parsed.error.issues[0]?.message ?? "Invalid account invite payload." },
+      { status: 400 },
+    );
+  }
+
+  const invite = await createInvite({
+    email: parsed.data.email,
+    fullName: parsed.data.name,
+    role: parsed.data.role,
+    invitedByUserId: session.user.id,
+    sendInviteEmail: parsed.data.sendInviteEmail === true,
+  });
 
   return Response.json(
-    { message: "Account created", data: { id: "placeholder-id", ...body } },
+    {
+      message: "Account invited",
+      data: {
+        id: invite.userId,
+        email: invite.email,
+        name: parsed.data.name,
+        role: parsed.data.role,
+        inviteUrl: invite.inviteUrl,
+      },
+    },
     { status: 201 },
   );
 }
