@@ -1,13 +1,11 @@
-import { ListingFormData } from "@/app/listingForm/types";
+import { ListingFormControl } from "@/app/listingForm/types";
 import { useAccessibilityFeaturesQuery } from "@/app/listingForm/useAccessibilityFeaturesQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleField } from "@/components/toggle-field/ToggleField";
 import { FormField, FormItem, FormControl } from "@/components/ui/form";
 import { FormSection } from "@/components/listing-form-layout/ListingFormLayout";
-import { Control } from "react-hook-form";
-
 export interface ListingFormFeaturesProps {
-  control: Control<ListingFormData>;
+  control: ListingFormControl;
 }
 
 export function ListingFormFeatures({ control }: ListingFormFeaturesProps) {

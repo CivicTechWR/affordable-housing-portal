@@ -9,10 +9,12 @@ export function useListingQuery(listingId?: string) {
   useEffect(() => {
     if (!listingId) {
       setData(null);
+      setIsError(false);
       setIsLoading(false);
       return;
     }
 
+    setIsError(false);
     setIsLoading(true);
     const timer = setTimeout(() => {
       try {

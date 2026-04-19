@@ -1,30 +1,51 @@
-export type CoreFieldType =
-  | "text"
-  | "number"
-  | "boolean"
-  | "select"
-  | "textarea"
-  | "date"
-  | "email"
-  | "tel";
+import type { ListingFormInput } from "./types";
+
+export type CoreFieldType = "text" | "number" | "select" | "textarea" | "email" | "tel";
 
 export interface FieldOption {
   label: string;
   value: string;
 }
 
-export interface CoreFieldDefinition {
-  key: string;
+type KeysMatching<T, V> = {
+  [K in keyof T]-?: T[K] extends V ? K : never;
+}[keyof T];
+
+type ListingStringKey = Extract<KeysMatching<ListingFormInput, string | undefined>, string>;
+type ListingNumberKey = Extract<KeysMatching<ListingFormInput, number | undefined>, string>;
+
+interface BaseCoreFieldDefinition {
   displayName: string;
-  fieldType: CoreFieldType;
   category: string;
   helpText?: string;
   placeholder?: string;
   isRequired: boolean;
   sortOrder: number;
-  options?: FieldOption[];
   colSpan?: 1 | 2;
 }
+
+interface TextLikeFieldDefinition extends BaseCoreFieldDefinition {
+  key: ListingStringKey;
+  fieldType: "text" | "textarea" | "email" | "tel";
+  options?: never;
+}
+
+interface SelectFieldDefinition extends BaseCoreFieldDefinition {
+  key: ListingStringKey;
+  fieldType: "select";
+  options: FieldOption[];
+}
+
+interface NumberFieldDefinition extends BaseCoreFieldDefinition {
+  key: ListingNumberKey;
+  fieldType: "number";
+  options?: never;
+}
+
+export type CoreFieldDefinition =
+  | TextLikeFieldDefinition
+  | SelectFieldDefinition
+  | NumberFieldDefinition;
 
 export const CORE_FIELD_CATEGORIES = [
   {

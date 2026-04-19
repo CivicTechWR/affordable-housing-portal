@@ -1,14 +1,20 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { listingFormSchema, ListingFormData, INITIAL_FORM_DATA } from "./types";
+import {
+  listingFormSchema,
+  ListingFormContext,
+  ListingFormData,
+  ListingFormInput,
+  INITIAL_FORM_DATA,
+} from "./types";
 import { useListingQuery } from "./useListingQuery";
 
 export function useListingForm(listingId?: string) {
   const { data: initialData, isLoading, isError } = useListingQuery(listingId);
 
-  const form = useForm<ListingFormData>({
-    resolver: zodResolver(listingFormSchema) as any,
+  const form = useForm<ListingFormInput, ListingFormContext, ListingFormData>({
+    resolver: zodResolver(listingFormSchema),
     defaultValues: INITIAL_FORM_DATA,
   });
 

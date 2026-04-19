@@ -1,30 +1,16 @@
 import { z } from "zod";
+import type { Control, UseFormReturn } from "react-hook-form";
 
 export const listingFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   propertyType: z.string().min(1, "Property type is required"),
   buildingType: z.string().min(1, "Building type is required"),
-  unitStory: z.preprocess(
-    (val) => (val === "" || val === null ? undefined : Number(val)),
-    z.number().optional(),
-  ),
-  bedrooms: z.preprocess(
-    (val) => (val === "" || val === null ? undefined : Number(val)),
-    z.number({ message: "Bedrooms are required" }).min(0, "Invalid number of bedrooms"),
-  ),
-  bathrooms: z.preprocess(
-    (val) => (val === "" || val === null ? undefined : Number(val)),
-    z.number({ message: "Bathrooms are required" }).min(0, "Invalid number of bathrooms"),
-  ),
-  squareFeet: z.preprocess(
-    (val) => (val === "" || val === null ? undefined : Number(val)),
-    z.number().optional(),
-  ),
-  monthlyRentCents: z.preprocess(
-    (val) => (val === "" || val === null ? undefined : Number(val)),
-    z.number({ message: "Rent is required" }).min(0, "Rent cannot be negative"),
-  ),
+  unitStory: z.number().optional(),
+  bedrooms: z.number({ message: "Bedrooms are required" }).min(0, "Invalid number of bedrooms"),
+  bathrooms: z.number({ message: "Bathrooms are required" }).min(0, "Invalid number of bathrooms"),
+  squareFeet: z.number().optional(),
+  monthlyRentCents: z.number({ message: "Rent is required" }).min(0, "Rent cannot be negative"),
   leaseTerm: z.string().min(1, "Lease term is required"),
   utilitiesIncluded: z.array(z.string()).default([]),
   images: z.array(z.string()).default([]),
@@ -47,7 +33,15 @@ export const listingFormSchema = z.object({
   accessibilityFeatures: z.array(z.string()).default([]),
 });
 
-export type ListingFormData = z.infer<typeof listingFormSchema>;
+export type ListingFormInput = z.input<typeof listingFormSchema>;
+export type ListingFormData = z.output<typeof listingFormSchema>;
+export type ListingFormContext = Record<string, never>;
+export type ListingFormControl = Control<ListingFormInput, ListingFormContext, ListingFormData>;
+export type ListingFormMethods = UseFormReturn<
+  ListingFormInput,
+  ListingFormContext,
+  ListingFormData
+>;
 
 /**
  * TEMPORARY MOCK — This hardcoded data will be replaced by the
@@ -341,14 +335,17 @@ export const INITIAL_FORM_DATA: ListingFormData = {
   description: "",
   propertyType: "",
   buildingType: "",
+  unitStory: undefined, // Add this
   bedrooms: 0,
   bathrooms: 0,
+  squareFeet: undefined, // Add this
   monthlyRentCents: 0,
   leaseTerm: "",
   utilitiesIncluded: [],
   images: [],
+  availableOn: undefined, // Add this
   status: "draft",
-  unitNumber: "",
+  unitNumber: undefined,
   name: "",
   street1: "",
   street2: "",

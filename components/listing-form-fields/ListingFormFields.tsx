@@ -1,5 +1,4 @@
-import { Control, Path } from "react-hook-form";
-import { ListingFormData } from "@/app/listingForm/types";
+import { ListingFormControl } from "@/app/listingForm/types";
 import {
   CORE_FIELD_DEFINITIONS,
   CORE_FIELD_CATEGORIES,
@@ -25,7 +24,7 @@ import {
 import { FormSection } from "@/components/listing-form-layout/ListingFormLayout";
 
 export interface ListingFormFieldsProps {
-  control: Control<ListingFormData>;
+  control: ListingFormControl;
 }
 
 function FieldRenderer({
@@ -33,23 +32,22 @@ function FieldRenderer({
   control,
 }: {
   def: CoreFieldDefinition;
-  control: Control<ListingFormData>;
+  control: ListingFormControl;
 }) {
-  const fieldName = def.key as Path<ListingFormData>;
   const label = `${def.displayName}${def.isRequired ? " *" : ""}`;
 
   if (def.fieldType === "select") {
     return (
       <FormField
         control={control}
-        name={fieldName}
+        name={def.key}
         render={({ field }) => (
           <FormItem>
             <FormLabel>{label}</FormLabel>
             <Select
               onValueChange={field.onChange}
-              defaultValue={(field.value as string) || undefined}
-              value={(field.value as string) || undefined}
+              defaultValue={field.value ?? undefined}
+              value={field.value ?? undefined}
             >
               <FormControl>
                 <SelectTrigger>
@@ -76,7 +74,7 @@ function FieldRenderer({
     return (
       <FormField
         control={control}
-        name={fieldName}
+        name={def.key}
         render={({ field }) => (
           <FormItem className={def.colSpan === 2 ? "md:col-span-2" : undefined}>
             <FormLabel>{label}</FormLabel>
@@ -96,7 +94,7 @@ function FieldRenderer({
     return (
       <FormField
         control={control}
-        name={fieldName}
+        name={def.key}
         render={({ field }) => (
           <FormItem>
             <FormLabel>{label}</FormLabel>
@@ -111,10 +109,16 @@ function FieldRenderer({
                       value: typeof field.value === "number" ? field.value / 100 : "",
                       onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                         const val = e.target.value;
-                        field.onChange(val !== "" ? Number(val) * 100 : "");
+                        field.onChange(val === "" ? undefined : Number(val) * 100);
                       },
                     }
-                  : { value: field.value ?? "", onChange: field.onChange })}
+                  : {
+                      value: typeof field.value === "number" ? field.value : "",
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? undefined : Number(val));
+                      },
+                    })}
               />
             </FormControl>
             {def.helpText && <FormDescription>{def.helpText}</FormDescription>}
@@ -130,7 +134,7 @@ function FieldRenderer({
   return (
     <FormField
       control={control}
-      name={fieldName}
+      name={def.key}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
