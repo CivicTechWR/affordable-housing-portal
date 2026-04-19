@@ -18,12 +18,12 @@ import {
 
 const details: ListingDetails = {
   id: "11111111-1111-4111-8111-111111111111",
-  price: 100000,
+  price: 2350,
   address: "123 Main St",
   city: "Waterloo",
   beds: 3,
   baths: 2,
-  sqft: 100,
+  sqft: 1200,
   images: [
     {
       url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
@@ -47,9 +47,9 @@ const details: ListingDetails = {
     {
       categoryName: "Accessibility",
       features: [
-        { name: "braille", description: "description of this" },
-        { name: "wheelchair", description: "description of this" },
-        { name: "ramp", description: "description of this" },
+        { name: "braille", description: "braille signage" },
+        { name: "lowered counters", description: "lowered counters for wheelchair users" },
+        { name: "ramp", description: "wheelchair accessible ramp" },
       ],
     },
   ],

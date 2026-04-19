@@ -19,12 +19,12 @@ export default function ListingsDashboard() {
   const listings: ListingSummary[] = [
     {
       id: "11111111-1111-4111-8111-111111111111",
-      price: 100000,
+      price: 2350,
       address: "123 Main St",
       city: "Waterloo",
       beds: 3,
       baths: 2,
-      sqft: 100,
+      sqft: 1200,
       imageUrl:
         "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
       timeAgo: "2 days ago",
