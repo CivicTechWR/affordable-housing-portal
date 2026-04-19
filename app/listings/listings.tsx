@@ -16,6 +16,7 @@ import type { ListingSummary } from "@/shared/schemas/listings";
 export default function ListingsDashboard() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
+  const isSplitView = displayMode === DisplayMode.MAP_LIST;
   const listings: ListingSummary[] = [
     {
       id: "11111111-1111-4111-8111-111111111111",
@@ -60,8 +61,8 @@ export default function ListingsDashboard() {
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-16 items-center border-b bg-background px-4 shrink-0">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
+      <header className="flex h-16 shrink-0 items-center border-b bg-background px-4">
         <ListingFilterSearchBar
           searchInputProps={searchInputProps}
           priceRangeProps={priceRangeProps}
@@ -79,7 +80,7 @@ export default function ListingsDashboard() {
         />
         <FilterButton {...filterButtonProps} />
       </header>
-      <main className="flex flex-1 overflow-hidden">
+      <main className="flex min-h-0 flex-1 overflow-hidden">
         {displayMode !== DisplayMode.MAP ? (
           <ListingsPanel
             listings={listings}
@@ -89,7 +90,9 @@ export default function ListingsDashboard() {
           />
         ) : null}
         {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
-          <MapView listings={listings} />
+          <div className={`min-w-0 flex-1 ${isSplitView ? "lg:basis-1/2" : ""}`}>
+            <MapView listings={listings} />
+          </div>
         )}
         {isFilterOpen && (
           <ListingFilters
