@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { route, routeOperation } from "next-rest-framework";
 
 import { requireListingWriteSession } from "@/lib/auth/session";
-import { createListingSchema, listingSearchQuerySchema } from "@/shared/schemas/listings";
+import { errorMessageSchema } from "@/shared/schemas/common";
+import {
+  createListingResponseSchema,
+  createListingSchema,
+  listingsResponseSchema,
+  listingSearchQuerySchema,
+} from "@/shared/schemas/listings";
 
 export const { GET, POST } = route({
   getListings: routeOperation({
@@ -11,6 +17,13 @@ export const { GET, POST } = route({
     .input({
       query: listingSearchQuerySchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: listingsResponseSchema,
+      },
+    ])
     .handler((request) => {
       const { searchParams } = request.nextUrl;
 
@@ -44,6 +57,23 @@ export const { GET, POST } = route({
       contentType: "application/json",
       body: createListingSchema,
     })
+    .outputs([
+      {
+        status: 201,
+        contentType: "application/json",
+        body: createListingResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (request) => {
       const { response } = await requireListingWriteSession();
 
@@ -52,11 +82,12 @@ export const { GET, POST } = route({
       }
 
       const body = await request.json();
+      const createdListingId = crypto.randomUUID();
 
       // TODO: persist to database
 
       return NextResponse.json(
-        { message: "Listing created", data: { id: "placeholder-id", ...body } },
+        { message: "Listing created", data: { id: createdListingId, ...body } },
         { status: 201 },
       );
     }),

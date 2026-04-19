@@ -50,7 +50,7 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
     cache: "no-store",
   });
 
-  if (response.status === 404) {
+  if (response.status === 400 || response.status === 404) {
     notFound();
   }
 

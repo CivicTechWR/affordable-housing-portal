@@ -81,6 +81,34 @@ const listingContactSchema = z.object({
 });
 
 const listingApplicationMethodSchema = z.enum(["internal", "external_link", "paper"]);
+const listingExternalApplicationUrlSchema = z
+  .string()
+  .trim()
+  .url("Invalid external application URL.");
+const listingImageUrlSchema = z.string().trim().url("Invalid image URL.");
+const listingPaginationSchema = z.object({
+  page: z.number().int().min(1),
+  limit: z.number().int().min(1),
+  total: z.number().int().min(0),
+  totalPages: z.number().int().min(0),
+});
+const updateListingPayloadSchema = z.object({
+  name: nonEmptyString.optional(),
+  description: nonEmptyString.optional(),
+  address: listingAddressSchema.partial().optional(),
+  units: z.array(listingUnitSchema.partial()).min(1, "At least one unit is required.").optional(),
+  amenities: z.array(nonEmptyString).optional(),
+  accessibilityFeatures: z.array(nonEmptyString).optional(),
+  applicationMethod: listingApplicationMethodSchema.optional(),
+  externalApplicationUrl: listingExternalApplicationUrlSchema.optional(),
+  eligibilityCriteria: listingEligibilityCriteriaSchema.partial().optional(),
+  images: z.array(listingImageUrlSchema).optional(),
+  contact: listingContactSchema.partial().optional(),
+  status: listingStatusSchema.optional(),
+});
+const listingIdDataSchema = z.object({
+  id: listingIdParamSchema,
+});
 
 const listingPayloadSchema = z.object({
   name: nonEmptyString,
@@ -90,9 +118,9 @@ const listingPayloadSchema = z.object({
   amenities: z.array(nonEmptyString),
   accessibilityFeatures: z.array(nonEmptyString),
   applicationMethod: listingApplicationMethodSchema,
-  externalApplicationUrl: z.string().trim().url("Invalid external application URL.").optional(),
+  externalApplicationUrl: listingExternalApplicationUrlSchema.optional(),
   eligibilityCriteria: listingEligibilityCriteriaSchema,
-  images: z.array(z.string().trim().url("Invalid image URL.")),
+  images: z.array(listingImageUrlSchema),
   contact: listingContactSchema,
   status: listingStatusSchema,
 });
@@ -107,7 +135,7 @@ export const createListingSchema = listingPayloadSchema.superRefine((value, cont
   }
 });
 
-export const updateListingSchema = listingPayloadSchema.partial().superRefine((value, context) => {
+export const updateListingSchema = updateListingPayloadSchema.superRefine((value, context) => {
   if (Object.keys(value).length === 0) {
     context.addIssue({
       code: "custom",
@@ -122,6 +150,32 @@ export const updateListingSchema = listingPayloadSchema.partial().superRefine((v
       path: ["externalApplicationUrl"],
     });
   }
+});
+
+export const listingsResponseSchema = z.object({
+  data: z.array(z.unknown()),
+  pagination: listingPaginationSchema,
+});
+
+export const listingByIdResponseSchema = z.object({
+  data: listingDetailsSchema,
+});
+
+export const createListingResponseSchema = z.object({
+  message: z.string(),
+  data: listingPayloadSchema.extend({
+    id: listingIdParamSchema,
+  }),
+});
+
+export const updateListingResponseSchema = z.object({
+  message: z.string(),
+  data: listingIdDataSchema.and(updateListingPayloadSchema),
+});
+
+export const deleteListingResponseSchema = z.object({
+  message: z.string(),
+  data: listingIdDataSchema,
 });
 
 export type ListingIdParam = z.infer<typeof listingIdParamSchema>;

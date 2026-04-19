@@ -5,10 +5,14 @@ import { route, routeOperation } from "next-rest-framework";
 import { db } from "@/db";
 import { listings, properties } from "@/db/schema";
 import { requireListingWriteSession } from "@/lib/auth/session";
+import { errorMessageSchema } from "@/shared/schemas/common";
 import {
+  deleteListingResponseSchema,
+  listingByIdResponseSchema,
   type ListingDetails,
   listingRouteParamsSchema,
   type ListingIdParam,
+  updateListingResponseSchema,
   updateListingSchema,
 } from "@/shared/schemas/listings";
 
@@ -46,6 +50,18 @@ export const { GET, PUT, DELETE } = route({
     .input({
       params: listingRouteParamsSchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: listingByIdResponseSchema,
+      },
+      {
+        status: 404,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler((_request, { params }) => {
       const { id } = params;
 
@@ -66,6 +82,28 @@ export const { GET, PUT, DELETE } = route({
       contentType: "application/json",
       body: updateListingSchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: updateListingResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 404,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (request, { params }) => {
       const { response } = await requireOwnedListingForWrite(params.id);
 
@@ -89,6 +127,28 @@ export const { GET, PUT, DELETE } = route({
     .input({
       params: listingRouteParamsSchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: deleteListingResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 404,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (_request, { params }) => {
       const { response } = await requireOwnedListingForWrite(params.id);
 
@@ -110,7 +170,7 @@ async function requireOwnedListingForWrite(listingId: ListingIdParam) {
 
   if (response || !session || !authzUser) {
     return {
-      response: response ?? new NextResponse("Forbidden", { status: 403 }),
+      response: response ?? NextResponse.json({ message: "Forbidden" }, { status: 403 }),
     };
   }
 
@@ -126,13 +186,13 @@ async function requireOwnedListingForWrite(listingId: ListingIdParam) {
 
   if (!listing) {
     return {
-      response: new NextResponse("Listing not found", { status: 404 }),
+      response: NextResponse.json({ message: "Listing not found" }, { status: 404 }),
     };
   }
 
   if (authzUser.role !== "admin" && listing.ownerUserId !== session.user.id) {
     return {
-      response: new NextResponse("Forbidden", { status: 403 }),
+      response: NextResponse.json({ message: "Forbidden" }, { status: 403 }),
     };
   }
 
