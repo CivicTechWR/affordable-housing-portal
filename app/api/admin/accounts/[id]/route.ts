@@ -2,18 +2,39 @@ import { NextResponse } from "next/server";
 import { route, routeOperation } from "next-rest-framework";
 
 import { requireAdminSession } from "@/lib/auth/session";
+import { errorMessageSchema } from "@/shared/schemas/common";
 import {
-  adminAccountParamsSchema,
-  updateAdminAccountSchema,
-} from "@/shared/schemas/admin-account-management";
+  accountByIdResponseSchema,
+  accountParamsSchema,
+  deactivateAccountResponseSchema,
+  updateAccountResponseSchema,
+  updateAccountSchema,
+} from "@/shared/schemas/account-management";
 
 export const { GET, PUT, DELETE } = route({
-  getAdminAccountById: routeOperation({
+  getAccountById: routeOperation({
     method: "GET",
   })
     .input({
-      params: adminAccountParamsSchema,
+      params: accountParamsSchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: accountByIdResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (_request, { params }) => {
       const { response } = await requireAdminSession();
 
@@ -37,14 +58,31 @@ export const { GET, PUT, DELETE } = route({
       });
     }),
 
-  updateAdminAccountById: routeOperation({
+  updateAccountById: routeOperation({
     method: "PUT",
   })
     .input({
-      params: adminAccountParamsSchema,
+      params: accountParamsSchema,
       contentType: "application/json",
-      body: updateAdminAccountSchema,
+      body: updateAccountSchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: updateAccountResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (request, { params }) => {
       const { response } = await requireAdminSession();
 
@@ -62,12 +100,29 @@ export const { GET, PUT, DELETE } = route({
       });
     }),
 
-  deactivateAdminAccountById: routeOperation({
+  deactivateAccountById: routeOperation({
     method: "DELETE",
   })
     .input({
-      params: adminAccountParamsSchema,
+      params: accountParamsSchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: deactivateAccountResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (_request, { params }) => {
       const { response } = await requireAdminSession();
 

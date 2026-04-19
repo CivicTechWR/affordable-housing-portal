@@ -3,18 +3,38 @@ import { route, routeOperation } from "next-rest-framework";
 
 import { createInvite } from "@/lib/auth/invite-service";
 import { requireAdminSession } from "@/lib/auth/session";
+import { errorMessageSchema } from "@/shared/schemas/common";
 import {
-  adminAccountsQuerySchema,
-  createAdminAccountInviteSchema,
-} from "@/shared/schemas/admin-account-management";
+  accountsListResponseSchema,
+  accountsQuerySchema,
+  createAccountInviteSchema,
+  createAccountResponseSchema,
+} from "@/shared/schemas/account-management";
 
 export const { GET, POST } = route({
-  getAdminAccounts: routeOperation({
+  getAccounts: routeOperation({
     method: "GET",
   })
     .input({
-      query: adminAccountsQuerySchema,
+      query: accountsQuerySchema,
     })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: accountsListResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (request) => {
       const { response } = await requireAdminSession();
 
@@ -44,18 +64,35 @@ export const { GET, POST } = route({
       });
     }),
 
-  createAdminAccount: routeOperation({
+  createAccount: routeOperation({
     method: "POST",
   })
     .input({
       contentType: "application/json",
-      body: createAdminAccountInviteSchema,
+      body: createAccountInviteSchema,
     })
+    .outputs([
+      {
+        status: 201,
+        contentType: "application/json",
+        body: createAccountResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
     .handler(async (request) => {
       const { response, session } = await requireAdminSession();
 
       if (response || !session) {
-        return response ?? new NextResponse("Forbidden", { status: 403 });
+        return response ?? NextResponse.json({ message: "Forbidden" }, { status: 403 });
       }
 
       const body = await request.json();
