@@ -750,7 +750,10 @@
                 },
                 "additionalProperties": false
               },
-              "images": { "type": "array", "items": { "type": "string" } },
+              "images": {
+                "type": "array",
+                "items": { "type": "string", "format": "uri" }
+              },
               "contact": {
                 "type": "object",
                 "properties": {
@@ -864,7 +867,10 @@
               "housingType": { "type": "string" }
             }
           },
-          "images": { "type": "array", "items": { "type": "string" } },
+          "images": {
+            "type": "array",
+            "items": { "type": "string", "format": "uri" }
+          },
           "contact": {
             "type": "object",
             "properties": {
@@ -1148,7 +1154,42 @@
       "GetListings200ResponseBody": {
         "type": "object",
         "properties": {
-          "data": { "type": "array", "items": {} },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "price": { "type": "number" },
+                "address": { "type": "string" },
+                "city": { "type": "string" },
+                "beds": { "type": "number" },
+                "baths": { "type": "number" },
+                "sqft": { "type": "number" },
+                "lat": { "type": "number" },
+                "lng": { "type": "number" },
+                "imageUrl": { "type": "string", "format": "uri" },
+                "timeAgo": { "type": "string" }
+              },
+              "required": [
+                "id",
+                "price",
+                "address",
+                "city",
+                "beds",
+                "baths",
+                "sqft",
+                "lat",
+                "lng",
+                "timeAgo"
+              ],
+              "additionalProperties": false
+            }
+          },
           "pagination": {
             "type": "object",
             "properties": {
@@ -1301,7 +1342,10 @@
                     },
                     "additionalProperties": false
                   },
-                  "images": { "type": "array", "items": { "type": "string" } },
+                  "images": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "uri" }
+                  },
                   "contact": {
                     "type": "object",
                     "properties": {
@@ -1395,7 +1439,10 @@
               "housingType": { "type": "string" }
             }
           },
-          "images": { "type": "array", "items": { "type": "string" } },
+          "images": {
+            "type": "array",
+            "items": { "type": "string", "format": "uri" }
+          },
           "contact": {
             "type": "object",
             "properties": {

@@ -40,6 +40,8 @@ export const listingImageSchema = z.object({
   caption: nonEmptyString,
 });
 
+const listingImageUrlSchema = z.url("Invalid image URL.");
+
 export const listingDetailsSchema = z.object({
   id: listingIdParamSchema,
   price: z.number().min(0),
@@ -51,6 +53,20 @@ export const listingDetailsSchema = z.object({
   images: z.array(listingImageSchema),
   timeAgo: nonEmptyString,
   features: z.array(listingFeatureCategorySchema),
+});
+
+export const listingSummarySchema = z.object({
+  id: listingIdParamSchema,
+  price: z.number().min(0),
+  address: nonEmptyString,
+  city: nonEmptyString,
+  beds: z.number().int().min(0),
+  baths: z.number().min(0),
+  sqft: z.number().int().min(0),
+  lat: z.number(),
+  lng: z.number(),
+  imageUrl: listingImageUrlSchema.optional(),
+  timeAgo: nonEmptyString,
 });
 
 const listingAddressSchema = z.object({
@@ -85,7 +101,6 @@ const listingExternalApplicationUrlSchema = z
   .string()
   .trim()
   .url("Invalid external application URL.");
-const listingImageUrlSchema = z.string().trim().url("Invalid image URL.");
 const listingPaginationSchema = z.object({
   page: z.number().int().min(1),
   limit: z.number().int().min(1),
@@ -153,7 +168,7 @@ export const updateListingSchema = updateListingPayloadSchema.superRefine((value
 });
 
 export const listingsResponseSchema = z.object({
-  data: z.array(z.unknown()),
+  data: z.array(listingSummarySchema),
   pagination: listingPaginationSchema,
 });
 
@@ -182,5 +197,8 @@ export type ListingIdParam = z.infer<typeof listingIdParamSchema>;
 export type ListingRouteParams = z.infer<typeof listingRouteParamsSchema>;
 export type ListingSearchQuery = z.infer<typeof listingSearchQuerySchema>;
 export type ListingDetails = z.infer<typeof listingDetailsSchema>;
+export type ListingSummary = z.infer<typeof listingSummarySchema>;
+export type ListingsResponse = z.infer<typeof listingsResponseSchema>;
+export type ListingByIdResponse = z.infer<typeof listingByIdResponseSchema>;
 export type CreateListingInput = z.infer<typeof createListingSchema>;
 export type UpdateListingInput = z.infer<typeof updateListingSchema>;

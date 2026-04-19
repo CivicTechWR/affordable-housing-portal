@@ -11,11 +11,12 @@ import {
 import { FilterButton } from "@/components/filter-button/FilterButton";
 import { useState } from "react";
 import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
+import type { ListingSummary } from "@/shared/schemas/listings";
 
 export default function ListingsDashboard() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
-  const listings = [
+  const listings: ListingSummary[] = [
     {
       id: "11111111-1111-4111-8111-111111111111",
       price: 100000,
@@ -24,20 +25,10 @@ export default function ListingsDashboard() {
       beds: 3,
       baths: 2,
       sqft: 100,
-      // imageUrl: "https://picsum.photos/id/1/200/300",
+      imageUrl: "https://picsum.photos/id/1/200/300",
       timeAgo: "2 days ago",
       lat: 43.45055954361165,
       lng: -80.49228395260133,
-      features: [
-        {
-          categoryName: "Accessibility",
-          features: [
-            { name: "braille", description: "description of this" },
-            { name: "wheelchair", description: "description of this" },
-            { name: "ramp", description: "description of this" },
-          ],
-        },
-      ],
     },
   ];
 
