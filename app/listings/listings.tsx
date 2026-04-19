@@ -11,6 +11,7 @@ import {
 import { FilterButton } from "@/components/filter-button/FilterButton";
 import { useState } from "react";
 import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
+import { ListingsShell } from "@/components/listings-layout/ListingsShell";
 
 export default function ListingsDashboard() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -90,38 +91,44 @@ export default function ListingsDashboard() {
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-16 items-center border-b bg-background px-4 shrink-0">
-        <ListingFilterSearchBar
-          searchInputProps={searchInputProps}
-          priceRangeProps={priceRangeProps}
-          bedroomToggleProps={bedroomToggleProps}
-          bathroomToggleProps={bathroomToggleProps}
-          displayModeProps={{
-            displayModes: [
-              { value: DisplayMode.LIST, label: "List" },
-              { value: DisplayMode.MAP, label: "Map" },
-              { value: DisplayMode.MAP_LIST, label: "Split" },
-            ],
-            onChange: (value: string) => setDisplayMode(value as DisplayMode),
-            value: displayMode,
-          }}
-        />
-        <FilterButton {...filterButtonProps} />
-      </header>
-      <main className="flex flex-1 overflow-hidden">
-        {displayMode !== DisplayMode.MAP ? (
+    <ListingsShell
+      header={
+        <>
+          <ListingFilterSearchBar
+            searchInputProps={searchInputProps}
+            priceRangeProps={priceRangeProps}
+            bedroomToggleProps={bedroomToggleProps}
+            bathroomToggleProps={bathroomToggleProps}
+            displayModeProps={{
+              displayModes: [
+                { value: DisplayMode.LIST, label: "List" },
+                { value: DisplayMode.MAP, label: "Map" },
+                { value: DisplayMode.MAP_LIST, label: "Split" },
+              ],
+              onChange: (value: string) => setDisplayMode(value as DisplayMode),
+              value: displayMode,
+            }}
+          />
+          <FilterButton {...filterButtonProps} />
+        </>
+      }
+      panel={
+        displayMode !== DisplayMode.MAP ? (
           <ListingsPanel
             listings={listings}
             displayMode={displayMode}
             filterButtonProps={filterButtonProps}
             sortOptionProps={sortOptionProps}
           />
-        ) : null}
-        {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
+        ) : null
+      }
+      map={
+        [DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) ? (
           <MapView listings={listings} />
-        )}
-        {isFilterOpen && (
+        ) : null
+      }
+      filters={
+        isFilterOpen ? (
           <ListingFilters
             bathroomToggleProps={bathroomToggleProps}
             bedroomToggleProps={bedroomToggleProps}
@@ -131,8 +138,8 @@ export default function ListingsDashboard() {
             clearFilters={clearFilters}
             dynamicGroups={dynamicGroups}
           />
-        )}
-      </main>
-    </div>
+        ) : null
+      }
+    />
   );
 }

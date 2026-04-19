@@ -1,41 +1,55 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { ListingsShell } from "@/components/listings-layout/ListingsShell";
+import { ListingsPanelShell } from "@/components/listings-layout/ListingsPanelShell";
+import { FULLSCREEN_CARD_GRID_CLASS } from "@/components/listing-card-list/listingsCardList";
+
+function ListingsHeaderSkeleton() {
+  return (
+    <>
+      <div className="flex flex-row items-center w-full gap-6">
+        <div className="flex-1 max-w-sm">
+          <div className="relative">
+            <Skeleton className="h-10 w-full rounded-md" />
+          </div>
+        </div>
+        <div className="w-full max-w-[280px] shrink-0">
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
+        <div className="hidden lg:flex items-center gap-6 shrink-0">
+          <Skeleton className="h-9 w-[180px] rounded-md" />
+          <Skeleton className="h-9 w-[180px] rounded-md" />
+        </div>
+        <div>
+          <Skeleton className="h-9 w-[100px] rounded-full" />
+        </div>
+      </div>
+      <div className="ml-auto flex items-center gap-2 shrink-0">
+        <Skeleton className="h-9 w-[110px] rounded-full" />
+      </div>
+    </>
+  );
+}
+
+function ListingsPanelHeaderSkeleton() {
+  return (
+    <div className="sticky top-0 z-10 bg-background border-b p-4 flex items-center gap-3">
+      <Skeleton className="h-4 w-[90px]" />
+      <Skeleton className="h-9 w-[180px]" />
+      <div className="ml-auto">
+        <Skeleton className="h-9 w-[110px] rounded-full" />
+      </div>
+    </div>
+  );
+}
 
 export default function ListingsSkeleton() {
   return (
-    <>
-      <header className="flex h-16 items-center border-b bg-background px-4 shrink-0">
-        <div className="flex flex-row items-center w-full gap-6">
-          <div className="flex-1 max-w-sm">
-            <div className="relative">
-              <Skeleton className="h-10 w-full rounded-md" />
-            </div>
-          </div>
-          <div className="w-full max-w-[280px] shrink-0">
-            <Skeleton className="h-10 w-full rounded-md" />
-          </div>
-          <div className="hidden lg:flex items-center gap-6 shrink-0">
-            <Skeleton className="h-9 w-[180px] rounded-md" />
-            <Skeleton className="h-9 w-[180px] rounded-md" />
-          </div>
-          <div>
-            <Skeleton className="h-9 w-[100px] rounded-full" />
-          </div>
-        </div>
-        <div className="ml-auto flex items-center gap-2 shrink-0">
-          <Skeleton className="h-9 w-[110px] rounded-full" />
-        </div>
-      </header>
-      <main className="flex flex-1 overflow-hidden">
-        <div className="flex flex-col h-full bg-background min-w-[300px] sm:min-w-[330px] lg:min-w-[360px] flex-1">
-          <div className="sticky top-0 z-10 bg-background border-b p-4 flex items-center gap-3">
-            <Skeleton className="h-4 w-[90px]" />
-            <Skeleton className="h-9 w-[180px]" />
-            <div className="ml-auto">
-              <Skeleton className="h-9 w-[110px] rounded-full" />
-            </div>
-          </div>
+    <ListingsShell
+      header={<ListingsHeaderSkeleton />}
+      panel={
+        <ListingsPanelShell grow header={<ListingsPanelHeaderSkeleton />}>
           <div className="flex-1 overflow-auto p-4">
-            <div className="grid gap-4 grid-cols-[260px] sm:grid-cols-[290px_290px] lg:grid-cols-[320px_320px_320px]">
+            <div className={`grid gap-4 ${FULLSCREEN_CARD_GRID_CLASS}`}>
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
@@ -55,8 +69,8 @@ export default function ListingsSkeleton() {
               ))}
             </div>
           </div>
-        </div>
-      </main>
-    </>
+        </ListingsPanelShell>
+      }
+    />
   );
 }

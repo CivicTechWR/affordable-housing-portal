@@ -22,6 +22,9 @@ export enum ListingsDisplayMode {
   FULLSCREEN = "fullscreen",
 }
 
+export const FULLSCREEN_CARD_GRID_CLASS =
+  "grid-cols-[260px] sm:grid-cols-[290px_290px] lg:grid-cols-[320px_320px_320px] xl:grid-cols-[320px_320px_320px_320px]";
+
 interface ListingCardGalleryProps {
   listings: Listing[];
   mode: ListingsDisplayMode;
@@ -34,11 +37,7 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
     // Added h-full and w-full so it fills the parent column and enables actual scrolling
     <ScrollArea className="flex-1 h-full w-full">
       <div
-        className={`p-4 grid gap-4 ${
-          isFullscreen
-            ? "grid-cols-[260px] sm:grid-cols-[290px_290px] lg:grid-cols-[320px_320px_320px] xl:grid-cols-[320px_320px_320px_320px]"
-            : "grid-cols-1"
-        }`}
+        className={`p-4 grid gap-4 ${isFullscreen ? FULLSCREEN_CARD_GRID_CLASS : "grid-cols-1"}`}
       >
         {listings.map((listing) => (
           <ListingsCard

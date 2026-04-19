@@ -9,6 +9,7 @@ import { SortOptions as SortOptionsType } from "@/components/sort-options/SortOp
 import { FilterButtonProps } from "@/components/filter-button/FilterButton";
 import { DisplayMode } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
 import { ListingsPanelHeader } from "@/components/listings-panel-header/ListingsPanelHeader";
+import { ListingsPanelShell } from "@/components/listings-layout/ListingsPanelShell";
 
 interface ListingsPanelProps {
   listings: Listing[];
@@ -24,14 +25,16 @@ export function ListingsPanel({
   sortOptionProps,
 }: ListingsPanelProps) {
   return (
-    <div
-      className={`flex flex-col h-full bg-background min-w-[300px] sm:min-w-[330px] lg:min-w-[360px] ${displayMode === DisplayMode.LIST ? "flex-1" : ""}`}
+    <ListingsPanelShell
+      grow={displayMode === DisplayMode.LIST}
+      header={
+        <ListingsPanelHeader
+          listings={listings}
+          filterButtonProps={filterButtonProps}
+          sortOptionProps={sortOptionProps}
+        />
+      }
     >
-      <ListingsPanelHeader
-        listings={listings}
-        filterButtonProps={filterButtonProps}
-        sortOptionProps={sortOptionProps}
-      />
       <ListingCardGallery
         listings={listings}
         mode={
@@ -40,6 +43,6 @@ export function ListingsPanel({
             : ListingsDisplayMode.SIDESCROLL
         }
       />
-    </div>
+    </ListingsPanelShell>
   );
 }
