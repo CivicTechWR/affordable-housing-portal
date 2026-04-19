@@ -10,7 +10,7 @@ import {
   deleteListingResponseSchema,
   listingByIdResponseSchema,
   type ListingDetails,
-  listingRouteParamsSchema,
+  listingParamsSchema,
   type ListingIdParam,
   updateListingResponseSchema,
   updateListingSchema,
@@ -60,7 +60,7 @@ export const { GET, PUT, DELETE } = route({
     method: "GET",
   })
     .input({
-      params: listingRouteParamsSchema,
+      params: listingParamsSchema,
     })
     .outputs([
       {
@@ -90,7 +90,7 @@ export const { GET, PUT, DELETE } = route({
     method: "PUT",
   })
     .input({
-      params: listingRouteParamsSchema,
+      params: listingParamsSchema,
       contentType: "application/json",
       body: updateListingSchema,
     })
@@ -137,7 +137,7 @@ export const { GET, PUT, DELETE } = route({
     method: "DELETE",
   })
     .input({
-      params: listingRouteParamsSchema,
+      params: listingParamsSchema,
     })
     .outputs([
       {
@@ -178,13 +178,15 @@ export const { GET, PUT, DELETE } = route({
 });
 
 async function requireOwnedListingForWrite(listingId: ListingIdParam) {
-  const { response, session, authzUser } = await requireListingWriteSession();
+  const sessionResult = await requireListingWriteSession();
 
-  if (response || !session || !authzUser) {
+  if (sessionResult.response) {
     return {
-      response: response ?? NextResponse.json({ message: "Forbidden" }, { status: 403 }),
+      response: sessionResult.response,
     };
   }
+
+  const { session, authzUser } = sessionResult;
 
   const [listing] = await db
     .select({
@@ -198,13 +200,16 @@ async function requireOwnedListingForWrite(listingId: ListingIdParam) {
 
   if (!listing) {
     return {
-      response: NextResponse.json({ message: "Listing not found" }, { status: 404 }),
+      response: NextResponse.json<{ message: string }>(
+        { message: "Listing not found" },
+        { status: 404 },
+      ),
     };
   }
 
   if (authzUser.role !== "admin" && listing.ownerUserId !== session.user.id) {
     return {
-      response: NextResponse.json({ message: "Forbidden" }, { status: 403 }),
+      response: NextResponse.json<{ message: string }>({ message: "Forbidden" }, { status: 403 }),
     };
   }
 

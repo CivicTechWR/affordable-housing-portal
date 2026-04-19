@@ -5,8 +5,8 @@ import { createInvite } from "@/lib/auth/invite-service";
 import { requireAdminSession } from "@/lib/auth/session";
 import { errorMessageSchema } from "@/shared/schemas/common";
 import {
-  accountsListResponseSchema,
-  accountsQuerySchema,
+  accountListResponseSchema,
+  accountQuerySchema,
   createAccountInviteSchema,
   createAccountResponseSchema,
 } from "@/shared/schemas/account-management";
@@ -16,13 +16,13 @@ export const { GET, POST } = route({
     method: "GET",
   })
     .input({
-      query: accountsQuerySchema,
+      query: accountQuerySchema,
     })
     .outputs([
       {
         status: 200,
         contentType: "application/json",
-        body: accountsListResponseSchema,
+        body: accountListResponseSchema,
       },
       {
         status: 401,
@@ -89,11 +89,13 @@ export const { GET, POST } = route({
       },
     ])
     .handler(async (request) => {
-      const { response, session } = await requireAdminSession();
+      const sessionResult = await requireAdminSession();
 
-      if (response || !session) {
-        return response ?? NextResponse.json({ message: "Forbidden" }, { status: 403 });
+      if (sessionResult.response) {
+        return sessionResult.response;
       }
+
+      const { session } = sessionResult;
 
       const body = await request.json();
       const invite = await createInvite({

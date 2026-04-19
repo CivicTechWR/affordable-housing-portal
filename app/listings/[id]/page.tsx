@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListingImageCarousel } from "@/components/listing-image-carousel/ListingImageCarousel";
-import type { ListingByIdResponse, ListingDetails } from "@/shared/schemas/listings";
+import { listingByIdResponseSchema, type ListingDetails } from "@/shared/schemas/listings";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -23,7 +23,7 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
     cache: "no-store",
   });
 
-  if (response.status === 400 || response.status === 404) {
+  if (response.status === 404) {
     notFound();
   }
 
@@ -31,7 +31,7 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
     throw new Error("Failed to load listing details");
   }
 
-  const payload = (await response.json()) as ListingByIdResponse;
+  const payload = listingByIdResponseSchema.parse(await response.json());
   return payload.data;
 }
 

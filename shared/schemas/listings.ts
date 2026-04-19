@@ -4,11 +4,11 @@ const nonEmptyString = z.string().trim().min(1);
 const listingStatusSchema = z.enum(["draft", "published", "archived"]);
 
 export const listingIdParamSchema = z.uuid("Invalid listing id.");
-export const listingRouteParamsSchema = z.object({
+export const listingParamsSchema = z.object({
   id: listingIdParamSchema,
 });
 
-export const listingSearchQuerySchema = z.object({
+export const listingQuerySchema = z.object({
   page: z
     .string()
     .regex(/^[1-9]\d*$/)
@@ -167,7 +167,7 @@ export const updateListingSchema = updateListingPayloadSchema.superRefine((value
   }
 });
 
-export const listingsResponseSchema = z.object({
+export const listingListResponseSchema = z.object({
   data: z.array(listingSummarySchema),
   pagination: listingPaginationSchema,
 });
@@ -194,11 +194,14 @@ export const deleteListingResponseSchema = z.object({
 });
 
 export type ListingIdParam = z.infer<typeof listingIdParamSchema>;
-export type ListingRouteParams = z.infer<typeof listingRouteParamsSchema>;
-export type ListingSearchQuery = z.infer<typeof listingSearchQuerySchema>;
+export type ListingParams = z.infer<typeof listingParamsSchema>;
+export type ListingQuery = z.infer<typeof listingQuerySchema>;
 export type ListingDetails = z.infer<typeof listingDetailsSchema>;
 export type ListingSummary = z.infer<typeof listingSummarySchema>;
-export type ListingsResponse = z.infer<typeof listingsResponseSchema>;
+export type ListingListResponse = z.infer<typeof listingListResponseSchema>;
 export type ListingByIdResponse = z.infer<typeof listingByIdResponseSchema>;
 export type CreateListingInput = z.infer<typeof createListingSchema>;
 export type UpdateListingInput = z.infer<typeof updateListingSchema>;
+export type CreateListingResponse = z.infer<typeof createListingResponseSchema>;
+export type UpdateListingResponse = z.infer<typeof updateListingResponseSchema>;
+export type DeleteListingResponse = z.infer<typeof deleteListingResponseSchema>;

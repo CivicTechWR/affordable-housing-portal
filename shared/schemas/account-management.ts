@@ -22,7 +22,7 @@ export const accountParamsSchema = z.object({
   id: accountIdSchema,
 });
 
-export const accountsQuerySchema = z.object({
+export const accountQuerySchema = z.object({
   page: z
     .string()
     .regex(/^[1-9]\d*$/)
@@ -49,24 +49,26 @@ export const updateAccountSchema = z
     message: "At least one field is required.",
   });
 
-export const accountsListResponseSchema = z.object({
-  data: z.array(z.unknown()),
+const accountResponseDataSchema = z.object({
+  id: accountIdSchema,
+  email: z.email().nullable(),
+  name: z.string().nullable(),
+  role: accountRoleSchema.nullable(),
+  organization: z.string().nullable(),
+  status: accountStatusSchema.nullable(),
+  listingsCount: z.number().int().min(0),
+  lastLoginAt: z.string().nullable(),
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+});
+
+export const accountListResponseSchema = z.object({
+  data: z.array(accountResponseDataSchema),
   pagination: paginationSchema,
 });
 
 export const accountByIdResponseSchema = z.object({
-  data: z.object({
-    id: accountIdSchema,
-    email: z.email().nullable(),
-    name: z.string().nullable(),
-    role: accountRoleSchema.nullable(),
-    organization: z.string().nullable(),
-    status: accountStatusSchema.nullable(),
-    listingsCount: z.number().int().min(0),
-    lastLoginAt: z.string().nullable(),
-    createdAt: z.string().nullable(),
-    updatedAt: z.string().nullable(),
-  }),
+  data: accountResponseDataSchema,
 });
 
 export const createAccountResponseSchema = z.object({
@@ -91,6 +93,11 @@ export const deactivateAccountResponseSchema = z.object({
 });
 
 export type AccountParams = z.infer<typeof accountParamsSchema>;
-export type AccountsQuery = z.infer<typeof accountsQuerySchema>;
+export type AccountQuery = z.infer<typeof accountQuerySchema>;
 export type CreateAccountInviteInput = z.infer<typeof createAccountInviteSchema>;
 export type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
+export type AccountListResponse = z.infer<typeof accountListResponseSchema>;
+export type AccountByIdResponse = z.infer<typeof accountByIdResponseSchema>;
+export type CreateAccountResponse = z.infer<typeof createAccountResponseSchema>;
+export type UpdateAccountResponse = z.infer<typeof updateAccountResponseSchema>;
+export type DeactivateAccountResponse = z.infer<typeof deactivateAccountResponseSchema>;

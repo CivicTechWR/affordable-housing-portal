@@ -6,8 +6,8 @@ import { errorMessageSchema } from "@/shared/schemas/common";
 import {
   createListingResponseSchema,
   createListingSchema,
-  listingsResponseSchema,
-  listingSearchQuerySchema,
+  listingListResponseSchema,
+  listingQuerySchema,
 } from "@/shared/schemas/listings";
 
 export const { GET, POST } = route({
@@ -15,13 +15,13 @@ export const { GET, POST } = route({
     method: "GET",
   })
     .input({
-      query: listingSearchQuerySchema,
+      query: listingQuerySchema,
     })
     .outputs([
       {
         status: 200,
         contentType: "application/json",
-        body: listingsResponseSchema,
+        body: listingListResponseSchema,
       },
     ])
     .handler((request) => {

@@ -14,15 +14,6 @@ export const signInSchema = z.object({
   password: z.string().min(1),
 });
 
-export const createAccountInviteSchema = z.object({
-  email: emailSchema,
-  name: z.string().trim().min(1, "Name is required."),
-  role: z.enum(["admin", "partner", "user"], {
-    error: "Role must be admin, partner, or user.",
-  }),
-  sendInviteEmail: z.boolean().optional(),
-});
-
 export const acceptInviteSchema = z
   .object({
     token: z.string().min(1),
