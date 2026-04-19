@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface FormSectionProps {
   title: string;
@@ -53,21 +54,27 @@ export function ListingFormLayout({
           {formPaneHeader && (
             <div className="border-b border-foreground/10 px-4 py-3 md:px-6">{formPaneHeader}</div>
           )}
-          <div
-            className={cn(
-              "px-4 py-5 md:px-6 md:py-6",
-              isExpandedWithPreview
-                ? "lg:sticky lg:top-0 lg:max-h-[calc(100vh-10rem)] lg:overflow-y-auto"
-                : "",
-            )}
-          >
-            {formContent}
-            {footer && (
-              <div className="mt-10 flex justify-end gap-4 border-t border-foreground/10 pt-8">
-                {footer}
+          {isExpandedWithPreview ? (
+            <ScrollArea type="always" className="lg:sticky lg:top-0 lg:h-[calc(100vh-10rem)]">
+              <div className="px-4 py-5 md:px-6 md:py-6">
+                {formContent}
+                {footer && (
+                  <div className="mt-10 flex justify-end gap-4 border-t border-foreground/10 pt-8">
+                    {footer}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </ScrollArea>
+          ) : (
+            <div className="px-4 py-5 md:px-6 md:py-6">
+              {formContent}
+              {footer && (
+                <div className="mt-10 flex justify-end gap-4 border-t border-foreground/10 pt-8">
+                  {footer}
+                </div>
+              )}
+            </div>
+          )}
         </section>
 
         {previewContent && (
@@ -83,16 +90,13 @@ export function ListingFormLayout({
                   {previewPaneHeader}
                 </div>
               )}
-              <div
-                className={cn(
-                  "px-4 py-5 md:px-6 md:py-6",
-                  isExpandedWithPreview
-                    ? "lg:sticky lg:top-0 lg:max-h-[calc(100vh-10rem)] lg:overflow-y-scroll lg:[scrollbar-gutter:stable]"
-                    : "lg:sticky lg:top-0",
-                )}
-              >
-                {previewContent}
-              </div>
+              {isExpandedWithPreview ? (
+                <ScrollArea type="always" className="lg:sticky lg:top-0 lg:h-[calc(100vh-10rem)]">
+                  <div className="px-4 py-5 md:px-6 md:py-6">{previewContent}</div>
+                </ScrollArea>
+              ) : (
+                <div className="px-4 py-5 md:px-6 md:py-6 lg:sticky lg:top-0">{previewContent}</div>
+              )}
             </section>
           </>
         )}

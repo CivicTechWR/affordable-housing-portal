@@ -67,7 +67,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
       isPreviewExpanded={isPreviewExpanded}
       formPaneHeader={
         <div>
-          <h2>Listing Form</h2>
+          <h2>{isEditMode ? "Update" : "Create New"} Listing</h2>
           <p className="text-xs text-muted-foreground">
             Enter listing details, images, and accessibility information.
           </p>
@@ -77,14 +77,14 @@ export default function ListingForm({ listingId }: ListingFormProps) {
         <div>
           <h2>Live Preview</h2>
           <p className="text-xs text-muted-foreground">
-            Read-only view of how this listing appears to renters.
+            Read-only view of how this listing appears to housing searchers.
           </p>
         </div>
       }
       dividerControl={
         <Button
           type="button"
-          variant="ghost"
+          variant="secondary"
           onClick={handleDividerToggle}
           aria-label={previewToggleLabel}
           className="h-full min-h-[460px] w-full rounded-none border-0 px-0 py-0 hover:bg-muted/40"
@@ -121,7 +121,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
       }
       footer={
         <Button type="submit" form="listing-form" size="lg">
-          {isEditMode ? "Save Changes" : "Create Listing"}
+          {isEditMode ? "Edit Changes" : "Publish Listing"}
         </Button>
       }
     />

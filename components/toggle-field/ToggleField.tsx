@@ -1,5 +1,6 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { ComponentProps } from "react";
 
 export type ToggleFieldProps = {
   title?: string;
@@ -11,6 +12,7 @@ export type ToggleFieldProps = {
   value: string | undefined | null;
   onValueChange: (value: string) => void;
   allowEmpty?: boolean;
+  variant?: ComponentProps<typeof ToggleGroup>["variant"];
 };
 
 export function ToggleField({
@@ -20,6 +22,7 @@ export function ToggleField({
   value,
   onValueChange,
   allowEmpty,
+  variant,
 }: ToggleFieldProps) {
   return (
     <Field>
@@ -31,6 +34,7 @@ export function ToggleField({
       )}
       <ToggleGroup
         type="single"
+        variant={variant}
         value={value ?? ""}
         onValueChange={(val) => {
           if (val) {
