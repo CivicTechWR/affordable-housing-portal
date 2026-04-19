@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useCallback, useMemo } from "react";
 import { Map, Marker, Popup } from "@vis.gl/react-maplibre";
 import type { Listing } from "@/components/listing-card-list/listingsCardList";
@@ -22,7 +23,7 @@ export function MapView({ listings }: { listings: Listing[] }) {
   }, []);
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full min-h-0 w-full flex-1">
       <Map
         mapStyle={OPENFREEMAP_STYLE}
         initialViewState={DEFAULT_VIEW}
@@ -63,9 +64,12 @@ export function MapView({ listings }: { listings: Listing[] }) {
               <div className="text-lg font-bold text-blue-600">
                 ${selectedListing.price.toLocaleString()}
               </div>
-              <div className="text-sm font-semibold">
+              <Link
+                href={`/listings/${selectedListing.id}`}
+                className="text-sm font-semibold text-foreground transition-colors hover:text-blue-600 hover:underline"
+              >
                 {selectedListing.address}, {selectedListing.city}
-              </div>
+              </Link>
               <div className="mt-1 flex gap-2 text-xs text-muted-foreground">
                 <span>
                   <strong>{selectedListing.beds}</strong> bed
