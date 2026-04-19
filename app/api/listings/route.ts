@@ -1,83 +1,94 @@
-import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { route, routeOperation } from "next-rest-framework";
 
 import { requireListingWriteSession } from "@/lib/auth/session";
+import { errorMessageSchema } from "@/shared/schemas/common";
+import {
+  createListingResponseSchema,
+  createListingSchema,
+  listingListResponseSchema,
+  listingQuerySchema,
+} from "@/shared/schemas/listings";
 
-/**
- * GET /api/listings
- *
- * Returns a paginated list of affordable housing listings.
- * Supports query params for filtering and pagination:
- *   - ?page=1&limit=20
- *   - ?status=active
- *   - ?neighborhood=downtown
- *   - ?bedrooms=2
- *   - ?maxRent=1500
- *   - ?accessibility=true
- *   - ?search=keyword
- */
-export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
+export const { GET, POST } = route({
+  getListings: routeOperation({
+    method: "GET",
+  })
+    .input({
+      query: listingQuerySchema,
+    })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: listingListResponseSchema,
+      },
+    ])
+    .handler((request) => {
+      const { searchParams } = request.nextUrl;
 
-  const page = Number(searchParams.get("page") ?? 1);
-  const limit = Number(searchParams.get("limit") ?? 20);
-  const status = searchParams.get("status");
-  const neighborhood = searchParams.get("neighborhood");
-  const bedrooms = searchParams.get("bedrooms");
-  const maxRent = searchParams.get("maxRent");
-  const accessibility = searchParams.get("accessibility");
-  const search = searchParams.get("search");
+      const page = Number(searchParams.get("page") ?? 1);
+      const limit = Number(searchParams.get("limit") ?? 20);
+      const status = searchParams.get("status");
+      const neighborhood = searchParams.get("neighborhood");
+      const bedrooms = searchParams.get("bedrooms");
+      const maxRent = searchParams.get("maxRent");
+      const accessibility = searchParams.get("accessibility");
+      const search = searchParams.get("search");
 
-  // TODO: query database with filters
-  void [page, limit, status, neighborhood, bedrooms, maxRent, accessibility, search];
+      // TODO: query database with filters
+      void [page, limit, status, neighborhood, bedrooms, maxRent, accessibility, search];
 
-  return Response.json({
-    data: [],
-    pagination: {
-      page,
-      limit,
-      total: 0,
-      totalPages: 0,
-    },
-  });
-}
+      return NextResponse.json({
+        data: [],
+        pagination: {
+          page,
+          limit,
+          total: 0,
+          totalPages: 0,
+        },
+      });
+    }),
 
-/**
- * POST /api/listings
- *
- * Creates a new housing listing. Requires authentication
- * (housing provider / property manager / admin).
- *
- * Expected body:
- * {
- *   name: string
- *   description: string
- *   address: { street, city, province, postalCode }
- *   units: [{ bedrooms, bathrooms, sqft, rent, availableDate }]
- *   amenities: string[]
- *   accessibilityFeatures: string[]
- *   applicationMethod: "internal" | "external_link" | "paper"
- *   externalApplicationUrl?: string
- *   eligibilityCriteria: { maxIncome?, minAge?, housingType? }
- *   images: string[]
- *   contact: { name, email, phone }
- *   status: "draft" | "active"
- * }
- */
-export async function POST(request: NextRequest) {
-  const { response } = await requireListingWriteSession();
+  createListing: routeOperation({
+    method: "POST",
+  })
+    .input({
+      contentType: "application/json",
+      body: createListingSchema,
+    })
+    .outputs([
+      {
+        status: 201,
+        contentType: "application/json",
+        body: createListingResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
+    .handler(async (request) => {
+      const { response } = await requireListingWriteSession();
 
-  if (response) {
-    return response;
-  }
+      if (response) {
+        return response;
+      }
 
-  const body = await request.json();
+      const body = await request.json();
+      const createdListingId = crypto.randomUUID();
 
-  // TODO: validate body schema
-  // TODO: persist to database
-  void body;
+      // TODO: persist to database
 
-  return Response.json(
-    { message: "Listing created", data: { id: "placeholder-id", ...body } },
-    { status: 201 },
-  );
-}
+      return NextResponse.json(
+        { message: "Listing created", data: { id: createdListingId, ...body } },
+        { status: 201 },
+      );
+    }),
+});

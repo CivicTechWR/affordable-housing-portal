@@ -1,30 +1,54 @@
 import "server-only";
 
-import { auth } from "@/auth";
-import { isUserAllowedToSignIn } from "@/lib/auth/user-store";
+import { NextResponse } from "next/server";
 
-type SessionGuardResult = {
-  response: Response | null;
-  session: Awaited<ReturnType<typeof auth>>;
+import { auth } from "@/auth";
+import { getUserForSession, isUserAllowedToSignIn } from "@/lib/auth/user-store";
+
+type SessionErrorBody = {
+  message: string;
 };
+
+type AuthSession = NonNullable<Awaited<ReturnType<typeof auth>>>;
+type AuthorizedUser = NonNullable<Awaited<ReturnType<typeof getUserForSession>>>;
+
+type SessionGuardResult =
+  | {
+      response: NextResponse<SessionErrorBody>;
+      session: null;
+      authzUser: null;
+    }
+  | {
+      response: null;
+      session: AuthSession;
+      authzUser: AuthorizedUser;
+    };
 
 export async function requireSession() {
   const session = await auth();
 
-  if (
-    !session?.user?.id ||
-    session.user.status === undefined ||
-    !isUserAllowedToSignIn(session.user.status)
-  ) {
+  if (!session?.user?.id) {
     return {
-      response: new Response("Unauthorized", { status: 401 }),
+      response: NextResponse.json<SessionErrorBody>({ message: "Unauthorized" }, { status: 401 }),
       session: null,
+      authzUser: null,
+    } satisfies SessionGuardResult;
+  }
+
+  const authzUser = await getUserForSession(session.user.id);
+
+  if (!authzUser || !isUserAllowedToSignIn(authzUser.status)) {
+    return {
+      response: NextResponse.json<SessionErrorBody>({ message: "Unauthorized" }, { status: 401 }),
+      session: null,
+      authzUser: null,
     } satisfies SessionGuardResult;
   }
 
   return {
     response: null,
     session,
+    authzUser,
   } satisfies SessionGuardResult;
 }
 
@@ -35,10 +59,11 @@ export async function requireAdminSession() {
     return result;
   }
 
-  if (result.session?.user.role !== "admin") {
+  if (result.authzUser?.role !== "admin") {
     return {
-      response: new Response("Forbidden", { status: 403 }),
+      response: NextResponse.json<SessionErrorBody>({ message: "Forbidden" }, { status: 403 }),
       session: null,
+      authzUser: null,
     } satisfies SessionGuardResult;
   }
 
@@ -52,10 +77,11 @@ export async function requireListingWriteSession() {
     return result;
   }
 
-  if (result.session?.user.role !== "admin" && result.session?.user.role !== "partner") {
+  if (result.authzUser?.role !== "admin" && result.authzUser?.role !== "partner") {
     return {
-      response: new Response("Forbidden", { status: 403 }),
+      response: NextResponse.json<SessionErrorBody>({ message: "Forbidden" }, { status: 403 }),
       session: null,
+      authzUser: null,
     } satisfies SessionGuardResult;
   }
 

@@ -1,19 +1,8 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { ListingSummary } from "@/shared/schemas/listings";
 import { ListingsCard } from "../listings-card/listingsCard";
 
-export interface Listing {
-  id: string;
-  price: number;
-  address: string;
-  city: string;
-  beds: number;
-  baths: number;
-  sqft: number;
-  lat: number;
-  lng: number;
-  imageUrl?: string;
-  timeAgo: string;
-}
+export type Listing = ListingSummary;
 
 export enum ListingsDisplayMode {
   SIDESCROLL = "sidescroll",

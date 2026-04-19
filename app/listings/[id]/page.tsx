@@ -4,37 +4,10 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListingImageCarousel } from "@/components/listing-image-carousel/ListingImageCarousel";
+import { listingByIdResponseSchema, type ListingDetails } from "@/shared/schemas/listings";
 
 type PageProps = {
   params: Promise<{ id: string }>;
-};
-
-type ListingFeature = {
-  name: string;
-  description: string;
-};
-
-type ListingFeatureCategory = {
-  categoryName: string;
-  features: ListingFeature[];
-};
-
-type ListingImage = {
-  url: string;
-  caption: string;
-};
-
-type ListingDetails = {
-  id: string;
-  price: number;
-  address: string;
-  city: string;
-  beds: number;
-  baths: number;
-  sqft: number;
-  images: ListingImage[];
-  timeAgo: string;
-  features: ListingFeatureCategory[];
 };
 
 async function getListingFromApi(id: string): Promise<ListingDetails> {
@@ -58,7 +31,7 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
     throw new Error("Failed to load listing details");
   }
 
-  const payload = (await response.json()) as { data: ListingDetails };
+  const payload = listingByIdResponseSchema.parse(await response.json());
   return payload.data;
 }
 
