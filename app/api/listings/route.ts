@@ -54,11 +54,11 @@ export async function GET(request: NextRequest) {
  *   address: { street, city, province, postalCode }
  *   units: [{ bedrooms, bathrooms, sqft, rent, availableDate }]
  *   amenities: string[]
- *   accessibilityFeatures: string[]
+ *   customFeatures: Array<{ category: string, id: string, name: string, description: string }>
  *   applicationMethod: "internal" | "external_link" | "paper"
  *   externalApplicationUrl?: string
  *   eligibilityCriteria: { maxIncome?, minAge?, housingType? }
- *   images: string[]
+ *   images: Array<{ url: string, caption: string }>
  *   contact: { name, email, phone }
  *   status: "draft" | "active"
  * }

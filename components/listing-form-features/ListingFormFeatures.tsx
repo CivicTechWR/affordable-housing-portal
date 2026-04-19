@@ -54,7 +54,7 @@ export function ListingFormFeatures({ control }: ListingFormFeaturesProps) {
               <FormField
                 key={option.id}
                 control={control}
-                name="accessibilityFeatures"
+                name="customFeatures"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
@@ -65,15 +65,31 @@ export function ListingFormFeatures({ control }: ListingFormFeaturesProps) {
                           { label: "Yes", value: "yes" },
                           { label: "No", value: "no" },
                         ]}
-                        value={field.value?.includes(option.id) ? "yes" : "no"}
+                        value={
+                          field.value?.some((feature) => feature.id === option.id) ? "yes" : "no"
+                        }
                         onValueChange={(val) => {
+                          const currentFeatures = field.value ?? [];
+
                           if (val === "yes") {
-                            if (!field.value?.includes(option.id)) {
-                              field.onChange([...(field.value || []), option.id]);
+                            const isAlreadySelected = currentFeatures.some(
+                              (feature) => feature.id === option.id,
+                            );
+
+                            if (!isAlreadySelected) {
+                              field.onChange([
+                                ...currentFeatures,
+                                {
+                                  category: group.groupLabel,
+                                  id: option.id,
+                                  name: option.label,
+                                  description: option.description,
+                                },
+                              ]);
                             }
                           } else if (val === "no") {
                             field.onChange(
-                              field.value?.filter((value: string) => value !== option.id),
+                              currentFeatures.filter((feature) => feature.id !== option.id),
                             );
                           }
                         }}

@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:down:volumes": "docker compose down -v",
+    "docker:logs": "docker compose logs -f app db",
     "dev:secrets": "infisical run --env=dev -- next dev",
     "build": "next build",
     "build:secrets": "infisical run --env=dev -- next build",

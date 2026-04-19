@@ -6,7 +6,7 @@ import {
   ListingFormContext,
   ListingFormData,
   ListingFormInput,
-  INITIAL_FORM_DATA,
+  CREATE_FORM_DEFAULTS,
 } from "./types";
 import { useListingQuery } from "./useListingQuery";
 
@@ -15,14 +15,14 @@ export function useListingForm(listingId?: string) {
 
   const form = useForm<ListingFormInput, ListingFormContext, ListingFormData>({
     resolver: zodResolver(listingFormSchema),
-    defaultValues: INITIAL_FORM_DATA,
+    defaultValues: CREATE_FORM_DEFAULTS,
   });
 
   useEffect(() => {
     if (initialData) {
       form.reset(initialData);
     } else {
-      form.reset(INITIAL_FORM_DATA);
+      form.reset(CREATE_FORM_DEFAULTS);
     }
   }, [initialData, form]);
 

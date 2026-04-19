@@ -31,7 +31,7 @@ export function ListingFilters({
 }: ListingFiltersProps) {
   return (
     <div className="w-full max-w-sm border p-4 space-y-6">
-      <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+      <h2 className="text-lg">Filters</h2>
 
       <PriceRangeInput {...priceRangeProps} />
 

@@ -16,6 +16,8 @@ interface ListingsCardProps {
   imageUrl?: string;
   timeAgo: string;
   variant?: "vertical" | "horizontal";
+  href?: string;
+  onClick?: () => void;
 }
 
 const variants = {
@@ -53,13 +55,14 @@ export function ListingsCard({
   accessibilityFeatures,
   price,
   address,
-  city,
   beds,
   baths,
   sqft,
   imageUrl,
   timeAgo,
   variant = "vertical",
+  href,
+  onClick,
 }: ListingsCardProps) {
   const v = variants[variant];
   const isHorizontal = variant === "horizontal";
@@ -70,6 +73,8 @@ export function ListingsCard({
   const hasMoreFeatures = safeFeatures.length > MAX_FEATURES;
   const baseFeatures = safeFeatures.slice(0, MAX_FEATURES);
   const extraFeatures = safeFeatures.slice(MAX_FEATURES);
+  const listingHref = href ?? `/listings/${id}`;
+  const ariaLabel = `View listing: ${listingTitle} at ${address}`;
 
   return (
     <Card
@@ -79,7 +84,7 @@ export function ListingsCard({
         {imageUrl ? (
           <Image
             src={imageUrl}
-            alt={`${address}, ${city}`}
+            alt={address}
             fill
             sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -113,7 +118,7 @@ export function ListingsCard({
           <div
             className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
           >
-            {address}, {city}
+            {address}
           </div>
         </div>
 
@@ -170,11 +175,16 @@ export function ListingsCard({
         )}
       </CardContent>
 
-      <Link
-        href={`/listings/${id}`}
-        aria-label={`View listing: ${listingTitle} at ${address}, ${city}`}
-        className="absolute inset-0 z-10"
-      />
+      {onClick ? (
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          className="absolute inset-0 z-10 cursor-pointer border-0 bg-transparent p-0"
+          onClick={onClick}
+        />
+      ) : (
+        <Link href={listingHref} aria-label={ariaLabel} className="absolute inset-0 z-10" />
+      )}
     </Card>
   );
 }

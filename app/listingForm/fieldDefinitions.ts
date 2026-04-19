@@ -187,7 +187,7 @@ export const CORE_FIELD_DEFINITIONS: CoreFieldDefinition[] = [
   },
   {
     key: "street1",
-    displayName: "Street Address 1",
+    displayName: "Street address 1",
     fieldType: "text",
     category: "property_info",
     isRequired: true,
@@ -195,7 +195,7 @@ export const CORE_FIELD_DEFINITIONS: CoreFieldDefinition[] = [
   },
   {
     key: "street2",
-    displayName: "Street Address 2",
+    displayName: "Street address 2",
     fieldType: "text",
     category: "property_info",
     isRequired: false,

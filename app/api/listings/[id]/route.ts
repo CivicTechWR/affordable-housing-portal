@@ -21,6 +21,7 @@ type ListingImage = {
 
 type ListingDetails = {
   id: string;
+  title?: string;
   price: number;
   address: string;
   city: string;
@@ -34,6 +35,7 @@ type ListingDetails = {
 
 const details: ListingDetails = {
   id: "1",
+  title: "Sunny Downtown Loft",
   price: 100000,
   address: "123 Main St",
   city: "Waterloo",

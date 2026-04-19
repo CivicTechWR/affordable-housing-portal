@@ -4,8 +4,10 @@ import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingF
 
 export default function ListingFormPage() {
   return (
-    <Suspense fallback={<ListingFormSkeleton />}>
-      <ListingForm />
-    </Suspense>
+    <div data-listing-form-page="true" className="h-full">
+      <Suspense fallback={<ListingFormSkeleton />}>
+        <ListingForm />
+      </Suspense>
+    </div>
   );
 }

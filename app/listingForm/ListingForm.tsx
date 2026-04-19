@@ -1,22 +1,46 @@
 "use client";
 
+import { useState } from "react";
 import { useListingForm } from "./useListingForm";
 import { ListingFormFields } from "@/components/listing-form-fields/ListingFormFields";
 import { ListingFormFeatures } from "@/components/listing-form-features/ListingFormFeatures";
+import { ListingFormImages } from "@/components/listing-form-images/ListingFormImages";
+import { ListingFormLayout } from "@/components/listing-form-layout/ListingFormLayout";
+import {
+  ListingFormPreview,
+  type ListingFormPreviewMode,
+} from "@/components/listing-form-preview/ListingFormPreview";
+import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingFormSkeleton";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { ListingFormLayout } from "@/components/listing-form-layout/ListingFormLayout";
-import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingFormSkeleton";
 
 export interface ListingFormProps {
   listingId?: string;
 }
 
 export default function ListingForm({ listingId }: ListingFormProps) {
-  const isEditMode = !!listingId;
+  const isEditMode = Boolean(listingId);
   const { form, onSubmit, isLoading, isError } = useListingForm(listingId);
+  const [previewMode, setPreviewMode] = useState<ListingFormPreviewMode>("card");
+  const handleOpenDetails = () => {
+    setPreviewMode("details");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const handleDividerToggle = () => {
+    if (previewMode === "card") {
+      handleOpenDetails();
+      return;
+    }
+
+    setPreviewMode("card");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const liveFormData = form.watch();
+  const isPreviewExpanded = previewMode === "details";
+  const previewToggleLabel = isPreviewExpanded
+    ? "Hide Listing Details Page Preview"
+    : "Show Listing Page Preview";
 
   if (isLoading) {
     return <ListingFormSkeleton />;
@@ -25,10 +49,9 @@ export default function ListingForm({ listingId }: ListingFormProps) {
   if (isError) {
     return (
       <ListingFormLayout
-        header={<div />}
         formContent={
           <div className="bg-destructive/15 text-destructive p-8 rounded-lg border border-destructive/20">
-            <h3 className="font-semibold text-lg mb-2">Error Loading Listing</h3>
+            <h3 className="mb-2">Error Loading Listing</h3>
             <p>
               We encountered an error while retrieving this listing. It may have been deleted or
               there is a network issue.
@@ -41,33 +64,65 @@ export default function ListingForm({ listingId }: ListingFormProps) {
 
   return (
     <ListingFormLayout
-      header={
+      isPreviewExpanded={isPreviewExpanded}
+      formPaneHeader={
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground">
-            {isEditMode ? "Edit Listing" : "Create Listing"}
-          </h2>
-          <p className="text-muted-foreground mt-2">
-            {isEditMode
-              ? "Update the details for this existing property listing."
-              : "Fill out the details below to add a new property listing."}
+          <h2>Listing Form</h2>
+          <p className="text-xs text-muted-foreground">
+            Enter listing details, images, and accessibility information.
           </p>
         </div>
+      }
+      previewPaneHeader={
+        <div>
+          <h2>Live Preview</h2>
+          <p className="text-xs text-muted-foreground">
+            Read-only view of how this listing appears to renters.
+          </p>
+        </div>
+      }
+      dividerControl={
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={handleDividerToggle}
+          aria-label={previewToggleLabel}
+          className="h-full min-h-[460px] w-full rounded-none border-0 px-0 py-0 hover:bg-muted/40"
+        >
+          <div className="h-full w-full">
+            <div className="sticky top-1/2 flex -translate-y-1/2 flex-col items-center gap-3">
+              <span className="text-[10px] uppercase tracking-[0.14em] [writing-mode:vertical-rl] rotate-180">
+                {previewToggleLabel}
+              </span>
+              <span className="text-xs leading-none text-muted-foreground" aria-hidden>
+                {isPreviewExpanded ? "<<" : ">>"}
+              </span>
+            </div>
+          </div>
+        </Button>
       }
       formContent={
         <Form {...form}>
           <form id="listing-form" onSubmit={form.handleSubmit(onSubmit)}>
             <ListingFormFields control={form.control} />
+            <ListingFormImages control={form.control} />
             <ListingFormFeatures control={form.control} />
           </form>
         </Form>
       }
-      previewContent={<div>Placeholder: {JSON.stringify(liveFormData)}</div>}
+      previewContent={
+        <ListingFormPreview
+          mode={previewMode}
+          formData={liveFormData}
+          listingId={listingId}
+          onOpenDetails={handleOpenDetails}
+          onBackToCard={() => setPreviewMode("card")}
+        />
+      }
       footer={
-        <>
-          <Button type="submit" form="listing-form" size="lg">
-            {isEditMode ? "Save Changes" : "Create Listing"}
-          </Button>
-        </>
+        <Button type="submit" form="listing-form" size="lg">
+          {isEditMode ? "Save Changes" : "Create Listing"}
+        </Button>
       }
     />
   );

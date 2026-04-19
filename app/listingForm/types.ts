@@ -1,6 +1,18 @@
 import { z } from "zod";
 import type { Control, UseFormReturn } from "react-hook-form";
 
+export const listingImageSchema = z.object({
+  url: z.string().url("Image URL is invalid"),
+  caption: z.string(),
+});
+
+export const listingCustomFeatureSchema = z.object({
+  category: z.string().min(1, "Feature category is required"),
+  id: z.string().min(1, "Feature id is required"),
+  name: z.string().min(1, "Feature name is required"),
+  description: z.string().min(1, "Feature description is required"),
+});
+
 export const listingFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
@@ -13,7 +25,7 @@ export const listingFormSchema = z.object({
   monthlyRentCents: z.number({ message: "Rent is required" }).min(0, "Rent cannot be negative"),
   leaseTerm: z.string().min(1, "Lease term is required"),
   utilitiesIncluded: z.array(z.string()).default([]),
-  images: z.array(z.string()).default([]),
+  images: z.array(listingImageSchema).default([]),
   availableOn: z.string().optional(),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   unitNumber: z.string().optional(),
@@ -29,12 +41,13 @@ export const listingFormSchema = z.object({
   contactEmail: z.string().email("Invalid email").min(1, "Contact email is required"),
   contactPhone: z.string().min(1, "Contact phone is required"),
 
-  // Accessibility feature IDs that are checked
-  accessibilityFeatures: z.array(z.string()).default([]),
+  // Selected custom features (includes display data for preview/UI rendering)
+  customFeatures: z.array(listingCustomFeatureSchema).default([]),
 });
 
 export type ListingFormInput = z.input<typeof listingFormSchema>;
 export type ListingFormData = z.output<typeof listingFormSchema>;
+export type ListingFormImage = z.output<typeof listingImageSchema>;
 export type ListingFormContext = Record<string, never>;
 export type ListingFormControl = Control<ListingFormInput, ListingFormContext, ListingFormData>;
 export type ListingFormMethods = UseFormReturn<
@@ -330,20 +343,19 @@ export const ACCESSIBILITY_FEATURE_GROUPS = [
   },
 ];
 
-export const INITIAL_FORM_DATA: ListingFormData = {
+export const CREATE_FORM_DEFAULTS: Omit<ListingFormInput, "monthlyRentCents"> = {
   title: "",
   description: "",
   propertyType: "",
   buildingType: "",
-  unitStory: undefined, // Add this
+  unitStory: undefined,
   bedrooms: 0,
   bathrooms: 0,
-  squareFeet: undefined, // Add this
-  monthlyRentCents: 0,
+  squareFeet: undefined,
   leaseTerm: "",
   utilitiesIncluded: [],
   images: [],
-  availableOn: undefined, // Add this
+  availableOn: undefined,
   status: "draft",
   unitNumber: undefined,
   name: "",
@@ -355,5 +367,5 @@ export const INITIAL_FORM_DATA: ListingFormData = {
   contactName: "",
   contactEmail: "",
   contactPhone: "",
-  accessibilityFeatures: [],
+  customFeatures: [],
 };

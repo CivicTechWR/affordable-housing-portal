@@ -5,16 +5,15 @@ import { CORE_FIELD_CATEGORIES } from "@/app/listingForm/fieldDefinitions";
 export function ListingFormSkeleton() {
   return (
     <ListingFormLayout
-      header={
-        <div className="space-y-3">
-          <Skeleton className="h-10 w-48" />
-          <Skeleton className="h-5 w-96" />
-        </div>
-      }
       formContent={
         <>
-          {CORE_FIELD_CATEGORIES.map((cat) => (
-            <FormSection key={cat.key} title={cat.displayName} description={cat.description}>
+          {CORE_FIELD_CATEGORIES.map((cat, index) => (
+            <FormSection
+              key={cat.key}
+              isSeparated={index > 0}
+              title={cat.displayName}
+              description={cat.description}
+            >
               {Array.from({ length: cat.key === "listing_details" ? 8 : 6 }).map((_, i) => (
                 <div key={i} className="space-y-2">
                   <Skeleton className="h-4 w-24" />

@@ -164,8 +164,13 @@ export function ListingFormFields({ control }: ListingFormFieldsProps) {
 
   return (
     <>
-      {fieldsByCategory.map((cat) => (
-        <FormSection key={cat.key} title={cat.displayName} description={cat.description}>
+      {fieldsByCategory.map((cat, index) => (
+        <FormSection
+          key={cat.key}
+          isSeparated={index > 0}
+          title={cat.displayName}
+          description={cat.description}
+        >
           {cat.fields.map((def) => (
             <FieldRenderer key={def.key} def={def} control={control} />
           ))}
