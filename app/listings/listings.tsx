@@ -3,7 +3,7 @@
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
-import { MapView } from "@/components/map-view/mapView";
+import { MapView } from "@/components/map-view/MapView";
 import {
   DisplayMode,
   ListingFilterSearchBar,

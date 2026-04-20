@@ -1,6 +1,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ListingSummary } from "@/shared/schemas/listings";
-import { ListingsCard } from "../listings-card/listingsCard";
+import { ListingsCard } from "../listings-card/ListingsCard";
 
 export type Listing = ListingSummary;
 

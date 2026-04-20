@@ -1,6 +1,6 @@
 import type { ListingFormInput } from "@/app/listingForm/types";
 import { ListingDetails } from "@/components/listing-details/ListingDetails";
-import { ListingsCard } from "@/components/listings-card/listingsCard";
+import { ListingsCard } from "@/components/listings-card/ListingsCard";
 import { buildAddress } from "@/lib/address";
 
 export type ListingFormPreviewMode = "card" | "details";

@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { DatePicker, DatePickerProps } from "../date-picker/date-picker";
+import { DatePicker, DatePickerProps } from "../date-picker/DatePicker";
 import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
 import { ToggleField, ToggleFieldProps } from "../toggle-field/ToggleField";
 import { FeatureAccordion, DynamicFilterGroup } from "../feature-accordian/FeatureAccordian";

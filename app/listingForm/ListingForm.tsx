@@ -92,11 +92,14 @@ export default function ListingForm({ listingId }: ListingFormProps) {
         >
           <div className="h-full w-full">
             <div className="sticky top-1/2 flex -translate-y-1/2 flex-col items-center gap-3">
+              <span className="text-xs leading-none text-muted-foreground" aria-hidden>
+                {isPreviewExpanded ? ">>" : "<<"}
+              </span>
               <span className="text-[10px] uppercase tracking-[0.14em] [writing-mode:vertical-rl] rotate-180">
                 {previewToggleLabel}
               </span>
               <span className="text-xs leading-none text-muted-foreground" aria-hidden>
-                {isPreviewExpanded ? "<<" : ">>"}
+                {isPreviewExpanded ? ">>" : "<<"}
               </span>
             </div>
           </div>
