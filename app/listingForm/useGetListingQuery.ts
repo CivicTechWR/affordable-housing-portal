@@ -58,7 +58,7 @@ const MOCK_LISTING_DATA: ListingFormData = {
   ],
 };
 
-export function useListingQuery(listingId?: string) {
+export function useGetListingQuery(listingId?: string) {
   const [data, setData] = useState<ListingFormData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);

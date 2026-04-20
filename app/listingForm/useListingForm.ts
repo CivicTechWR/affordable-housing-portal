@@ -8,10 +8,14 @@ import {
   ListingFormInput,
   CREATE_FORM_DEFAULTS,
 } from "./types";
-import { useListingQuery } from "./useListingQuery";
+import { useCreateListingQuery } from "./useCreateListingQuery";
+import { useEditListingQuery } from "./useEditListingQuery";
+import { useGetListingQuery } from "./useGetListingQuery";
 
 export function useListingForm(listingId?: string) {
-  const { data: initialData, isLoading, isError } = useListingQuery(listingId);
+  const { data: initialData, isLoading, isError } = useGetListingQuery(listingId);
+  const { createListing } = useCreateListingQuery();
+  const { editListing } = useEditListingQuery();
 
   const form = useForm<ListingFormInput, ListingFormContext, ListingFormData>({
     resolver: zodResolver(listingFormSchema),
@@ -26,9 +30,15 @@ export function useListingForm(listingId?: string) {
     }
   }, [initialData, form]);
 
-  const onSubmit = (data: ListingFormData) => {
-    console.log(listingId ? `Updating ID ${listingId}:` : "Creating:", data);
-    alert(listingId ? "Listing Updated! (Mock)" : "Listing Created! (Mock)");
+  const onSubmit = async (data: ListingFormData) => {
+    if (listingId) {
+      await editListing({ listingId, data });
+      alert("Listing Updated! (Mock)");
+      return;
+    }
+
+    await createListing(data);
+    alert("Listing Created! (Mock)");
   };
 
   return {
