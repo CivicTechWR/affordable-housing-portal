@@ -66,15 +66,13 @@ export function ListingsCard({
 }: ListingsCardProps) {
   const v = variants[variant];
   const isHorizontal = variant === "horizontal";
-  const listingTitle = title || "Untitled Listing";
-
   const safeFeatures = accessibilityFeatures || [];
   const MAX_FEATURES = 3;
   const hasMoreFeatures = safeFeatures.length > MAX_FEATURES;
   const baseFeatures = safeFeatures.slice(0, MAX_FEATURES);
   const extraFeatures = safeFeatures.slice(MAX_FEATURES);
   const listingHref = href ?? `/listings/${id}`;
-  const ariaLabel = `View listing: ${listingTitle} at ${address}`;
+  const ariaLabel = `View listing:${title ? `${title} at ${address}}` : `${address}`}`;
 
   return (
     <Card
@@ -114,12 +112,8 @@ export function ListingsCard({
             ${price.toLocaleString()}
             <span className="text-sm font-normal text-muted-foreground">/mo</span>
           </div>
-          <div className="font-semibold line-clamp-1 mt-0.5 text-base">{listingTitle}</div>
-          <div
-            className={`${v.address} text-muted-foreground truncate ${isHorizontal ? "" : "mt-0.5"}`}
-          >
-            {address}
-          </div>
+          <h3>{address}</h3>
+          {title && <h4>{title}</h4>}
         </div>
 
         <div className={`flex items-center ${v.stats} flex-wrap text-muted-foreground mb-auto`}>
