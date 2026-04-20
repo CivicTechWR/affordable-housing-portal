@@ -1,6 +1,5 @@
 import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
-import { NextResponse } from "next/server";
-import { route, routeOperation } from "next-rest-framework";
+import { route, routeOperation, TypedNextResponse } from "next-rest-framework";
 
 import { db } from "@/db";
 import { listings, properties, users, type UserRole, type UserStatus } from "@/db/schema";
@@ -15,28 +14,12 @@ import {
 } from "@/shared/schemas/account-management";
 
 export const { GET, POST } = route({
-  getAccounts: routeOperation({
-    method: "GET",
-  })
-    .input({
-      query: accountQuerySchema,
-    })
+  getAccounts: routeOperation({ method: "GET" })
+    .input({ query: accountQuerySchema })
     .outputs([
-      {
-        status: 200,
-        contentType: "application/json",
-        body: accountListResponseSchema,
-      },
-      {
-        status: 401,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 403,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
+      { status: 200, contentType: "application/json", body: accountListResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(async (request) => {
       const { response } = await requireAdminSession();
@@ -121,7 +104,7 @@ export const { GET, POST } = route({
         listingCounts.map((row) => [row.ownerUserId, Number(row.total)]),
       );
 
-      return NextResponse.json({
+      return TypedNextResponse.json({
         data: rows.map((row) => ({
           id: row.id,
           email: row.email,
@@ -143,29 +126,12 @@ export const { GET, POST } = route({
       });
     }),
 
-  createAccount: routeOperation({
-    method: "POST",
-  })
-    .input({
-      contentType: "application/json",
-      body: createAccountInviteSchema,
-    })
+  createAccount: routeOperation({ method: "POST" })
+    .input({ contentType: "application/json", body: createAccountInviteSchema })
     .outputs([
-      {
-        status: 201,
-        contentType: "application/json",
-        body: createAccountResponseSchema,
-      },
-      {
-        status: 401,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 403,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
+      { status: 201, contentType: "application/json", body: createAccountResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(async (request) => {
       const sessionResult = await requireAdminSession();
@@ -186,7 +152,7 @@ export const { GET, POST } = route({
         sendInviteEmail: body.sendInviteEmail === true,
       });
 
-      return NextResponse.json(
+      return TypedNextResponse.json(
         {
           message: "Account invited",
           data: {
