@@ -20,7 +20,8 @@ export interface ListingFormProps {
 
 export default function ListingForm({ listingId }: ListingFormProps) {
   const isEditMode = Boolean(listingId);
-  const { form, onSubmit, isLoading, isError } = useListingForm(listingId);
+  const { form, onSubmit, isLoading, isError, isSubmitting, submitFeedback } =
+    useListingForm(listingId);
   const [previewMode, setPreviewMode] = useState<ListingFormPreviewMode>("card");
   const handleOpenDetails = () => {
     setPreviewMode("details");
@@ -123,9 +124,24 @@ export default function ListingForm({ listingId }: ListingFormProps) {
         />
       }
       footer={
-        <Button type="submit" form="listing-form" size="lg">
-          {isEditMode ? "Edit Changes" : "Publish Listing"}
-        </Button>
+        <div className="flex items-center gap-3">
+          {submitFeedback && (
+            <p
+              className={
+                submitFeedback.status === "success"
+                  ? "text-sm text-emerald-700"
+                  : "text-sm text-destructive"
+              }
+              role="status"
+              aria-live="polite"
+            >
+              {submitFeedback.message}
+            </p>
+          )}
+          <Button type="submit" form="listing-form" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Publish Listing"}
+          </Button>
+        </div>
       }
     />
   );

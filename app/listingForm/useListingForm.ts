@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,9 +13,17 @@ import { useEditListingQuery } from "./useEditListingQuery";
 import { useGetListingQuery } from "./useGetListingQuery";
 
 export function useListingForm(listingId?: string) {
-  const { data: initialData, isLoading, isError } = useGetListingQuery(listingId);
-  const { createListing } = useCreateListingQuery();
-  const { editListing } = useEditListingQuery();
+  const {
+    data: initialData,
+    isLoading: isFetching,
+    isError: isFetchError,
+  } = useGetListingQuery(listingId);
+  const { createListing, isLoading: isCreating } = useCreateListingQuery();
+  const { editListing, isLoading: isEditing } = useEditListingQuery();
+  const [submitFeedback, setSubmitFeedback] = useState<{
+    status: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const form = useForm<ListingFormInput, ListingFormContext, ListingFormData>({
     resolver: zodResolver(listingFormSchema),
@@ -31,20 +39,37 @@ export function useListingForm(listingId?: string) {
   }, [initialData, form]);
 
   const onSubmit = async (data: ListingFormData) => {
-    if (listingId) {
-      await editListing({ listingId, data });
-      alert("Listing Updated! (Mock)");
-      return;
-    }
+    setSubmitFeedback(null);
 
-    await createListing(data);
-    alert("Listing Created! (Mock)");
+    try {
+      if (listingId) {
+        await editListing({ listingId, data });
+        setSubmitFeedback({
+          status: "success",
+          message: "Listing updated successfully. (Mock)",
+        });
+        return;
+      }
+
+      await createListing(data);
+      setSubmitFeedback({
+        status: "success",
+        message: "Listing created successfully. (Mock)",
+      });
+    } catch {
+      setSubmitFeedback({
+        status: "error",
+        message: "Unable to save listing. Please try again.",
+      });
+    }
   };
 
   return {
     form,
     onSubmit,
-    isLoading,
-    isError,
+    isLoading: isFetching,
+    isError: isFetchError,
+    isSubmitting: isCreating || isEditing || form.formState.isSubmitting,
+    submitFeedback,
   };
 }
