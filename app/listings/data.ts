@@ -1,5 +1,6 @@
 import type { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import type { ListingSummary } from "@/shared/schemas/listings";
+import { MOCK_LISTING_ID_PRIMARY, MOCK_LISTING_ID_SECONDARY } from "./mockListingIds";
 
 export interface ListingsDashboardData {
   listings: ListingSummary[];
@@ -8,7 +9,7 @@ export interface ListingsDashboardData {
 
 const MOCK_LISTINGS: ListingSummary[] = [
   {
-    id: "11111111-1111-4111-8111-111111111111",
+    id: MOCK_LISTING_ID_PRIMARY,
     title: "Sunny Downtown Loft",
     price: 2350,
     address: "123 Main St",
@@ -33,7 +34,7 @@ const MOCK_LISTINGS: ListingSummary[] = [
     ],
   },
   {
-    id: "22222222-2222-4222-8222-222222222222",
+    id: MOCK_LISTING_ID_SECONDARY,
     title: "Cozy Suburb Apartment",
     price: 145000,
     address: "456 King St N",
