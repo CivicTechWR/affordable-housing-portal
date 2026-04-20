@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { positiveIntegerQueryParamSchema, positiveIntegerQueryParamWithMaxSchema } from "./common";
 
 const nonEmptyString = z.string().trim().min(1);
 const accountIdSchema = z.uuid("Invalid account id.");
@@ -23,14 +24,8 @@ export const accountParamsSchema = z.object({
 });
 
 export const accountQuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .optional(),
-  limit: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .optional(),
+  page: positiveIntegerQueryParamSchema.optional(),
+  limit: positiveIntegerQueryParamWithMaxSchema(100).optional(),
   role: accountRoleSchema.optional(),
   status: accountStatusSchema.optional(),
   search: nonEmptyString.optional(),

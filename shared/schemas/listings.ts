@@ -5,6 +5,7 @@ import {
   trimmedEmailString,
   trimmedUrlString,
 } from "@/shared/schemas/string-normalizers";
+import { positiveIntegerQueryParamSchema, positiveIntegerQueryParamWithMaxSchema } from "./common";
 
 const nonEmptyString = requiredTrimmedString();
 const listingStatusSchema = z.enum(["draft", "published", "archived"]);
@@ -16,18 +17,15 @@ export const listingParamsSchema = z.object({
 });
 
 export const listingQuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .optional(),
-  limit: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .optional(),
+  page: positiveIntegerQueryParamSchema.optional(),
+  limit: positiveIntegerQueryParamWithMaxSchema(100).optional(),
   status: listingStatusSchema.optional(),
   neighborhood: optionalTrimmedString(),
   bedrooms: z.string().regex(/^\d+$/).optional(),
-  maxRent: z.string().regex(/^\d+$/).optional(),
+  maxRent: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
   accessibility: z.enum(["true", "false"]).optional(),
   search: optionalTrimmedString(),
 });
@@ -87,8 +85,8 @@ export const listingSummarySchema = z.object({
   baths: z.number().min(0),
   sqft: z.number().int().min(0),
   accessibilityFeatures: z.array(listingFeatureSchema).optional(),
-  lat: z.number(),
-  lng: z.number(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
   imageUrl: listingImageUrlSchema.optional(),
   timeAgo: nonEmptyString,
 });

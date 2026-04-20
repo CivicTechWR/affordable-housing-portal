@@ -1,7 +1,7 @@
-import { TypedNextResponse } from "next-rest-framework";
+import { TypedNextResponse, type TypedNextRequest } from "next-rest-framework";
 
 import { db } from "@/db";
-import { listingImages, listings, properties, type ListingStatus } from "@/db/schema";
+import { listingImages, listings, properties } from "@/db/schema";
 import { getOptionalSession, requireListingWriteSession } from "@/lib/auth/session";
 import { readListings, toListingReadContext } from "@/lib/listings/queries";
 import {
@@ -14,47 +14,38 @@ import type {
   CreateListingInput,
   CreateListingResponse,
   ListingListResponse,
+  ListingQuery,
 } from "@/shared/schemas/listings";
+import { listingQuerySchema } from "@/shared/schemas/listings";
 
-export async function getListingsHandler(request: Request) {
-  const { searchParams } = new URL(request.url);
-
-  const page = Number(searchParams.get("page") ?? 1);
-  const limit = Number(searchParams.get("limit") ?? 20);
-  const statusValue = searchParams.get("status");
-  const status: ListingStatus | null =
-    statusValue === "draft" || statusValue === "published" || statusValue === "archived"
-      ? statusValue
-      : null;
-  const neighborhood = searchParams.get("neighborhood");
-  const bedroomsValue = searchParams.get("bedrooms");
-  const bedrooms = bedroomsValue ? Number(bedroomsValue) : null;
-  const maxRent = searchParams.get("maxRent");
-  const accessibility = searchParams.get("accessibility") ?? undefined;
-  const search = searchParams.get("search");
+export async function getListingsHandler(
+  request: TypedNextRequest<"GET", string, unknown, ListingQuery>,
+) {
+  const query = listingQuerySchema.parse(Object.fromEntries(request.nextUrl.searchParams));
 
   const optionalSession =
-    status === "draft" || status === "archived"
+    query.status === "draft" || query.status === "archived"
       ? await getOptionalSession()
       : { session: null, authzUser: null };
 
   const payload = await readListings({
-    page,
-    limit,
-    status,
-    neighborhood,
-    bedrooms,
-    maxRent,
-    accessibility:
-      accessibility === "true" || accessibility === "false" ? accessibility : undefined,
-    search,
+    page: query.page ? Number(query.page) : 1,
+    limit: query.limit ? Number(query.limit) : 20,
+    status: query.status ?? null,
+    neighborhood: query.neighborhood ?? null,
+    bedrooms: query.bedrooms ? Number(query.bedrooms) : null,
+    maxRent: query.maxRent ?? null,
+    accessibility: query.accessibility,
+    search: query.search ?? null,
     auth: toListingReadContext(optionalSession),
   });
 
   return TypedNextResponse.json<ListingListResponse, 200, "application/json">(payload);
 }
 
-export async function createListingHandler(request: Request) {
+export async function createListingHandler(
+  request: TypedNextRequest<"POST", "application/json", CreateListingInput>,
+) {
   const sessionResult = await requireListingWriteSession();
 
   if (sessionResult.response) {
@@ -62,7 +53,7 @@ export async function createListingHandler(request: Request) {
   }
 
   const { session } = sessionResult;
-  const body = (await request.json()) as CreateListingInput;
+  const body = await request.json();
   const primaryUnit = body.units[0];
 
   if (!primaryUnit) {
@@ -70,6 +61,11 @@ export async function createListingHandler(request: Request) {
       { message: "At least one unit is required" },
       { status: 400 },
     );
+  }
+  const primaryUnitRentCents = dollarsToCents(primaryUnit.rent);
+
+  if (primaryUnitRentCents === null) {
+    throw new Error("Primary unit rent is required.");
   }
 
   const statusTimestamps = resolveListingStatusTimestamps(body.status);
@@ -115,7 +111,7 @@ export async function createListingHandler(request: Request) {
         bedrooms: primaryUnit.bedrooms,
         bathrooms: primaryUnit.bathrooms,
         squareFeet: primaryUnit.sqft,
-        monthlyRentCents: primaryUnit.rent * 100,
+        monthlyRentCents: primaryUnitRentCents,
         availableOn: primaryUnit.availableDate,
         maxIncomeCents: dollarsToCents(body.eligibilityCriteria.maxIncome),
         applicationUrl:

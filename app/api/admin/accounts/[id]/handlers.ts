@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { TypedNextResponse } from "next-rest-framework";
+import { TypedNextResponse, type TypedNextRequest } from "next-rest-framework";
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -17,7 +17,7 @@ type AccountByIdRouteContext = {
 };
 
 export async function getAccountByIdHandler(
-  _request: Request,
+  _request: TypedNextRequest<"GET">,
   { params }: AccountByIdRouteContext,
 ) {
   const { response } = await requireAdminSession();
@@ -65,7 +65,7 @@ export async function getAccountByIdHandler(
 }
 
 export async function updateAccountByIdHandler(
-  request: Request,
+  request: TypedNextRequest<"PUT", "application/json", UpdateAccountInput>,
   { params }: AccountByIdRouteContext,
 ) {
   const sessionResult = await requireAdminSession();
@@ -75,7 +75,7 @@ export async function updateAccountByIdHandler(
     return response;
   }
 
-  const body = (await request.json()) as UpdateAccountInput;
+  const body = await request.json();
   const [targetUser] = await db
     .select({
       id: users.id,
@@ -134,7 +134,7 @@ export async function updateAccountByIdHandler(
 }
 
 export async function deactivateAccountByIdHandler(
-  _request: Request,
+  _request: TypedNextRequest<"DELETE">,
   { params }: AccountByIdRouteContext,
 ) {
   const sessionResult = await requireAdminSession();

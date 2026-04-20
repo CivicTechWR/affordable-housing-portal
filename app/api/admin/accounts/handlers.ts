@@ -1,39 +1,43 @@
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
-import { TypedNextResponse } from "next-rest-framework";
+import { TypedNextResponse, type TypedNextRequest } from "next-rest-framework";
 
 import { db } from "@/db";
-import { users, type UserRole, type UserStatus } from "@/db/schema";
+import { users } from "@/db/schema";
 import { createInvite } from "@/lib/auth/invite-service";
 import { requireAdminSession } from "@/lib/auth/session";
+import { accountQuerySchema } from "@/shared/schemas/account-management";
 import type {
+  AccountQuery,
   AccountListResponse,
   CreateAccountInviteInput,
   CreateAccountResponse,
 } from "@/shared/schemas/account-management";
 
-export async function getAccountsHandler(request: Request) {
+export async function getAccountsHandler(
+  request: TypedNextRequest<"GET", string, unknown, AccountQuery>,
+) {
   const sessionResult = await requireAdminSession();
 
   if (sessionResult.response) {
     return sessionResult.response;
   }
 
-  const { searchParams } = new URL(request.url);
-  const page = Number(searchParams.get("page") ?? 1);
-  const limit = Number(searchParams.get("limit") ?? 20);
-  const role = searchParams.get("role");
-  const status = searchParams.get("status");
-  const search = searchParams.get("search");
+  const query = accountQuerySchema.parse(Object.fromEntries(request.nextUrl.searchParams));
+  const page = query.page ? Number(query.page) : 1;
+  const limit = query.limit ? Number(query.limit) : 20;
+  const role = query.role;
+  const status = query.status;
+  const search = query.search;
   const offset = (page - 1) * limit;
 
   const filters = [];
 
   if (role) {
-    filters.push(eq(users.role, role as UserRole));
+    filters.push(eq(users.role, role));
   }
 
   if (status) {
-    filters.push(eq(users.status, status as UserStatus));
+    filters.push(eq(users.status, status));
   }
 
   if (search) {
@@ -87,7 +91,9 @@ export async function getAccountsHandler(request: Request) {
   });
 }
 
-export async function createAccountHandler(request: Request) {
+export async function createAccountHandler(
+  request: TypedNextRequest<"POST", "application/json", CreateAccountInviteInput>,
+) {
   const sessionResult = await requireAdminSession();
 
   if (sessionResult.response) {
@@ -96,7 +102,7 @@ export async function createAccountHandler(request: Request) {
 
   const { session } = sessionResult;
 
-  const body = (await request.json()) as CreateAccountInviteInput;
+  const body = await request.json();
   const invite = await createInvite({
     email: body.email,
     fullName: body.name,

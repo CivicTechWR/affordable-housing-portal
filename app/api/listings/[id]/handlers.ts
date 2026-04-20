@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { TypedNextResponse } from "next-rest-framework";
+import { TypedNextResponse, type TypedNextRequest } from "next-rest-framework";
 
 import { db } from "@/db";
 import { listingImages, listings, properties } from "@/db/schema";
@@ -32,7 +32,7 @@ type ListingByIdRouteContext = {
 };
 
 export async function getListingByIdHandler(
-  _request: Request,
+  _request: TypedNextRequest<"GET">,
   { params }: ListingByIdRouteContext,
 ) {
   const optionalSession = await getOptionalSession();
@@ -54,7 +54,7 @@ export async function getListingByIdHandler(
 }
 
 export async function updateListingByIdHandler(
-  request: Request,
+  request: TypedNextRequest<"PUT", "application/json", UpdateListingInput>,
   { params }: ListingByIdRouteContext,
 ) {
   const ownership = await requireOwnedListingForWrite(params.id);
@@ -63,7 +63,7 @@ export async function updateListingByIdHandler(
     return ownership.response;
   }
 
-  const body = (await request.json()) as UpdateListingInput;
+  const body = await request.json();
   const { session, listing } = ownership;
 
   const nextCustomFields = mergeListingCustomFields(listing.customFields, body);
@@ -174,7 +174,7 @@ export async function updateListingByIdHandler(
 }
 
 export async function deleteListingByIdHandler(
-  _request: Request,
+  _request: TypedNextRequest<"DELETE">,
   { params }: ListingByIdRouteContext,
 ) {
   const ownership = await requireOwnedListingForWrite(params.id);
