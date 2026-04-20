@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
-    return Response.json({ message: "Missing file upload" }, { status: 400 });
+    return Response.json({ message: "Missing image file upload" }, { status: 400 });
   }
 
   if (!file.type.startsWith("image/")) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   return Response.json(
     {
-      message: "Mock upload successful",
+      message: "Mock image upload successful",
       data: {
         url: createMockImageUrl(file.name),
         fileName: file.name,
