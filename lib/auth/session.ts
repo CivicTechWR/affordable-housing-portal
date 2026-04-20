@@ -24,20 +24,42 @@ type SessionGuardResult =
       authzUser: AuthorizedUser;
     };
 
-export async function requireSession() {
-  const session = await auth();
+type OptionalSessionResult = {
+  session: AuthSession | null;
+  authzUser: AuthorizedUser | null;
+};
+
+export async function getOptionalSession(
+  preloadedSession?: Awaited<ReturnType<typeof auth>> | null,
+) {
+  const session = preloadedSession ?? (await auth());
 
   if (!session?.user?.id) {
     return {
-      response: NextResponse.json<SessionErrorBody>({ message: "Unauthorized" }, { status: 401 }),
       session: null,
       authzUser: null,
-    } satisfies SessionGuardResult;
+    } satisfies OptionalSessionResult;
   }
 
   const authzUser = await getUserForSession(session.user.id);
 
   if (!authzUser || !isUserAllowedToSignIn(authzUser.status)) {
+    return {
+      session: null,
+      authzUser: null,
+    } satisfies OptionalSessionResult;
+  }
+
+  return {
+    session,
+    authzUser,
+  } satisfies OptionalSessionResult;
+}
+
+export async function requireSession() {
+  const optionalSession = await getOptionalSession();
+
+  if (!optionalSession.session || !optionalSession.authzUser) {
     return {
       response: NextResponse.json<SessionErrorBody>({ message: "Unauthorized" }, { status: 401 }),
       session: null,
@@ -47,8 +69,8 @@ export async function requireSession() {
 
   return {
     response: null,
-    session,
-    authzUser,
+    session: optionalSession.session,
+    authzUser: optionalSession.authzUser,
   } satisfies SessionGuardResult;
 }
 

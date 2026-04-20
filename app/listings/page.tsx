@@ -1,16 +1,25 @@
-// app/listings/page.tsx
-// types/listings.ts
+import { connection } from "next/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { readListings } from "@/lib/listings/queries";
+
 import ListingsDashboard from "./listings";
-import ListingsSkeleton from "@/components/listings-skeleton/ListingsSkeleton";
-import { Suspense } from "react";
+
+async function getListings() {
+  await connection();
+
+  const payload = await readListings({
+    limit: 50,
+  });
+
+  return payload.data;
+}
 
 export default async function ListingsPage() {
+  const listings = await getListings();
+
   return (
     <NuqsAdapter>
-      <Suspense fallback={<ListingsSkeleton />}>
-        <ListingsDashboard />
-      </Suspense>
+      <ListingsDashboard initialListings={listings} />
     </NuqsAdapter>
   );
 }

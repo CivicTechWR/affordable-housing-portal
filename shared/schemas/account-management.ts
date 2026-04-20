@@ -40,6 +40,7 @@ export const createAccountInviteSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email("Invalid email address.")),
   name: nonEmptyString,
   role: accountRoleSchema,
+  organization: z.string().trim().nullable().optional(),
   sendInviteEmail: z.boolean().optional(),
 });
 
@@ -56,7 +57,6 @@ const accountResponseDataSchema = z.object({
   role: accountRoleSchema.nullable(),
   organization: z.string().nullable(),
   status: accountStatusSchema.nullable(),
-  listingsCount: z.number().int().min(0),
   lastLoginAt: z.string().nullable(),
   createdAt: z.string().nullable(),
   updatedAt: z.string().nullable(),
@@ -78,6 +78,7 @@ export const createAccountResponseSchema = z.object({
     email: z.email(),
     name: nonEmptyString,
     role: accountRoleSchema,
+    organization: z.string().nullable().optional(),
     inviteUrl: z.url(),
   }),
 });

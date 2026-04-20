@@ -12,10 +12,17 @@ const DEFAULT_VIEW = { longitude: -80.52, latitude: 43.46, zoom: 12 } as const;
 
 export function MapView({ listings }: { listings: Listing[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const mappableListings = useMemo(
+    () =>
+      listings.filter((listing): listing is Listing & { lat: number; lng: number } =>
+        hasCoordinates(listing),
+      ),
+    [listings],
+  );
 
   const selectedListing = useMemo(
-    () => listings.find((l) => l.id === selectedId) ?? null,
-    [listings, selectedId],
+    () => mappableListings.find((l) => l.id === selectedId) ?? null,
+    [mappableListings, selectedId],
   );
 
   const handleMarkerClick = useCallback((id: string) => {
@@ -30,7 +37,7 @@ export function MapView({ listings }: { listings: Listing[] }) {
         style={{ width: "100%", height: "100%" }}
         scrollZoom={true}
       >
-        {listings.map((listing) => (
+        {mappableListings.map((listing) => (
           <Marker
             key={listing.id}
             longitude={listing.lng}
@@ -87,4 +94,8 @@ export function MapView({ listings }: { listings: Listing[] }) {
       </Map>
     </div>
   );
+}
+
+function hasCoordinates(listing: Listing): listing is Listing & { lat: number; lng: number } {
+  return typeof listing.lat === "number" && typeof listing.lng === "number";
 }
