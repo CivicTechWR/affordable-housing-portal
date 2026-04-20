@@ -21,7 +21,10 @@ export const listingQuerySchema = z.object({
   status: listingStatusSchema.optional(),
   neighborhood: nonEmptyString.optional(),
   bedrooms: z.string().regex(/^\d+$/).optional(),
-  maxRent: z.string().regex(/^\d+$/).optional(),
+  maxRent: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
   accessibility: z.enum(["true", "false"]).optional(),
   search: nonEmptyString.optional(),
 });
@@ -41,6 +44,14 @@ export const listingImageSchema = z.object({
   caption: nonEmptyString,
 });
 
+const listingUnitSchema = z.object({
+  bedrooms: z.number().int().min(0),
+  bathrooms: z.number().min(0),
+  sqft: z.number().int().min(0),
+  rent: z.number().int().min(0),
+  availableDate: z.iso.date(),
+});
+
 const listingImageUrlSchema = z.url("Invalid image URL.");
 
 export const listingDetailsSchema = z.object({
@@ -48,9 +59,11 @@ export const listingDetailsSchema = z.object({
   price: z.number().min(0),
   address: nonEmptyString,
   city: nonEmptyString,
+  description: z.string().nullable().optional(),
   beds: z.number().int().min(0),
   baths: z.number().min(0),
   sqft: z.number().int().min(0),
+  units: z.array(listingUnitSchema),
   images: z.array(listingImageSchema),
   timeAgo: nonEmptyString,
   features: z.array(listingFeatureCategorySchema),
@@ -64,8 +77,8 @@ export const listingSummarySchema = z.object({
   beds: z.number().int().min(0),
   baths: z.number().min(0),
   sqft: z.number().int().min(0),
-  lat: z.number(),
-  lng: z.number(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
   imageUrl: listingImageUrlSchema.optional(),
   timeAgo: nonEmptyString,
 });
@@ -75,14 +88,9 @@ const listingAddressSchema = z.object({
   city: nonEmptyString,
   province: nonEmptyString,
   postalCode: nonEmptyString,
-});
-
-const listingUnitSchema = z.object({
-  bedrooms: z.number().int().min(0),
-  bathrooms: z.number().min(0),
-  sqft: z.number().int().min(0),
-  rent: z.number().int().min(0),
-  availableDate: z.iso.date(),
+  neighborhood: nonEmptyString.optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
 const listingEligibilityCriteriaSchema = z.object({
@@ -90,6 +98,12 @@ const listingEligibilityCriteriaSchema = z.object({
   minAge: z.number().int().min(0).optional(),
   housingType: nonEmptyString.optional(),
 });
+const updateListingEligibilityCriteriaSchema = z.object({
+  maxIncome: z.number().int().min(0).nullable().optional(),
+  minAge: z.number().int().min(0).nullable().optional(),
+  housingType: nonEmptyString.nullable().optional(),
+});
+const listingUnitUpdateSchema = listingUnitSchema.partial().nullable();
 
 const listingContactSchema = z.object({
   name: nonEmptyString,
@@ -112,12 +126,12 @@ const updateListingPayloadSchema = z.object({
   name: nonEmptyString.optional(),
   description: nonEmptyString.optional(),
   address: listingAddressSchema.partial().optional(),
-  units: z.array(listingUnitSchema.partial()).min(1, "At least one unit is required.").optional(),
+  units: z.array(listingUnitUpdateSchema).min(1, "At least one unit is required.").optional(),
   amenities: z.array(nonEmptyString).optional(),
   accessibilityFeatures: z.array(nonEmptyString).optional(),
   applicationMethod: listingApplicationMethodSchema.optional(),
-  externalApplicationUrl: listingExternalApplicationUrlSchema.optional(),
-  eligibilityCriteria: listingEligibilityCriteriaSchema.partial().optional(),
+  externalApplicationUrl: listingExternalApplicationUrlSchema.nullable().optional(),
+  eligibilityCriteria: updateListingEligibilityCriteriaSchema.optional(),
   images: z.array(listingImageUrlSchema).optional(),
   contact: listingContactSchema.partial().optional(),
   status: listingStatusSchema.optional(),
@@ -185,7 +199,7 @@ export const updateListingSchema = updateListingPayloadSchema.superRefine((value
 
   if (value.units) {
     value.units.forEach((unit, index) => {
-      if (!hasAtLeastOneField(unit)) {
+      if (unit !== null && !hasAtLeastOneField(unit)) {
         context.addIssue({
           code: "custom",
           message: "Each unit update must include at least one field.",
@@ -193,6 +207,14 @@ export const updateListingSchema = updateListingPayloadSchema.superRefine((value
         });
       }
     });
+
+    if (value.units.every((unit) => unit === null)) {
+      context.addIssue({
+        code: "custom",
+        message: "At least one unit is required.",
+        path: ["units"],
+      });
+    }
   }
 
   if (value.applicationMethod === "external_link" && !value.externalApplicationUrl) {

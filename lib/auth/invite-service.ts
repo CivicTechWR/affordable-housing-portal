@@ -15,6 +15,7 @@ export async function createInvite(params: {
   email: string;
   fullName: string;
   role: UserRole;
+  organization?: string | null;
   invitedByUserId: string;
   sendInviteEmail?: boolean;
 }) {
@@ -31,6 +32,11 @@ export async function createInvite(params: {
       .where(eq(users.email, normalizedEmail))
       .limit(1);
 
+    const organization =
+      params.organization === undefined
+        ? (existingUser?.organization ?? null)
+        : params.organization;
+
     const userId = existingUser?.id ?? randomUUID();
 
     if (existingUser) {
@@ -38,6 +44,7 @@ export async function createInvite(params: {
         .update(users)
         .set({
           fullName: params.fullName,
+          organization,
           role: params.role,
           status: existingUser.passwordHash ? existingUser.status : "invited",
         })
@@ -47,6 +54,7 @@ export async function createInvite(params: {
         id: userId,
         email: normalizedEmail,
         fullName: params.fullName,
+        organization,
         role: params.role,
         status: "invited",
       });
@@ -85,6 +93,7 @@ export async function createInvite(params: {
       invite,
       userId,
       email: normalizedEmail,
+      organization,
     };
   });
 

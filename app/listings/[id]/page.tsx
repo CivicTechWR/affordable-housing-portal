@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { getOptionalSession } from "@/lib/auth/session";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ListingImageCarousel } from "@/components/listing-image-carousel/ListingImageCarousel";
@@ -14,6 +15,10 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
   const requestHeaders = await headers();
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
+  const cookieHeader = requestHeaders.get("cookie");
+  const optionalSession = await getOptionalSession();
+  const shouldForwardPreviewSession =
+    optionalSession.authzUser?.role === "admin" || optionalSession.authzUser?.role === "partner";
 
   if (!host) {
     notFound();
@@ -21,6 +26,8 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
 
   const response = await fetch(`${protocol}://${host}/api/listings/${id}`, {
     cache: "no-store",
+    // Writers can preview non-public listings through the same details page.
+    headers: shouldForwardPreviewSession && cookieHeader ? { cookie: cookieHeader } : undefined,
   });
 
   if (response.status === 404) {
@@ -47,6 +54,7 @@ export default async function ListingDetailsPage({ params }: Readonly<PageProps>
     { label: "Square Feet", value: `${details.sqft.toLocaleString()} sqft` },
     { label: "Posted", value: details.timeAgo },
   ];
+  const additionalUnits = details.units.slice(1);
 
   return (
     <main className="min-h-screen bg-muted/30 px-4 py-8 sm:px-6 lg:px-8">
@@ -83,6 +91,43 @@ export default async function ListingDetailsPage({ params }: Readonly<PageProps>
             </dl>
           </CardContent>
         </Card>
+
+        {additionalUnits.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Additional Units</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {additionalUnits.map((unit, index) => (
+                <div
+                  key={`${unit.availableDate}-${index}`}
+                  className="rounded-md border border-border bg-background p-3"
+                >
+                  <p className="text-sm font-medium text-foreground">
+                    ${unit.rent.toLocaleString()} · {unit.bedrooms} bed · {unit.bathrooms} bath ·{" "}
+                    {unit.sqft.toLocaleString()} sqft
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Available {unit.availableDate}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {details.description && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Description</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="whitespace-pre-wrap text-sm leading-6 text-foreground">
+                {details.description}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>

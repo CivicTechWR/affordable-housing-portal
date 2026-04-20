@@ -6,6 +6,7 @@ import { userRoleEnum, userStatusEnum, type UserRole, type UserStatus } from "@/
 import {
   ensureBootstrapAdmin,
   getUserForAuth,
+  getUserForSession,
   isUserAllowedToSignIn,
   recordSuccessfulLogin,
 } from "@/lib/auth/user-store";
@@ -85,10 +86,19 @@ const authConfig = {
 
       return session;
     },
-    authorized({ auth: currentAuth, request }) {
+    async authorized({ auth: currentAuth, request }) {
       const pathname = request.nextUrl.pathname;
-      const isActiveUser =
-        currentAuth?.user?.status !== undefined && isUserAllowedToSignIn(currentAuth.user.status);
+
+      if (!currentAuth?.user?.id) {
+        return !(
+          pathname.startsWith("/api/admin") ||
+          pathname.startsWith("/admin") ||
+          (pathname.startsWith("/api/listings") && request.method !== "GET")
+        );
+      }
+
+      const authzUser = await getUserForSession(currentAuth.user.id);
+      const isActiveUser = authzUser ? isUserAllowedToSignIn(authzUser.status) : false;
 
       if (
         !pathname.startsWith("/api/admin") &&
@@ -99,13 +109,11 @@ const authConfig = {
       }
 
       if (pathname.startsWith("/api/admin") || pathname.startsWith("/admin")) {
-        return isActiveUser && currentAuth.user.role === "admin";
+        return isActiveUser && authzUser?.role === "admin";
       }
 
       if (pathname.startsWith("/api/listings") && request.method !== "GET") {
-        return (
-          isActiveUser && (currentAuth.user.role === "admin" || currentAuth.user.role === "partner")
-        );
+        return isActiveUser && (authzUser?.role === "admin" || authzUser?.role === "partner");
       }
 
       return true;
