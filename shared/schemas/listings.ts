@@ -96,6 +96,9 @@ const listingAddressSchema = z.object({
   city: nonEmptyString,
   province: nonEmptyString,
   postalCode: nonEmptyString,
+  neighborhood: nonEmptyString.optional(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
 });
 
 const listingUnitSchema = z.object({

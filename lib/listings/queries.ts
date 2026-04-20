@@ -21,7 +21,6 @@ import {
   getEnabledBooleanCustomFieldKeys,
   getListingCoordinates,
   getListingSquareFeet,
-  getStoredUnits,
 } from "@/lib/listings/store";
 import type {
   ListingDetails,
@@ -255,6 +254,7 @@ export async function getListingRecordById(listingId: ListingIdParam) {
         ownerUserId: properties.ownerUserId,
         name: properties.name,
         street1: properties.street1,
+        street2: properties.street2,
         city: properties.city,
         province: properties.province,
         postalCode: properties.postalCode,
@@ -311,29 +311,33 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
 
   return {
     id: listing.id,
+    title: listing.title,
+    unitNumber: listing.unitNumber ?? undefined,
     price: centsToDollars(listing.monthlyRentCents),
-    address: formatListingAddress(listing.property.street1, listing.unitNumber),
-    city: listing.property.city,
-    description: listing.description,
+    address: {
+      street1: listing.property.street1,
+      street2: listing.property.street2 ?? undefined,
+      city: listing.property.city,
+      province: listing.property.province,
+      postalCode: listing.property.postalCode,
+    },
     beds: listing.bedrooms,
     baths: listing.bathrooms,
     sqft: getListingSquareFeet(listing.squareFeet, listing.customFields),
-    units: getStoredUnits(listing.customFields).map((unit) => ({
-      bedrooms: unit.bedrooms ?? listing.bedrooms,
-      bathrooms: unit.bathrooms ?? listing.bathrooms,
-      sqft: unit.sqft ?? getListingSquareFeet(listing.squareFeet, listing.customFields),
-      rent: unit.rent ?? centsToDollars(listing.monthlyRentCents),
-      availableDate:
-        unit.availableDate ??
-        listing.availableOn ??
-        new Date(listing.createdAt).toISOString().slice(0, 10),
-    })),
     images: imageRows.map((image) => ({
       url: image.imageUrl,
       caption: image.altText ?? `${listing.title} image`,
     })),
     timeAgo: formatListingTimeAgo(listing.publishedAt, listing.createdAt),
     features: buildListingFeatureCategories(listing.customFields, featureDefinitions),
+    contact:
+      listing.property.contactName && listing.property.contactEmail && listing.property.contactPhone
+        ? {
+            name: listing.property.contactName,
+            email: listing.property.contactEmail,
+            phone: listing.property.contactPhone,
+          }
+        : undefined,
   };
 }
 
