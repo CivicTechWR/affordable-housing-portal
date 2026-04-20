@@ -48,7 +48,7 @@ export const { GET, POST } = route({
       const neighborhood = searchParams.get("neighborhood");
       const bedrooms = searchParams.get("bedrooms");
       const maxRent = searchParams.get("maxRent");
-      const accessibility = searchParams.get("accessibility");
+      const accessibility = searchParams.get("accessibility") ?? undefined;
       const search = searchParams.get("search");
 
       const visibility = getListingListVisibility(optionalSession, status);
