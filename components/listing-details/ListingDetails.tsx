@@ -28,6 +28,9 @@ export interface ListingDetailProps {
   beds: number;
   baths: number;
   sqft: number;
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
   images: ListingImage[];
   timeAgo: string;
   features: ListingFeatureCategory[];
@@ -41,6 +44,9 @@ export function ListingDetails({
   beds,
   baths,
   sqft,
+  contactName,
+  contactEmail,
+  contactPhone,
   images,
   timeAgo,
   features,
@@ -60,6 +66,22 @@ export function ListingDetails({
     { label: "Square Feet", value: `${sqft.toLocaleString()} sqft` },
     { label: "Posted", value: timeAgo },
   ];
+  const contactRows = [
+    {
+      label: "Name",
+      value: contactName?.trim(),
+    },
+    {
+      label: "Email",
+      value: contactEmail?.trim(),
+      href: contactEmail ? `mailto:${contactEmail}` : undefined,
+    },
+    {
+      label: "Phone",
+      value: contactPhone?.trim(),
+      href: contactPhone ? `tel:${contactPhone}` : undefined,
+    },
+  ].filter((row): row is { label: string; value: string; href?: string } => Boolean(row.value));
 
   const wrapperClasses = embedded ? "w-full" : "min-h-screen bg-muted/30 px-4 py-8 sm:px-6 lg:px-8";
   const contentClasses = embedded
@@ -125,6 +147,34 @@ export function ListingDetails({
             ))}
           </CardContent>
         </Card>
+
+        {contactRows.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact Info</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {contactRows.map((row) => (
+                  <div key={row.label} className="bg-background p-3">
+                    <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {row.label}
+                    </dt>
+                    <dd className="mt-1 text-sm font-medium text-foreground">
+                      {row.href ? (
+                        <a href={row.href} className="hover:underline">
+                          {row.value}
+                        </a>
+                      ) : (
+                        row.value
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </main>
   );

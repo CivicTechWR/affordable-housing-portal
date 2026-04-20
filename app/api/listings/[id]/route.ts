@@ -57,6 +57,11 @@ const details: ListingDetails = {
       ],
     },
   ],
+  contact: {
+    name: "Leasing Office",
+    email: "leasing@mainstreetrentals.ca",
+    phone: "519-555-0199",
+  },
 };
 
 export const { GET, PUT, DELETE } = route({

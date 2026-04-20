@@ -49,6 +49,11 @@ const listingDetailsAddressSchema = z.object({
   province: nonEmptyString,
   postalCode: nonEmptyString,
 });
+const listingContactSchema = z.object({
+  name: nonEmptyString,
+  email: z.email("Invalid contact email."),
+  phone: nonEmptyString,
+});
 
 export const listingDetailsSchema = z.object({
   id: listingIdParamSchema,
@@ -63,6 +68,7 @@ export const listingDetailsSchema = z.object({
   images: z.array(listingImageSchema),
   timeAgo: nonEmptyString,
   features: z.array(listingFeatureCategorySchema),
+  contact: listingContactSchema.optional(),
 });
 
 export const listingSummarySchema = z.object({
@@ -100,12 +106,6 @@ const listingEligibilityCriteriaSchema = z.object({
   maxIncome: z.number().int().min(0).optional(),
   minAge: z.number().int().min(0).optional(),
   housingType: nonEmptyString.optional(),
-});
-
-const listingContactSchema = z.object({
-  name: nonEmptyString,
-  email: z.email("Invalid contact email."),
-  phone: nonEmptyString,
 });
 
 const listingApplicationMethodSchema = z.enum(["internal", "external_link", "paper"]);

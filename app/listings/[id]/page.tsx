@@ -51,6 +51,9 @@ function mapListingDetailsToDisplay(details: ListingDetailsData): ListingDetailP
     images: details.images,
     timeAgo: details.timeAgo,
     features: details.features,
+    contactName: details.contact?.name,
+    contactEmail: details.contact?.email,
+    contactPhone: details.contact?.phone,
   };
 }
 
