@@ -14,7 +14,7 @@ import type { ListingSummary } from "@/shared/schemas/listings";
 import dynamic from "next/dynamic";
 
 const LazyMapView = dynamic<{ listings: ListingSummary[] }>(
-  () => import("../../components/map-view/MapView.js").then((mod) => mod.MapView),
+  () => import("../../components/map-view/MapView.tsx").then((mod) => mod.MapView),
   {
     ssr: false,
     loading: () => (
