@@ -1,6 +1,5 @@
 import { and, asc, desc, eq, ilike, inArray, lte, or, sql } from "drizzle-orm";
-import { NextResponse } from "next/server";
-import { route, routeOperation } from "next-rest-framework";
+import { route, routeOperation, TypedNextResponse } from "next-rest-framework";
 
 import { db } from "@/db";
 import { listingImages, listings, properties, type ListingStatus } from "@/db/schema";
@@ -25,19 +24,9 @@ import {
 } from "@/shared/schemas/listings";
 
 export const { GET, POST } = route({
-  getListings: routeOperation({
-    method: "GET",
-  })
-    .input({
-      query: listingQuerySchema,
-    })
-    .outputs([
-      {
-        status: 200,
-        contentType: "application/json",
-        body: listingListResponseSchema,
-      },
-    ])
+  getListings: routeOperation({ method: "GET" })
+    .input({ query: listingQuerySchema })
+    .outputs([{ status: 200, contentType: "application/json", body: listingListResponseSchema }])
     .handler(async (request) => {
       const { searchParams } = request.nextUrl;
 
@@ -58,7 +47,7 @@ export const { GET, POST } = route({
       const visibility = getListingListVisibility(optionalSession, status);
 
       if (!visibility.isAccessible) {
-        return NextResponse.json({
+        return TypedNextResponse.json({
           data: [],
           pagination: {
             page,
@@ -163,7 +152,7 @@ export const { GET, POST } = route({
         }
       }
 
-      return NextResponse.json({
+      return TypedNextResponse.json({
         data: pagedRows.map((row) => {
           const coordinates = getListingCoordinates(row.latitude, row.longitude);
           const listingSummary = {
@@ -197,34 +186,13 @@ export const { GET, POST } = route({
       });
     }),
 
-  createListing: routeOperation({
-    method: "POST",
-  })
-    .input({
-      contentType: "application/json",
-      body: createListingSchema,
-    })
+  createListing: routeOperation({ method: "POST" })
+    .input({ contentType: "application/json", body: createListingSchema })
     .outputs([
-      {
-        status: 201,
-        contentType: "application/json",
-        body: createListingResponseSchema,
-      },
-      {
-        status: 401,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 403,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 400,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
+      { status: 201, contentType: "application/json", body: createListingResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 400, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(async (request) => {
       const sessionResult = await requireListingWriteSession();
@@ -238,7 +206,10 @@ export const { GET, POST } = route({
       const primaryUnit = body.units[0];
 
       if (!primaryUnit) {
-        return NextResponse.json({ message: "At least one unit is required" }, { status: 400 });
+        return TypedNextResponse.json(
+          { message: "At least one unit is required" },
+          { status: 400 },
+        );
       }
 
       const statusTimestamps = resolveListingStatusTimestamps(body.status);
@@ -318,7 +289,7 @@ export const { GET, POST } = route({
         return listing;
       });
 
-      return NextResponse.json(
+      return TypedNextResponse.json(
         { message: "Listing created", data: { id: createdListing.id, ...body } },
         { status: 201 },
       );

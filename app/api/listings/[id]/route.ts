@@ -1,6 +1,5 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { NextResponse } from "next/server";
-import { route, routeOperation } from "next-rest-framework";
+import { route, routeOperation, TypedNextResponse } from "next-rest-framework";
 
 import { db } from "@/db";
 import {
@@ -37,78 +36,40 @@ import {
 } from "@/shared/schemas/listings";
 
 export const { GET, PUT, DELETE } = route({
-  getListingById: routeOperation({
-    method: "GET",
-  })
-    .input({
-      params: listingParamsSchema,
-    })
+  getListingById: routeOperation({ method: "GET" })
+    .input({ params: listingParamsSchema })
     .outputs([
-      {
-        status: 200,
-        contentType: "application/json",
-        body: listingByIdResponseSchema,
-      },
-      {
-        status: 404,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 400,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
+      { status: 200, contentType: "application/json", body: listingByIdResponseSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
+      { status: 400, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(async (_request, { params }) => {
       const optionalSession = await getOptionalSession();
       const listing = await getListingRecord(params.id);
 
       if (!listing || !canReadListing(listing, optionalSession)) {
-        return NextResponse.json({ message: "Listing not found" }, { status: 404 });
+        return TypedNextResponse.json({ message: "Listing not found" }, { status: 404 });
       }
 
       const details = await buildListingDetailsResponse(listing);
 
-      return NextResponse.json({
+      return TypedNextResponse.json({
         data: details,
       });
     }),
 
-  updateListingById: routeOperation({
-    method: "PUT",
-  })
+  updateListingById: routeOperation({ method: "PUT" })
     .input({
       params: listingParamsSchema,
       contentType: "application/json",
       body: updateListingSchema,
     })
     .outputs([
-      {
-        status: 200,
-        contentType: "application/json",
-        body: updateListingResponseSchema,
-      },
-      {
-        status: 401,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 403,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 404,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 400,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
+      { status: 200, contentType: "application/json", body: updateListingResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
+      { status: 400, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(async (request, { params }) => {
       const ownership = await requireOwnedListingForWrite(params.id);
@@ -146,7 +107,7 @@ export const { GET, PUT, DELETE } = route({
           : null;
 
       if (effectiveApplicationMethod === "external_link" && !nextApplicationUrl) {
-        return NextResponse.json(
+        return TypedNextResponse.json(
           {
             message:
               "External application URL is required when applicationMethod is external_link.",
@@ -223,39 +184,19 @@ export const { GET, PUT, DELETE } = route({
         }
       });
 
-      return NextResponse.json({
+      return TypedNextResponse.json({
         message: "Listing updated",
         data: { id: params.id, ...body },
       });
     }),
 
-  deleteListingById: routeOperation({
-    method: "DELETE",
-  })
-    .input({
-      params: listingParamsSchema,
-    })
+  deleteListingById: routeOperation({ method: "DELETE" })
+    .input({ params: listingParamsSchema })
     .outputs([
-      {
-        status: 200,
-        contentType: "application/json",
-        body: deleteListingResponseSchema,
-      },
-      {
-        status: 401,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 403,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
-      {
-        status: 404,
-        contentType: "application/json",
-        body: errorMessageSchema,
-      },
+      { status: 200, contentType: "application/json", body: deleteListingResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(async (_request, { params }) => {
       const ownership = await requireOwnedListingForWrite(params.id);
@@ -274,7 +215,7 @@ export const { GET, PUT, DELETE } = route({
         })
         .where(eq(listings.id, params.id));
 
-      return NextResponse.json({
+      return TypedNextResponse.json({
         message: "Listing deleted",
         data: { id: params.id },
       });
@@ -427,7 +368,7 @@ async function requireOwnedListingForWrite(listingId: ListingIdParam) {
 
   if (!listing) {
     return {
-      response: NextResponse.json<{ message: string }>(
+      response: TypedNextResponse.json<{ message: string }, 404, "application/json">(
         { message: "Listing not found" },
         { status: 404 },
       ),
@@ -441,7 +382,10 @@ async function requireOwnedListingForWrite(listingId: ListingIdParam) {
     listing.property.ownerUserId !== sessionResult.session.user.id
   ) {
     return {
-      response: NextResponse.json<{ message: string }>({ message: "Forbidden" }, { status: 403 }),
+      response: TypedNextResponse.json<{ message: string }, 403, "application/json">(
+        { message: "Forbidden" },
+        { status: 403 },
+      ),
       session: null,
       listing: null,
     };
