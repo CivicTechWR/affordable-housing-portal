@@ -1,6 +1,12 @@
 import { z } from "zod";
+import {
+  optionalTrimmedString,
+  requiredTrimmedString,
+  trimmedEmailString,
+  trimmedUrlString,
+} from "@/shared/schemas/string-normalizers";
 
-const nonEmptyString = z.string().trim().min(1);
+const nonEmptyString = requiredTrimmedString();
 const listingStatusSchema = z.enum(["draft", "published", "archived"]);
 const hasAtLeastOneField = (value: Record<string, unknown>) => Object.keys(value).length > 0;
 
@@ -19,11 +25,11 @@ export const listingQuerySchema = z.object({
     .regex(/^[1-9]\d*$/)
     .optional(),
   status: listingStatusSchema.optional(),
-  neighborhood: nonEmptyString.optional(),
+  neighborhood: optionalTrimmedString(),
   bedrooms: z.string().regex(/^\d+$/).optional(),
   maxRent: z.string().regex(/^\d+$/).optional(),
   accessibility: z.enum(["true", "false"]).optional(),
-  search: nonEmptyString.optional(),
+  search: optionalTrimmedString(),
 });
 
 export const listingFeatureSchema = z.object({
@@ -37,11 +43,11 @@ export const listingFeatureCategorySchema = z.object({
 });
 
 export const listingImageSchema = z.object({
-  url: z.url("Invalid listing image URL."),
+  url: trimmedUrlString("Invalid listing image URL."),
   caption: nonEmptyString,
 });
 
-const listingImageUrlSchema = z.url("Invalid image URL.");
+const listingImageUrlSchema = trimmedUrlString("Invalid image URL.");
 const listingDetailsAddressSchema = z.object({
   street1: nonEmptyString,
   street2: nonEmptyString.optional(),
@@ -51,7 +57,7 @@ const listingDetailsAddressSchema = z.object({
 });
 const listingContactSchema = z.object({
   name: nonEmptyString,
-  email: z.email("Invalid contact email."),
+  email: trimmedEmailString("Invalid contact email."),
   phone: nonEmptyString,
 });
 
@@ -109,10 +115,7 @@ const listingEligibilityCriteriaSchema = z.object({
 });
 
 const listingApplicationMethodSchema = z.enum(["internal", "external_link", "paper"]);
-const listingExternalApplicationUrlSchema = z
-  .string()
-  .trim()
-  .url("Invalid external application URL.");
+const listingExternalApplicationUrlSchema = trimmedUrlString("Invalid external application URL.");
 const listingPaginationSchema = z.object({
   page: z.number().int().min(1),
   limit: z.number().int().min(1),

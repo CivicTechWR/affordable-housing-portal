@@ -1,45 +1,49 @@
 import { z } from "zod";
 import type { Control, UseFormReturn } from "react-hook-form";
+import {
+  optionalTrimmedStringToUndefined,
+  requiredTrimmedString,
+} from "@/shared/schemas/string-normalizers";
 
 export const listingImageSchema = z.object({
   url: z.string().url("Image URL is invalid"),
-  caption: z.string(),
+  caption: z.string().trim(),
 });
 
 export const listingCustomFeatureSchema = z.object({
-  category: z.string().min(1, "Feature category is required"),
-  id: z.string().min(1, "Feature id is required"),
-  name: z.string().min(1, "Feature name is required"),
-  description: z.string().min(1, "Feature description is required"),
+  category: requiredTrimmedString("Feature category is required"),
+  id: requiredTrimmedString("Feature id is required"),
+  name: requiredTrimmedString("Feature name is required"),
+  description: requiredTrimmedString("Feature description is required"),
 });
 
 export const listingFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  propertyType: z.string().min(1, "Property type is required"),
-  buildingType: z.string().min(1, "Building type is required"),
+  title: requiredTrimmedString("Title is required"),
+  description: optionalTrimmedStringToUndefined(),
+  propertyType: requiredTrimmedString("Property type is required"),
+  buildingType: requiredTrimmedString("Building type is required"),
   unitStory: z.number().optional(),
   bedrooms: z.number({ message: "Bedrooms are required" }).min(0, "Invalid number of bedrooms"),
   bathrooms: z.number({ message: "Bathrooms are required" }).min(0, "Invalid number of bathrooms"),
   squareFeet: z.number().optional(),
   monthlyRentCents: z.number({ message: "Rent is required" }).min(0, "Rent cannot be negative"),
-  leaseTerm: z.string().min(1, "Lease term is required"),
+  leaseTerm: requiredTrimmedString("Lease term is required"),
   utilitiesIncluded: z.array(z.string()).default([]),
   images: z.array(listingImageSchema).default([]),
-  availableOn: z.string().optional(),
+  availableOn: optionalTrimmedStringToUndefined(),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
-  unitNumber: z.string().optional(),
+  unitNumber: optionalTrimmedStringToUndefined(),
 
   // Property Info
-  name: z.string().min(1, "Property name is required"),
-  street1: z.string().min(1, "Street address is required"),
-  street2: z.string().optional(),
-  city: z.string().min(1, "City is required"),
-  province: z.string().min(1, "Province is required"),
-  postalCode: z.string().min(1, "Postal code is required"),
-  contactName: z.string().min(1, "Contact name is required"),
-  contactEmail: z.string().email("Invalid email").min(1, "Contact email is required"),
-  contactPhone: z.string().min(1, "Contact phone is required"),
+  name: requiredTrimmedString("Property name is required"),
+  street1: requiredTrimmedString("Street address is required"),
+  street2: optionalTrimmedStringToUndefined(),
+  city: requiredTrimmedString("City is required"),
+  province: requiredTrimmedString("Province is required"),
+  postalCode: requiredTrimmedString("Postal code is required"),
+  contactName: requiredTrimmedString("Contact name is required"),
+  contactEmail: requiredTrimmedString("Contact email is required").email("Invalid email"),
+  contactPhone: requiredTrimmedString("Contact phone is required"),
 
   // Selected custom features (includes display data for preview/UI rendering)
   customFeatures: z.array(listingCustomFeatureSchema).default([]),

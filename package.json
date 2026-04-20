@@ -26,8 +26,8 @@
     "format:check": "oxfmt --check . -c .oxfmtrc.json",
     "prepare": "husky",
     "test": "jest",
-    "test:unit": "jest --testPathPattern=\\.unit\\.test\\.",
-    "test:integration": "jest --testPathPattern=\\.integration\\.test\\."
+    "test:unit": "jest --testPathPatterns=\\.unit\\.test\\.",
+    "test:integration": "jest --testPathPatterns=\\.integration\\.test\\."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
