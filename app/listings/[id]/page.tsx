@@ -16,15 +16,25 @@ async function getListingFromApi(id: string): Promise<ListingDetails> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
   const cookieHeader = requestHeaders.get("cookie");
+  const allowedHosts = new Set([
+    "localhost:3000",
+    "localhost:3100",
+    "localhost:3200",
+    "localhost:3201",
+  ]);
+  const trustedBaseUrl = process.env.NEXTAUTH_URL;
   const optionalSession = await getOptionalSession();
   const shouldForwardPreviewSession =
     optionalSession.authzUser?.role === "admin" || optionalSession.authzUser?.role === "partner";
 
-  if (!host) {
+  const baseUrl =
+    trustedBaseUrl || (host && allowedHosts.has(host) ? `${protocol}://${host}` : null);
+
+  if (!baseUrl) {
     notFound();
   }
 
-  const response = await fetch(`${protocol}://${host}/api/listings/${id}`, {
+  const response = await fetch(`${baseUrl}/api/listings/${id}`, {
     cache: "no-store",
     // Writers can preview non-public listings through the same details page.
     headers: shouldForwardPreviewSession && cookieHeader ? { cookie: cookieHeader } : undefined,

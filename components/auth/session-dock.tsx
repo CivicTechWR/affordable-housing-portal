@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { getOptionalSession } from "@/lib/auth/session";
 
 export async function SessionDock() {
-  const [rawSession, optionalSession] = await Promise.all([auth(), getOptionalSession()]);
+  const rawSession = await auth();
+  const optionalSession = await getOptionalSession(rawSession);
   const session = optionalSession.session;
 
   return (
