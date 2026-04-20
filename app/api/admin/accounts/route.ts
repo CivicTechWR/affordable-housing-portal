@@ -79,7 +79,7 @@ export const { GET, POST } = route({
       const offset = (page - 1) * limit;
 
       const totalRows = await db.select({ total: count() }).from(users).where(whereClause);
-      const total = totalRows[0]?.total ?? 0;
+      const total = Number(totalRows[0]?.total ?? 0);
 
       const rows = await db
         .select({
@@ -118,7 +118,7 @@ export const { GET, POST } = route({
           : [];
 
       const listingCountByUserId = new Map(
-        listingCounts.map((row) => [row.ownerUserId, row.total]),
+        listingCounts.map((row) => [row.ownerUserId, Number(row.total)]),
       );
 
       return NextResponse.json({

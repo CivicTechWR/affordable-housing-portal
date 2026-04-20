@@ -109,11 +109,11 @@ export const { GET, POST } = route({
       const offset = (page - 1) * limit;
 
       const totalRows = await db
-        .select({ total: sql<number>`count(*)` })
+        .select({ total: sql<number>`count(*)::int` })
         .from(listings)
         .innerJoin(properties, eq(listings.propertyId, properties.id))
         .where(whereClause);
-      const total = totalRows[0]?.total ?? 0;
+      const total = Number(totalRows[0]?.total ?? 0);
 
       const pagedRows = await db
         .select({
