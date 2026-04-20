@@ -50,10 +50,17 @@ export type CustomListingFieldOption = {
   value: string;
 };
 
-export type CustomListingFieldValue = boolean | number | string | string[] | null;
-export type ListingCustomFields = Record<string, CustomListingFieldValue>;
+export type ListingCustomFieldValue =
+  | boolean
+  | number
+  | string
+  | null
+  | ListingCustomFieldValue[]
+  | { [key: string]: ListingCustomFieldValue };
+export type ListingCustomFields = Record<string, ListingCustomFieldValue>;
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 export type UserStatus = (typeof userStatusEnum.enumValues)[number];
+export type ListingStatus = (typeof listingStatusEnum.enumValues)[number];
 
 export const users = pgTable(
   "users",
@@ -62,6 +69,7 @@ export const users = pgTable(
     externalAuthId: text("external_auth_id"),
     email: text("email").notNull(),
     fullName: text("full_name").notNull(),
+    organization: text("organization"),
     passwordHash: text("password_hash"),
     role: userRoleEnum("role").notNull(),
     status: userStatusEnum("status").notNull(),

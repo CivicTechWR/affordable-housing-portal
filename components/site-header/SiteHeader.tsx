@@ -3,9 +3,11 @@ import { UserIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import { auth, signOut } from "@/auth";
+import { getOptionalSession } from "@/lib/auth/session";
 
 export async function SiteHeader() {
-  const session = await auth();
+  const [rawSession, optionalSession] = await Promise.all([auth(), getOptionalSession()]);
+  const session = optionalSession.session;
   const navPillClass =
     "rounded-full bg-primary-foreground/20 px-4 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/30";
 
@@ -22,12 +24,14 @@ export async function SiteHeader() {
           Browse Listings
         </Link>
 
-        {session?.user ? (
+        {rawSession?.user ? (
           <>
-            <span className="inline-flex max-w-56 items-center gap-1.5 rounded-full bg-primary-foreground/20 px-3 py-1.5 text-sm font-medium text-primary-foreground">
-              <HugeiconsIcon icon={UserIcon} strokeWidth={2} size={16} />
-              <span className="truncate">{session.user.name ?? session.user.email}</span>
-            </span>
+            {session?.user ? (
+              <span className="inline-flex max-w-56 items-center gap-1.5 rounded-full bg-primary-foreground/20 px-3 py-1.5 text-sm font-medium text-primary-foreground">
+                <HugeiconsIcon icon={UserIcon} strokeWidth={2} size={16} />
+                <span className="truncate">{session.user.name ?? session.user.email}</span>
+              </span>
+            ) : null}
 
             <form
               action={async () => {
