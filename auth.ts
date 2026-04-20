@@ -88,31 +88,28 @@ const authConfig = {
     },
     async authorized({ auth: currentAuth, request }) {
       const pathname = request.nextUrl.pathname;
+      const requiresAdminAccess =
+        pathname.startsWith("/api/admin") || pathname.startsWith("/admin");
+      const requiresListingWriteAccess =
+        pathname.startsWith("/api/listings") && request.method !== "GET";
+      const requiresRoleCheck = requiresAdminAccess || requiresListingWriteAccess;
 
       if (!currentAuth?.user?.id) {
-        return !(
-          pathname.startsWith("/api/admin") ||
-          pathname.startsWith("/admin") ||
-          (pathname.startsWith("/api/listings") && request.method !== "GET")
-        );
+        return !requiresRoleCheck;
+      }
+
+      if (!requiresRoleCheck) {
+        return true;
       }
 
       const authzUser = await getUserForSession(currentAuth.user.id);
       const isActiveUser = authzUser ? isUserAllowedToSignIn(authzUser.status) : false;
 
-      if (
-        !pathname.startsWith("/api/admin") &&
-        !pathname.startsWith("/admin") &&
-        !(pathname.startsWith("/api/listings") && request.method !== "GET")
-      ) {
-        return true;
-      }
-
-      if (pathname.startsWith("/api/admin") || pathname.startsWith("/admin")) {
+      if (requiresAdminAccess) {
         return isActiveUser && authzUser?.role === "admin";
       }
 
-      if (pathname.startsWith("/api/listings") && request.method !== "GET") {
+      if (requiresListingWriteAccess) {
         return isActiveUser && (authzUser?.role === "admin" || authzUser?.role === "partner");
       }
 

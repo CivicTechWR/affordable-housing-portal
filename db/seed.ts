@@ -59,8 +59,9 @@ async function main() {
           status: user.status,
         })
         .onConflictDoUpdate({
-          target: users.id,
+          target: users.email,
           set: {
+            id: user.id,
             email: user.email,
             fullName: user.fullName,
             organization: user.organization,

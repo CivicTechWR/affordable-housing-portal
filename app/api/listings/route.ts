@@ -40,7 +40,6 @@ export const { GET, POST } = route({
     ])
     .handler(async (request) => {
       const { searchParams } = request.nextUrl;
-      const optionalSession = await getOptionalSession();
 
       const page = Number(searchParams.get("page") ?? 1);
       const limit = Number(searchParams.get("limit") ?? 20);
@@ -50,6 +49,11 @@ export const { GET, POST } = route({
       const maxRent = searchParams.get("maxRent");
       const accessibility = searchParams.get("accessibility") ?? undefined;
       const search = searchParams.get("search");
+
+      const optionalSession =
+        status === "draft" || status === "archived"
+          ? await getOptionalSession()
+          : { session: null, authzUser: null };
 
       const visibility = getListingListVisibility(optionalSession, status);
 
