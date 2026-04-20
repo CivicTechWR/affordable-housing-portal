@@ -45,6 +45,7 @@ function mapListingDetailsToDisplay(details: ListingDetailsData): ListingDetailP
     street1: details.address.street1,
     street2: details.address.street2,
     city: details.address.city,
+    postalCode: details.address.postalCode,
     beds: details.beds,
     baths: details.baths,
     sqft: details.sqft,

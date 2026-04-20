@@ -25,6 +25,7 @@ export interface ListingDetailProps {
   street1: string;
   street2?: string;
   city: string;
+  postalCode?: string;
   beds: number;
   baths: number;
   sqft: number;
@@ -53,9 +54,10 @@ export function ListingDetails({
   unitNumber,
   street1,
   street2,
+  postalCode,
   embedded = false,
 }: ListingDetailProps) {
-  const address = buildAddress({ unitNumber, street1, street2, city });
+  const address = buildAddress({ unitNumber, street1, street2, city, postalCode });
   const rentalCost = `$${price.toLocaleString()}`;
 
   const rentalDetailRows: Array<{ label: string; value: string; fullWidth?: boolean }> = [

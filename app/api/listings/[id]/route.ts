@@ -16,8 +16,9 @@ import {
   updateListingSchema,
 } from "@/shared/schemas/listings";
 
-const details: ListingDetails = {
+const primaryListingDetails: ListingDetails = {
   id: "11111111-1111-4111-8111-111111111111",
+  title: "Sunny Downtown Loft",
   price: 2350,
   address: {
     street1: "123 Main St",
@@ -64,6 +65,28 @@ const details: ListingDetails = {
   },
 };
 
+const secondaryListingDetails: ListingDetails = {
+  ...primaryListingDetails,
+  id: "22222222-2222-4222-8222-222222222222",
+  title: "Cozy Suburb Apartment",
+  price: 145000,
+  address: {
+    street1: "456 King St N",
+    city: "Waterloo",
+    province: "ON",
+    postalCode: "N2J 2Y4",
+  },
+  beds: 1,
+  baths: 1,
+  sqft: 650,
+  timeAgo: "5 hours ago",
+};
+
+const listingDetailsById: Record<string, ListingDetails> = {
+  [primaryListingDetails.id]: primaryListingDetails,
+  [secondaryListingDetails.id]: secondaryListingDetails,
+};
+
 export const { GET, PUT, DELETE } = route({
   getListingById: routeOperation({
     method: "GET",
@@ -85,13 +108,14 @@ export const { GET, PUT, DELETE } = route({
     ])
     .handler((_request, { params }) => {
       const { id } = params;
+      const listingDetails = listingDetailsById[id];
 
-      if (id !== details.id) {
+      if (!listingDetails) {
         return NextResponse.json({ message: "Listing not found" }, { status: 404 });
       }
 
       return NextResponse.json({
-        data: details,
+        data: listingDetails,
       });
     }),
 

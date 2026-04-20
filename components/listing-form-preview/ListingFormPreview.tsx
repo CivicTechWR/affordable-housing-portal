@@ -22,6 +22,7 @@ export function ListingFormPreview({
   const previewStreet1Value = formData.street1?.trim();
   const previewStreet2Value = formData.street2?.trim();
   const previewCityValue = formData.city?.trim();
+  const previewPostalCodeValue = formData.postalCode?.trim();
   const previewUnitNumberValue = formData.unitNumber?.trim();
   const previewTitle = previewTitleValue || "Title Here";
   const previewStreet1 = previewStreet1Value || "Address Here";
@@ -29,6 +30,7 @@ export function ListingFormPreview({
     unitNumber: previewUnitNumberValue,
     street1: previewStreet1,
     street2: previewStreet2Value,
+    city: previewCityValue,
   });
   const previewCardFeatures = Array.from(
     new Set((formData.customFeatures ?? []).map((feature) => feature.name)),
@@ -68,6 +70,7 @@ export function ListingFormPreview({
           street1={previewStreet1}
           street2={previewStreet2Value}
           city={previewCityValue || ""}
+          postalCode={previewPostalCodeValue}
           beds={formData.bedrooms}
           baths={formData.bathrooms}
           sqft={formData.squareFeet || 0}

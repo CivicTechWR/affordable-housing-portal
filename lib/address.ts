@@ -10,8 +10,26 @@ export interface BuildAddressOptions {
 
 const normalize = (value: AddressPart) => value?.trim() ?? "";
 
-export function buildAddress({ unitNumber, street1, street2 }: BuildAddressOptions): string {
-  return [unitNumber ? `${normalize(unitNumber)} -` : "", normalize(street1), normalize(street2)]
-    .filter(Boolean)
-    .join(" ");
+function compactAddressParts(parts: AddressPart[]): string[] {
+  return parts.map(normalize).filter((part) => part.length > 0);
+}
+
+export function buildAddress({
+  unitNumber,
+  street1,
+  street2,
+  city,
+  postalCode,
+}: BuildAddressOptions): string {
+  const normalizedUnit = normalize(unitNumber);
+  const streetSegment = compactAddressParts([street1, street2]).join(" ");
+
+  const lineOne =
+    normalizedUnit && streetSegment
+      ? `${normalizedUnit} - ${streetSegment}`
+      : normalizedUnit || streetSegment;
+
+  const lineTwo = compactAddressParts([city, postalCode]).join(" ");
+
+  return [lineOne, lineTwo].filter(Boolean).join(", ");
 }
