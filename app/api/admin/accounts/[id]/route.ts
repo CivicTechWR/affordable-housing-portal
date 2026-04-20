@@ -246,7 +246,7 @@ async function getAccountRecord(accountId: string) {
     role: user.role,
     organization: user.organization,
     status: user.status,
-    listingsCount: listingCounts[0]?.total ?? 0,
+    listingsCount: Number(listingCounts[0]?.total ?? 0),
     lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
