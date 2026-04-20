@@ -17,6 +17,42 @@ import {
   updateListingSchema,
 } from "@/shared/schemas/listings";
 
+const sharedListingImages: ListingDetails["images"] = [
+  {
+    url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
+    caption: "Open-concept living area and kitchen",
+  },
+  {
+    url: "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
+    caption: "Bright apartment living room and dining area",
+  },
+  {
+    url: "https://images.pexels.com/photos/7614411/pexels-photo-7614411.jpeg?cs=srgb&dl=pexels-artbovich-7614411.jpg&fm=jpg",
+    caption: "Primary bedroom",
+  },
+  {
+    url: "https://images.pexels.com/photos/26732551/pexels-photo-26732551.jpeg?cs=srgb&dl=pexels-pu-ca-adryan-163345030-26732551.jpg&fm=jpg",
+    caption: "Modern apartment sitting room",
+  },
+];
+
+const sharedListingFeatures: ListingDetails["features"] = [
+  {
+    categoryName: "Accessibility",
+    features: [
+      { name: "braille", description: "braille signage" },
+      { name: "lowered counters", description: "lowered counters for wheelchair users" },
+      { name: "ramp", description: "wheelchair accessible ramp" },
+    ],
+  },
+];
+
+const sharedListingContact: NonNullable<ListingDetails["contact"]> = {
+  name: "Leasing Office",
+  email: "leasing@mainstreetrentals.ca",
+  phone: "519-555-0199",
+};
+
 const primaryListingDetails: ListingDetails = {
   id: MOCK_LISTING_ID_PRIMARY,
   title: "Sunny Downtown Loft",
@@ -30,44 +66,13 @@ const primaryListingDetails: ListingDetails = {
   beds: 3,
   baths: 2,
   sqft: 1200,
-  images: [
-    {
-      url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
-      caption: "Open-concept living area and kitchen",
-    },
-    {
-      url: "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
-      caption: "Bright apartment living room and dining area",
-    },
-    {
-      url: "https://images.pexels.com/photos/7614411/pexels-photo-7614411.jpeg?cs=srgb&dl=pexels-artbovich-7614411.jpg&fm=jpg",
-      caption: "Primary bedroom",
-    },
-    {
-      url: "https://images.pexels.com/photos/26732551/pexels-photo-26732551.jpeg?cs=srgb&dl=pexels-pu-ca-adryan-163345030-26732551.jpg&fm=jpg",
-      caption: "Modern apartment sitting room",
-    },
-  ],
+  images: sharedListingImages,
   timeAgo: "2 days ago",
-  features: [
-    {
-      categoryName: "Accessibility",
-      features: [
-        { name: "braille", description: "braille signage" },
-        { name: "lowered counters", description: "lowered counters for wheelchair users" },
-        { name: "ramp", description: "wheelchair accessible ramp" },
-      ],
-    },
-  ],
-  contact: {
-    name: "Leasing Office",
-    email: "leasing@mainstreetrentals.ca",
-    phone: "519-555-0199",
-  },
+  features: sharedListingFeatures,
+  contact: sharedListingContact,
 };
 
 const secondaryListingDetails: ListingDetails = {
-  ...primaryListingDetails,
   id: MOCK_LISTING_ID_SECONDARY,
   title: "Cozy Suburb Apartment",
   price: 145000,
@@ -80,7 +85,10 @@ const secondaryListingDetails: ListingDetails = {
   beds: 1,
   baths: 1,
   sqft: 650,
+  images: sharedListingImages,
   timeAgo: "5 hours ago",
+  features: sharedListingFeatures,
+  contact: sharedListingContact,
 };
 
 const listingDetailsById: Record<string, ListingDetails> = {
