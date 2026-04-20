@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ACCESSIBILITY_FEATURE_GROUPS } from "./types";
+import { ACCESSIBILITY_FEATURE_GROUPS } from "./accessibilityFeatureGroups";
 
 export function useAccessibilityFeaturesQuery() {
   const [data, setData] = useState<typeof ACCESSIBILITY_FEATURE_GROUPS | null>(null);
