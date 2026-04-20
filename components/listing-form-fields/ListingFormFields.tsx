@@ -1,9 +1,9 @@
-import { ListingFormControl } from "@/app/listingForm/types";
+import { ListingFormControl } from "@/app/listing-form/types";
 import {
   CORE_FIELD_DEFINITIONS,
   CORE_FIELD_CATEGORIES,
   CoreFieldDefinition,
-} from "@/app/listingForm/fieldDefinitions";
+} from "@/app/listing-form/fieldDefinitions";
 import {
   FormField,
   FormItem,

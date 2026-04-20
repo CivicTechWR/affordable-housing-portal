@@ -3,7 +3,7 @@ import {
   CREATE_FORM_DEFAULTS,
   listingFormSchema,
   type ListingFormInput,
-} from "@/app/listingForm/types";
+} from "@/app/listing-form/types";
 
 const validFormInput: ListingFormInput = {
   ...CREATE_FORM_DEFAULTS,

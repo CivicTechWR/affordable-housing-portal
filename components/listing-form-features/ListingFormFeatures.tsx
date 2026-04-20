@@ -1,5 +1,5 @@
-import { ListingFormControl } from "@/app/listingForm/types";
-import { useAccessibilityFeaturesQuery } from "@/app/listingForm/useAccessibilityFeaturesQuery";
+import { ListingFormControl } from "@/app/listing-form/types";
+import { useAccessibilityFeaturesQuery } from "@/app/listing-form/useAccessibilityFeaturesQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleField } from "@/components/toggle-field/ToggleField";
 import { FormField, FormItem, FormControl } from "@/components/ui/form";

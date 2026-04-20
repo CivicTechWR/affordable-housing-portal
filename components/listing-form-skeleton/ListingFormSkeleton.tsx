@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListingFormLayout, FormSection } from "@/components/listing-form-layout/ListingFormLayout";
-import { CORE_FIELD_CATEGORIES } from "@/app/listingForm/fieldDefinitions";
+import { CORE_FIELD_CATEGORIES } from "@/app/listing-form/fieldDefinitions";
 
 export function ListingFormSkeleton() {
   return (

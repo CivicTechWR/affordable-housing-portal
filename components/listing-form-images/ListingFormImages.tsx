@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useState } from "react";
 
-import { ListingFormControl, ListingFormImage } from "@/app/listingForm/types";
+import { ListingFormControl, ListingFormImage } from "@/app/listing-form/types";
 import { FormSection } from "@/components/listing-form-layout/ListingFormLayout";
 import {
   FormControl,

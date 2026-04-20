@@ -1,4 +1,4 @@
-import type { ListingFormInput } from "@/app/listingForm/types";
+import type { ListingFormInput } from "@/app/listing-form/types";
 import { ListingDetails } from "@/components/listing-details/ListingDetails";
 import { ListingsCard } from "@/components/listings-card/ListingsCard";
 import { buildAddress } from "@/lib/address";
