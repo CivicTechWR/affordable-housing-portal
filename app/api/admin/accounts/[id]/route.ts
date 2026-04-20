@@ -1,9 +1,5 @@
-import { count, eq } from "drizzle-orm";
-import { route, routeOperation, TypedNextResponse } from "next-rest-framework";
+import { route, routeOperation } from "next-rest-framework";
 
-import { db } from "@/db";
-import { listings, properties, users } from "@/db/schema";
-import { requireAdminSession } from "@/lib/auth/session";
 import { errorMessageSchema } from "@/shared/schemas/common";
 import {
   accountByIdResponseSchema,
@@ -12,6 +8,11 @@ import {
   updateAccountResponseSchema,
   updateAccountSchema,
 } from "@/shared/schemas/account-management";
+import {
+  deactivateAccountByIdHandler,
+  getAccountByIdHandler,
+  updateAccountByIdHandler,
+} from "./handlers";
 
 export const { GET, PUT, DELETE } = route({
   getAccountById: routeOperation({ method: "GET" })
@@ -22,56 +23,7 @@ export const { GET, PUT, DELETE } = route({
       { status: 403, contentType: "application/json", body: errorMessageSchema },
       { status: 404, contentType: "application/json", body: errorMessageSchema },
     ])
-    .handler(async (_request, { params }) => {
-      const { response } = await requireAdminSession();
-
-      if (response) {
-        return response;
-      }
-
-      const [user] = await db
-        .select({
-          id: users.id,
-          email: users.email,
-          name: users.fullName,
-          role: users.role,
-          organization: users.organization,
-          status: users.status,
-          lastLoginAt: users.lastLoginAt,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt,
-        })
-        .from(users)
-        .where(eq(users.id, params.id))
-        .limit(1);
-
-      if (!user) {
-        return TypedNextResponse.json({ message: "Account not found" }, { status: 404 });
-      }
-
-      const listingCounts = await db
-        .select({ total: count(listings.id) })
-        .from(properties)
-        .leftJoin(listings, eq(listings.propertyId, properties.id))
-        .where(eq(properties.ownerUserId, params.id));
-
-      const account = {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        organization: user.organization,
-        status: user.status,
-        listingsCount: Number(listingCounts[0]?.total ?? 0),
-        lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt.toISOString(),
-      };
-
-      return TypedNextResponse.json({
-        data: account,
-      });
-    }),
+    .handler(getAccountByIdHandler),
 
   updateAccountById: routeOperation({ method: "PUT" })
     .input({
@@ -86,62 +38,7 @@ export const { GET, PUT, DELETE } = route({
       { status: 404, contentType: "application/json", body: errorMessageSchema },
       { status: 409, contentType: "application/json", body: errorMessageSchema },
     ])
-    .handler(async (request, { params }) => {
-      const sessionResult = await requireAdminSession();
-      const { response } = sessionResult;
-
-      if (response) {
-        return response;
-      }
-
-      const body = await request.json();
-      const [targetUser] = await db
-        .select({
-          id: users.id,
-          role: users.role,
-          status: users.status,
-        })
-        .from(users)
-        .where(eq(users.id, params.id))
-        .limit(1);
-
-      if (!targetUser) {
-        return TypedNextResponse.json({ message: "Account not found" }, { status: 404 });
-      }
-
-      const nextRole = body.role ?? targetUser.role;
-      const nextStatus = body.status ?? targetUser.status;
-
-      if (
-        params.id === sessionResult.session.user.id &&
-        (nextRole !== "admin" || nextStatus !== "active")
-      ) {
-        return TypedNextResponse.json(
-          { message: "You cannot remove your own admin access." },
-          { status: 409 },
-        );
-      }
-
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          fullName: body.name,
-          role: body.role,
-          status: body.status,
-          organization: body.organization,
-        })
-        .where(eq(users.id, params.id))
-        .returning({ id: users.id });
-
-      if (!updatedUser) {
-        return TypedNextResponse.json({ message: "Account not found" }, { status: 404 });
-      }
-
-      return TypedNextResponse.json({
-        message: "Account updated",
-        data: { id: params.id, ...body },
-      });
-    }),
+    .handler(updateAccountByIdHandler),
 
   deactivateAccountById: routeOperation({ method: "DELETE" })
     .input({ params: accountParamsSchema })
@@ -152,36 +49,5 @@ export const { GET, PUT, DELETE } = route({
       { status: 404, contentType: "application/json", body: errorMessageSchema },
       { status: 409, contentType: "application/json", body: errorMessageSchema },
     ])
-    .handler(async (_request, { params }) => {
-      const sessionResult = await requireAdminSession();
-      const { response } = sessionResult;
-
-      if (response) {
-        return response;
-      }
-
-      if (params.id === sessionResult.session.user.id) {
-        return TypedNextResponse.json(
-          { message: "You cannot deactivate your own admin account." },
-          { status: 409 },
-        );
-      }
-
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          status: "deactivated",
-        })
-        .where(eq(users.id, params.id))
-        .returning({ id: users.id });
-
-      if (!updatedUser) {
-        return TypedNextResponse.json({ message: "Account not found" }, { status: 404 });
-      }
-
-      return TypedNextResponse.json({
-        message: "Account deactivated",
-        data: { id: params.id },
-      });
-    }),
+    .handler(deactivateAccountByIdHandler),
 });
