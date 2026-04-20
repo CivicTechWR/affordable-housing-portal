@@ -186,4 +186,18 @@
   html {
     @apply font-sans;
   }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading tracking-tight;
+  }
+  h1 {
+    @apply text-2xl font-semibold sm:text-3xl;
+  }
+  h2 {
+    @apply text-xl font-semibold sm:text-2xl;
+  }
+  h3 {
+    @apply text-lg font-semibold;
+  }
 }

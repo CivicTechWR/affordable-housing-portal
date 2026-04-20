@@ -4,7 +4,7 @@ import { ComponentProps } from "react";
 import { Input } from "@/components/ui/input";
 import { FieldGroup } from "@/components/ui/field";
 import { PriceRangeInput, PriceRangeInputProps } from "../price-range-input/PriceRangeInput";
-import { ToggleFilter, ToggleFilterProps } from "../toggle-filter/ToggleFilter";
+import { ToggleField, ToggleFieldProps } from "../toggle-field/ToggleField";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 export enum DisplayMode {
@@ -15,8 +15,8 @@ export enum DisplayMode {
 export interface ListingFilterSearchBarProps {
   searchInputProps: ComponentProps<typeof Input>;
   priceRangeProps: PriceRangeInputProps;
-  bedroomToggleProps: ToggleFilterProps;
-  bathroomToggleProps: ToggleFilterProps;
+  bedroomToggleProps: ToggleFieldProps;
+  bathroomToggleProps: ToggleFieldProps;
   displayModeProps: {
     displayModes: {
       value: DisplayMode;
@@ -54,12 +54,13 @@ export function ListingFilterSearchBar({
 
       {/* Property Filters: Compact toggles */}
       <div className="hidden lg:flex items-center gap-6 shrink-0">
-        <ToggleFilter {...bedroomToggleProps} />
-        <ToggleFilter {...bathroomToggleProps} />
+        <ToggleField {...bedroomToggleProps} allowEmpty />
+        <ToggleField {...bathroomToggleProps} allowEmpty />
       </div>
 
       <div>
-        <ToggleFilter
+        <ToggleField
+          allowEmpty
           title={"View"}
           value={displayModeProps.value}
           onValueChange={displayModeProps.onChange}

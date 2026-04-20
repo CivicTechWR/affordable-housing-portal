@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { listings, properties } from "@/db/schema";
 import { requireListingWriteSession } from "@/lib/auth/session";
 import { errorMessageSchema } from "@/shared/schemas/common";
+import { MOCK_LISTING_ID_PRIMARY, MOCK_LISTING_ID_SECONDARY } from "@/app/listings/mockListingIds";
 import {
   deleteListingResponseSchema,
   listingByIdResponseSchema,
@@ -16,43 +17,83 @@ import {
   updateListingSchema,
 } from "@/shared/schemas/listings";
 
-const details: ListingDetails = {
-  id: "11111111-1111-4111-8111-111111111111",
+const sharedListingImages: ListingDetails["images"] = [
+  {
+    url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
+    caption: "Open-concept living area and kitchen",
+  },
+  {
+    url: "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
+    caption: "Bright apartment living room and dining area",
+  },
+  {
+    url: "https://images.pexels.com/photos/7614411/pexels-photo-7614411.jpeg?cs=srgb&dl=pexels-artbovich-7614411.jpg&fm=jpg",
+    caption: "Primary bedroom",
+  },
+  {
+    url: "https://images.pexels.com/photos/26732551/pexels-photo-26732551.jpeg?cs=srgb&dl=pexels-pu-ca-adryan-163345030-26732551.jpg&fm=jpg",
+    caption: "Modern apartment sitting room",
+  },
+];
+
+const sharedListingFeatures: ListingDetails["features"] = [
+  {
+    categoryName: "Accessibility",
+    features: [
+      { name: "braille", description: "braille signage" },
+      { name: "lowered counters", description: "lowered counters for wheelchair users" },
+      { name: "ramp", description: "wheelchair accessible ramp" },
+    ],
+  },
+];
+
+const sharedListingContact: NonNullable<ListingDetails["contact"]> = {
+  name: "Leasing Office",
+  email: "leasing@mainstreetrentals.ca",
+  phone: "519-555-0199",
+};
+
+const primaryListingDetails: ListingDetails = {
+  id: MOCK_LISTING_ID_PRIMARY,
+  title: "Sunny Downtown Loft",
   price: 2350,
-  address: "123 Main St",
-  city: "Waterloo",
+  address: {
+    street1: "123 Main St",
+    city: "Waterloo",
+    province: "ON",
+    postalCode: "N2L 3A1",
+  },
   beds: 3,
   baths: 2,
   sqft: 1200,
-  images: [
-    {
-      url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
-      caption: "Open-concept living area and kitchen",
-    },
-    {
-      url: "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
-      caption: "Bright apartment living room and dining area",
-    },
-    {
-      url: "https://images.pexels.com/photos/7614411/pexels-photo-7614411.jpeg?cs=srgb&dl=pexels-artbovich-7614411.jpg&fm=jpg",
-      caption: "Primary bedroom",
-    },
-    {
-      url: "https://images.pexels.com/photos/26732551/pexels-photo-26732551.jpeg?cs=srgb&dl=pexels-pu-ca-adryan-163345030-26732551.jpg&fm=jpg",
-      caption: "Modern apartment sitting room",
-    },
-  ],
+  images: sharedListingImages,
   timeAgo: "2 days ago",
-  features: [
-    {
-      categoryName: "Accessibility",
-      features: [
-        { name: "braille", description: "braille signage" },
-        { name: "lowered counters", description: "lowered counters for wheelchair users" },
-        { name: "ramp", description: "wheelchair accessible ramp" },
-      ],
-    },
-  ],
+  features: sharedListingFeatures,
+  contact: sharedListingContact,
+};
+
+const secondaryListingDetails: ListingDetails = {
+  id: MOCK_LISTING_ID_SECONDARY,
+  title: "Cozy Suburb Apartment",
+  price: 145000,
+  address: {
+    street1: "456 King St N",
+    city: "Waterloo",
+    province: "ON",
+    postalCode: "N2J 2Y4",
+  },
+  beds: 1,
+  baths: 1,
+  sqft: 650,
+  images: sharedListingImages,
+  timeAgo: "5 hours ago",
+  features: sharedListingFeatures,
+  contact: sharedListingContact,
+};
+
+const listingDetailsById: Record<string, ListingDetails> = {
+  [primaryListingDetails.id]: primaryListingDetails,
+  [secondaryListingDetails.id]: secondaryListingDetails,
 };
 
 export const { GET, PUT, DELETE } = route({
@@ -76,13 +117,14 @@ export const { GET, PUT, DELETE } = route({
     ])
     .handler((_request, { params }) => {
       const { id } = params;
+      const listingDetails = listingDetailsById[id];
 
-      if (id !== details.id) {
+      if (!listingDetails) {
         return NextResponse.json({ message: "Listing not found" }, { status: 404 });
       }
 
       return NextResponse.json({
-        data: details,
+        data: listingDetails,
       });
     }),
 

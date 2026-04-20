@@ -10,7 +10,10 @@ export async function SiteHeader() {
     "rounded-full bg-primary-foreground/20 px-4 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/30";
 
   return (
-    <header className="relative flex h-14 items-center justify-center bg-primary px-6 shrink-0">
+    <header
+      data-site-header="true"
+      className="relative flex h-14 items-center justify-center bg-primary px-6 shrink-0"
+    >
       <Link href="/" className="text-lg font-semibold text-primary-foreground tracking-tight">
         WR Housing Bridge
       </Link>

@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:down:volumes": "docker compose down -v",
+    "docker:logs": "docker compose logs -f app db",
     "dev:secrets": "infisical run --env=dev -- next dev",
     "build": "next build",
     "build:secrets": "infisical run --env=dev -- next build",
@@ -22,10 +26,11 @@
     "format:check": "oxfmt --check . -c .oxfmtrc.json",
     "prepare": "husky",
     "test": "jest",
-    "test:unit": "jest --testPathPattern=\\.unit\\.test\\.",
-    "test:integration": "jest --testPathPattern=\\.integration\\.test\\."
+    "test:unit": "jest --testPathPatterns=\\.unit\\.test\\.",
+    "test:integration": "jest --testPathPatterns=\\.integration\\.test\\."
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/react": "^1.1.6",
     "@vis.gl/react-maplibre": "^8.1.0",
@@ -44,6 +49,7 @@
     "react": "^19.2.4",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.4",
+    "react-hook-form": "^7.72.1",
     "react-resizable-panels": "^4.8.0",
     "resend": "^6.11.0",
     "sass": "^1.98.0",

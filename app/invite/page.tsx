@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { AcceptInviteForm } from "@/components/auth/accept-invite-form";
+import { AcceptInviteForm } from "@/components/auth/AcceptInviteForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getPendingInviteByToken } from "@/lib/auth/invite-store";
