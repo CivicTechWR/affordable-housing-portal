@@ -13,26 +13,14 @@ import { useState } from "react";
 import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
 import type { ListingSummary } from "@/shared/schemas/listings";
 
-export default function ListingsDashboard() {
+type ListingsDashboardProps = {
+  initialListings: ListingSummary[];
+};
+
+export default function ListingsDashboard({ initialListings }: ListingsDashboardProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
   const isSplitView = displayMode === DisplayMode.MAP_LIST;
-  const listings: ListingSummary[] = [
-    {
-      id: "11111111-1111-4111-8111-111111111111",
-      price: 2350,
-      address: "123 Main St",
-      city: "Waterloo",
-      beds: 3,
-      baths: 2,
-      sqft: 1200,
-      imageUrl:
-        "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
-      timeAgo: "2 days ago",
-      lat: 43.45055954361165,
-      lng: -80.49228395260133,
-    },
-  ];
 
   const dynamicGroups: DynamicFilterGroup[] = [
     {
@@ -83,7 +71,7 @@ export default function ListingsDashboard() {
       <main className="flex min-h-0 flex-1 overflow-hidden">
         {displayMode !== DisplayMode.MAP ? (
           <ListingsPanel
-            listings={listings}
+            listings={initialListings}
             displayMode={displayMode}
             filterButtonProps={filterButtonProps}
             sortOptionProps={sortOptionProps}
@@ -91,7 +79,7 @@ export default function ListingsDashboard() {
         ) : null}
         {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
           <div className={`min-w-0 flex-1 ${isSplitView ? "lg:basis-1/2" : ""}`}>
-            <MapView listings={listings} />
+            <MapView listings={initialListings} />
           </div>
         )}
         {isFilterOpen && (
