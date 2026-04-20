@@ -29,8 +29,10 @@ type OptionalSessionResult = {
   authzUser: AuthorizedUser | null;
 };
 
-export async function getOptionalSession() {
-  const session = await auth();
+export async function getOptionalSession(
+  preloadedSession?: Awaited<ReturnType<typeof auth>> | null,
+) {
+  const session = preloadedSession ?? (await auth());
 
   if (!session?.user?.id) {
     return {

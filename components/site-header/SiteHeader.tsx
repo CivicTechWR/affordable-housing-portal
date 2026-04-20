@@ -6,7 +6,8 @@ import { auth, signOut } from "@/auth";
 import { getOptionalSession } from "@/lib/auth/session";
 
 export async function SiteHeader() {
-  const [rawSession, optionalSession] = await Promise.all([auth(), getOptionalSession()]);
+  const rawSession = await auth();
+  const optionalSession = await getOptionalSession(rawSession);
   const session = optionalSession.session;
   const navPillClass =
     "rounded-full bg-primary-foreground/20 px-4 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/30";

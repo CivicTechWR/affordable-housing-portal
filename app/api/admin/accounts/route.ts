@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { route, routeOperation } from "next-rest-framework";
 
@@ -108,7 +108,12 @@ export const { GET, POST } = route({
               })
               .from(properties)
               .leftJoin(listings, eq(listings.propertyId, properties.id))
-              .where(or(...rows.map((row) => eq(properties.ownerUserId, row.id)))!)
+              .where(
+                inArray(
+                  properties.ownerUserId,
+                  rows.map((row) => row.id),
+                ),
+              )
               .groupBy(properties.ownerUserId)
           : [];
 

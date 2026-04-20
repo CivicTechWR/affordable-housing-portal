@@ -262,11 +262,11 @@ export function resolveListingStatusTimestamps(
 }
 
 export function centsToDollars(amountInCents: number) {
-  return Math.round(amountInCents / 100);
+  return amountInCents / 100;
 }
 
 export function dollarsToCents(amount: number | undefined) {
-  return typeof amount === "number" ? amount * 100 : null;
+  return typeof amount === "number" ? Math.round(amount * 100) : null;
 }
 
 function mergeStoredUnits(

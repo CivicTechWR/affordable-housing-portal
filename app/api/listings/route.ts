@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ilike, inArray, lte, or } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, lte, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { route, routeOperation } from "next-rest-framework";
 
@@ -80,7 +80,15 @@ export const { GET, POST } = route({
       }
 
       if (maxRent) {
-        filters.push(lte(listings.monthlyRentCents, Number(maxRent) * 100));
+        filters.push(lte(listings.monthlyRentCents, dollarsStringToCents(maxRent)));
+      }
+
+      const accessibilityFilter = buildAccessibilityFilter(
+        accessibility === "true" || accessibility === "false" ? accessibility : undefined,
+      );
+
+      if (accessibilityFilter) {
+        filters.push(accessibilityFilter);
       }
 
       if (search) {
@@ -99,7 +107,15 @@ export const { GET, POST } = route({
 
       const whereClause = and(...filters);
       const offset = (page - 1) * limit;
-      const allRows = await db
+
+      const totalRows = await db
+        .select({ total: sql<number>`count(*)` })
+        .from(listings)
+        .innerJoin(properties, eq(listings.propertyId, properties.id))
+        .where(whereClause);
+      const total = totalRows[0]?.total ?? 0;
+
+      const pagedRows = await db
         .select({
           id: listings.id,
           monthlyRentCents: listings.monthlyRentCents,
@@ -118,18 +134,10 @@ export const { GET, POST } = route({
         .from(listings)
         .innerJoin(properties, eq(listings.propertyId, properties.id))
         .where(whereClause)
-        .orderBy(desc(listings.publishedAt), desc(listings.createdAt));
+        .orderBy(desc(listings.publishedAt), desc(listings.createdAt))
+        .limit(limit)
+        .offset(offset);
 
-      const filteredRows =
-        accessibility === undefined
-          ? allRows
-          : allRows.filter((row) => {
-              const hasAccessibility = hasAccessibilityArray(row.customFields);
-
-              return accessibility === "true" ? hasAccessibility : !hasAccessibility;
-            });
-
-      const pagedRows = filteredRows.slice(offset, offset + limit);
       const listingIds = pagedRows.map((row) => row.id);
       const imageRows =
         listingIds.length > 0
@@ -179,8 +187,8 @@ export const { GET, POST } = route({
         pagination: {
           page,
           limit,
-          total: filteredRows.length,
-          totalPages: filteredRows.length === 0 ? 0 : Math.ceil(filteredRows.length / limit),
+          total,
+          totalPages: total === 0 ? 0 : Math.ceil(total / limit),
         },
       });
     }),
@@ -354,8 +362,27 @@ function getListingListVisibility(
   } satisfies ListingVisibility;
 }
 
-function hasAccessibilityArray(customFields: (typeof listings.$inferSelect)["customFields"]) {
-  const value = customFields.accessibilityFeatures;
+function dollarsStringToCents(value: string) {
+  const [whole, fractional = ""] = value.split(".");
+  const cents = `${fractional}00`.slice(0, 2);
 
-  return Array.isArray(value) && value.length > 0;
+  return Number(whole) * 100 + Number(cents);
+}
+
+function buildAccessibilityFilter(accessibility: "true" | "false" | undefined) {
+  if (!accessibility) {
+    return undefined;
+  }
+
+  const hasAccessibility = sql<boolean>`
+    jsonb_array_length(
+      case
+        when jsonb_typeof(${listings.customFields} -> 'accessibilityFeatures') = 'array'
+          then ${listings.customFields} -> 'accessibilityFeatures'
+        else '[]'::jsonb
+      end
+    ) > 0
+  `;
+
+  return accessibility === "true" ? hasAccessibility : sql<boolean>`not (${hasAccessibility})`;
 }
