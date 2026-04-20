@@ -59,9 +59,10 @@ export function ListingDetails({
 }: ListingDetailProps) {
   const address = buildAddress({ unitNumber, street1, street2, city, postalCode });
   const rentalCost = `$${price.toLocaleString()}`;
+  const WrapperElement = embedded ? "section" : "main";
 
   const rentalDetailRows: Array<{ label: string; value: string; fullWidth?: boolean }> = [
-    { label: "address", value: address || "address Here", fullWidth: true },
+    { label: "Address", value: address || "Address Here", fullWidth: true },
     { label: "Rental Cost", value: rentalCost },
     { label: "Bedrooms", value: String(beds) },
     { label: "Bathrooms", value: String(baths) },
@@ -91,7 +92,7 @@ export function ListingDetails({
     : "mx-auto flex w-full max-w-4xl flex-col gap-6";
 
   return (
-    <main className={wrapperClasses}>
+    <WrapperElement className={wrapperClasses}>
       <div className={contentClasses}>
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -178,6 +179,6 @@ export function ListingDetails({
           </Card>
         )}
       </div>
-    </main>
+    </WrapperElement>
   );
 }

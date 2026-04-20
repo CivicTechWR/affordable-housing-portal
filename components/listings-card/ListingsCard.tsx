@@ -55,6 +55,7 @@ export function ListingsCard({
   accessibilityFeatures,
   price,
   address,
+  city,
   beds,
   baths,
   sqft,
@@ -72,7 +73,8 @@ export function ListingsCard({
   const baseFeatures = safeFeatures.slice(0, MAX_FEATURES);
   const extraFeatures = safeFeatures.slice(MAX_FEATURES);
   const listingHref = href ?? `/listings/${id}`;
-  const ariaLabel = `View listing:${title ? `${title} at ${address}}` : `${address}`}`;
+  const displayAddress = city ? `${address}, ${city}` : address;
+  const ariaLabel = `View listing: ${title ? `${title} at ${displayAddress}` : displayAddress}`;
 
   return (
     <Card
@@ -82,7 +84,7 @@ export function ListingsCard({
         {imageUrl ? (
           <Image
             src={imageUrl}
-            alt={address}
+            alt={displayAddress}
             fill
             sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -112,7 +114,7 @@ export function ListingsCard({
             ${price.toLocaleString()}
             <span className="text-sm font-normal text-muted-foreground">/mo</span>
           </div>
-          <h3>{address}</h3>
+          <h3>{displayAddress}</h3>
           {title && <h4>{title}</h4>}
         </div>
 

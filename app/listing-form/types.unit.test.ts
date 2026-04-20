@@ -31,7 +31,7 @@ describe("listingFormSchema", () => {
       title: "  Accessible Two Bedroom  ",
       street2: "  Apt 301  ",
       unitNumber: "  301  ",
-      contactEmail: "  leasing@example.org  ",
+      contactEmail: "  Leasing@Example.ORG  ",
     });
 
     expect(parsed.title).toBe("Accessible Two Bedroom");

@@ -42,7 +42,9 @@ export const listingFormSchema = z.object({
   province: requiredTrimmedString("Province is required"),
   postalCode: requiredTrimmedString("Postal code is required"),
   contactName: requiredTrimmedString("Contact name is required"),
-  contactEmail: requiredTrimmedString("Contact email is required").email("Invalid email"),
+  contactEmail: requiredTrimmedString("Contact email is required")
+    .toLowerCase()
+    .pipe(z.email("Invalid email")),
   contactPhone: requiredTrimmedString("Contact phone is required"),
 
   // Selected custom features (includes display data for preview/UI rendering)

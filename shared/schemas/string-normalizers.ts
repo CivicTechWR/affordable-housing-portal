@@ -13,6 +13,7 @@ export const optionalTrimmedStringToUndefined = () =>
     .transform((value) => (value === "" ? undefined : value))
     .optional();
 
-export const trimmedEmailString = (message = "Invalid email") => z.string().trim().email(message);
+export const trimmedEmailString = (message = "Invalid email") =>
+  z.string().trim().toLowerCase().pipe(z.email(message));
 
 export const trimmedUrlString = (message = "Invalid URL") => z.string().trim().url(message);
