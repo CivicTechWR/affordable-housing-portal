@@ -58,6 +58,29 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
 
+### Run Backend Stack with Docker
+
+This repo includes a local backend stack with:
+
+- Next.js app server (API routes + frontend)
+- Postgres database
+- Automatic DB migration + seed on container startup
+
+```bash
+npm run docker:up
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+Postgres is exposed on `localhost:5433` by default (override with `POSTGRES_PORT`).
+
+Useful commands:
+
+```bash
+npm run docker:logs
+npm run docker:down
+npm run docker:down:volumes
+```
+
 ## Database
 
 The app now includes a Drizzle + Postgres schema for users, listings, saved listings, saved searches, and admin-configurable listing fields.
@@ -66,6 +89,8 @@ The app now includes a Drizzle + Postgres schema for users, listings, saved list
 2. Generate migrations after schema changes with `npm run db:generate`.
 3. Apply migrations with `npm run db:migrate`.
 4. Inspect the schema with `npm run db:studio`.
+
+When using Docker Compose, `db:migrate` and `db:seed` are run automatically when the app container starts.
 
 If you set `ADMIN_PASSWORD`, the app enables a one-time bootstrap admin sign-in for `ADMIN_EMAIL` (default `admin@example.com`) until an admin user has a stored local password. This is intended for first-run setup and local/dev recovery from external-auth-only data.
 

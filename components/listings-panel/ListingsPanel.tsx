@@ -4,7 +4,7 @@ import {
   Listing,
   ListingsDisplayMode,
   ListingCardGallery,
-} from "@/components/listing-card-list/listingsCardList";
+} from "@/components/listing-card-list/ListingsCardList";
 import { SortOptions as SortOptionsType } from "@/components/sort-options/SortOptions";
 import { FilterButtonProps } from "@/components/filter-button/FilterButton";
 import { DisplayMode } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";

@@ -3,7 +3,6 @@
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
-import { MapView } from "@/components/map-view/mapView";
 import {
   DisplayMode,
   ListingFilterSearchBar,
@@ -12,38 +11,32 @@ import { FilterButton } from "@/components/filter-button/FilterButton";
 import { useState } from "react";
 import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
 import type { ListingSummary } from "@/shared/schemas/listings";
+import dynamic from "next/dynamic";
 
-export default function ListingsDashboard() {
+const LazyMapView = dynamic<{ listings: ListingSummary[] }>(
+  () => import("../../components/map-view/MapView.tsx").then((mod) => mod.MapView),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full min-h-[400px] items-center justify-center bg-muted/30 text-sm text-muted-foreground">
+        Loading map...
+      </div>
+    ),
+  },
+);
+
+interface ListingsDashboardProps {
+  initialListings: ListingSummary[];
+  dynamicGroups: DynamicFilterGroup[];
+}
+
+export default function ListingsDashboard({
+  initialListings,
+  dynamicGroups,
+}: ListingsDashboardProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
   const isSplitView = displayMode === DisplayMode.MAP_LIST;
-  const listings: ListingSummary[] = [
-    {
-      id: "11111111-1111-4111-8111-111111111111",
-      price: 2350,
-      address: "123 Main St",
-      city: "Waterloo",
-      beds: 3,
-      baths: 2,
-      sqft: 1200,
-      imageUrl:
-        "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
-      timeAgo: "2 days ago",
-      lat: 43.45055954361165,
-      lng: -80.49228395260133,
-    },
-  ];
-
-  const dynamicGroups: DynamicFilterGroup[] = [
-    {
-      groupId: "features",
-      groupLabel: "Features",
-      options: [
-        { id: "beds", label: "Beds", type: "boolean" },
-        { id: "baths", label: "Baths", type: "boolean" },
-      ],
-    },
-  ];
 
   const {
     sortOptionProps,
@@ -83,7 +76,7 @@ export default function ListingsDashboard() {
       <main className="flex min-h-0 flex-1 overflow-hidden">
         {displayMode !== DisplayMode.MAP ? (
           <ListingsPanel
-            listings={listings}
+            listings={initialListings}
             displayMode={displayMode}
             filterButtonProps={filterButtonProps}
             sortOptionProps={sortOptionProps}
@@ -91,7 +84,7 @@ export default function ListingsDashboard() {
         ) : null}
         {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
           <div className={`min-w-0 flex-1 ${isSplitView ? "lg:basis-1/2" : ""}`}>
-            <MapView listings={listings} />
+            <LazyMapView listings={initialListings} />
           </div>
         )}
         {isFilterOpen && (

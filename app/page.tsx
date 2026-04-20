@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold text-foreground">WIP</h1>
+        <h1>WIP</h1>
         <p className="text-sm text-muted-foreground">Housing provider view coming soon.</p>
       </div>
     </main>

@@ -1,6 +1,6 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { ListingSummary } from "@/shared/schemas/listings";
-import { ListingsCard } from "../listings-card/listingsCard";
+import { ListingsCard } from "../listings-card/ListingsCard";
 
 export type Listing = ListingSummary;
 
@@ -31,6 +31,8 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
           <ListingsCard
             key={listing.id}
             id={listing.id}
+            title={listing.title}
+            accessibilityFeatures={listing.accessibilityFeatures?.map((feature) => feature.name)}
             price={listing.price}
             address={listing.address}
             city={listing.city}

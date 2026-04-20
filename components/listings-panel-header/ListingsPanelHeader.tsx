@@ -5,7 +5,7 @@ import {
   SortOptions as SortOptionsComponent,
 } from "@/components/sort-options/SortOptions";
 import { FilterButton, FilterButtonProps } from "@/components/filter-button/FilterButton";
-import { Listing } from "@/components/listing-card-list/listingsCardList";
+import { Listing } from "@/components/listing-card-list/ListingsCardList";
 
 interface ListingsPanelHeaderProps {
   listings: Listing[];
