@@ -1,21 +1,8 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { ListingSummary } from "@/shared/schemas/listings";
 import { ListingsCard } from "../listings-card/listingsCard";
 
-export interface Listing {
-  id: string;
-  title?: string;
-  accessibilityFeatures?: string[];
-  price: number;
-  address: string;
-  city: string;
-  beds: number;
-  baths: number;
-  sqft: number;
-  lat: number;
-  lng: number;
-  imageUrl?: string;
-  timeAgo: string;
-}
+export type Listing = ListingSummary;
 
 export enum ListingsDisplayMode {
   SIDESCROLL = "sidescroll",
@@ -45,7 +32,7 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
             key={listing.id}
             id={listing.id}
             title={listing.title}
-            accessibilityFeatures={listing.accessibilityFeatures}
+            accessibilityFeatures={listing.accessibilityFeatures?.map((feature) => feature.name)}
             price={listing.price}
             address={listing.address}
             city={listing.city}

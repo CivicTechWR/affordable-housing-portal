@@ -67,7 +67,9 @@ export function MapView({ listings }: { listings: Listing[] }) {
               <ListingsCard
                 id={selectedListing.id}
                 title={selectedListing.title}
-                accessibilityFeatures={selectedListing.accessibilityFeatures}
+                accessibilityFeatures={selectedListing.accessibilityFeatures?.map(
+                  (feature) => feature.name,
+                )}
                 price={selectedListing.price}
                 address={selectedListing.address}
                 city={selectedListing.city}

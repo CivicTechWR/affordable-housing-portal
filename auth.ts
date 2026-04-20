@@ -6,7 +6,6 @@ import { userRoleEnum, userStatusEnum, type UserRole, type UserStatus } from "@/
 import {
   ensureBootstrapAdmin,
   getUserForAuth,
-  getUserForSession,
   isUserAllowedToSignIn,
   recordSuccessfulLogin,
 } from "@/lib/auth/user-store";
@@ -71,25 +70,7 @@ const authConfig = {
       if (user) {
         token.role = user.role;
         token.status = user.status;
-
-        return token;
       }
-
-      if (!token.sub) {
-        return token;
-      }
-
-      const currentUser = await getUserForSession(token.sub);
-
-      if (!currentUser) {
-        delete token.role;
-        delete token.status;
-
-        return token;
-      }
-
-      token.role = currentUser.role;
-      token.status = currentUser.status;
 
       return token;
     },
@@ -108,6 +89,14 @@ const authConfig = {
       const pathname = request.nextUrl.pathname;
       const isActiveUser =
         currentAuth?.user?.status !== undefined && isUserAllowedToSignIn(currentAuth.user.status);
+
+      if (
+        !pathname.startsWith("/api/admin") &&
+        !pathname.startsWith("/admin") &&
+        !(pathname.startsWith("/api/listings") && request.method !== "GET")
+      ) {
+        return true;
+      }
 
       if (pathname.startsWith("/api/admin") || pathname.startsWith("/admin")) {
         return isActiveUser && currentAuth.user.role === "admin";

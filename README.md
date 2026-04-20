@@ -27,7 +27,15 @@ components/           → React components
 └── ...               → Other shared components
 
 lib/                  → Utilities
+shared/               → Shared runtime schemas and TypeScript types
 ```
+
+## Shared Schemas and Types
+
+Use `shared/schemas/*.ts` for contracts that must stay consistent across frontend and backend code.
+
+- Define request/response contracts once with `zod`.
+- Export inferred TypeScript types with `z.infer<typeof schema>`.
 
 ## Quick Start
 

@@ -1,133 +1,221 @@
-import { NextRequest } from "next/server";
+import { eq } from "drizzle-orm";
+import { NextResponse } from "next/server";
+import { route, routeOperation } from "next-rest-framework";
 
+import { db } from "@/db";
+import { listings, properties } from "@/db/schema";
 import { requireListingWriteSession } from "@/lib/auth/session";
-
-type RouteParams = { params: Promise<{ id: string }> };
-
-type ListingFeature = {
-  name: string;
-  description: string;
-};
-
-type ListingFeatureCategory = {
-  categoryName: string;
-  features: ListingFeature[];
-};
-
-type ListingImage = {
-  url: string;
-  caption: string;
-};
-
-type ListingDetails = {
-  id: string;
-  title?: string;
-  price: number;
-  address: string;
-  city: string;
-  beds: number;
-  baths: number;
-  sqft: number;
-  images: ListingImage[];
-  timeAgo: string;
-  features: ListingFeatureCategory[];
-};
+import { errorMessageSchema } from "@/shared/schemas/common";
+import {
+  deleteListingResponseSchema,
+  listingByIdResponseSchema,
+  type ListingDetails,
+  listingParamsSchema,
+  type ListingIdParam,
+  updateListingResponseSchema,
+  updateListingSchema,
+} from "@/shared/schemas/listings";
 
 const details: ListingDetails = {
-  id: "1",
-  title: "Sunny Downtown Loft",
-  price: 100000,
-  address: "123 Main St",
-  city: "Waterloo",
+  id: "11111111-1111-4111-8111-111111111111",
+  price: 2350,
+  address: {
+    street1: "123 Main St",
+    city: "Waterloo",
+    province: "ON",
+    postalCode: "N2L 3A1",
+  },
   beds: 3,
   baths: 2,
-  sqft: 100,
+  sqft: 1200,
   images: [
-    { url: "https://picsum.photos/id/1048/1200/800", caption: "Front exterior of the building" },
-    { url: "https://picsum.photos/id/1068/1200/800", caption: "Living room with natural light" },
-    { url: "https://picsum.photos/id/1084/1200/800", caption: "Primary bedroom" },
-    { url: "https://picsum.photos/id/1025/1200/800", caption: "Accessible entry pathway" },
+    {
+      url: "https://images.pexels.com/photos/7746646/pexels-photo-7746646.jpeg?cs=srgb&dl=pexels-artbovich-7746646.jpg&fm=jpg",
+      caption: "Open-concept living area and kitchen",
+    },
+    {
+      url: "https://images.pexels.com/photos/10117724/pexels-photo-10117724.jpeg?cs=srgb&dl=pexels-keeganjchecks-10117724.jpg&fm=jpg",
+      caption: "Bright apartment living room and dining area",
+    },
+    {
+      url: "https://images.pexels.com/photos/7614411/pexels-photo-7614411.jpeg?cs=srgb&dl=pexels-artbovich-7614411.jpg&fm=jpg",
+      caption: "Primary bedroom",
+    },
+    {
+      url: "https://images.pexels.com/photos/26732551/pexels-photo-26732551.jpeg?cs=srgb&dl=pexels-pu-ca-adryan-163345030-26732551.jpg&fm=jpg",
+      caption: "Modern apartment sitting room",
+    },
   ],
   timeAgo: "2 days ago",
   features: [
     {
       categoryName: "Accessibility",
       features: [
-        { name: "braille", description: "description of this" },
-        { name: "wheelchair", description: "description of this" },
-        { name: "ramp", description: "description of this" },
+        { name: "braille", description: "braille signage" },
+        { name: "lowered counters", description: "lowered counters for wheelchair users" },
+        { name: "ramp", description: "wheelchair accessible ramp" },
       ],
     },
   ],
 };
 
-/**
- * GET /api/listings/:id
- *
- * Returns a single listing by ID, including full detail:
- * units, eligibility criteria, accessibility features,
- * application instructions, and contact info.
- */
-export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+export const { GET, PUT, DELETE } = route({
+  getListingById: routeOperation({
+    method: "GET",
+  })
+    .input({
+      params: listingParamsSchema,
+    })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: listingByIdResponseSchema,
+      },
+      {
+        status: 404,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
+    .handler((_request, { params }) => {
+      const { id } = params;
 
-  if (id !== details.id) {
-    return Response.json({ message: "Listing not found" }, { status: 404 });
+      if (id !== details.id) {
+        return NextResponse.json({ message: "Listing not found" }, { status: 404 });
+      }
+
+      return NextResponse.json({
+        data: details,
+      });
+    }),
+
+  updateListingById: routeOperation({
+    method: "PUT",
+  })
+    .input({
+      params: listingParamsSchema,
+      contentType: "application/json",
+      body: updateListingSchema,
+    })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: updateListingResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 404,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
+    .handler(async (request, { params }) => {
+      const { response } = await requireOwnedListingForWrite(params.id);
+
+      if (response) {
+        return response;
+      }
+
+      const body = await request.json();
+
+      // TODO: update listing in database
+
+      return NextResponse.json({
+        message: "Listing updated",
+        data: { id: params.id, ...body },
+      });
+    }),
+
+  deleteListingById: routeOperation({
+    method: "DELETE",
+  })
+    .input({
+      params: listingParamsSchema,
+    })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: deleteListingResponseSchema,
+      },
+      {
+        status: 401,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 403,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+      {
+        status: 404,
+        contentType: "application/json",
+        body: errorMessageSchema,
+      },
+    ])
+    .handler(async (_request, { params }) => {
+      const { response } = await requireOwnedListingForWrite(params.id);
+
+      if (response) {
+        return response;
+      }
+
+      // TODO: soft-delete / archive listing in database
+
+      return NextResponse.json({
+        message: "Listing deleted",
+        data: { id: params.id },
+      });
+    }),
+});
+
+async function requireOwnedListingForWrite(listingId: ListingIdParam) {
+  const sessionResult = await requireListingWriteSession();
+
+  if (sessionResult.response) {
+    return {
+      response: sessionResult.response,
+    };
   }
 
-  return Response.json({
-    data: details,
-  });
-}
+  const { session, authzUser } = sessionResult;
 
-/**
- * PUT /api/listings/:id
- *
- * Updates an existing listing. Requires authentication
- * (the owning housing provider or an admin).
- *
- * Accepts a partial body — only provided fields are updated.
- */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+  const [listing] = await db
+    .select({
+      id: listings.id,
+      ownerUserId: properties.ownerUserId,
+    })
+    .from(listings)
+    .innerJoin(properties, eq(listings.propertyId, properties.id))
+    .where(eq(listings.id, listingId))
+    .limit(1);
 
-  const { response } = await requireListingWriteSession();
-
-  if (response) {
-    return response;
+  if (!listing) {
+    return {
+      response: NextResponse.json<{ message: string }>(
+        { message: "Listing not found" },
+        { status: 404 },
+      ),
+    };
   }
 
-  const body = await request.json();
-
-  // TODO: validate body schema
-  // TODO: update listing in database
-  void body;
-
-  return Response.json({
-    message: "Listing updated",
-    data: { id },
-  });
-}
-
-/**
- * DELETE /api/listings/:id
- *
- * Deletes (or archives) a listing. Requires authentication
- * (the owning housing provider or an admin).
- */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const { response } = await requireListingWriteSession();
-
-  if (response) {
-    return response;
+  if (authzUser.role !== "admin" && listing.ownerUserId !== session.user.id) {
+    return {
+      response: NextResponse.json<{ message: string }>({ message: "Forbidden" }, { status: 403 }),
+    };
   }
 
-  // TODO: soft-delete / archive listing in database
-
-  return Response.json({
-    message: "Listing deleted",
-    data: { id },
-  });
+  return { response: null };
 }

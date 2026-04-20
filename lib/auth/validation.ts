@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const emailSchema = z.string().trim().toLowerCase().email("Invalid email address.");
+export const emailSchema = z.string().trim().toLowerCase().pipe(z.email("Invalid email address."));
 
 export const passwordSchema = z
   .string()
@@ -12,15 +12,6 @@ export const passwordSchema = z
 export const signInSchema = z.object({
   email: emailSchema,
   password: z.string().min(1),
-});
-
-export const createAccountInviteSchema = z.object({
-  email: emailSchema,
-  name: z.string().trim().min(1, "Name is required."),
-  role: z.enum(["admin", "partner", "user"], {
-    error: "Role must be admin, partner, or user.",
-  }),
-  sendInviteEmail: z.boolean().optional(),
 });
 
 export const acceptInviteSchema = z
