@@ -1,34 +1,26 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { TypedNextResponse } from "next-rest-framework";
 
 import { db } from "@/db";
-import {
-  customListingFields,
-  listingImages,
-  listings,
-  properties,
-  type ListingCustomFields,
-} from "@/db/schema";
+import { listingImages, listings, properties } from "@/db/schema";
 import { getOptionalSession, requireListingWriteSession } from "@/lib/auth/session";
 import {
-  buildListingFeatureCategories,
-  centsToDollars,
+  getListingRecordById,
+  readListingById,
+  toListingReadContext,
+} from "@/lib/listings/queries";
+import {
   dollarsToCents,
-  formatListingAddress,
-  formatListingTimeAgo,
-  getEnabledBooleanCustomFieldKeys,
   getStoredApplicationMethod,
   getStoredEligibilityCriteria,
   getStoredExternalApplicationUrl,
   getStoredUnits,
-  getListingSquareFeet,
   mergeListingCustomFields,
   resolveListingStatusTimestamps,
 } from "@/lib/listings/store";
 import type {
   DeleteListingResponse,
   ListingByIdResponse,
-  ListingDetails,
   ListingIdParam,
   ListingParams,
   UpdateListingInput,
@@ -44,16 +36,17 @@ export async function getListingByIdHandler(
   { params }: ListingByIdRouteContext,
 ) {
   const optionalSession = await getOptionalSession();
-  const listing = await getListingRecord(params.id);
+  const details = await readListingById({
+    id: params.id,
+    auth: toListingReadContext(optionalSession),
+  });
 
-  if (!listing || !canReadListing(listing, optionalSession)) {
+  if (!details) {
     return TypedNextResponse.json<{ message: string }, 404, "application/json">(
       { message: "Listing not found" },
       { status: 404 },
     );
   }
-
-  const details = await buildListingDetailsResponse(listing);
 
   return TypedNextResponse.json<ListingByIdResponse, 200, "application/json">({
     data: details,
@@ -206,135 +199,6 @@ export async function deleteListingByIdHandler(
   });
 }
 
-async function buildListingDetailsResponse(
-  listing: NonNullable<Awaited<ReturnType<typeof getListingRecord>>>,
-): Promise<ListingDetails> {
-  const imageRows = await db
-    .select({
-      imageUrl: listingImages.imageUrl,
-      altText: listingImages.altText,
-    })
-    .from(listingImages)
-    .where(eq(listingImages.listingId, listing.id))
-    .orderBy(asc(listingImages.sortOrder));
-
-  const enabledDefinitionKeys = getEnabledBooleanCustomFieldKeys(listing.customFields);
-  const featureDefinitions =
-    enabledDefinitionKeys.length > 0
-      ? await db
-          .select({
-            key: customListingFields.key,
-            label: customListingFields.label,
-            description: customListingFields.description,
-            category: customListingFields.category,
-          })
-          .from(customListingFields)
-          .where(
-            and(
-              inArray(customListingFields.key, enabledDefinitionKeys),
-              eq(customListingFields.isPublic, true),
-            ),
-          )
-          .orderBy(asc(customListingFields.sortOrder))
-      : [];
-
-  return {
-    id: listing.id,
-    price: centsToDollars(listing.monthlyRentCents),
-    address: formatListingAddress(listing.property.street1, listing.unitNumber),
-    city: listing.property.city,
-    description: listing.description,
-    beds: listing.bedrooms,
-    baths: listing.bathrooms,
-    sqft: getListingSquareFeet(listing.squareFeet, listing.customFields),
-    units: getStoredUnits(listing.customFields).map((unit) => ({
-      bedrooms: unit.bedrooms ?? listing.bedrooms,
-      bathrooms: unit.bathrooms ?? listing.bathrooms,
-      sqft: unit.sqft ?? getListingSquareFeet(listing.squareFeet, listing.customFields),
-      rent: unit.rent ?? centsToDollars(listing.monthlyRentCents),
-      availableDate:
-        unit.availableDate ??
-        listing.availableOn ??
-        new Date(listing.createdAt).toISOString().slice(0, 10),
-    })),
-    images: imageRows.map((image) => ({
-      url: image.imageUrl,
-      caption: image.altText ?? `${listing.title} image`,
-    })),
-    timeAgo: formatListingTimeAgo(listing.publishedAt, listing.createdAt),
-    features: buildListingFeatureCategories(listing.customFields, featureDefinitions),
-  };
-}
-
-async function getListingRecord(listingId: ListingIdParam) {
-  const [listing] = await db
-    .select({
-      id: listings.id,
-      title: listings.title,
-      description: listings.description,
-      status: listings.status,
-      unitNumber: listings.unitNumber,
-      bedrooms: listings.bedrooms,
-      bathrooms: listings.bathrooms,
-      squareFeet: listings.squareFeet,
-      monthlyRentCents: listings.monthlyRentCents,
-      availableOn: listings.availableOn,
-      maxIncomeCents: listings.maxIncomeCents,
-      applicationUrl: listings.applicationUrl,
-      applicationEmail: listings.applicationEmail,
-      applicationPhone: listings.applicationPhone,
-      customFields: listings.customFields,
-      publishedAt: listings.publishedAt,
-      archivedAt: listings.archivedAt,
-      createdAt: listings.createdAt,
-      updatedAt: listings.updatedAt,
-      property: {
-        id: properties.id,
-        ownerUserId: properties.ownerUserId,
-        name: properties.name,
-        street1: properties.street1,
-        city: properties.city,
-        province: properties.province,
-        postalCode: properties.postalCode,
-        neighborhood: properties.neighborhood,
-        latitude: properties.latitude,
-        longitude: properties.longitude,
-        contactName: properties.contactName,
-        contactEmail: properties.contactEmail,
-        contactPhone: properties.contactPhone,
-      },
-    })
-    .from(listings)
-    .innerJoin(properties, eq(listings.propertyId, properties.id))
-    .where(eq(listings.id, listingId))
-    .limit(1);
-
-  return listing
-    ? {
-        ...listing,
-        customFields: listing.customFields as ListingCustomFields,
-      }
-    : null;
-}
-
-function canReadListing(
-  listing: NonNullable<Awaited<ReturnType<typeof getListingRecord>>>,
-  sessionResult: Awaited<ReturnType<typeof getOptionalSession>>,
-) {
-  if (listing.status === "published") {
-    return true;
-  }
-
-  if (!sessionResult.session || !sessionResult.authzUser) {
-    return false;
-  }
-
-  return (
-    sessionResult.authzUser.role === "admin" ||
-    listing.property.ownerUserId === sessionResult.session.user.id
-  );
-}
-
 async function requireOwnedListingForWrite(listingId: ListingIdParam) {
   const sessionResult = await requireListingWriteSession();
 
@@ -346,7 +210,7 @@ async function requireOwnedListingForWrite(listingId: ListingIdParam) {
     };
   }
 
-  const listing = await getListingRecord(listingId);
+  const listing = await getListingRecordById(listingId);
 
   if (!listing) {
     return {

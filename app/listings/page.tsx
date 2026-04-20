@@ -1,42 +1,21 @@
-import { headers } from "next/headers";
+import { connection } from "next/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { listingListResponseSchema, type ListingSummary } from "@/shared/schemas/listings";
+import { readListings } from "@/lib/listings/queries";
 
 import ListingsDashboard from "./listings";
 
-async function getListingsFromApi(): Promise<ListingSummary[]> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
-  const allowedHosts = new Set([
-    "localhost:3000",
-    "localhost:3100",
-    "localhost:3200",
-    "localhost:3201",
-  ]);
-  const trustedBaseUrl = process.env.NEXTAUTH_URL;
+async function getListings() {
+  await connection();
 
-  const baseUrl =
-    trustedBaseUrl || (host && allowedHosts.has(host) ? `${protocol}://${host}` : null);
-
-  if (!baseUrl) {
-    throw new Error("Missing trusted base URL for listings request.");
-  }
-
-  const response = await fetch(`${baseUrl}/api/listings?limit=50`, {
-    cache: "no-store",
+  const payload = await readListings({
+    limit: 50,
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to load listings.");
-  }
-
-  const payload = listingListResponseSchema.parse(await response.json());
   return payload.data;
 }
 
 export default async function ListingsPage() {
-  const listings = await getListingsFromApi();
+  const listings = await getListings();
 
   return (
     <NuqsAdapter>
