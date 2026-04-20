@@ -1,7 +1,6 @@
 import type { ListingFormInput } from "@/app/listingForm/types";
 import { ListingDetails } from "@/components/listing-details/ListingDetails";
 import { ListingsCard } from "@/components/listings-card/listingsCard";
-import { Button } from "@/components/ui/button";
 import { buildAddress } from "@/lib/address";
 
 export type ListingFormPreviewMode = "card" | "details";
@@ -11,7 +10,6 @@ export interface ListingFormPreviewProps {
   formData: ListingFormInput;
   listingId?: string;
   onOpenDetails: () => void;
-  onBackToCard: () => void;
 }
 
 export function ListingFormPreview({
@@ -19,7 +17,6 @@ export function ListingFormPreview({
   formData,
   listingId,
   onOpenDetails,
-  onBackToCard,
 }: ListingFormPreviewProps) {
   const previewTitleValue = formData.title?.trim();
   const previewStreet1Value = formData.street1?.trim();
@@ -63,11 +60,6 @@ export function ListingFormPreview({
   if (mode === "details") {
     return (
       <div className="space-y-4">
-        <div className="flex justify-end">
-          <Button type="button" variant="outline" onClick={onBackToCard}>
-            Back to Card Preview
-          </Button>
-        </div>
         <ListingDetails
           embedded
           title={previewTitle}

@@ -34,6 +34,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
 
     setPreviewMode("card");
     window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
   };
 
   const liveFormData = form.watch();
@@ -116,7 +117,6 @@ export default function ListingForm({ listingId }: ListingFormProps) {
           formData={liveFormData}
           listingId={listingId}
           onOpenDetails={handleOpenDetails}
-          onBackToCard={() => setPreviewMode("card")}
         />
       }
       footer={
