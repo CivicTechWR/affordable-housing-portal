@@ -18,7 +18,8 @@ export default function ListingsError({
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold text-slate-900">We couldn't load listings.</h1>
         <p className="text-sm text-slate-600">
-          Try again in a moment. If the issue keeps happening, there may be a data or network problem.
+          Try again in a moment. If the issue keeps happening, there may be a data or network
+          problem.
         </p>
       </div>
       <button
