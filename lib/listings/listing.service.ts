@@ -269,6 +269,11 @@ export async function updateListingByIdService(input: {
     publishedAt: listing.publishedAt,
     archivedAt: listing.archivedAt,
   });
+  const nextPrimaryUnitRentCents = dollarsToCents(primaryUnit?.rent ?? undefined);
+  const monthlyRentCents =
+    typeof nextPrimaryUnitRentCents === "number" && Number.isFinite(nextPrimaryUnitRentCents)
+      ? nextPrimaryUnitRentCents
+      : listing.monthlyRentCents;
 
   await updateListingGraph({
     actorUserId: actorResult.value.actor.userId,
@@ -294,9 +299,7 @@ export async function updateListingByIdService(input: {
       bedrooms: primaryUnit?.bedrooms ?? listing.bedrooms,
       bathrooms: primaryUnit?.bathrooms ?? listing.bathrooms,
       squareFeet: primaryUnit?.sqft ?? listing.squareFeet,
-      monthlyRentCents:
-        (typeof primaryUnit?.rent === "number" ? primaryUnit.rent * 100 : null) ??
-        listing.monthlyRentCents,
+      monthlyRentCents,
       availableOn: primaryUnit?.availableDate ?? listing.availableOn,
       maxIncomeCents:
         nextEligibility.maxIncome === null

@@ -3,14 +3,19 @@ import "server-only";
 import { and, eq, isNotNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { users, type UserStatus } from "@/db/schema";
+import { lower, users, type UserStatus } from "@/db/schema";
 import { hashPassword } from "@/lib/auth/password";
 
 const DEFAULT_BOOTSTRAP_ADMIN_EMAIL = "admin@example.com";
 const DEFAULT_BOOTSTRAP_ADMIN_NAME = "admin";
 
 export async function getUserForAuth(email: string) {
-  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const normalizedEmail = email.trim().toLowerCase();
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(lower(users.email), normalizedEmail))
+    .limit(1);
 
   return user ?? null;
 }
@@ -43,27 +48,35 @@ export async function ensureBootstrapAdmin(email: string, password: string) {
 
     const now = new Date();
     const passwordHash = await hashPassword(configuredPassword);
-    const [bootstrapAdmin] = await tx
-      .insert(users)
-      .values({
-        email: bootstrapEmail,
-        fullName: DEFAULT_BOOTSTRAP_ADMIN_NAME,
-        passwordHash,
-        role: "admin",
-        status: "active",
-        inviteAcceptedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: users.email,
-        set: {
-          fullName: DEFAULT_BOOTSTRAP_ADMIN_NAME,
-          passwordHash,
-          role: "admin",
-          status: "active",
-          inviteAcceptedAt: now,
-        },
-      })
-      .returning();
+    const [existingUserForEmail] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(lower(users.email), bootstrapEmail))
+      .limit(1);
+
+    const [bootstrapAdmin] = existingUserForEmail
+      ? await tx
+          .update(users)
+          .set({
+            fullName: DEFAULT_BOOTSTRAP_ADMIN_NAME,
+            passwordHash,
+            role: "admin",
+            status: "active",
+            inviteAcceptedAt: now,
+          })
+          .where(eq(users.id, existingUserForEmail.id))
+          .returning()
+      : await tx
+          .insert(users)
+          .values({
+            email: bootstrapEmail,
+            fullName: DEFAULT_BOOTSTRAP_ADMIN_NAME,
+            passwordHash,
+            role: "admin",
+            status: "active",
+            inviteAcceptedAt: now,
+          })
+          .returning();
 
     return bootstrapAdmin ?? null;
   });

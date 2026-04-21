@@ -100,10 +100,26 @@ export function andListingSpecifications(
 
 function dollarsStringToCents(value: string) {
   const normalized = value.trim();
+  const amountMatch = normalized.match(/^(\d+)(?:\.(\d{1,2}))?$/);
 
-  if (!/^\d+(\.\d+)?$/.test(normalized)) {
+  if (!amountMatch) {
     return null;
   }
 
-  return Math.round(Number(normalized) * 100);
+  const dollarsMatch = amountMatch[1];
+
+  if (!dollarsMatch) {
+    return null;
+  }
+
+  const dollars = Number.parseInt(dollarsMatch, 10);
+  const cents = Number.parseInt((amountMatch[2] ?? "").padEnd(2, "0") || "0", 10);
+
+  if (!Number.isSafeInteger(dollars) || !Number.isSafeInteger(cents)) {
+    return null;
+  }
+
+  const totalCents = dollars * 100 + cents;
+
+  return Number.isSafeInteger(totalCents) ? totalCents : null;
 }

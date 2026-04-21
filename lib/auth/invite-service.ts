@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { and, eq, gt, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { userInvites, users, type UserRole } from "@/db/schema";
+import { lower, userInvites, users, type UserRole } from "@/db/schema";
 import { sendInviteEmail } from "@/lib/auth/invite-email";
 import { createOpaqueToken, hashOpaqueToken } from "@/lib/auth/token";
 
@@ -29,7 +29,7 @@ export async function createInvite(params: {
     const [existingUser] = await tx
       .select()
       .from(users)
-      .where(eq(users.email, normalizedEmail))
+      .where(eq(lower(users.email), normalizedEmail))
       .limit(1);
 
     const organization =

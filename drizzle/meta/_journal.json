@@ -29,6 +29,13 @@
       "when": 1776641124311,
       "tag": "20260419232524_add_user_organization",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776735455214,
+      "tag": "20260421013735_case_insensitive_users_email_unique_index",
+      "breakpoints": true
     }
   ]
 }
