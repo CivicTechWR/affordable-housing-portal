@@ -39,21 +39,22 @@ const MOCK_LISTING_DATA: ListingFormData = {
   customFeatures: [
     {
       category: "Entry & Exterior",
-      id: "Main Entrance is Barrier-Free",
+      id: "main_entrance_is_barrier_free",
       name: "Main Entrance is Barrier-Free",
-      description: "The building's main entrance is level and accessible without stairs.",
+      description:
+        "The main building entrance has no steps or barriers and can be accessed without assistance.",
     },
     {
       category: "Building Amenities",
-      id: "Elevator in Building",
+      id: "elevator_in_building",
       name: "Elevator in Building",
-      description: "The building has at least one functioning passenger elevator.",
+      description: "The building has at least one elevator for accessing upper floors.",
     },
     {
       category: "Unit Interior",
-      id: "Unit Entrance is Barrier-Free",
+      id: "unit_entrance_is_barrier_free",
       name: "Unit Entrance is Barrier-Free",
-      description: "The doorway to the unit has no steps or raised thresholds.",
+      description: "The entrance to the unit has no steps or raised thresholds.",
     },
   ],
 };

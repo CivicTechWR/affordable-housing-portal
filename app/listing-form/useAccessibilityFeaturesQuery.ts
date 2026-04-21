@@ -1,24 +1,44 @@
 import { useState, useEffect } from "react";
-import { ACCESSIBILITY_FEATURE_GROUPS } from "./accessibilityFeatureGroups";
+
+import {
+  customListingFieldListResponseSchema,
+  type CustomListingFieldGroup,
+} from "@/shared/schemas/custom-listing-fields";
 
 export function useAccessibilityFeaturesQuery() {
-  const [data, setData] = useState<typeof ACCESSIBILITY_FEATURE_GROUPS | null>(null);
+  const [data, setData] = useState<CustomListingFieldGroup[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    // Simulate a network request delay
-    const timer = setTimeout(() => {
-      try {
-        setData(ACCESSIBILITY_FEATURE_GROUPS);
-        setIsLoading(false);
-      } catch {
-        setIsError(true);
-        setIsLoading(false);
-      }
-    }, 1000); // 1s mock wait
+    let cancelled = false;
 
-    return () => clearTimeout(timer);
+    async function fetchFeatures() {
+      try {
+        const response = await fetch(
+          "/api/custom-listing-fields?publicOnly=true&filterableOnly=true&type=boolean",
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch accessibility features");
+        }
+        const payload = customListingFieldListResponseSchema.parse(await response.json());
+        if (!cancelled) {
+          setData(payload.data);
+          setIsLoading(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsError(true);
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void fetchFeatures();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return { data, isLoading, isError };

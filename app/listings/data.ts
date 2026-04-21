@@ -1,5 +1,6 @@
 import type { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import type { ListingSummary } from "@/shared/schemas/listings";
+import { getCustomListingFieldsService } from "@/lib/custom-listing-fields/custom-listing-field.service";
 import { MOCK_LISTING_ID_PRIMARY, MOCK_LISTING_ID_SECONDARY } from "./mockListingIds";
 
 export interface ListingsDashboardData {
@@ -58,21 +59,26 @@ const MOCK_LISTINGS: ListingSummary[] = [
   },
 ];
 
-const DEFAULT_DYNAMIC_GROUPS: DynamicFilterGroup[] = [
-  {
-    groupId: "features",
-    groupLabel: "Features",
-    options: [
-      { id: "beds", label: "Beds", type: "boolean" },
-      { id: "baths", label: "Baths", type: "boolean" },
-    ],
-  },
-];
-
 export async function getListingsDashboardData(): Promise<ListingsDashboardData> {
+  const fieldsResponse = await getCustomListingFieldsService({
+    publicOnly: "true",
+    filterableOnly: "true",
+    type: "boolean",
+  });
+
+  const dynamicGroups: DynamicFilterGroup[] = fieldsResponse.data.map((group) => ({
+    groupId: group.groupId,
+    groupLabel: group.groupLabel,
+    options: group.options.map((option) => ({
+      id: option.id,
+      label: option.label,
+      type: "boolean" as const,
+    })),
+  }));
+
   // TODO: Replace with API/database reads when listings index data is available.
   return {
     listings: MOCK_LISTINGS,
-    dynamicGroups: DEFAULT_DYNAMIC_GROUPS,
+    dynamicGroups,
   };
 }
