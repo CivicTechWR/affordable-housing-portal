@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1775602503771,
+      "tag": "20260416010101_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776377621958,
+      "tag": "20260417021410_listing_custom_fields_jsonb",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776413258324,
+      "tag": "20260417080738_local_auth_invites",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776641124311,
+      "tag": "20260419232524_add_user_organization",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776735455214,
+      "tag": "20260421013735_case_insensitive_users_email_unique_index",
+      "breakpoints": true
+    }
+  ]
+}

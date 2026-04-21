@@ -1,79 +1,53 @@
-import { NextRequest } from "next/server";
+import { route, routeOperation } from "next-rest-framework";
 
-type RouteParams = { params: Promise<{ id: string }> };
+import { errorMessageSchema } from "@/shared/schemas/common";
+import {
+  accountByIdResponseSchema,
+  accountParamsSchema,
+  deactivateAccountResponseSchema,
+  updateAccountResponseSchema,
+  updateAccountSchema,
+} from "@/shared/schemas/account-management";
+import {
+  deactivateAccountByIdHandler,
+  getAccountByIdHandler,
+  updateAccountByIdHandler,
+} from "./handlers";
 
-/**
- * GET /api/admin/accounts/:id
- *
- * Returns a single account by ID, including profile details,
- * role, associated organization, and account status.
- * Admin-only endpoint.
- */
-export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
+export const { GET, PUT, DELETE } = route({
+  getAccountById: routeOperation({ method: "GET" })
+    .input({ params: accountParamsSchema })
+    .outputs([
+      { status: 200, contentType: "application/json", body: accountByIdResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
+    ])
+    .handler(getAccountByIdHandler),
 
-  // TODO: authenticate request (admin only)
-  // TODO: fetch account from database
-  // TODO: return 404 if not found
+  updateAccountById: routeOperation({ method: "PUT" })
+    .input({
+      params: accountParamsSchema,
+      contentType: "application/json",
+      body: updateAccountSchema,
+    })
+    .outputs([
+      { status: 200, contentType: "application/json", body: updateAccountResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
+      { status: 409, contentType: "application/json", body: errorMessageSchema },
+    ])
+    .handler(updateAccountByIdHandler),
 
-  return Response.json({
-    data: {
-      id,
-      email: null,
-      name: null,
-      role: null,
-      organization: null,
-      status: null,
-      listingsCount: 0,
-      lastLoginAt: null,
-      createdAt: null,
-      updatedAt: null,
-    },
-  });
-}
-
-/**
- * PUT /api/admin/accounts/:id
- *
- * Updates an account. Admin-only endpoint.
- *
- * Accepts a partial body. Common operations:
- *   - Change role
- *   - Suspend / reactivate account
- *   - Update organization association
- */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  // TODO: authenticate request (admin only)
-  const body = await request.json();
-
-  // TODO: validate body schema
-  // TODO: update account in database
-  void body;
-
-  return Response.json({
-    message: "Account updated",
-    data: { id },
-  });
-}
-
-/**
- * DELETE /api/admin/accounts/:id
- *
- * Deactivates (soft-deletes) an account. Admin-only endpoint.
- * Does not permanently erase data — the account is marked
- * as deactivated and the user can no longer sign in.
- */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  // TODO: authenticate request (admin only)
-  // TODO: soft-delete account in database
-  // TODO: revoke active sessions
-
-  return Response.json({
-    message: "Account deactivated",
-    data: { id },
-  });
-}
+  deactivateAccountById: routeOperation({ method: "DELETE" })
+    .input({ params: accountParamsSchema })
+    .outputs([
+      { status: 200, contentType: "application/json", body: deactivateAccountResponseSchema },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
+      { status: 409, contentType: "application/json", body: errorMessageSchema },
+    ])
+    .handler(deactivateAccountByIdHandler),
+});

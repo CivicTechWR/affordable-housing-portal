@@ -1,23 +1,32 @@
-import { Suspense } from "react";
+import { connection } from "next/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-
-import { listListings } from "@/lib/listings/data";
+import ListingsSkeleton from "@/components/listings-skeleton/ListingsSkeleton";
+import { Suspense } from "react";
+import { getListingsService } from "@/lib/listings/listing.service";
 
 import ListingsDashboard from "./listings";
-import { parseListingsPageQuery } from "./searchParams";
+import { getListingsDashboardData } from "./data";
 
-export default async function ListingsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const initialQuery = await parseListingsPageQuery(searchParams);
-  const initialData = listListings(initialQuery);
+async function getListings() {
+  await connection();
+
+  const payload = await getListingsService({
+    limit: "50",
+  });
+
+  return payload.data;
+}
+
+export default async function ListingsPage() {
+  const [listings, { dynamicGroups }] = await Promise.all([
+    getListings(),
+    getListingsDashboardData(),
+  ]);
 
   return (
     <NuqsAdapter>
-      <Suspense fallback={<div className="h-screen bg-white" />}>
-        <ListingsDashboard initialData={initialData} initialQuery={initialQuery} />
+      <Suspense fallback={<ListingsSkeleton />}>
+        <ListingsDashboard initialListings={listings} dynamicGroups={dynamicGroups} />
       </Suspense>
     </NuqsAdapter>
   );

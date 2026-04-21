@@ -3,35 +3,41 @@
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
-import { ListingsDisplayMode, ListingsSidebar } from "@/components/listings-sidebar/listingsSideBar";
-import { MapView } from "@/components/map-view/mapView";
-import { ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
-import { SortOptions } from "@/components/sort-options/SortOptions";
-import { ToggleIconButton } from "@/components/toggle-icon-button/ToggleIconButton";
-import { FilterMailIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { useMemo, useState } from "react";
+import {
+  DisplayMode,
+  ListingFilterSearchBar,
+} from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
+import { FilterButton } from "@/components/filter-button/FilterButton";
+import { useState } from "react";
+import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
+import type { ListingSummary } from "@/shared/schemas/listings";
+import dynamic from "next/dynamic";
 
-import { useListingsQuery } from "@/hooks/useListingsQuery";
-import type { ListingSortOption, ListingsQuery, ListingsResponse } from "@/lib/listings/types";
-
-export enum DisplayMode {
-  LIST = "list",
-  MAP_LIST = "map_list",
-  MAP = "map",
-}
+const LazyMapView = dynamic<{ listings: ListingSummary[] }>(
+  () => import("../../components/map-view/MapView.tsx").then((mod) => mod.MapView),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full min-h-[400px] items-center justify-center bg-muted/30 text-sm text-muted-foreground">
+        Loading map...
+      </div>
+    ),
+  },
+);
 
 interface ListingsDashboardProps {
-  initialData: ListingsResponse;
-  initialQuery: ListingsQuery;
+  initialListings: ListingSummary[];
+  dynamicGroups: DynamicFilterGroup[];
 }
 
 export default function ListingsDashboard({
-  initialData,
-  initialQuery,
+  initialListings,
+  dynamicGroups,
 }: ListingsDashboardProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [displayMode] = useState<DisplayMode>(DisplayMode.LIST);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
+  const isSplitView = displayMode === DisplayMode.MAP_LIST;
+
   const {
     sortOptionProps,
     bedroomToggleProps,
@@ -41,82 +47,47 @@ export default function ListingsDashboard({
     getFeatureCheckboxProps,
     datePickerProps,
     clearFilters,
-    bathrooms,
-    bedrooms,
-    features,
-    location,
-    maxPrice,
-    minPrice,
-    moveInDate,
-    sort,
+    getFilterButtonProps,
   } = useListingFilters();
-
-  const query = useMemo<ListingsQuery>(
-    () => ({
-      page: 1,
-      limit: 50,
-      location,
-      minPrice,
-      maxPrice,
-      bedrooms,
-      bathrooms,
-      moveInDate: moveInDate ? moveInDate.toISOString() : null,
-      sort: sort as ListingSortOption,
-      features,
-    }),
-    [bathrooms, bedrooms, features, location, maxPrice, minPrice, moveInDate, sort],
+  const filterButtonProps = getFilterButtonProps(isFilterOpen, () =>
+    setIsFilterOpen(!isFilterOpen),
   );
-  const { data, error, isLoading } = useListingsQuery(query, {
-    initialData,
-    initialQuery,
-  });
-  const listings = data.data;
-  const dynamicGroups: DynamicFilterGroup[] = data.availableFilters.featureGroups;
 
   return (
-    <div className="flex h-screen flex-col">
-      <header className="flex h-16 shrink-0 items-center border-b bg-white px-4">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
+      <header className="flex h-16 shrink-0 items-center border-b bg-background px-4">
         <ListingFilterSearchBar
           searchInputProps={searchInputProps}
           priceRangeProps={priceRangeProps}
           bedroomToggleProps={bedroomToggleProps}
           bathroomToggleProps={bathroomToggleProps}
+          displayModeProps={{
+            displayModes: [
+              { value: DisplayMode.LIST, label: "List" },
+              { value: DisplayMode.MAP, label: "Map" },
+              { value: DisplayMode.MAP_LIST, label: "Split" },
+            ],
+            onChange: (value: string) => setDisplayMode(value as DisplayMode),
+            value: displayMode,
+          }}
         />
-        <div className="flex items-center gap-3">
-          <h2 className="text-sm font-medium text-slate-700">Filters</h2>
-          <ToggleIconButton
-            isActive={isFilterOpen}
-            icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
-            onClick={() => setIsFilterOpen((current) => !current)}
-            aria-label="Toggle filters"
-          />
-        </div>
+        <FilterButton {...filterButtonProps} />
       </header>
-      <main className="flex flex-1 overflow-hidden">
-        <div className="flex h-full min-w-0 flex-col bg-white">
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-4">
-            <div className="text-sm text-slate-500">
-              {isLoading && listings.length === 0
-                ? "Loading listings..."
-                : `${data.pagination.total} results`}
-            </div>
-            <SortOptions {...sortOptionProps} />
+      <main className="flex min-h-0 flex-1 overflow-hidden">
+        {displayMode !== DisplayMode.MAP ? (
+          <ListingsPanel
+            listings={initialListings}
+            displayMode={displayMode}
+            filterButtonProps={filterButtonProps}
+            sortOptionProps={sortOptionProps}
+          />
+        ) : null}
+        {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
+          <div className={`min-w-0 flex-1 ${isSplitView ? "lg:basis-1/2" : ""}`}>
+            <LazyMapView listings={initialListings} />
           </div>
-          {error ? (
-            <div className="flex h-full items-center justify-center p-8 text-sm text-red-600">{error}</div>
-          ) : (
-            <ListingsSidebar
-              listings={listings}
-              mode={
-                displayMode === DisplayMode.LIST
-                  ? ListingsDisplayMode.FULLSCREEN
-                  : ListingsDisplayMode.SIDESCROLL
-              }
-            />
-          )}
-        </div>
-        <MapView listings={listings} />
-        {isFilterOpen ? (
+        )}
+        {isFilterOpen && (
           <ListingFilters
             bathroomToggleProps={bathroomToggleProps}
             bedroomToggleProps={bedroomToggleProps}
@@ -126,7 +97,7 @@ export default function ListingsDashboard({
             clearFilters={clearFilters}
             dynamicGroups={dynamicGroups}
           />
-        ) : null}
+        )}
       </main>
     </div>
   );
