@@ -1,0 +1,36 @@
+{
+  "adminInvite": {
+    "pageTitle": "Admin Invites | Affordable Housing Portal",
+    "pageDescription": "Invite housing searchers and housing listers by email.",
+    "previewPageTitle": "Admin Invite Mock Preview | Affordable Housing Portal",
+    "previewPageDescription": "Preview the account invite flow.",
+    "heading": "Admin invites",
+    "subheading": "Invite housing searchers and housing listers by email.",
+    "formTitle": "Send invitation",
+    "formDescription": "Sends account invitations through the admin accounts API.",
+    "fields": {
+      "nameLabel": "Name",
+      "namePlaceholder": "Jane Doe",
+      "emailLabel": "Invite email",
+      "emailPlaceholder": "name@example.com",
+      "organizationLabel": "Organization",
+      "organizationPlaceholder": "Optional",
+      "roleLabel": "Invite as",
+      "rolePlaceholder": "Select a role"
+    },
+    "actions": {
+      "send": "Send invite",
+      "sending": "Sending invite..."
+    },
+    "recentInvites": {
+      "heading": "Recent invites",
+      "description": "Shows the most recent active invites from the admin API.",
+      "emptyState": "No recent invites found."
+    },
+    "roles": {
+      "admin": "Admin",
+      "partner": "Housing Lister",
+      "user": "Housing Searcher"
+    }
+  }
+}

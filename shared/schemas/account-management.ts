@@ -78,6 +78,23 @@ export const createAccountResponseSchema = z.object({
   }),
 });
 
+export const accountInviteQuerySchema = z.object({
+  limit: positiveIntegerQueryParamWithMaxSchema(50).optional(),
+});
+
+export const accountInviteSchema = z.object({
+  id: accountIdSchema,
+  email: z.email(),
+  name: nonEmptyString,
+  role: accountRoleSchema,
+  organization: z.string().nullable(),
+  invitedAt: z.string(),
+});
+
+export const accountInviteListResponseSchema = z.object({
+  data: z.array(accountInviteSchema),
+});
+
 export const updateAccountResponseSchema = z.object({
   message: z.string(),
   data: z.object({ id: accountIdSchema }).and(updateAccountFieldsSchema),
@@ -92,6 +109,9 @@ export type AccountParams = z.infer<typeof accountParamsSchema>;
 export type AccountQuery = z.infer<typeof accountQuerySchema>;
 export type CreateAccountInviteInput = z.infer<typeof createAccountInviteSchema>;
 export type UpdateAccountInput = z.infer<typeof updateAccountSchema>;
+export type AccountInviteQuery = z.infer<typeof accountInviteQuerySchema>;
+export type AccountInvite = z.infer<typeof accountInviteSchema>;
+export type AccountInviteListResponse = z.infer<typeof accountInviteListResponseSchema>;
 export type AccountListResponse = z.infer<typeof accountListResponseSchema>;
 export type AccountByIdResponse = z.infer<typeof accountByIdResponseSchema>;
 export type CreateAccountResponse = z.infer<typeof createAccountResponseSchema>;

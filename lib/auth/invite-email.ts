@@ -9,14 +9,17 @@ export async function sendInviteEmail(params: {
 }) {
   const resend = createResendClient();
   const inviteUrl = getSafeInviteUrl(params.inviteUrl);
-
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: getEmailFromAddress(),
     to: params.email,
     subject: "You’ve been invited to the Affordable Housing Portal",
     text: `Hello ${params.fullName},\n\nYou’ve been invited to the Affordable Housing Portal. Use the link below to create your password and activate your account:\n\n${inviteUrl}\n\nIf you were not expecting this invite, you can ignore this email.`,
     html: `<p>Hello ${escapeHtml(params.fullName)},</p><p>You’ve been invited to the Affordable Housing Portal.</p><p><a href="${escapeHtml(inviteUrl)}">Create your password and activate your account</a></p><p>If you were not expecting this invite, you can ignore this email.</p>`,
   });
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
 }
 
 function getSafeInviteUrl(value: string) {

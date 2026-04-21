@@ -1,10 +1,19 @@
 import "server-only";
 
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { and, desc, eq, gt, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { userInvites, users } from "@/db/schema";
+import { userInvites, users, type UserRole } from "@/db/schema";
 import { hashOpaqueToken } from "@/lib/auth/token";
+
+export type RecentAccountInviteRow = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  organization: string | null;
+  invitedAt: Date;
+};
 
 export class InviteUnavailableError extends Error {
   constructor() {
@@ -37,6 +46,46 @@ export async function getPendingInviteByToken(token: string) {
     .limit(1);
 
   return invite ?? null;
+}
+
+export async function findRecentAccountInvites(limit: number): Promise<RecentAccountInviteRow[]> {
+  const rows = await db
+    .select({
+      id: userInvites.id,
+      email: userInvites.email,
+      name: users.fullName,
+      role: users.role,
+      organization: users.organization,
+      sentAt: userInvites.sentAt,
+    })
+    .from(userInvites)
+    .innerJoin(users, eq(userInvites.userId, users.id))
+    .where(
+      and(
+        isNull(userInvites.acceptedAt),
+        isNotNull(userInvites.sentAt),
+        gt(userInvites.expiresAt, new Date()),
+      ),
+    )
+    .orderBy(desc(userInvites.sentAt), desc(userInvites.createdAt))
+    .limit(limit);
+
+  return rows.flatMap((row) => {
+    if (!row.sentAt) {
+      return [];
+    }
+
+    return [
+      {
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        role: row.role,
+        organization: row.organization,
+        invitedAt: row.sentAt,
+      },
+    ];
+  });
 }
 
 export async function acceptInvite(params: {
