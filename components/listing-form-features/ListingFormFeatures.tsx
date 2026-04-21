@@ -60,7 +60,7 @@ export function ListingFormFeatures({ control }: ListingFormFeaturesProps) {
                     <FormControl>
                       <ToggleField
                         title={option.label}
-                        description={option.description}
+                        description={option.helpText ?? option.description}
                         variant="primary"
                         options={[
                           { label: "Yes", value: "yes" },
