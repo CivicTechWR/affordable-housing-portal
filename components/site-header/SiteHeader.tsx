@@ -27,6 +27,12 @@ export async function SiteHeader() {
 
         {rawSession?.user ? (
           <>
+            {optionalSession.authzUser?.role === "admin" ? (
+              <Link href="/admin/custom-listing-fields" className={navPillClass}>
+                Field Dashboard
+              </Link>
+            ) : null}
+
             {session?.user ? (
               <span className="inline-flex max-w-56 items-center gap-1.5 rounded-full bg-primary-foreground/20 px-3 py-1.5 text-sm font-medium text-primary-foreground">
                 <HugeiconsIcon icon={UserIcon} strokeWidth={2} size={16} />

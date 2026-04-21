@@ -2,12 +2,14 @@ import { TypedNextResponse, type TypedNextRequest } from "next-rest-framework";
 
 import { mapDomainErrorToHttpResponse } from "@/lib/http/map-domain-error";
 import {
+  deleteAdminCustomListingFieldByIdService,
   getAdminCustomListingFieldByIdService,
   updateAdminCustomListingFieldByIdService,
 } from "@/lib/custom-listing-fields/custom-listing-field-admin.service";
 import type {
   CustomListingFieldByIdResponse,
   CustomListingFieldParams,
+  DeleteCustomListingFieldResponse,
   UpdateCustomListingFieldInput,
   UpdateCustomListingFieldResponse,
 } from "@/shared/schemas/custom-listing-fields";
@@ -47,6 +49,22 @@ export async function updateAdminCustomListingFieldByIdHandler(
   }
 
   return TypedNextResponse.json<UpdateCustomListingFieldResponse, 200, "application/json">(
+    result.value,
+    { status: 200 },
+  );
+}
+
+export async function deleteAdminCustomListingFieldByIdHandler(
+  _request: TypedNextRequest<"DELETE">,
+  { params }: CustomListingFieldRouteContext,
+) {
+  const result = await deleteAdminCustomListingFieldByIdService(params.id);
+
+  if (!result.ok) {
+    return mapDomainErrorToHttpResponse(result.error);
+  }
+
+  return TypedNextResponse.json<DeleteCustomListingFieldResponse, 200, "application/json">(
     result.value,
     { status: 200 },
   );

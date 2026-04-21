@@ -101,6 +101,18 @@ export const updateCustomListingFieldSchema = customListingFieldMutationSchema
     message: "At least one field is required.",
   });
 
+export const reorderCustomListingFieldsSchema = z.object({
+  category: nonEmptyString,
+  fields: z
+    .array(
+      z.object({
+        id: customListingFieldIdSchema,
+        sortOrder: z.number().int().min(0),
+      }),
+    )
+    .min(1, "At least one field is required."),
+});
+
 export const customListingFieldByIdResponseSchema = z.object({
   data: adminCustomListingFieldSchema,
 });
@@ -113,6 +125,18 @@ export const createCustomListingFieldResponseSchema = z.object({
 export const updateCustomListingFieldResponseSchema = z.object({
   message: z.string(),
   data: adminCustomListingFieldSchema,
+});
+
+export const reorderCustomListingFieldsResponseSchema = z.object({
+  message: z.string(),
+  data: z.array(adminCustomListingFieldSchema),
+});
+
+export const deleteCustomListingFieldResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({
+    id: customListingFieldIdSchema,
+  }),
 });
 
 export type CustomListingFieldQuery = z.infer<typeof customListingFieldQuerySchema>;
@@ -131,10 +155,17 @@ export type AdminCustomListingFieldListResponse = z.infer<
 export type CustomListingFieldParams = z.infer<typeof customListingFieldParamsSchema>;
 export type CreateCustomListingFieldInput = z.infer<typeof createCustomListingFieldSchema>;
 export type UpdateCustomListingFieldInput = z.infer<typeof updateCustomListingFieldSchema>;
+export type ReorderCustomListingFieldsInput = z.infer<typeof reorderCustomListingFieldsSchema>;
 export type CustomListingFieldByIdResponse = z.infer<typeof customListingFieldByIdResponseSchema>;
 export type CreateCustomListingFieldResponse = z.infer<
   typeof createCustomListingFieldResponseSchema
 >;
 export type UpdateCustomListingFieldResponse = z.infer<
   typeof updateCustomListingFieldResponseSchema
+>;
+export type ReorderCustomListingFieldsResponse = z.infer<
+  typeof reorderCustomListingFieldsResponseSchema
+>;
+export type DeleteCustomListingFieldResponse = z.infer<
+  typeof deleteCustomListingFieldResponseSchema
 >;

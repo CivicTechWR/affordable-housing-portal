@@ -5,25 +5,27 @@ import { desc, eq, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { customListingFields } from "@/db/schema";
 
+export const adminCustomListingFieldColumns = {
+  id: customListingFields.id,
+  key: customListingFields.key,
+  label: customListingFields.label,
+  description: customListingFields.description,
+  fieldType: customListingFields.fieldType,
+  category: customListingFields.category,
+  helpText: customListingFields.helpText,
+  placeholder: customListingFields.placeholder,
+  isPublic: customListingFields.isPublic,
+  isFilterable: customListingFields.isFilterable,
+  isRequired: customListingFields.isRequired,
+  sortOrder: customListingFields.sortOrder,
+  options: customListingFields.options,
+  createdAt: customListingFields.createdAt,
+  updatedAt: customListingFields.updatedAt,
+};
+
 export async function findAdminCustomListingFields(input: { where?: SQL<unknown> }) {
   return db
-    .select({
-      id: customListingFields.id,
-      key: customListingFields.key,
-      label: customListingFields.label,
-      description: customListingFields.description,
-      fieldType: customListingFields.fieldType,
-      category: customListingFields.category,
-      helpText: customListingFields.helpText,
-      placeholder: customListingFields.placeholder,
-      isPublic: customListingFields.isPublic,
-      isFilterable: customListingFields.isFilterable,
-      isRequired: customListingFields.isRequired,
-      sortOrder: customListingFields.sortOrder,
-      options: customListingFields.options,
-      createdAt: customListingFields.createdAt,
-      updatedAt: customListingFields.updatedAt,
-    })
+    .select(adminCustomListingFieldColumns)
     .from(customListingFields)
     .where(input.where)
     .orderBy(
@@ -35,23 +37,7 @@ export async function findAdminCustomListingFields(input: { where?: SQL<unknown>
 
 export async function findAdminCustomListingFieldById(fieldId: string) {
   const [field] = await db
-    .select({
-      id: customListingFields.id,
-      key: customListingFields.key,
-      label: customListingFields.label,
-      description: customListingFields.description,
-      fieldType: customListingFields.fieldType,
-      category: customListingFields.category,
-      helpText: customListingFields.helpText,
-      placeholder: customListingFields.placeholder,
-      isPublic: customListingFields.isPublic,
-      isFilterable: customListingFields.isFilterable,
-      isRequired: customListingFields.isRequired,
-      sortOrder: customListingFields.sortOrder,
-      options: customListingFields.options,
-      createdAt: customListingFields.createdAt,
-      updatedAt: customListingFields.updatedAt,
-    })
+    .select(adminCustomListingFieldColumns)
     .from(customListingFields)
     .where(eq(customListingFields.id, fieldId))
     .limit(1);
@@ -144,6 +130,66 @@ export async function updateCustomListingFieldById(input: {
       updatedByUserId: input.actorUserId,
     })
     .where(eq(customListingFields.id, input.fieldId))
+    .returning({ id: customListingFields.id });
+
+  return field ?? null;
+}
+
+export async function reorderCustomListingFields(input: {
+  category: string;
+  fields: Array<{
+    id: string;
+    sortOrder: number;
+  }>;
+  actorUserId: string;
+}) {
+  return db.transaction(async (tx) => {
+    const categoryFields = await tx
+      .select(adminCustomListingFieldColumns)
+      .from(customListingFields)
+      .where(eq(customListingFields.category, input.category));
+
+    const requestedIds = new Set(input.fields.map((field) => field.id));
+    const requestedSortOrders = new Set(input.fields.map((field) => field.sortOrder));
+    const expectedSortOrders = new Set(input.fields.map((_, index) => index + 1));
+    const includesEveryCategoryField =
+      requestedIds.size === categoryFields.length &&
+      categoryFields.every((field) => requestedIds.has(field.id));
+    const hasContiguousSortOrder = input.fields.every((field) =>
+      expectedSortOrders.has(field.sortOrder),
+    );
+
+    if (
+      requestedIds.size !== input.fields.length ||
+      requestedSortOrders.size !== input.fields.length ||
+      !hasContiguousSortOrder ||
+      !includesEveryCategoryField
+    ) {
+      return null;
+    }
+
+    for (const field of input.fields) {
+      await tx
+        .update(customListingFields)
+        .set({
+          sortOrder: field.sortOrder,
+          updatedByUserId: input.actorUserId,
+        })
+        .where(eq(customListingFields.id, field.id));
+    }
+
+    return tx
+      .select(adminCustomListingFieldColumns)
+      .from(customListingFields)
+      .where(eq(customListingFields.category, input.category))
+      .orderBy(customListingFields.sortOrder, customListingFields.key);
+  });
+}
+
+export async function deleteCustomListingFieldById(fieldId: string) {
+  const [field] = await db
+    .delete(customListingFields)
+    .where(eq(customListingFields.id, fieldId))
     .returning({ id: customListingFields.id });
 
   return field ?? null;
