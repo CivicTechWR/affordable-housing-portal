@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { ListingCustomFields } from "@/db/schema";
 import type { getOptionalSession } from "@/lib/auth/session";
 import {
   buildListingFeatureCategories,
@@ -12,6 +13,7 @@ import {
   getListingCoordinates,
   getListingSquareFeet,
   getStoredApplicationMethod,
+  getStoredAccessibilityFeatures,
   getStoredEligibilityCriteria,
   getStoredExternalApplicationUrl,
   getStoredUnits,
@@ -114,6 +116,7 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
   return {
     data: rows.map((row) => {
       const coordinates = getListingCoordinates(row.latitude, row.longitude);
+      const accessibilityFeatures = getStoredAccessibilityFeatures(row.customFields);
       const listingSummary = {
         id: row.id,
         price: centsToDollars(row.monthlyRentCents),
@@ -122,6 +125,7 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
         beds: row.bedrooms,
         baths: row.bathrooms,
         sqft: getListingSquareFeet(row.squareFeet, row.customFields),
+        accessibilityFeatures: accessibilityFeatures.length > 0 ? accessibilityFeatures : undefined,
         imageUrl: imageByListingId.get(row.id),
         timeAgo: formatListingTimeAgo(row.publishedAt, row.createdAt),
       };
@@ -250,32 +254,15 @@ export async function updateListingByIdService(input: {
   const primaryUnit = nextUnits[0];
   const nextEligibility = getStoredEligibilityCriteria(nextCustomFields);
   const nextStatus = input.payload.status ?? listing.status;
-  const effectiveApplicationMethod =
-    getStoredApplicationMethod(nextCustomFields) ??
-    getStoredApplicationMethod(listing.customFields) ??
-    (listing.applicationUrl ? "external_link" : "internal");
-  const hasExplicitExternalApplicationUrlUpdate =
-    input.payload.externalApplicationUrl !== undefined;
+  const nextApplicationUrlResult = resolveNextApplicationUrl({
+    payload: input.payload,
+    listingApplicationUrl: listing.applicationUrl,
+    listingCustomFields: listing.customFields,
+    nextCustomFields,
+  });
 
-  if (effectiveApplicationMethod !== "external_link") {
-    nextCustomFields.externalApplicationUrl = null;
-  }
-
-  const nextExternalApplicationUrl = getStoredExternalApplicationUrl(nextCustomFields);
-  const nextApplicationUrl =
-    effectiveApplicationMethod === "external_link"
-      ? hasExplicitExternalApplicationUrlUpdate
-        ? (nextExternalApplicationUrl ?? null)
-        : nextExternalApplicationUrl === undefined
-          ? listing.applicationUrl
-          : nextExternalApplicationUrl
-      : null;
-
-  if (effectiveApplicationMethod === "external_link" && !nextApplicationUrl) {
-    return fail(
-      "validation",
-      "External application URL is required when applicationMethod is external_link.",
-    );
+  if (!nextApplicationUrlResult.ok) {
+    return fail("validation", nextApplicationUrlResult.message);
   }
 
   const statusTimestamps = resolveListingStatusTimestamps(nextStatus, {
@@ -315,7 +302,7 @@ export async function updateListingByIdService(input: {
         nextEligibility.maxIncome === null
           ? null
           : (dollarsToCents(nextEligibility.maxIncome ?? undefined) ?? listing.maxIncomeCents),
-      applicationUrl: nextApplicationUrl,
+      applicationUrl: nextApplicationUrlResult.nextApplicationUrl,
       applicationEmail: input.payload.contact?.email ?? listing.applicationEmail,
       applicationPhone: input.payload.contact?.phone ?? listing.applicationPhone,
       customFields: nextCustomFields,
@@ -441,6 +428,7 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
     beds: listing.bedrooms,
     baths: listing.bathrooms,
     sqft: getListingSquareFeet(listing.squareFeet, listing.customFields),
+    accessibilityFeatures: getStoredAccessibilityFeatures(listing.customFields),
     images: imageRows.map((image) => ({
       url: image.imageUrl,
       caption: image.altText ?? `${listing.title} image`,
@@ -455,5 +443,45 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
             phone: listing.property.contactPhone,
           }
         : undefined,
+  };
+}
+
+function resolveNextApplicationUrl(input: {
+  payload: UpdateListingInput;
+  listingApplicationUrl: string | null;
+  listingCustomFields: ListingCustomFields;
+  nextCustomFields: ListingCustomFields;
+}) {
+  const effectiveApplicationMethod =
+    getStoredApplicationMethod(input.nextCustomFields) ??
+    getStoredApplicationMethod(input.listingCustomFields) ??
+    (input.listingApplicationUrl ? "external_link" : "internal");
+  const hasExplicitExternalApplicationUrlUpdate =
+    input.payload.externalApplicationUrl !== undefined;
+
+  if (effectiveApplicationMethod !== "external_link") {
+    input.nextCustomFields.externalApplicationUrl = null;
+  }
+
+  const nextExternalApplicationUrl = getStoredExternalApplicationUrl(input.nextCustomFields);
+  const nextApplicationUrl =
+    effectiveApplicationMethod === "external_link"
+      ? hasExplicitExternalApplicationUrlUpdate
+        ? (nextExternalApplicationUrl ?? null)
+        : nextExternalApplicationUrl === undefined
+          ? input.listingApplicationUrl
+          : nextExternalApplicationUrl
+      : null;
+
+  if (effectiveApplicationMethod === "external_link" && !nextApplicationUrl) {
+    return {
+      ok: false as const,
+      message: "External application URL is required when applicationMethod is external_link.",
+    };
+  }
+
+  return {
+    ok: true as const,
+    nextApplicationUrl,
   };
 }

@@ -39,7 +39,13 @@ export function listingMaxRentSpecification(maxRent: string | null): ListingFilt
     return undefined;
   }
 
-  return lte(listings.monthlyRentCents, dollarsStringToCents(maxRent));
+  const maxRentInCents = dollarsStringToCents(maxRent);
+
+  if (maxRentInCents === null) {
+    return undefined;
+  }
+
+  return lte(listings.monthlyRentCents, maxRentInCents);
 }
 
 export function listingAccessibilitySpecification(
@@ -93,8 +99,11 @@ export function andListingSpecifications(
 }
 
 function dollarsStringToCents(value: string) {
-  const [whole, fractional = ""] = value.split(".");
-  const cents = `${fractional}00`.slice(0, 2);
+  const normalized = value.trim();
 
-  return Number(whole) * 100 + Number(cents);
+  if (!/^\d+(\.\d+)?$/.test(normalized)) {
+    return null;
+  }
+
+  return Math.round(Number(normalized) * 100);
 }

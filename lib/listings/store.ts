@@ -33,6 +33,7 @@ type ListingFeatureDefinition = {
   description: string | null;
   category: string;
 };
+type StoredListingFeature = NonNullable<ListingDetails["accessibilityFeatures"]>[number];
 
 export function buildListingCustomFields(input: CreateListingInput): ListingCustomFields {
   return {
@@ -138,6 +139,44 @@ export function getStoredStringArray(customFields: ListingCustomFields, key: str
   return value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0);
 }
 
+export function getStoredAccessibilityFeatures(
+  customFields: ListingCustomFields,
+): StoredListingFeature[] {
+  const value = customFields.accessibilityFeatures;
+
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((entry) => {
+    if (typeof entry === "string" && entry.length > 0) {
+      return [
+        {
+          name: entry,
+          description: entry,
+        },
+      ];
+    }
+
+    if (!isRecord(entry)) {
+      return [];
+    }
+
+    const name = getString(entry.name);
+
+    if (!name) {
+      return [];
+    }
+
+    return [
+      {
+        name,
+        description: getString(entry.description) ?? name,
+      },
+    ];
+  });
+}
+
 export function getStoredApplicationMethod(
   customFields: ListingCustomFields,
 ): ListingApplicationMethod | undefined {
@@ -168,14 +207,11 @@ export function buildListingFeatureCategories(
 ): ListingDetails["features"] {
   const categories = new Map<string, ListingDetails["features"][number]>();
 
-  const accessibilityFeatures = getStoredStringArray(customFields, "accessibilityFeatures");
+  const accessibilityFeatures = getStoredAccessibilityFeatures(customFields);
   if (accessibilityFeatures.length > 0) {
     categories.set("Accessibility", {
       categoryName: "Accessibility",
-      features: accessibilityFeatures.map((feature) => ({
-        name: feature,
-        description: feature,
-      })),
+      features: accessibilityFeatures.map((feature) => ({ ...feature })),
     });
   }
 
