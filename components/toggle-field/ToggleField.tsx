@@ -29,7 +29,9 @@ export function ToggleField({
       {title && (
         <div className="grid gap-1.5 leading-none mb-1">
           <FieldLabel className="font-medium leading-none">{title}</FieldLabel>
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="text-sm text-muted-foreground whitespace-pre-line">{description}</p>
+          )}
         </div>
       )}
       <ToggleGroup
