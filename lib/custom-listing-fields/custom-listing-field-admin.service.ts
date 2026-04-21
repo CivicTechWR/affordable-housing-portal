@@ -11,6 +11,7 @@ import {
   findAdminCustomListingFieldById,
   findAdminCustomListingFields,
   findCustomListingFieldByKey,
+  reorderCustomListingFields,
   updateCustomListingFieldById,
 } from "@/lib/custom-listing-fields/custom-listing-field-admin.repository";
 import { canManageAccounts, type AccountActor } from "@/lib/policies/account-policy";
@@ -22,6 +23,8 @@ import type {
   CreateCustomListingFieldResponse,
   CustomListingFieldByIdResponse,
   DeleteCustomListingFieldResponse,
+  ReorderCustomListingFieldsInput,
+  ReorderCustomListingFieldsResponse,
   UpdateCustomListingFieldInput,
   UpdateCustomListingFieldResponse,
 } from "@/shared/schemas/custom-listing-fields";
@@ -223,6 +226,31 @@ export async function updateAdminCustomListingFieldByIdService(input: {
   return succeed({
     message: "Custom listing field updated",
     data: toAdminCustomListingField(field),
+  });
+}
+
+export async function reorderAdminCustomListingFieldsService(
+  input: ReorderCustomListingFieldsInput,
+): Promise<DomainResult<ReorderCustomListingFieldsResponse>> {
+  const actorResult = await requireCustomListingFieldsAdminActor();
+
+  if (!actorResult.ok) {
+    return actorResult;
+  }
+
+  const reorderedFields = await reorderCustomListingFields({
+    category: normalizeCategory(input.category),
+    fields: input.fields,
+    actorUserId: actorResult.value.actor.userId,
+  });
+
+  if (!reorderedFields) {
+    return fail("validation", "Unable to reorder custom listing fields. Refresh and try again.");
+  }
+
+  return succeed({
+    message: "Custom listing field order updated",
+    data: reorderedFields.map(toAdminCustomListingField),
   });
 }
 
