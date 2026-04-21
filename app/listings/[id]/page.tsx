@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getOptionalSession } from "@/lib/auth/session";
-import { readListingById, toListingReadContext } from "@/lib/listings/queries";
+import { getListingByIdService } from "@/lib/listings/listing.service";
 import { ListingDetails } from "@/components/listing-details/ListingDetails";
 import type { ListingDetailProps } from "@/components/listing-details/ListingDetails";
 import type { ListingDetails as ListingDetailsData } from "@/shared/schemas/listings";
@@ -11,17 +10,13 @@ type PageProps = {
 };
 
 async function getListingDetails(id: string): Promise<ListingDetailsData> {
-  const optionalSession = await getOptionalSession();
-  const details = await readListingById({
-    id,
-    auth: toListingReadContext(optionalSession),
-  });
+  const result = await getListingByIdService(id);
 
-  if (!details) {
+  if (!result.ok) {
     notFound();
   }
 
-  return details;
+  return result.value.data;
 }
 
 function mapListingDetailsToDisplay(details: ListingDetailsData): ListingDetailProps {
