@@ -4,16 +4,16 @@ export type SortOptions = {
     value: string;
     label: string;
 }
-export function SortOptions({ sortOptions, onChange }: { sortOptions: SortOptions[], onChange: (value: string) => void }) {
+export function SortOptions({ sortOptions, onChange, value }: { sortOptions: SortOptions[], onChange: (value: string) => void, value?: string }) {
     return (
-                <Select onValueChange={onChange}>
+                <Select onValueChange={onChange} value={value}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Sort By" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
                             {sortOptions.map((option) => (
-                                <SelectItem value={option.value}>{option.label}</SelectItem>
+                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
                             ))}
                         </SelectGroup>
                     </SelectContent>

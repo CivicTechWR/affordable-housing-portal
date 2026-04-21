@@ -8,7 +8,7 @@ import {
   parseAsIsoDateTime,
 } from 'nuqs/server';
 
-const sortOptions = ['newest', 'price_asc', 'price_desc'];
+const sortOptions = ["newest", "price_asc", "price_desc"];
 
 // 1. Define the raw parsers as a standalone object
 export const listingSearchParamsParsers = {

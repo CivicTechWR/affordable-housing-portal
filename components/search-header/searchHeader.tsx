@@ -7,31 +7,28 @@ import { ToggleFilter } from "../toggle-filter/ToggleFilter";
 
 export function SearchHeader() {
   const {
-    getPriceRangeInputProps,
-    getBedroomToggleProps,
-    getBathroomToggleProps,
-    getSearchInputProps,
+    priceRangeProps,
+    bedroomToggleProps,
+    bathroomToggleProps,
+    searchInputProps,
   } = useListingFilters();
 
   return (
     <header className="flex h-16 items-center border-b bg-white px-4 gap-4 shrink-0">
       {/* Search Input with Icon */}
       <div className="relative w-full max-w-sm">
-        <Input
-          {...getSearchInputProps()}
-          onChange={(e) => getSearchInputProps().onChange(e.target.value)}
-        />
+        <Input {...searchInputProps} />
       </div>
 
       {/* Price Range Selects */}
       <div className="flex items-center gap-1">
-        <PriceRangeInput {...getPriceRangeInputProps()} />
+        <PriceRangeInput {...priceRangeProps} />
       </div>
 
       {/* Property Filters */}
       <div className="hidden lg:flex items-center gap-2">
-        <ToggleFilter title="Bedrooms" {...getBedroomToggleProps()} />
-        <ToggleFilter title="Bathrooms" {...getBathroomToggleProps()} />
+        <ToggleFilter {...bedroomToggleProps} />
+        <ToggleFilter {...bathroomToggleProps} />
       </div>
 
       {/* Action Buttons */}

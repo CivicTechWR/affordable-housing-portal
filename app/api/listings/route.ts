@@ -1,5 +1,25 @@
 import { NextRequest } from "next/server";
 
+import { listListings } from "@/lib/listings/data";
+import type { ListingSortOption, ListingsQuery } from "@/lib/listings/types";
+
+function parseOptionalNumber(value: string | null) {
+  if (value == null || value.trim() === "") {
+    return null;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseSortOption(value: string | null): ListingSortOption | null {
+  if (value === "newest" || value === "price_asc" || value === "price_desc") {
+    return value;
+  }
+
+  return null;
+}
+
 /**
  * GET /api/listings
  *
@@ -16,27 +36,20 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
 
-  const page = Number(searchParams.get("page") ?? 1);
-  const limit = Number(searchParams.get("limit") ?? 20);
-  const status = searchParams.get("status");
-  const neighborhood = searchParams.get("neighborhood");
-  const bedrooms = searchParams.get("bedrooms");
-  const maxRent = searchParams.get("maxRent");
-  const accessibility = searchParams.get("accessibility");
-  const search = searchParams.get("search");
+  const query: ListingsQuery = {
+    page: parseOptionalNumber(searchParams.get("page")) ?? 1,
+    limit: parseOptionalNumber(searchParams.get("limit")) ?? 20,
+    location: searchParams.get("location"),
+    minPrice: parseOptionalNumber(searchParams.get("minPrice")),
+    maxPrice: parseOptionalNumber(searchParams.get("maxPrice")),
+    bedrooms: parseOptionalNumber(searchParams.get("bedrooms")),
+    bathrooms: parseOptionalNumber(searchParams.get("bathrooms")),
+    moveInDate: searchParams.get("moveInDate"),
+    sort: parseSortOption(searchParams.get("sort")) ?? "newest",
+    features: searchParams.getAll("features"),
+  };
 
-  // TODO: query database with filters
-  void [page, limit, status, neighborhood, bedrooms, maxRent, accessibility, search];
-
-  return Response.json({
-    data: [],
-    pagination: {
-      page,
-      limit,
-      total: 0,
-      totalPages: 0,
-    },
-  });
+  return Response.json(listListings(query));
 }
 
 /**

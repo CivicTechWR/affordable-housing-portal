@@ -9,15 +9,16 @@ export function useListingFilters() {
     const sortOptionProps = useMemo(() => ({
         sortOptions: [
             { value: "newest", label: "Newest" },
-            { value: "oldest", label: "Oldest" },
             { value: "price_asc", label: "Price: Low to High" },
             { value: "price_desc", label: "Price: High to Low" },
         ],
+        value: filters.sort,
         onChange: async (value: string) => await setFilters({ sort: value }),
     }), [filters.sort, setFilters]);
 
     const searchInputProps = useMemo(() => ({
-        value: filters.location || "Waterloo, ON",
+        value: filters.location ?? "",
+        placeholder: "Search by city, neighbourhood, or address",
         onChange: async (e: React.ChangeEvent<HTMLInputElement>) => {
             await setFilters({ location: e.target.value })
         },
@@ -96,6 +97,7 @@ export function useListingFilters() {
 
     const clearFilters = useCallback(async () => {
         await setFilters({
+            location: null,
             minPrice: null,
             maxPrice: null,
             bedrooms: null,

@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 
+import { getListingById } from "@/lib/listings/data";
+
 type RouteParams = { params: Promise<{ id: string }> };
 
 /**
@@ -11,28 +13,14 @@ type RouteParams = { params: Promise<{ id: string }> };
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
+  const listing = getListingById(id);
 
-  // TODO: fetch listing from database by id
-  // TODO: return 404 if not found
+  if (!listing) {
+    return Response.json({ message: "Listing not found" }, { status: 404 });
+  }
 
   return Response.json({
-    data: {
-      id,
-      name: null,
-      description: null,
-      address: null,
-      units: [],
-      amenities: [],
-      accessibilityFeatures: [],
-      applicationMethod: null,
-      externalApplicationUrl: null,
-      eligibilityCriteria: null,
-      images: [],
-      contact: null,
-      status: null,
-      createdAt: null,
-      updatedAt: null,
-    },
+    data: listing,
   });
 }
 

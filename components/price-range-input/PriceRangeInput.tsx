@@ -1,14 +1,9 @@
 import {
     Field,
-    FieldDescription,
-    FieldGroup,
     FieldLabel,
-    FieldLegend,
     FieldSet,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { ArrowRightIcon } from '@hugeicons/core-free-icons';
 
 export interface PriceRangeInputProps {
     min?: number;
@@ -25,10 +20,7 @@ export function PriceRangeInput({
     onMaxChange,
 }: PriceRangeInputProps) {
     return (
-
-
         <FieldSet className="flex-row">
-
             <Field>
                 <FieldLabel>Min Price</FieldLabel>
                 <Input
@@ -44,7 +36,6 @@ export function PriceRangeInput({
 
             <Field>
                 <FieldLabel>Max Price</FieldLabel>
-
                 <Input
                     type="number"
                     value={max}

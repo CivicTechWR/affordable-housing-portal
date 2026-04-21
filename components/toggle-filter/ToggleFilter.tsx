@@ -1,5 +1,5 @@
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldLabel } from '@/components/ui/field';
 
 export type ToggleFilterProps = {
   title: string;
@@ -16,27 +16,22 @@ export function ToggleFilter({
   onValueChange,
 }: ToggleFilterProps) {
   return (
-      
-      <Field>
-        <FieldLabel className="font-medium leading-none">{title}</FieldLabel>
-        <ToggleGroup 
-          type="single" 
-          value={value} 
+    <Field>
+      <FieldLabel className="font-medium leading-none">{title}</FieldLabel>
+      <ToggleGroup
+        type="single"
+        value={value}
           onValueChange={(val) => {
             if (val) onValueChange(val);
-          }} 
-          className="justify-start"
-        >
-          {options.map((option) => (
-            <ToggleGroupItem 
-              key={option} 
-              value={option} 
-              className="border"
-            >
-              {option}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      </Field>
-);
+          }}
+        className="justify-start"
+      >
+        {options.map((option) => (
+          <ToggleGroupItem key={option} value={option} className="border">
+            {option}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+    </Field>
+  );
 }

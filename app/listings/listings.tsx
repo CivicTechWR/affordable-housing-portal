@@ -1,114 +1,122 @@
 "use client";
 
-// app/listings/page.tsx
-// types/listings.ts
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { DynamicFilterGroup } from "@/components/feature-accordian/FeatureAccordian";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
 import { useListingFilters } from "@/components/listing-filter/useListingFilter";
 import { ListingsDisplayMode, ListingsSidebar } from "@/components/listings-sidebar/listingsSideBar";
 import { MapView } from "@/components/map-view/mapView";
 import { ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
-import { SortOptions } from '@/components/sort-options/SortOptions';
-import { ToggleIconButton } from '@/components/toggle-icon-button/ToggleIconButton';
-import { useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { FilterMailIcon } from '@hugeicons/core-free-icons';
+import { SortOptions } from "@/components/sort-options/SortOptions";
+import { ToggleIconButton } from "@/components/toggle-icon-button/ToggleIconButton";
+import { FilterMailIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { useMemo, useState } from "react";
+
+import { useListingsQuery } from "@/hooks/useListingsQuery";
+import type { ListingSortOption, ListingsQuery } from "@/lib/listings/types";
 
 export enum DisplayMode {
-    LIST = 'list',
-    MAP_LIST = 'map_list',
-    MAP = 'map',
+  LIST = "list",
+  MAP_LIST = "map_list",
+  MAP = "map",
 }
+
 export default function ListingsDashboard() {
-    // Await the params in Next.js 15+ and set defaults
-    // Await the params in Next.js 15+
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
-    const listings = [
-        {
-            id: "1",
-            price: 100000,
-            address: "123 Main St",
-            city: "Waterloo",
-            beds: 3,
-            baths: 2,
-            sqft: 100,
-            imageUrl: "https://picsum.photos/id/1/200/300",
-            timeAgo: "2 days ago",
-            features: [
-                {
-                    categoryName: "Accessibility",
-                    features: [{ name: "braille", description: "description of this" },
-                    { name: "wheelchair", description: "description of this" },
-                    { name: "ramp", description: "description of this" }]
-                }]
-        },]
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [displayMode] = useState<DisplayMode>(DisplayMode.LIST);
+  const {
+    sortOptionProps,
+    bedroomToggleProps,
+    priceRangeProps,
+    searchInputProps,
+    bathroomToggleProps,
+    getFeatureCheckboxProps,
+    datePickerProps,
+    clearFilters,
+    bathrooms,
+    bedrooms,
+    features,
+    location,
+    maxPrice,
+    minPrice,
+    moveInDate,
+    sort,
+  } = useListingFilters();
 
-    const dynamicGroups: DynamicFilterGroup[] = [
-        {
-            groupId: "features",
-            groupLabel: "Features",
-            options: [
-                { id: "beds", label: "Beds", type: "boolean" },
-                { id: "baths", label: "Baths", type: "boolean" },
-            ],
-        },
-    ]
+  const query = useMemo<ListingsQuery>(
+    () => ({
+      page: 1,
+      limit: 50,
+      location,
+      minPrice,
+      maxPrice,
+      bedrooms,
+      bathrooms,
+      moveInDate: moveInDate ? moveInDate.toISOString() : null,
+      sort: sort as ListingSortOption,
+      features,
+    }),
+    [bathrooms, bedrooms, features, location, maxPrice, minPrice, moveInDate, sort],
+  );
+  const { data, error, isLoading } = useListingsQuery(query);
+  const listings = data?.data ?? [];
+  const dynamicGroups: DynamicFilterGroup[] = data?.availableFilters.featureGroups ?? [];
 
-    // Accessing the data
-    const {
-        sortOptionProps,
-        bedroomToggleProps,
-        priceRangeProps,
-        searchInputProps,
-        bathroomToggleProps,
-        getFeatureCheckboxProps,
-        datePickerProps,
-        clearFilters,
-    } = useListingFilters();
-
-    return (
-        <NuqsAdapter>
-            <div className="flex h-screen flex-col">
-                <header className="flex h-16 items-center border-b bg-white px-4 shrink-0">
-
-                    <ListingFilterSearchBar
-                        searchInputProps={searchInputProps}
-                        priceRangeProps={priceRangeProps}
-                        bedroomToggleProps={bedroomToggleProps}
-                        bathroomToggleProps={bathroomToggleProps}
-                    />
-                    <div className="flex">
-                        <h2>Filters</h2>
-                        <ToggleIconButton
-                            isActive={isFilterOpen}
-                            icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
-                            onClick={() => setIsFilterOpen(!isFilterOpen)} />
-                    </div>
-                </header>
-                <main className="flex flex-1 overflow-hidden">
-                    {/* The Sidebar stays relatively static but scrolls */}
-                    <div className="flex flex-col h-full bg-white">
-                        <div className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-                            <SortOptions {...sortOptionProps} />
-                        </div>
-                        <ListingsSidebar listings={listings} mode={displayMode === DisplayMode.LIST ? ListingsDisplayMode.FULLSCREEN : ListingsDisplayMode.SIDESCROLL} />
-                    </div>
-                    <MapView listings={listings} />
-                    {isFilterOpen &&
-                        <ListingFilters
-                            bathroomToggleProps={bathroomToggleProps}
-                            bedroomToggleProps={bedroomToggleProps}
-                            priceRangeProps={priceRangeProps}
-                            getFeatureCheckboxProps={getFeatureCheckboxProps}
-                            datePickerProps={datePickerProps}
-                            clearFilters={clearFilters}
-                            dynamicGroups={dynamicGroups}
-                        />
-                    }
-                </main>
+  return (
+    <div className="flex h-screen flex-col">
+      <header className="flex h-16 shrink-0 items-center border-b bg-white px-4">
+        <ListingFilterSearchBar
+          searchInputProps={searchInputProps}
+          priceRangeProps={priceRangeProps}
+          bedroomToggleProps={bedroomToggleProps}
+          bathroomToggleProps={bathroomToggleProps}
+        />
+        <div className="flex items-center gap-3">
+          <h2 className="text-sm font-medium text-slate-700">Filters</h2>
+          <ToggleIconButton
+            isActive={isFilterOpen}
+            icon={<HugeiconsIcon icon={FilterMailIcon} strokeWidth={2} />}
+            onClick={() => setIsFilterOpen((current) => !current)}
+            aria-label="Toggle filters"
+          />
+        </div>
+      </header>
+      <main className="flex flex-1 overflow-hidden">
+        <div className="flex h-full min-w-0 flex-col bg-white">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-4">
+            <div className="text-sm text-slate-500">
+              {isLoading && listings.length === 0
+                ? "Loading listings..."
+                : `${data?.pagination.total ?? 0} results`}
             </div>
-        </NuqsAdapter>
-    );
+            <SortOptions {...sortOptionProps} />
+          </div>
+          {error ? (
+            <div className="flex h-full items-center justify-center p-8 text-sm text-red-600">{error}</div>
+          ) : (
+            <ListingsSidebar
+              listings={listings}
+              mode={
+                displayMode === DisplayMode.LIST
+                  ? ListingsDisplayMode.FULLSCREEN
+                  : ListingsDisplayMode.SIDESCROLL
+              }
+            />
+          )}
+        </div>
+        <MapView listings={listings} />
+        {isFilterOpen ? (
+          <ListingFilters
+            bathroomToggleProps={bathroomToggleProps}
+            bedroomToggleProps={bedroomToggleProps}
+            priceRangeProps={priceRangeProps}
+            getFeatureCheckboxProps={getFeatureCheckboxProps}
+            datePickerProps={datePickerProps}
+            clearFilters={clearFilters}
+            dynamicGroups={dynamicGroups}
+          />
+        ) : null}
+      </main>
+    </div>
+  );
 }

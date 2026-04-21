@@ -81,6 +81,11 @@ export function MapView({ listings }: { listings: Listing[] }) {
           </Popup>
         )}
       </Map>
+      {listings.length === 0 ? (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/60 text-sm text-slate-600 backdrop-blur-[1px]">
+          Adjust the filters to see homes on the map.
+        </div>
+      ) : null}
     </div>
   );
 }

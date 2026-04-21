@@ -11,20 +11,19 @@ import {
   type DynamicFilterGroup,
 } from "@/components/feature-accordian/FeatureAccordian";
 import { DatePicker } from "@/components/date-picker/date-picker";
-import { LabeledCheckbox } from "@/components/labeled-checkbox/LabeledCheckbox";
 import { ListingFilters } from "@/components/listing-filter/ListingFilter";
-import { ListingsSidebar, type Listing } from "@/components/listings-sidebar/listingsSideBar";
+import { useListingFilters } from "@/components/listing-filter/useListingFilter";
+import { ListingFilterSearchBar } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
+import {
+  ListingsDisplayMode,
+  ListingsSidebar,
+  type Listing,
+} from "@/components/listings-sidebar/listingsSideBar";
 import { MapView } from "@/components/map-view/mapView";
 import { PriceRangeInput } from "@/components/price-range-input/PriceRangeInput";
-import { SearchHeader } from "@/components/search-header/searchHeader";
+import { SortOptions } from "@/components/sort-options/SortOptions";
 import { ToggleFilter } from "@/components/toggle-filter/ToggleFilter";
 import { ToggleIconButton } from "@/components/toggle-icon-button/ToggleIconButton";
-
-const sortOptions = [
-  { value: "newest", label: "Newest" },
-  { value: "price_asc", label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
-];
 
 const previewListings: Listing[] = [
   {
@@ -32,6 +31,7 @@ const previewListings: Listing[] = [
     price: 1825,
     address: "45 Erb St W",
     city: "Waterloo",
+    neighborhood: "Uptown",
     beds: 2,
     baths: 1,
     sqft: 840,
@@ -39,12 +39,17 @@ const previewListings: Listing[] = [
     timeAgo: "2 days ago",
     lat: 43.4636,
     lng: -80.5264,
+    features: ["parking", "laundry", "balcony"],
+    availableFrom: "2026-05-01",
+    listedAt: "2026-04-19T10:00:00.000Z",
+    status: "active",
   },
   {
     id: "listing-2",
     price: 2140,
     address: "18 King St N",
     city: "Kitchener",
+    neighborhood: "Downtown",
     beds: 3,
     baths: 2,
     sqft: 1040,
@@ -52,12 +57,17 @@ const previewListings: Listing[] = [
     timeAgo: "5 hours ago",
     lat: 43.4516,
     lng: -80.4925,
+    features: ["parking", "elevator", "laundry", "wheelchair"],
+    availableFrom: "2026-06-15",
+    listedAt: "2026-04-21T08:00:00.000Z",
+    status: "active",
   },
   {
     id: "listing-3",
     price: 1595,
     address: "77 Weber St E",
     city: "Waterloo",
+    neighborhood: "Midtown",
     beds: 1,
     baths: 1,
     sqft: 610,
@@ -65,12 +75,17 @@ const previewListings: Listing[] = [
     timeAgo: "Just listed",
     lat: 43.4668,
     lng: -80.5087,
+    features: ["laundry", "step-free"],
+    availableFrom: "2026-05-10",
+    listedAt: "2026-04-21T11:30:00.000Z",
+    status: "active",
   },
   {
     id: "listing-4",
     price: 2475,
     address: "12 Duke St",
     city: "Cambridge",
+    neighborhood: "Galt",
     beds: 3,
     baths: 2,
     sqft: 1220,
@@ -78,6 +93,10 @@ const previewListings: Listing[] = [
     timeAgo: "1 week ago",
     lat: 43.3601,
     lng: -80.3149,
+    features: ["parking", "balcony", "laundry"],
+    availableFrom: "2026-07-01",
+    listedAt: "2026-04-14T09:00:00.000Z",
+    status: "active",
   },
 ];
 
@@ -122,12 +141,22 @@ function PreviewCard({
   );
 }
 
-export default function PreviewPage() {
+function PreviewContent() {
   const [priceRange, setPriceRange] = useState({ min: 1200, max: 2600 });
   const [bedrooms, setBedrooms] = useState("2");
   const [moveInDate, setMoveInDate] = useState<Date | undefined>(new Date("2026-05-01"));
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(["parking", "balcony"]);
   const [saved, setSaved] = useState(false);
+  const {
+    sortOptionProps,
+    bedroomToggleProps,
+    priceRangeProps,
+    searchInputProps,
+    bathroomToggleProps,
+    getFeatureCheckboxProps,
+    datePickerProps,
+    clearFilters,
+  } = useListingFilters();
 
   const formattedMoveInDate = moveInDate
     ? moveInDate.toLocaleDateString("en-CA", {
@@ -178,30 +207,46 @@ export default function PreviewPage() {
           title="Full Page Composition"
           description="The current search header, sidebar, filters, and map shell rendered together with mock listings."
         >
-          <NuqsAdapter>
-            <div className="overflow-hidden rounded-3xl border border-slate-200">
-              <Suspense
-                fallback={
-                  <div className="flex h-16 items-center border-b border-slate-200 bg-white px-4" />
-                }
-              >
-                <SearchHeader />
-              </Suspense>
-              <div className="grid min-h-[840px] bg-slate-50 xl:grid-cols-[340px_320px_minmax(0,1fr)]">
-                <div className="border-b border-slate-200 xl:border-r xl:border-b-0">
-                  <ListingsSidebar listings={previewListings} sortOptions={sortOptions} />
+          <div className="overflow-hidden rounded-3xl border border-slate-200">
+            <Suspense
+              fallback={
+                <div className="flex h-16 items-center border-b border-slate-200 bg-white px-4" />
+              }
+            >
+              <div className="flex h-16 items-center border-b border-slate-200 bg-white px-4">
+                <ListingFilterSearchBar
+                  searchInputProps={searchInputProps}
+                  priceRangeProps={priceRangeProps}
+                  bedroomToggleProps={bedroomToggleProps}
+                  bathroomToggleProps={bathroomToggleProps}
+                />
+              </div>
+            </Suspense>
+            <div className="grid min-h-[840px] bg-slate-50 xl:grid-cols-[340px_320px_minmax(0,1fr)]">
+              <div className="border-b border-slate-200 xl:border-r xl:border-b-0">
+                <div className="border-b border-slate-200 bg-white p-4">
+                  <SortOptions {...sortOptionProps} />
                 </div>
-                <div className="border-b border-slate-200 bg-white xl:border-r xl:border-b-0">
-                  <Suspense fallback={<div className="min-h-[420px] bg-white" />}>
-                    <ListingFilters dynamicGroups={dynamicGroups} />
-                  </Suspense>
-                </div>
-                <div className="min-h-[420px] xl:min-h-full">
-                  <MapView listings={previewListings} />
-                </div>
+                <ListingsSidebar listings={previewListings} mode={ListingsDisplayMode.SIDESCROLL} />
+              </div>
+              <div className="border-b border-slate-200 bg-white xl:border-r xl:border-b-0">
+                <Suspense fallback={<div className="min-h-[420px] bg-white" />}>
+                  <ListingFilters
+                    bathroomToggleProps={bathroomToggleProps}
+                    bedroomToggleProps={bedroomToggleProps}
+                    priceRangeProps={priceRangeProps}
+                    getFeatureCheckboxProps={getFeatureCheckboxProps}
+                    datePickerProps={datePickerProps}
+                    clearFilters={clearFilters}
+                    dynamicGroups={dynamicGroups}
+                  />
+                </Suspense>
+              </div>
+              <div className="min-h-[420px] xl:min-h-full">
+                <MapView listings={previewListings} />
               </div>
             </div>
-          </NuqsAdapter>
+          </div>
         </PreviewCard>
 
         <div className="grid gap-6 xl:grid-cols-2">
@@ -214,8 +259,11 @@ export default function PreviewPage() {
               <PriceRangeInput
                 min={priceRange.min}
                 max={priceRange.max}
-                onValueChange={async (min, max) => {
-                  setPriceRange({ min, max });
+                onMinChange={async (min) => {
+                  setPriceRange((current) => ({ ...current, min: min ?? 0 }));
+                }}
+                onMaxChange={async (max) => {
+                  setPriceRange((current) => ({ ...current, max: max ?? 0 }));
                 }}
               />
               <DatePicker
@@ -260,27 +308,30 @@ export default function PreviewPage() {
                     selectedFeatures.map((feature) => (
                       <span
                         key={feature}
-                        className="rounded-full bg-sky-100 px-3 py-1 text-sm font-medium text-sky-800"
+                        className="rounded-full bg-slate-200 px-3 py-1 text-sm text-slate-700"
                       >
                         {feature}
                       </span>
                     ))
                   ) : (
-                    <span className="text-sm text-slate-500">No features selected.</span>
+                    <span className="text-sm text-slate-500">No filters selected</span>
                   )}
                 </div>
               </div>
-
-              <LabeledCheckbox
-                id="accept-notifications"
-                label="Email me when matching units are posted"
-                checked={saved}
-                onCheckedChange={(checked) => setSaved(Boolean(checked))}
-              />
             </div>
           </PreviewCard>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function PreviewPage() {
+  return (
+    <NuqsAdapter>
+      <Suspense fallback={<main className="min-h-screen bg-white" />}>
+        <PreviewContent />
+      </Suspense>
+    </NuqsAdapter>
   );
 }
