@@ -117,82 +117,80 @@ export function CustomListingFieldsTable({
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-3 xl:flex-row xl:items-center">
-        <label className="relative block w-full xl:w-80">
-          <span className="sr-only">Search fields</span>
-          <HugeiconsIcon
-            icon={Search01Icon}
-            strokeWidth={2}
-            className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search fields..."
-            className="h-10 rounded-md bg-background pl-11 text-sm"
-          />
-        </label>
+      <div className="mt-6 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+          <label className="relative block w-full xl:w-80">
+            <span className="sr-only">Search fields</span>
+            <HugeiconsIcon
+              icon={Search01Icon}
+              strokeWidth={2}
+              className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              value={search}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="Search fields..."
+              className="h-10 rounded-md bg-background pl-11 text-sm"
+            />
+          </label>
 
-        <FilterSelect
-          ariaLabel="Filter by category"
-          value={categoryFilter}
-          onChange={onCategoryFilterChange}
-        >
-          <option value="all">Category: All</option>
-          {categories.map((category) => (
-            <option key={category.category} value={category.category}>
-              Category: {category.label}
-            </option>
-          ))}
-        </FilterSelect>
+          <FilterSelect
+            ariaLabel="Filter by category"
+            value={categoryFilter}
+            onChange={onCategoryFilterChange}
+          >
+            <option value="all">Category: All</option>
+            {categories.map((category) => (
+              <option key={category.category} value={category.category}>
+                Category: {category.label}
+              </option>
+            ))}
+          </FilterSelect>
 
-        <FilterSelect
-          ariaLabel="Filter by visibility"
-          value={visibilityFilter}
-          onChange={(value) => onVisibilityFilterChange(value as VisibilityFilter)}
-        >
-          <option value="all">Visibility: All</option>
-          <option value="public">Visibility: Public</option>
-          <option value="internal">Visibility: Internal</option>
-        </FilterSelect>
+          <FilterSelect
+            ariaLabel="Filter by visibility"
+            value={visibilityFilter}
+            onChange={(value) => onVisibilityFilterChange(value as VisibilityFilter)}
+          >
+            <option value="all">Visibility: All</option>
+            <option value="public">Visibility: Public</option>
+            <option value="internal">Visibility: Internal</option>
+          </FilterSelect>
 
-        <button
-          type="button"
-          className="h-10 px-3 text-left text-sm font-medium text-foreground/80 hover:text-primary"
-          onClick={onClearFilters}
-        >
-          Clear filters
-        </button>
+          <button
+            type="button"
+            className="h-10 px-3 text-left text-sm font-medium text-foreground/80 hover:text-primary"
+            onClick={onClearFilters}
+          >
+            Clear filters
+          </button>
+        </div>
+
+        {selectedFieldCount > 0 ? (
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center xl:justify-end">
+            <span className="text-sm font-medium text-foreground">
+              {selectedFieldCount} {selectedFieldCount === 1 ? "field" : "fields"} selected
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="bg-background"
+                onClick={onClearSelection}
+              >
+                Clear selection
+              </Button>
+              <Button type="button" size="lg" onClick={onOpenBulkEdit}>
+                Bulk Edit
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 overflow-hidden rounded-md border border-border bg-background">
         <div className="overflow-x-auto">
-          {selectedFieldCount > 0 ? (
-            <div
-              className={cn(
-                "flex items-center justify-between border-b border-border bg-primary/5 px-4 py-3",
-                TABLE_MIN_WIDTH,
-              )}
-            >
-              <span className="text-sm font-medium text-foreground">
-                {selectedFieldCount} {selectedFieldCount === 1 ? "field" : "fields"} selected
-              </span>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  className="bg-background"
-                  onClick={onClearSelection}
-                >
-                  Clear selection
-                </Button>
-                <Button type="button" size="lg" onClick={onOpenBulkEdit}>
-                  Bulk Edit
-                </Button>
-              </div>
-            </div>
-          ) : null}
           <div
             className={cn(
               "grid border-b border-border bg-muted/50",

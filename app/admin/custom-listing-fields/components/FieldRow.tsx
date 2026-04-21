@@ -15,6 +15,7 @@ import {
   DragDropVerticalIcon,
   EyeIcon,
   Tick02Icon,
+  ViewOffSlashIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 
@@ -171,6 +172,8 @@ export function FieldRow({
   onRequiredChange: (required: boolean) => void;
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
+  const visibilityIcon = field.publicOnly ? EyeIcon : ViewOffSlashIcon;
+  const visibilityToneClass = field.publicOnly ? "text-emerald-700" : "text-muted-foreground";
 
   return (
     <div
@@ -262,15 +265,21 @@ export function FieldRow({
         <label className="relative inline-flex">
           <span className="sr-only">Visibility for {field.label}</span>
           <HugeiconsIcon
-            icon={EyeIcon}
+            icon={visibilityIcon}
             strokeWidth={2}
-            className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-emerald-700"
+            className={cn(
+              "pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2",
+              visibilityToneClass,
+            )}
           />
           <select
             value={field.publicOnly ? "public" : "internal"}
             onChange={(event) => onVisibilityChange(event.target.value === "public")}
             disabled={isPending}
-            className="h-8 w-28 rounded-md border border-input bg-background py-1 pl-8 pr-2 text-xs font-medium text-emerald-700 outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-60"
+            className={cn(
+              "h-8 w-28 rounded-md border border-input bg-background py-1 pl-8 pr-2 text-xs font-medium outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-60",
+              visibilityToneClass,
+            )}
           >
             <option value="public">Public</option>
             <option value="internal">Internal</option>
