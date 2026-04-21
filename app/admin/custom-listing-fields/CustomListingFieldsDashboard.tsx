@@ -34,10 +34,6 @@ import type {
   UpdateCustomListingFieldInput,
 } from "@/shared/schemas/custom-listing-fields";
 
-const TABLE_COLUMNS =
-  "grid-cols-[48px_minmax(180px,1.1fr)_minmax(190px,1.15fr)_minmax(150px,0.85fr)_minmax(260px,1.35fr)_minmax(260px,1.35fr)_minmax(132px,0.7fr)_96px_96px_94px]";
-
-type VisibilityFilter = "all" | "public" | "internal";
 type SortKey =
   | "label"
   | "key"
@@ -48,6 +44,22 @@ type SortKey =
   | "filterable"
   | "required";
 type SortDirection = "asc" | "desc";
+
+const TABLE_COLUMNS =
+  "grid-cols-[48px_minmax(180px,1.1fr)_minmax(190px,1.15fr)_minmax(150px,0.85fr)_minmax(260px,1.35fr)_minmax(260px,1.35fr)_minmax(132px,0.7fr)_96px_96px_94px]";
+
+const FIELD_HELP_TEXT = {
+  label: "Human-readable field name shown to partners and renters.",
+  key: "Stable identifier used by listing data and APIs.",
+  category: "Groups related fields together in forms and listings.",
+  description: "Public text shown to tenants and applicants.",
+  helpText: "Partner guidance shown while creating listings.",
+  visibility: "Controls whether renters can see the field.",
+  filterable: "Makes the field available in search filters.",
+  required: "Marks whether listings should answer this field.",
+} satisfies Record<SortKey, string>;
+
+type VisibilityFilter = "all" | "public" | "internal";
 type FieldDialogState = {
   mode: "create";
   category: string;
@@ -661,6 +673,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Label"
                 sortKey="label"
+                helperText={FIELD_HELP_TEXT.label}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -668,6 +681,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Key"
                 sortKey="key"
+                helperText={FIELD_HELP_TEXT.key}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -675,6 +689,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Category"
                 sortKey="category"
+                helperText={FIELD_HELP_TEXT.category}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -682,6 +697,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Description"
                 sortKey="description"
+                helperText={FIELD_HELP_TEXT.description}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -689,6 +705,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Help Text"
                 sortKey="helpText"
+                helperText={FIELD_HELP_TEXT.helpText}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -696,6 +713,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Visibility"
                 sortKey="visibility"
+                helperText={FIELD_HELP_TEXT.visibility}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -703,6 +721,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Filterable"
                 sortKey="filterable"
+                helperText={FIELD_HELP_TEXT.filterable}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -710,6 +729,7 @@ export function CustomListingFieldsDashboard({
               <SortHeader
                 label="Required"
                 sortKey="required"
+                helperText={FIELD_HELP_TEXT.required}
                 activeSortKey={sortKey}
                 direction={sortDirection}
                 onSort={handleSort}
@@ -906,12 +926,14 @@ function FilterSelect({
 function SortHeader({
   label,
   sortKey,
+  helperText,
   activeSortKey,
   direction,
   onSort,
 }: {
   label: string;
   sortKey: SortKey;
+  helperText: string;
   activeSortKey: SortKey;
   direction: SortDirection;
   onSort: (sortKey: SortKey) => void;
@@ -921,6 +943,8 @@ function SortHeader({
   return (
     <button
       type="button"
+      title={helperText}
+      aria-label={`${label}: ${helperText}`}
       className="flex items-center gap-1 px-4 py-4 text-left text-xs font-medium text-foreground/80"
       onClick={() => onSort(sortKey)}
     >
@@ -1327,7 +1351,12 @@ function FieldEditorDialog({
         </div>
 
         <div className="grid gap-5 px-6 py-5 md:grid-cols-2">
-          <FieldControl label="Label" htmlFor="field-label" required>
+          <FieldControl
+            label="Label"
+            htmlFor="field-label"
+            helpText={FIELD_HELP_TEXT.label}
+            required
+          >
             <Input
               id="field-label"
               value={form.label}
@@ -1335,7 +1364,7 @@ function FieldEditorDialog({
               required
             />
           </FieldControl>
-          <FieldControl label="Key" htmlFor="field-key" required>
+          <FieldControl label="Key" htmlFor="field-key" helpText={FIELD_HELP_TEXT.key} required>
             <Input
               id="field-key"
               value={form.key}
@@ -1346,7 +1375,12 @@ function FieldEditorDialog({
               required
             />
           </FieldControl>
-          <FieldControl label="Category" htmlFor="field-category" required>
+          <FieldControl
+            label="Category"
+            htmlFor="field-category"
+            helpText={FIELD_HELP_TEXT.category}
+            required
+          >
             <CategoryCombobox
               id="field-category"
               value={form.category}
@@ -1355,7 +1389,11 @@ function FieldEditorDialog({
               required
             />
           </FieldControl>
-          <FieldControl label="Visibility" htmlFor="field-visibility">
+          <FieldControl
+            label="Visibility"
+            htmlFor="field-visibility"
+            helpText={FIELD_HELP_TEXT.visibility}
+          >
             <select
               id="field-visibility"
               value={form.publicOnly ? "public" : "internal"}
@@ -1366,7 +1404,12 @@ function FieldEditorDialog({
               <option value="internal">Internal</option>
             </select>
           </FieldControl>
-          <FieldControl label="Description" htmlFor="field-description" className="md:col-span-2">
+          <FieldControl
+            label="Description"
+            htmlFor="field-description"
+            helpText={FIELD_HELP_TEXT.description}
+            className="md:col-span-2"
+          >
             <Textarea
               id="field-description"
               value={form.description}
@@ -1377,6 +1420,7 @@ function FieldEditorDialog({
           <FieldControl
             label="Partner Help Text"
             htmlFor="field-help-text"
+            helpText={FIELD_HELP_TEXT.helpText}
             className="md:col-span-2"
           >
             <Textarea
@@ -1387,20 +1431,18 @@ function FieldEditorDialog({
             />
           </FieldControl>
           <div className="flex flex-wrap gap-6 md:col-span-2">
-            <label className="flex items-center gap-2 text-sm font-medium">
-              <Checkbox
-                checked={form.filterableOnly}
-                onCheckedChange={(checked) => updateForm("filterableOnly", checked === true)}
-              />
-              Filterable
-            </label>
-            <label className="flex items-center gap-2 text-sm font-medium">
-              <Checkbox
-                checked={form.required}
-                onCheckedChange={(checked) => updateForm("required", checked === true)}
-              />
-              Required
-            </label>
+            <CheckboxFieldControl
+              label="Filterable"
+              helpText={FIELD_HELP_TEXT.filterable}
+              checked={form.filterableOnly}
+              onCheckedChange={(checked) => updateForm("filterableOnly", checked)}
+            />
+            <CheckboxFieldControl
+              label="Required"
+              helpText={FIELD_HELP_TEXT.required}
+              checked={form.required}
+              onCheckedChange={(checked) => updateForm("required", checked)}
+            />
           </div>
           {error ? <p className="text-sm text-destructive md:col-span-2">{error}</p> : null}
         </div>
@@ -1439,9 +1481,35 @@ function FieldControl({
         {label}
         {required ? " *" : ""}
       </label>
-      {children}
       {helpText ? <p className="text-xs text-muted-foreground">{helpText}</p> : null}
+      {children}
     </div>
+  );
+}
+
+function CheckboxFieldControl({
+  label,
+  helpText,
+  checked,
+  onCheckedChange,
+}: {
+  label: string;
+  helpText: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex max-w-xs items-start gap-2 text-sm font-medium">
+      <Checkbox
+        checked={checked}
+        className="mt-0.5"
+        onCheckedChange={(value) => onCheckedChange(value === true)}
+      />
+      <span className="flex min-w-0 flex-col gap-0.5">
+        <span>{label}</span>
+        <span className="text-xs font-normal leading-snug text-muted-foreground">{helpText}</span>
+      </span>
+    </label>
   );
 }
 
