@@ -62,6 +62,11 @@ export async function getCustomListingFieldsService(
 
   for (const row of rows) {
     const groupId = slugifyCategory(row.category);
+
+    if (query.groupId && query.groupId !== groupId) {
+      continue;
+    }
+
     const groupLabel = formatCategoryLabel(row.category);
 
     if (!groups.has(groupId)) {

@@ -22,6 +22,7 @@ export const customListingFieldQuerySchema = z.object({
   publicOnly: z.enum(["true", "false"]).optional(),
   filterableOnly: z.enum(["true", "false"]).optional(),
   category: optionalTrimmedStringToUndefined(),
+  groupId: optionalTrimmedStringToUndefined(),
   type: customListingFieldTypeSchema.optional(),
 });
 
