@@ -84,7 +84,7 @@ export function ListingFormFeatures({ control }: ListingFormFeaturesProps) {
                                   category: group.groupLabel,
                                   id: option.id,
                                   name: option.label,
-                                  description: option.description,
+                                  description: option.description ?? option.label,
                                 },
                               ]);
                             }

@@ -1,10 +1,11 @@
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, type SQL } from "drizzle-orm";
 
 import { customListingFields } from "@/db/schema";
 import { findCustomListingFields } from "@/lib/custom-listing-fields/custom-listing-field.repository";
 import type {
+  CustomListingFieldDefinition,
   CustomListingFieldListResponse,
   CustomListingFieldQuery,
   CustomListingFieldType,
@@ -33,11 +34,7 @@ function formatCategoryLabel(category: string) {
 export async function getCustomListingFieldsService(
   query: CustomListingFieldQuery,
 ): Promise<CustomListingFieldListResponse> {
-  const conditions = [];
-
-  if (query.publicOnly === "true") {
-    conditions.push(eq(customListingFields.isPublic, true));
-  }
+  const conditions: SQL<unknown>[] = [eq(customListingFields.isPublic, true)];
 
   if (query.filterableOnly === "true") {
     conditions.push(eq(customListingFields.isFilterable, true));
@@ -59,13 +56,7 @@ export async function getCustomListingFieldsService(
     {
       groupId: string;
       groupLabel: string;
-      options: {
-        id: string;
-        label: string;
-        type: CustomListingFieldType;
-        description?: string | undefined;
-        helpText?: string | undefined;
-      }[];
+      options: CustomListingFieldDefinition[];
     }
   >();
 
@@ -89,6 +80,8 @@ export async function getCustomListingFieldsService(
         type: row.fieldType as CustomListingFieldType,
         description: row.description ?? undefined,
         helpText: row.helpText ?? undefined,
+        placeholder: row.placeholder ?? undefined,
+        selectableOptions: row.options ?? undefined,
       });
     }
   }

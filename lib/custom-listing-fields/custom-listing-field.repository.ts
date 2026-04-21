@@ -14,6 +14,8 @@ export async function findCustomListingFields(input: { where?: SQL<unknown> }) {
       fieldType: customListingFields.fieldType,
       category: customListingFields.category,
       helpText: customListingFields.helpText,
+      placeholder: customListingFields.placeholder,
+      options: customListingFields.options,
       sortOrder: customListingFields.sortOrder,
     })
     .from(customListingFields)
