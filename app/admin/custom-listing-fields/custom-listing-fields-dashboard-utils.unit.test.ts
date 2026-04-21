@@ -2,6 +2,13 @@ import { describe, expect, it } from "@jest/globals";
 
 import type { AdminCustomListingField } from "@/shared/schemas/custom-listing-fields";
 import {
+  bulkEditDialogSchema,
+  getDefaultBulkEditDialogValues,
+  getDefaultCreateFieldDialogValues,
+  toBulkEditPayload,
+  toCreateFieldDialogPayload,
+} from "./custom-listing-fields-dashboard-forms";
+import {
   formatCategoryLabel,
   getCanonicalCategoryValue,
   getCategoryStats,
@@ -192,5 +199,65 @@ describe("custom listing field dashboard utilities", () => {
     expect(slugifyKey("  Laundry / Storage!  ")).toBe("laundry_storage");
     expect(nullableTrim("   ")).toBeNull();
     expect(nullableTrim("  hello  ")).toBe("hello");
+  });
+
+  it("builds create dialog defaults and payloads", () => {
+    const defaults = getDefaultCreateFieldDialogValues({
+      mode: "create",
+      category: "BUILDING AMENITIES",
+    });
+
+    expect(defaults).toMatchObject({
+      category: "BUILDING AMENITIES",
+      publicOnly: true,
+      filterableOnly: true,
+      required: false,
+    });
+    expect(
+      toCreateFieldDialogPayload(
+        {
+          ...defaults,
+          key: "shared_laundry",
+          label: "Shared Laundry",
+          description: "  Laundry room is shared. ",
+          helpText: "   ",
+        },
+        ["BUILDING AMENITIES"],
+      ),
+    ).toEqual({
+      key: "shared_laundry",
+      label: "Shared Laundry",
+      description: "Laundry room is shared.",
+      type: "boolean",
+      category: "BUILDING AMENITIES",
+      helpText: null,
+      publicOnly: true,
+      filterableOnly: true,
+      required: false,
+      options: null,
+    });
+  });
+
+  it("validates and converts bulk edit dialog values", () => {
+    expect(
+      bulkEditDialogSchema.safeParse(getDefaultBulkEditDialogValues(["BUILDING AMENITIES"]))
+        .success,
+    ).toBe(false);
+
+    expect(
+      toBulkEditPayload(
+        {
+          ...getDefaultBulkEditDialogValues(["BUILDING AMENITIES"]),
+          categoryEnabled: true,
+          category: "building amenities",
+          requiredEnabled: true,
+          required: true,
+        },
+        ["BUILDING AMENITIES"],
+      ),
+    ).toEqual({
+      category: "BUILDING AMENITIES",
+      required: true,
+    });
   });
 });

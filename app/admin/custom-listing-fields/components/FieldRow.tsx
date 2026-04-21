@@ -9,10 +9,11 @@ import {
   useState,
 } from "react";
 import {
+  ArrowDown01Icon,
+  ArrowUp01Icon,
   Delete02Icon,
   DragDropVerticalIcon,
   EyeIcon,
-  Sorting05Icon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -116,15 +117,13 @@ export function SortHeader({
       onClick={() => onSort(sortKey)}
     >
       {label}
-      <HugeiconsIcon
-        icon={Sorting05Icon}
-        strokeWidth={2}
-        className={cn(
-          "size-3 text-muted-foreground",
-          isActive && "text-primary",
-          isActive && direction === "desc" && "rotate-180",
-        )}
-      />
+      {isActive ? (
+        <HugeiconsIcon
+          icon={direction === "asc" ? ArrowUp01Icon : ArrowDown01Icon}
+          strokeWidth={2}
+          className="size-3 text-primary"
+        />
+      ) : null}
     </button>
   );
 }
