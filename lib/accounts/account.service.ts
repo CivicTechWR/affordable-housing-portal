@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createInvite } from "@/lib/auth/invite-service";
+import { findRecentAccountInvites } from "@/lib/auth/invite-store";
 import { getOptionalSession } from "@/lib/auth/session";
 import { fail, succeed, type DomainResult } from "@/lib/http/domain-result";
 import {
@@ -24,6 +25,7 @@ import {
 } from "@/lib/policies/account-policy";
 import type {
   AccountByIdResponse,
+  AccountInviteListResponse,
   AccountListResponse,
   AccountQuery,
   CreateAccountInviteInput,
@@ -70,6 +72,25 @@ export async function getAccountsService(
       total,
       totalPages: total === 0 ? 0 : Math.ceil(total / limit),
     },
+  });
+}
+
+export async function getRecentAccountInvitesService(
+  limit: number,
+): Promise<DomainResult<AccountInviteListResponse>> {
+  const actorResult = await requireAccountsActor();
+
+  if (!actorResult.ok) {
+    return actorResult;
+  }
+
+  const invites = await findRecentAccountInvites(limit);
+
+  return succeed({
+    data: invites.map((invite) => ({
+      ...invite,
+      invitedAt: invite.invitedAt.toISOString(),
+    })),
   });
 }
 
