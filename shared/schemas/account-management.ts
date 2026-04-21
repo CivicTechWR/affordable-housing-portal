@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { positiveIntegerQueryParamSchema, positiveIntegerQueryParamWithMaxSchema } from "./common";
 
 const nonEmptyString = z.string().trim().min(1);
 const accountIdSchema = z.uuid("Invalid account id.");
@@ -23,14 +24,8 @@ export const accountParamsSchema = z.object({
 });
 
 export const accountQuerySchema = z.object({
-  page: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .optional(),
-  limit: z
-    .string()
-    .regex(/^[1-9]\d*$/)
-    .optional(),
+  page: positiveIntegerQueryParamSchema.optional(),
+  limit: positiveIntegerQueryParamWithMaxSchema(100).optional(),
   role: accountRoleSchema.optional(),
   status: accountStatusSchema.optional(),
   search: nonEmptyString.optional(),
@@ -40,6 +35,7 @@ export const createAccountInviteSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email("Invalid email address.")),
   name: nonEmptyString,
   role: accountRoleSchema,
+  organization: z.string().trim().nullable().optional(),
   sendInviteEmail: z.boolean().optional(),
 });
 
@@ -56,7 +52,6 @@ const accountResponseDataSchema = z.object({
   role: accountRoleSchema.nullable(),
   organization: z.string().nullable(),
   status: accountStatusSchema.nullable(),
-  listingsCount: z.number().int().min(0),
   lastLoginAt: z.string().nullable(),
   createdAt: z.string().nullable(),
   updatedAt: z.string().nullable(),
@@ -78,6 +73,7 @@ export const createAccountResponseSchema = z.object({
     email: z.email(),
     name: nonEmptyString,
     role: accountRoleSchema,
+    organization: z.string().nullable().optional(),
     inviteUrl: z.url(),
   }),
 });

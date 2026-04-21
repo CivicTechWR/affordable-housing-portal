@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { and, eq, gt, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { userInvites, users, type UserRole } from "@/db/schema";
+import { lower, userInvites, users, type UserRole } from "@/db/schema";
 import { sendInviteEmail } from "@/lib/auth/invite-email";
 import { createOpaqueToken, hashOpaqueToken } from "@/lib/auth/token";
 
@@ -15,6 +15,7 @@ export async function createInvite(params: {
   email: string;
   fullName: string;
   role: UserRole;
+  organization?: string | null;
   invitedByUserId: string;
   sendInviteEmail?: boolean;
 }) {
@@ -28,8 +29,13 @@ export async function createInvite(params: {
     const [existingUser] = await tx
       .select()
       .from(users)
-      .where(eq(users.email, normalizedEmail))
+      .where(eq(lower(users.email), normalizedEmail))
       .limit(1);
+
+    const organization =
+      params.organization === undefined
+        ? (existingUser?.organization ?? null)
+        : params.organization;
 
     const userId = existingUser?.id ?? randomUUID();
 
@@ -38,6 +44,7 @@ export async function createInvite(params: {
         .update(users)
         .set({
           fullName: params.fullName,
+          organization,
           role: params.role,
           status: existingUser.passwordHash ? existingUser.status : "invited",
         })
@@ -47,6 +54,7 @@ export async function createInvite(params: {
         id: userId,
         email: normalizedEmail,
         fullName: params.fullName,
+        organization,
         role: params.role,
         status: "invited",
       });
@@ -85,6 +93,7 @@ export async function createInvite(params: {
       invite,
       userId,
       email: normalizedEmail,
+      organization,
     };
   });
 

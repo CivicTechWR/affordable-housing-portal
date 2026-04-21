@@ -1,40 +1,22 @@
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { getListingByIdService } from "@/lib/listings/listing.service";
 import { ListingDetails } from "@/components/listing-details/ListingDetails";
 import type { ListingDetailProps } from "@/components/listing-details/ListingDetails";
-import {
-  listingByIdResponseSchema,
-  type ListingDetails as ListingDetailsData,
-} from "@/shared/schemas/listings";
+import type { ListingDetails as ListingDetailsData } from "@/shared/schemas/listings";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-async function getListingFromApi(id: string): Promise<ListingDetailsData> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
+async function getListingDetails(id: string): Promise<ListingDetailsData> {
+  const result = await getListingByIdService(id);
 
-  if (!host) {
+  if (!result.ok) {
     notFound();
   }
 
-  const response = await fetch(`${protocol}://${host}/api/listings/${id}`, {
-    cache: "no-store",
-  });
-
-  if (response.status === 404) {
-    notFound();
-  }
-
-  if (!response.ok) {
-    throw new Error("Failed to load listing details");
-  }
-
-  const payload = listingByIdResponseSchema.parse(await response.json());
-  return payload.data;
+  return result.value.data;
 }
 
 function mapListingDetailsToDisplay(details: ListingDetailsData): ListingDetailProps {
@@ -60,7 +42,7 @@ function mapListingDetailsToDisplay(details: ListingDetailsData): ListingDetailP
 
 export default async function ListingDetailsPage({ params }: Readonly<PageProps>) {
   const { id } = await params;
-  const details = await getListingFromApi(id);
+  const details = await getListingDetails(id);
   const displayDetails = mapListingDetailsToDisplay(details);
 
   return <ListingDetails {...displayDetails} />;

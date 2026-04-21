@@ -1,5 +1,6 @@
-import { sql } from "drizzle-orm";
+import { SQL, sql } from "drizzle-orm";
 import {
+  AnyPgColumn,
   boolean,
   date,
   doublePrecision,
@@ -50,10 +51,21 @@ export type CustomListingFieldOption = {
   value: string;
 };
 
-export type CustomListingFieldValue = boolean | number | string | string[] | null;
-export type ListingCustomFields = Record<string, CustomListingFieldValue>;
+export type ListingCustomFieldValue =
+  | boolean
+  | number
+  | string
+  | null
+  | ListingCustomFieldValue[]
+  | { [key: string]: ListingCustomFieldValue };
+export type ListingCustomFields = Record<string, ListingCustomFieldValue>;
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 export type UserStatus = (typeof userStatusEnum.enumValues)[number];
+export type ListingStatus = (typeof listingStatusEnum.enumValues)[number];
+
+export function lower(email: AnyPgColumn): SQL {
+  return sql`lower(${email})`;
+}
 
 export const users = pgTable(
   "users",
@@ -62,6 +74,7 @@ export const users = pgTable(
     externalAuthId: text("external_auth_id"),
     email: text("email").notNull(),
     fullName: text("full_name").notNull(),
+    organization: text("organization"),
     passwordHash: text("password_hash"),
     role: userRoleEnum("role").notNull(),
     status: userStatusEnum("status").notNull(),
@@ -75,7 +88,7 @@ export const users = pgTable(
   },
   (table) => [
     uniqueIndex("users_external_auth_id_unique").on(table.externalAuthId),
-    uniqueIndex("users_email_unique").on(table.email),
+    uniqueIndex("users_email_unique").on(lower(table.email)),
     index("users_role_idx").on(table.role),
     index("users_status_idx").on(table.status),
   ],

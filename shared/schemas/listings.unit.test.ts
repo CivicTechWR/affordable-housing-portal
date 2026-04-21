@@ -1,5 +1,9 @@
 import { describe, expect, it } from "@jest/globals";
-import { createListingSchema, updateListingSchema } from "@/shared/schemas/listings";
+import {
+  createListingSchema,
+  listingQuerySchema,
+  updateListingSchema,
+} from "@/shared/schemas/listings";
 
 const validCreatePayload = {
   name: "Cedar Court",
@@ -34,6 +38,36 @@ const validCreatePayload = {
 };
 
 describe("listing API schemas", () => {
+  it("accepts maxRent query values with up to two decimal places", () => {
+    const result = listingQuerySchema.safeParse({
+      maxRent: "1200.50",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error("Expected query schema parse to succeed");
+    }
+
+    expect(result.data.maxRent).toBe("1200.50");
+  });
+
+  it("rejects maxRent query values with invalid numeric formats", () => {
+    const invalidValues = ["1200.555", "not-a-number"];
+
+    invalidValues.forEach((maxRent) => {
+      const result = listingQuerySchema.safeParse({
+        maxRent,
+      });
+
+      expect(result.success).toBe(false);
+
+      if (!result.success) {
+        expect(result.error.issues.some((issue) => issue.path.join(".") === "maxRent")).toBe(true);
+      }
+    });
+  });
+
   it("trims create payload strings", () => {
     const parsed = createListingSchema.parse({
       ...validCreatePayload,
