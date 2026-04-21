@@ -3,6 +3,7 @@ import "server-only";
 import { formatDistanceToNow } from "date-fns";
 
 import type { ListingCustomFields, ListingCustomFieldValue, ListingStatus } from "@/db/schema";
+import { sortCustomListingFieldsForDisplay } from "@/lib/custom-listing-fields/custom-listing-field-ordering";
 import type {
   CreateListingInput,
   ListingDetails,
@@ -32,6 +33,7 @@ type ListingFeatureDefinition = {
   label: string;
   description: string | null;
   category: string;
+  sortOrder: number;
 };
 type StoredListingFeature = NonNullable<ListingDetails["accessibilityFeatures"]>[number];
 
@@ -226,7 +228,7 @@ export function buildListingFeatureCategories(
     });
   }
 
-  for (const definition of definitions) {
+  for (const definition of sortCustomListingFieldsForDisplay(definitions)) {
     const existingCategory = categories.get(definition.category) ?? {
       categoryName: definition.category,
       features: [],

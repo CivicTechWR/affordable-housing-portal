@@ -3,6 +3,10 @@ import "server-only";
 import { and, eq, type SQL } from "drizzle-orm";
 
 import { customListingFields } from "@/db/schema";
+import {
+  formatCustomListingFieldCategoryLabel,
+  sortCustomListingFieldsForDisplay,
+} from "@/lib/custom-listing-fields/custom-listing-field-ordering";
 import { findCustomListingFields } from "@/lib/custom-listing-fields/custom-listing-field.repository";
 import type {
   CustomListingFieldDefinition,
@@ -16,19 +20,6 @@ function slugifyCategory(category: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "");
-}
-
-function formatCategoryLabel(category: string) {
-  return category
-    .split(/\s*&\s*/)
-    .map((part) =>
-      part
-        .toLowerCase()
-        .split(/\s+/)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" "),
-    )
-    .join(" & ");
 }
 
 export async function getCustomListingFieldsService(
@@ -49,7 +40,7 @@ export async function getCustomListingFieldsService(
   }
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
-  const rows = await findCustomListingFields({ where });
+  const rows = sortCustomListingFieldsForDisplay(await findCustomListingFields({ where }));
 
   const groups = new Map<
     string,
@@ -67,7 +58,7 @@ export async function getCustomListingFieldsService(
       continue;
     }
 
-    const groupLabel = formatCategoryLabel(row.category);
+    const groupLabel = formatCustomListingFieldCategoryLabel(row.category);
 
     if (!groups.has(groupId)) {
       groups.set(groupId, {
@@ -92,6 +83,8 @@ export async function getCustomListingFieldsService(
   }
 
   return {
-    data: Array.from(groups.values()),
+    data: Array.from(groups.values()).sort((left, right) =>
+      left.groupLabel.localeCompare(right.groupLabel),
+    ),
   };
 }

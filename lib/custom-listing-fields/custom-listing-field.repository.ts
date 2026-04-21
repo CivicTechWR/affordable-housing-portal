@@ -20,5 +20,9 @@ export async function findCustomListingFields(input: { where?: SQL<unknown> }) {
     })
     .from(customListingFields)
     .where(input.where)
-    .orderBy(asc(customListingFields.sortOrder), asc(customListingFields.key));
+    .orderBy(
+      asc(customListingFields.category),
+      asc(customListingFields.sortOrder),
+      asc(customListingFields.key),
+    );
 }

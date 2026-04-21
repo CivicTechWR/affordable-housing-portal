@@ -203,10 +203,15 @@ export async function findPublicFeatureDefinitionsByKeys(keys: string[]) {
       label: customListingFields.label,
       description: customListingFields.description,
       category: customListingFields.category,
+      sortOrder: customListingFields.sortOrder,
     })
     .from(customListingFields)
     .where(and(inArray(customListingFields.key, keys), eq(customListingFields.isPublic, true)))
-    .orderBy(asc(customListingFields.sortOrder));
+    .orderBy(
+      asc(customListingFields.category),
+      asc(customListingFields.sortOrder),
+      asc(customListingFields.key),
+    );
 }
 
 export async function createListing(input: {
