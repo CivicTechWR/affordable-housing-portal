@@ -14,6 +14,7 @@ import type {
 import {
   FIELD_HELP_TEXT,
   TABLE_COLUMNS,
+  TABLE_MIN_WIDTH,
   type DisplayGroup,
   type DropIndicator,
   type SortDirection,
@@ -167,7 +168,12 @@ export function CustomListingFieldsTable({
       <div className="mt-6 overflow-hidden rounded-md border border-border bg-background">
         <div className="overflow-x-auto">
           {selectedFieldCount > 0 ? (
-            <div className="flex min-w-[1500px] items-center justify-between border-b border-border bg-primary/5 px-4 py-3">
+            <div
+              className={cn(
+                "flex items-center justify-between border-b border-border bg-primary/5 px-4 py-3",
+                TABLE_MIN_WIDTH,
+              )}
+            >
               <span className="text-sm font-medium text-foreground">
                 {selectedFieldCount} {selectedFieldCount === 1 ? "field" : "fields"} selected
               </span>
@@ -188,9 +194,14 @@ export function CustomListingFieldsTable({
             </div>
           ) : null}
           <div
-            className={cn("grid min-w-[1500px] border-b border-border bg-muted/50", TABLE_COLUMNS)}
+            className={cn(
+              "grid border-b border-border bg-muted/50",
+              TABLE_MIN_WIDTH,
+              TABLE_COLUMNS,
+            )}
           >
             <div />
+            <div className="py-4 pr-3 text-xs font-medium text-foreground/80">Order</div>
             <SortHeader
               label="Label"
               sortKey="label"
@@ -258,7 +269,7 @@ export function CustomListingFieldsTable({
             <div className="px-4 py-4 text-xs font-medium text-foreground/80">Actions</div>
           </div>
 
-          <div className="min-w-[1500px]">
+          <div className={TABLE_MIN_WIDTH}>
             {displayGroups.length === 0 ? (
               <div className="px-8 py-14 text-center text-muted-foreground">
                 No custom fields match these filters.
@@ -267,7 +278,7 @@ export function CustomListingFieldsTable({
               displayGroups.map((group) => {
                 return (
                   <div key={group.category}>
-                    <div className="flex h-10 items-center gap-3 border-y border-border bg-muted/20 px-14">
+                    <div className="flex h-10 items-center gap-3 border-y border-border bg-muted/20 pl-[84px] pr-4">
                       <span className="text-xs font-semibold uppercase tracking-wide text-foreground/80">
                         {group.label}
                       </span>

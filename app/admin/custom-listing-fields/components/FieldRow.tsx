@@ -184,7 +184,7 @@ export function FieldRow({
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
-      <div className="flex justify-center px-1">
+      <div className="flex justify-end pr-1">
         <button
           type="button"
           draggable={!isPending}
@@ -209,6 +209,9 @@ export function FieldRow({
             className="size-4"
           />
         </button>
+      </div>
+      <div className="py-3 pr-3 font-mono text-xs tabular-nums text-muted-foreground">
+        {field.sortOrder}
       </div>
       <EditableTextCell
         value={field.label}

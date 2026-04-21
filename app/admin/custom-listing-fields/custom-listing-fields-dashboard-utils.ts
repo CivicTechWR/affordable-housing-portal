@@ -16,7 +16,9 @@ export type SortKey =
 export type SortDirection = "asc" | "desc";
 
 export const TABLE_COLUMNS =
-  "grid-cols-[48px_minmax(180px,1.1fr)_minmax(190px,1.15fr)_minmax(150px,0.85fr)_minmax(260px,1.35fr)_minmax(260px,1.35fr)_minmax(132px,0.7fr)_96px_96px_94px]";
+  "grid-cols-[36px_48px_minmax(180px,1.1fr)_minmax(190px,1.15fr)_minmax(150px,0.85fr)_minmax(260px,1.35fr)_minmax(260px,1.35fr)_minmax(132px,0.7fr)_96px_96px_94px]";
+
+export const TABLE_MIN_WIDTH = "min-w-[1540px]";
 
 export const FIELD_HELP_TEXT = {
   label: "Human-readable field name shown to partners and renters.",
