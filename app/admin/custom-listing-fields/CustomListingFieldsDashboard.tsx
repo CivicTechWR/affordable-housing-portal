@@ -229,6 +229,14 @@ export function CustomListingFieldsDashboard({
     setSortDirection("asc");
   };
 
+  const refreshFieldsFromServer = async () => {
+    const response = await requestJson<{ data: AdminCustomListingField[] }>(
+      "/api/admin/custom-listing-fields",
+      { method: "GET" },
+    );
+    setFields(sortFields(normalizeFieldCategories(response.data)));
+  };
+
   const handleCreateField = async (payload: CreateFieldDialogPayload) => {
     setFeedback(null);
     const normalizedPayload = normalizeCategoryPayload(payload);
@@ -307,11 +315,22 @@ export function CustomListingFieldsDashboard({
       );
       setFeedback({ status: "success", message: "Custom field order updated." });
     } catch (caught) {
-      setFields(previousFields);
-      setFeedback({
-        status: "error",
-        message: caught instanceof Error ? caught.message : "Unable to update custom field order.",
-      });
+      const message =
+        caught instanceof Error ? caught.message : "Unable to update custom field order.";
+
+      try {
+        await refreshFieldsFromServer();
+        setFeedback({
+          status: "error",
+          message: `${message} Refreshed fields to match the latest saved order.`,
+        });
+      } catch {
+        setFields(previousFields);
+        setFeedback({
+          status: "error",
+          message: `${message} Unable to refresh the latest saved order.`,
+        });
+      }
     }
   };
 
@@ -473,10 +492,21 @@ export function CustomListingFieldsDashboard({
         message: `${responses.length} custom ${responses.length === 1 ? "field" : "fields"} updated.`,
       });
     } catch (caught) {
-      setFeedback({
-        status: "error",
-        message: caught instanceof Error ? caught.message : "Unable to update selected fields.",
-      });
+      const message =
+        caught instanceof Error ? caught.message : "Unable to update selected fields.";
+
+      try {
+        await refreshFieldsFromServer();
+        setFeedback({
+          status: "error",
+          message: `${message} Refreshed fields to match the latest saved values.`,
+        });
+      } catch {
+        setFeedback({
+          status: "error",
+          message: `${message} Unable to refresh the latest saved values.`,
+        });
+      }
     } finally {
       setIsBulkSaving(false);
     }
