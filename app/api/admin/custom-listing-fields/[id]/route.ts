@@ -4,15 +4,17 @@ import { errorMessageSchema } from "@/shared/schemas/common";
 import {
   customListingFieldByIdResponseSchema,
   customListingFieldParamsSchema,
+  deleteCustomListingFieldResponseSchema,
   updateCustomListingFieldResponseSchema,
   updateCustomListingFieldSchema,
 } from "@/shared/schemas/custom-listing-fields";
 import {
+  deleteAdminCustomListingFieldByIdHandler,
   getAdminCustomListingFieldByIdHandler,
   updateAdminCustomListingFieldByIdHandler,
 } from "./handlers";
 
-export const { GET, PUT } = route({
+export const { GET, PUT, DELETE } = route({
   getAdminCustomListingFieldById: routeOperation({ method: "GET" })
     .input({ params: customListingFieldParamsSchema })
     .outputs([
@@ -42,4 +44,20 @@ export const { GET, PUT } = route({
       { status: 409, contentType: "application/json", body: errorMessageSchema },
     ])
     .handler(updateAdminCustomListingFieldByIdHandler),
+
+  deleteAdminCustomListingFieldById: routeOperation({ method: "DELETE" })
+    .input({
+      params: customListingFieldParamsSchema,
+    })
+    .outputs([
+      {
+        status: 200,
+        contentType: "application/json",
+        body: deleteCustomListingFieldResponseSchema,
+      },
+      { status: 401, contentType: "application/json", body: errorMessageSchema },
+      { status: 403, contentType: "application/json", body: errorMessageSchema },
+      { status: 404, contentType: "application/json", body: errorMessageSchema },
+    ])
+    .handler(deleteAdminCustomListingFieldByIdHandler),
 });

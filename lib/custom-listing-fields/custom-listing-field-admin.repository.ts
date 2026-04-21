@@ -148,3 +148,12 @@ export async function updateCustomListingFieldById(input: {
 
   return field ?? null;
 }
+
+export async function deleteCustomListingFieldById(fieldId: string) {
+  const [field] = await db
+    .delete(customListingFields)
+    .where(eq(customListingFields.id, fieldId))
+    .returning({ id: customListingFields.id });
+
+  return field ?? null;
+}

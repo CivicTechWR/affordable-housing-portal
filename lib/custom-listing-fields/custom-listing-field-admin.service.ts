@@ -7,6 +7,7 @@ import { getOptionalSession } from "@/lib/auth/session";
 import { fail, succeed, type DomainResult } from "@/lib/http/domain-result";
 import {
   createCustomListingField,
+  deleteCustomListingFieldById,
   findAdminCustomListingFieldById,
   findAdminCustomListingFields,
   findCustomListingFieldByKey,
@@ -20,6 +21,7 @@ import type {
   CreateCustomListingFieldInput,
   CreateCustomListingFieldResponse,
   CustomListingFieldByIdResponse,
+  DeleteCustomListingFieldResponse,
   UpdateCustomListingFieldInput,
   UpdateCustomListingFieldResponse,
 } from "@/shared/schemas/custom-listing-fields";
@@ -58,6 +60,10 @@ function toAdminCustomListingField(row: {
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
+}
+
+function normalizeCategory(category: string) {
+  return category.trim().toUpperCase();
 }
 
 export async function getAdminCustomListingFieldsService(
@@ -136,7 +142,7 @@ export async function createAdminCustomListingFieldService(
     label: input.label,
     description: input.description,
     fieldType: input.type,
-    category: input.category,
+    category: normalizeCategory(input.category),
     helpText: input.helpText,
     placeholder: input.placeholder,
     isPublic: input.publicOnly,
@@ -193,7 +199,7 @@ export async function updateAdminCustomListingFieldByIdService(input: {
     label: input.payload.label,
     description: input.payload.description,
     fieldType: input.payload.type,
-    category: input.payload.category,
+    category: input.payload.category ? normalizeCategory(input.payload.category) : undefined,
     helpText: input.payload.helpText,
     placeholder: input.payload.placeholder,
     isPublic: input.payload.publicOnly,
@@ -217,6 +223,29 @@ export async function updateAdminCustomListingFieldByIdService(input: {
   return succeed({
     message: "Custom listing field updated",
     data: toAdminCustomListingField(field),
+  });
+}
+
+export async function deleteAdminCustomListingFieldByIdService(
+  fieldId: string,
+): Promise<DomainResult<DeleteCustomListingFieldResponse>> {
+  const actorResult = await requireCustomListingFieldsAdminActor();
+
+  if (!actorResult.ok) {
+    return actorResult;
+  }
+
+  const deleted = await deleteCustomListingFieldById(fieldId);
+
+  if (!deleted) {
+    return fail("not_found", "Custom listing field not found");
+  }
+
+  return succeed({
+    message: "Custom listing field deleted",
+    data: {
+      id: deleted.id,
+    },
   });
 }
 

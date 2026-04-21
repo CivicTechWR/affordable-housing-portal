@@ -115,6 +115,13 @@ export const updateCustomListingFieldResponseSchema = z.object({
   data: adminCustomListingFieldSchema,
 });
 
+export const deleteCustomListingFieldResponseSchema = z.object({
+  message: z.string(),
+  data: z.object({
+    id: customListingFieldIdSchema,
+  }),
+});
+
 export type CustomListingFieldQuery = z.infer<typeof customListingFieldQuerySchema>;
 export type CustomListingFieldType = z.infer<typeof customListingFieldTypeSchema>;
 export type CustomListingFieldSelectableOption = z.infer<
@@ -137,4 +144,7 @@ export type CreateCustomListingFieldResponse = z.infer<
 >;
 export type UpdateCustomListingFieldResponse = z.infer<
   typeof updateCustomListingFieldResponseSchema
+>;
+export type DeleteCustomListingFieldResponse = z.infer<
+  typeof deleteCustomListingFieldResponseSchema
 >;
