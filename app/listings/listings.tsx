@@ -13,7 +13,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useMemo, useState } from "react";
 
 import { useListingsQuery } from "@/hooks/useListingsQuery";
-import type { ListingSortOption, ListingsQuery } from "@/lib/listings/types";
+import type { ListingSortOption, ListingsQuery, ListingsResponse } from "@/lib/listings/types";
 
 export enum DisplayMode {
   LIST = "list",
@@ -21,7 +21,15 @@ export enum DisplayMode {
   MAP = "map",
 }
 
-export default function ListingsDashboard() {
+interface ListingsDashboardProps {
+  initialData: ListingsResponse;
+  initialQuery: ListingsQuery;
+}
+
+export default function ListingsDashboard({
+  initialData,
+  initialQuery,
+}: ListingsDashboardProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [displayMode] = useState<DisplayMode>(DisplayMode.LIST);
   const {
@@ -58,9 +66,12 @@ export default function ListingsDashboard() {
     }),
     [bathrooms, bedrooms, features, location, maxPrice, minPrice, moveInDate, sort],
   );
-  const { data, error, isLoading } = useListingsQuery(query);
-  const listings = data?.data ?? [];
-  const dynamicGroups: DynamicFilterGroup[] = data?.availableFilters.featureGroups ?? [];
+  const { data, error, isLoading } = useListingsQuery(query, {
+    initialData,
+    initialQuery,
+  });
+  const listings = data.data;
+  const dynamicGroups: DynamicFilterGroup[] = data.availableFilters.featureGroups;
 
   return (
     <div className="flex h-screen flex-col">
@@ -87,7 +98,7 @@ export default function ListingsDashboard() {
             <div className="text-sm text-slate-500">
               {isLoading && listings.length === 0
                 ? "Loading listings..."
-                : `${data?.pagination.total ?? 0} results`}
+                : `${data.pagination.total} results`}
             </div>
             <SortOptions {...sortOptionProps} />
           </div>

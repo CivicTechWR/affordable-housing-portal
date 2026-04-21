@@ -6,13 +6,22 @@ import { fetchListings, buildListingsSearchParams } from "@/lib/listings/api";
 import type { ListingsQuery, ListingsResponse } from "@/lib/listings/types";
 
 interface ListingsQueryState {
-  data: ListingsResponse | null;
+  data: ListingsResponse;
   error: string | null;
   isLoading: boolean;
 }
 
-export function useListingsQuery(query: ListingsQuery) {
+interface UseListingsQueryOptions {
+  initialData: ListingsResponse;
+  initialQuery: ListingsQuery;
+}
+
+export function useListingsQuery(query: ListingsQuery, options: UseListingsQueryOptions) {
   const deferredQuery = useDeferredValue(query);
+  const initialRequestKey = useMemo(
+    () => buildListingsSearchParams(options.initialQuery).toString(),
+    [options.initialQuery],
+  );
   const requestKey = useMemo(
     () => buildListingsSearchParams(deferredQuery).toString(),
     [
@@ -29,12 +38,21 @@ export function useListingsQuery(query: ListingsQuery) {
     ],
   );
   const [state, setState] = useState<ListingsQueryState>({
-    data: null,
+    data: options.initialData,
     error: null,
-    isLoading: true,
+    isLoading: false,
   });
 
   useEffect(() => {
+    if (requestKey === initialRequestKey) {
+      setState({
+        data: options.initialData,
+        error: null,
+        isLoading: false,
+      });
+      return;
+    }
+
     const controller = new AbortController();
 
     async function loadListings() {
@@ -69,7 +87,7 @@ export function useListingsQuery(query: ListingsQuery) {
     return () => {
       controller.abort();
     };
-  }, [deferredQuery, requestKey]);
+  }, [deferredQuery, initialRequestKey, options.initialData, requestKey]);
 
   return state;
 }
