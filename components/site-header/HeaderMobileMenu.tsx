@@ -11,6 +11,7 @@ import { signOutFromHeader } from "@/components/site-header/actions";
 type HeaderMobileMenuProps = {
   isSignedIn: boolean;
   isAdmin: boolean;
+  canCreateListing: boolean;
   user: {
     email?: string | null;
     name?: string | null;
@@ -20,7 +21,12 @@ type HeaderMobileMenuProps = {
 const mobileMenuItemClass =
   "flex w-full items-center justify-between rounded-2xl bg-primary-foreground/10 px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/20";
 
-export function HeaderMobileMenu({ isSignedIn, isAdmin, user }: HeaderMobileMenuProps) {
+export function HeaderMobileMenu({
+  isSignedIn,
+  isAdmin,
+  canCreateListing,
+  user,
+}: HeaderMobileMenuProps) {
   const pathname = usePathname();
   const menuId = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -59,6 +65,16 @@ export function HeaderMobileMenu({ isSignedIn, isAdmin, user }: HeaderMobileMenu
 
             {isSignedIn ? (
               <>
+                {canCreateListing ? (
+                  <Link
+                    href="/listing-form"
+                    className={mobileMenuItemClass}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <span>New listing</span>
+                  </Link>
+                ) : null}
+
                 {isAdmin ? (
                   <Link
                     href="/admin/custom-listing-fields"

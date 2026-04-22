@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,6 +14,7 @@ import { useEditListingQuery } from "./useEditListingQuery";
 import { useGetListingQuery } from "./useGetListingQuery";
 
 export function useListingForm(listingId?: string) {
+  const router = useRouter();
   const {
     data: initialData,
     isLoading: isFetching,
@@ -51,15 +53,14 @@ export function useListingForm(listingId?: string) {
         return;
       }
 
-      await createListing(data);
-      setSubmitFeedback({
-        status: "success",
-        message: "Listing created successfully. (Mock)",
-      });
-    } catch {
+      const createdListing = await createListing(data);
+      router.push(`/listings/${createdListing.id}`);
+      router.refresh();
+    } catch (error) {
       setSubmitFeedback({
         status: "error",
-        message: "Unable to save listing. Please try again.",
+        message:
+          error instanceof Error ? error.message : "Unable to save listing. Please try again.",
       });
     }
   };

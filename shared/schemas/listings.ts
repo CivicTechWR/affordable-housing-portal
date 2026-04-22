@@ -112,6 +112,7 @@ export const listingSummarySchema = z.object({
 
 const listingAddressSchema = z.object({
   street: nonEmptyString,
+  street2: nonEmptyString.optional(),
   city: nonEmptyString,
   province: nonEmptyString,
   postalCode: nonEmptyString,
@@ -123,9 +124,9 @@ const listingAddressSchema = z.object({
 const listingUnitSchema = z.object({
   bedrooms: z.number().int().min(0),
   bathrooms: z.number().min(0),
-  sqft: z.number().int().min(0),
+  sqft: z.number().int().min(0).optional(),
   rent: z.number().int().min(0),
-  availableDate: z.iso.date(),
+  availableDate: z.iso.date().optional(),
 });
 
 const listingEligibilityCriteriaSchema = z.object({
@@ -158,8 +159,9 @@ const listingUnitPatchSchema = listingUnitSchema.partial().refine(hasAtLeastOneF
 });
 
 const updateListingBasePayloadSchema = z.object({
+  title: nonEmptyString.optional(),
   name: nonEmptyString.optional(),
-  description: nonEmptyString.optional(),
+  description: optionalTrimmedString(),
   address: listingAddressPatchSchema.optional(),
   units: z.array(listingUnitPatchSchema).min(1, "At least one unit is required.").optional(),
   amenities: z.array(nonEmptyString).optional(),
@@ -168,6 +170,12 @@ const updateListingBasePayloadSchema = z.object({
   images: z.array(listingImageUrlSchema).optional(),
   contact: listingContactPatchSchema.optional(),
   status: listingStatusSchema.optional(),
+  unitNumber: nonEmptyString.optional(),
+  propertyType: nonEmptyString.optional(),
+  buildingType: nonEmptyString.optional(),
+  unitStory: z.number().optional(),
+  leaseTerm: nonEmptyString.optional(),
+  utilitiesIncluded: z.array(nonEmptyString).optional(),
 });
 const updateListingApplicationPayloadSchema = z
   .object({
@@ -191,8 +199,9 @@ const listingIdDataSchema = z.object({
 });
 
 const listingPayloadSchema = z.object({
+  title: nonEmptyString,
   name: nonEmptyString,
-  description: nonEmptyString,
+  description: optionalTrimmedString(),
   address: listingAddressSchema,
   units: z.array(listingUnitSchema).min(1, "At least one unit is required."),
   amenities: z.array(nonEmptyString),
@@ -203,6 +212,12 @@ const listingPayloadSchema = z.object({
   images: z.array(listingImageUrlSchema),
   contact: listingContactSchema,
   status: listingStatusSchema,
+  unitNumber: nonEmptyString.optional(),
+  propertyType: nonEmptyString.optional(),
+  buildingType: nonEmptyString.optional(),
+  unitStory: z.number().optional(),
+  leaseTerm: nonEmptyString.optional(),
+  utilitiesIncluded: z.array(nonEmptyString).optional(),
 });
 
 export const createListingSchema = listingPayloadSchema.superRefine((value, context) => {

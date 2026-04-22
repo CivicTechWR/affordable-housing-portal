@@ -139,7 +139,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
             </p>
           )}
           <Button type="submit" form="listing-form" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Publish Listing"}
+            {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Create Listing"}
           </Button>
         </div>
       }

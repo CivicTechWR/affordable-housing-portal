@@ -46,6 +46,11 @@ export function buildListingCustomFields(input: CreateListingInput): ListingCust
     externalApplicationUrl:
       input.applicationMethod === "external_link" ? (input.externalApplicationUrl ?? null) : null,
     eligibilityCriteria: { ...input.eligibilityCriteria },
+    ...(input.propertyType ? { propertyType: input.propertyType } : {}),
+    ...(input.buildingType ? { buildingType: input.buildingType } : {}),
+    ...(input.unitStory !== undefined ? { unitStory: input.unitStory } : {}),
+    ...(input.leaseTerm ? { leaseTerm: input.leaseTerm } : {}),
+    ...(input.utilitiesIncluded ? { utilitiesIncluded: [...input.utilitiesIncluded] } : {}),
   };
 }
 
@@ -86,6 +91,26 @@ export function mergeListingCustomFields(
       ...getStoredEligibilityCriteria(existing),
       ...input.eligibilityCriteria,
     };
+  }
+
+  if (input.propertyType !== undefined) {
+    next.propertyType = input.propertyType;
+  }
+
+  if (input.buildingType !== undefined) {
+    next.buildingType = input.buildingType;
+  }
+
+  if (input.unitStory !== undefined) {
+    next.unitStory = input.unitStory;
+  }
+
+  if (input.leaseTerm !== undefined) {
+    next.leaseTerm = input.leaseTerm;
+  }
+
+  if (input.utilitiesIncluded !== undefined) {
+    next.utilitiesIncluded = [...input.utilitiesIncluded];
   }
 
   return next;

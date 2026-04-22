@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { mapListingFormToCreateListingInput, parseCreateListingResponse } from "./api";
 import type { ListingFormData } from "./types";
 
 export function useCreateListingQuery() {
@@ -10,12 +11,18 @@ export function useCreateListingQuery() {
     setIsError(false);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      console.log("Creating listing:", data);
-      return data;
-    } catch {
+      const response = await fetch("/api/listings", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(mapListingFormToCreateListingInput(data)),
+      });
+
+      return await parseCreateListingResponse(response);
+    } catch (error) {
       setIsError(true);
-      throw new Error("Unable to create listing");
+      throw error instanceof Error ? error : new Error("Unable to create listing");
     } finally {
       setIsLoading(false);
     }

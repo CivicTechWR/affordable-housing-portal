@@ -55,6 +55,7 @@ export type ListingRecord = {
     ownerUserId: string;
     name: string;
     street1: string;
+    street2: string | null;
     city: string;
     province: string;
     postalCode: string;
@@ -158,6 +159,7 @@ export async function findListingRecordById(
         ownerUserId: properties.ownerUserId,
         name: properties.name,
         street1: properties.street1,
+        street2: properties.street2,
         city: properties.city,
         province: properties.province,
         postalCode: properties.postalCode,
@@ -230,7 +232,7 @@ export async function createListing(input: {
         ownerUserId: input.actorUserId,
         name: input.payload.name,
         street1: input.payload.address.street,
-        street2: null,
+        street2: input.payload.address.street2 ?? null,
         city: input.payload.address.city,
         province: input.payload.address.province,
         postalCode: input.payload.address.postalCode,
@@ -262,15 +264,15 @@ export async function createListing(input: {
         propertyId: property.id,
         createdByUserId: input.actorUserId,
         updatedByUserId: input.actorUserId,
-        title: input.payload.name,
-        description: input.payload.description,
+        title: input.payload.title,
+        description: input.payload.description ?? null,
         status: input.payload.status,
-        unitNumber: null,
+        unitNumber: input.payload.unitNumber ?? null,
         bedrooms: primaryUnit.bedrooms,
         bathrooms: primaryUnit.bathrooms,
-        squareFeet: primaryUnit.sqft,
+        squareFeet: primaryUnit.sqft ?? null,
         monthlyRentCents: input.primaryUnitRentCents,
-        availableOn: primaryUnit.availableDate,
+        availableOn: primaryUnit.availableDate ?? null,
         maxIncomeCents: dollarsToCents(input.payload.eligibilityCriteria.maxIncome),
         applicationUrl:
           input.payload.applicationMethod === "external_link"
@@ -311,6 +313,7 @@ export async function updateListingGraph(input: {
   property: {
     name: string;
     street1: string;
+    street2: string | null;
     city: string;
     province: string;
     postalCode: string;
@@ -325,6 +328,7 @@ export async function updateListingGraph(input: {
     title: string;
     description: string | null;
     status: ListingStatus;
+    unitNumber: string | null;
     bedrooms: number;
     bathrooms: number;
     squareFeet: number | null;
@@ -347,6 +351,7 @@ export async function updateListingGraph(input: {
       .set({
         name: input.property.name,
         street1: input.property.street1,
+        street2: input.property.street2,
         city: input.property.city,
         province: input.property.province,
         postalCode: input.property.postalCode,
@@ -366,6 +371,7 @@ export async function updateListingGraph(input: {
         title: input.listing.title,
         description: input.listing.description,
         status: input.listing.status,
+        unitNumber: input.listing.unitNumber,
         bedrooms: input.listing.bedrooms,
         bathrooms: input.listing.bathrooms,
         squareFeet: input.listing.squareFeet,

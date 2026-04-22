@@ -352,6 +352,7 @@ export async function updateListingByIdService(input: {
     property: {
       name: input.payload.name ?? listing.property.name,
       street1: input.payload.address?.street ?? listing.property.street1,
+      street2: input.payload.address?.street2 ?? listing.property.street2,
       city: input.payload.address?.city ?? listing.property.city,
       province: input.payload.address?.province ?? listing.property.province,
       postalCode: input.payload.address?.postalCode ?? listing.property.postalCode,
@@ -363,9 +364,10 @@ export async function updateListingByIdService(input: {
       contactPhone: input.payload.contact?.phone ?? listing.property.contactPhone,
     },
     listing: {
-      title: input.payload.name ?? listing.title,
+      title: input.payload.title ?? listing.title,
       description: input.payload.description ?? listing.description,
       status: nextStatus,
+      unitNumber: input.payload.unitNumber ?? listing.unitNumber,
       bedrooms: primaryUnit?.bedrooms ?? listing.bedrooms,
       bathrooms: primaryUnit?.bathrooms ?? listing.bathrooms,
       squareFeet: primaryUnit?.sqft ?? listing.squareFeet,
@@ -494,6 +496,7 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
     price: centsToDollars(listing.monthlyRentCents),
     address: {
       street1: listing.property.street1,
+      street2: listing.property.street2 ?? undefined,
       city: listing.property.city,
       province: listing.property.province,
       postalCode: listing.property.postalCode,
