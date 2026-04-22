@@ -30,7 +30,7 @@ const validCreatePayload = {
   applicationMethod: "external_link" as const,
   externalApplicationUrl: "https://example.org/apply",
   eligibilityCriteria: {},
-  images: ["https://example.org/listing.jpg"],
+  images: [{ id: "6ee785fa-7f75-414f-b6e7-c65fb22083b2", caption: "Front exterior" }],
   contact: {
     name: "Leasing Office",
     email: "leasing@example.org",
@@ -162,6 +162,7 @@ describe("listing API schemas", () => {
       ...validCreatePayload,
       description: undefined,
       unitNumber: undefined,
+      images: [],
       units: [
         {
           bedrooms: 2,

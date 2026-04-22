@@ -1,26 +1,33 @@
 import { useState } from "react";
-import type { ListingFormData } from "./types";
+import type { UpdateListingInput } from "@/shared/schemas/listings";
+import { parseCreateListingResponse } from "./api";
 
 interface EditListingInput {
   listingId: string;
-  data: ListingFormData;
+  payload: UpdateListingInput;
 }
 
 export function useEditListingQuery() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const editListing = async ({ listingId, data }: EditListingInput) => {
+  const editListing = async ({ listingId, payload }: EditListingInput) => {
     setIsLoading(true);
     setIsError(false);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      console.log(`Updating listing ${listingId}:`, data);
-      return { listingId, data };
-    } catch {
+      const response = await fetch(`/api/listings/${listingId}`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      return await parseCreateListingResponse(response);
+    } catch (error) {
       setIsError(true);
-      throw new Error("Unable to edit listing");
+      throw error instanceof Error ? error : new Error("Unable to edit listing");
     } finally {
       setIsLoading(false);
     }

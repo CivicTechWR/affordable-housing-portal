@@ -166,6 +166,14 @@ export function getStoredStringArray(customFields: ListingCustomFields, key: str
   return value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0);
 }
 
+export function getStoredString(customFields: ListingCustomFields, key: string) {
+  return getString(customFields[key]);
+}
+
+export function getStoredNumber(customFields: ListingCustomFields, key: string) {
+  return getNumber(customFields[key]);
+}
+
 export function getStoredAccessibilityFeatures(
   customFields: ListingCustomFields,
 ): StoredListingFeature[] {
@@ -272,6 +280,10 @@ export function buildListingFeatureCategories(
 
 export function formatListingAddress(street1: string, unitNumber: string | null) {
   return unitNumber ? `${street1} #${unitNumber}` : street1;
+}
+
+export function getListingImageUrl(imageId: string, imageUrl: string | null) {
+  return imageUrl ?? `/api/image-uploads/${imageId}`;
 }
 
 export function formatListingTimeAgo(publishedAt: Date | null, createdAt: Date) {

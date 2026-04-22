@@ -193,6 +193,7 @@ async function main() {
         await db.insert(listingImages).values({
           id: image.id,
           listingId: seedListing.listingId,
+          uploadedByUserId: seedListing.ownerUserId,
           imageUrl: image.imageUrl,
           altText: image.altText,
           sortOrder: image.sortOrder,

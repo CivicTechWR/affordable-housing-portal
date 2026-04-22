@@ -66,13 +66,22 @@ export function HeaderMobileMenu({
             {isSignedIn ? (
               <>
                 {canCreateListing ? (
-                  <Link
-                    href="/listing-form"
-                    className={mobileMenuItemClass}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <span>New listing</span>
-                  </Link>
+                  <>
+                    <Link
+                      href="/my-listings"
+                      className={mobileMenuItemClass}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>My Listings</span>
+                    </Link>
+                    <Link
+                      href="/listing-form"
+                      className={mobileMenuItemClass}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>New listing</span>
+                    </Link>
+                  </>
                 ) : null}
 
                 {isAdmin ? (

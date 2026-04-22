@@ -36,6 +36,13 @@
       "when": 1776735455214,
       "tag": "20260421013735_case_insensitive_users_email_unique_index",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1776822419636,
+      "tag": "20260422014659_listing_image_uploads_and_draft_authoring",
+      "breakpoints": true
     }
   ]
 }

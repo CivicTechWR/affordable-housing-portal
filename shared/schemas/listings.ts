@@ -54,6 +54,13 @@ export const listingFeatureSchema = z.object({
   description: nonEmptyString,
 });
 
+const listingEditorFeatureSchema = z.object({
+  category: z.string(),
+  id: nonEmptyString,
+  name: nonEmptyString,
+  description: nonEmptyString,
+});
+
 export const listingFeatureCategorySchema = z.object({
   categoryName: nonEmptyString,
   features: z.array(listingFeatureSchema),
@@ -62,6 +69,17 @@ export const listingFeatureCategorySchema = z.object({
 export const listingImageSchema = z.object({
   url: trimmedUrlString("Invalid listing image URL."),
   caption: nonEmptyString,
+});
+
+export const listingUploadedImageInputSchema = z.object({
+  id: z.uuid("Invalid uploaded image id."),
+  caption: optionalTrimmedString(),
+});
+
+const listingEditorImageSchema = z.object({
+  id: listingIdParamSchema,
+  url: z.string(),
+  caption: z.string(),
 });
 
 const listingImageUrlSchema = trimmedUrlString("Invalid image URL.");
@@ -167,7 +185,7 @@ const updateListingBasePayloadSchema = z.object({
   amenities: z.array(nonEmptyString).optional(),
   accessibilityFeatures: z.array(listingFeatureSchema).optional(),
   eligibilityCriteria: listingEligibilityCriteriaPatchSchema.optional(),
-  images: z.array(listingImageUrlSchema).optional(),
+  images: z.array(listingUploadedImageInputSchema).optional(),
   contact: listingContactPatchSchema.optional(),
   status: listingStatusSchema.optional(),
   unitNumber: nonEmptyString.optional(),
@@ -209,10 +227,11 @@ const listingPayloadSchema = z.object({
   applicationMethod: listingApplicationMethodSchema,
   externalApplicationUrl: listingExternalApplicationUrlSchema.optional(),
   eligibilityCriteria: listingEligibilityCriteriaSchema,
-  images: z.array(listingImageUrlSchema),
+  images: z.array(listingUploadedImageInputSchema),
   contact: listingContactSchema,
   status: listingStatusSchema,
   unitNumber: nonEmptyString.optional(),
+  imageUploadSessionId: z.uuid("Invalid image upload session id.").optional(),
   propertyType: nonEmptyString.optional(),
   buildingType: nonEmptyString.optional(),
   unitStory: z.number().optional(),
@@ -232,6 +251,34 @@ export const createListingSchema = listingPayloadSchema.superRefine((value, cont
 
 export const updateListingSchema = updateListingPayloadSchema;
 
+export const listingEditorDataSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  propertyType: z.string(),
+  buildingType: z.string(),
+  unitStory: z.number().optional(),
+  bedrooms: z.number().min(0),
+  bathrooms: z.number().min(0),
+  squareFeet: z.number().min(0).optional(),
+  monthlyRentCents: z.number().min(0),
+  leaseTerm: z.string(),
+  utilitiesIncluded: z.array(z.string()),
+  images: z.array(listingEditorImageSchema),
+  availableOn: z.iso.date().optional(),
+  status: listingStatusSchema,
+  unitNumber: z.string().optional(),
+  name: z.string(),
+  street1: z.string(),
+  street2: z.string().optional(),
+  city: z.string(),
+  province: z.string(),
+  postalCode: z.string(),
+  contactName: z.string(),
+  contactEmail: z.string(),
+  contactPhone: z.string(),
+  customFeatures: z.array(listingEditorFeatureSchema),
+});
+
 export const listingListResponseSchema = z.object({
   data: z.array(listingSummarySchema),
   pagination: listingPaginationSchema,
@@ -241,11 +288,22 @@ export const listingByIdResponseSchema = z.object({
   data: listingDetailsSchema,
 });
 
+export const listingEditorResponseSchema = z.object({
+  data: listingEditorDataSchema.extend({
+    id: listingIdParamSchema,
+  }),
+});
+
 export const createListingResponseSchema = z.object({
   message: z.string(),
   data: listingPayloadSchema.extend({
     id: listingIdParamSchema,
   }),
+});
+
+export const createDraftListingResponseSchema = z.object({
+  message: z.string(),
+  data: listingIdDataSchema,
 });
 
 export const updateListingResponseSchema = z.object({
@@ -265,8 +323,11 @@ export type ListingDetails = z.infer<typeof listingDetailsSchema>;
 export type ListingSummary = z.infer<typeof listingSummarySchema>;
 export type ListingListResponse = z.infer<typeof listingListResponseSchema>;
 export type ListingByIdResponse = z.infer<typeof listingByIdResponseSchema>;
+export type ListingEditorData = z.infer<typeof listingEditorDataSchema>;
+export type ListingEditorResponse = z.infer<typeof listingEditorResponseSchema>;
 export type CreateListingInput = z.infer<typeof createListingSchema>;
 export type UpdateListingInput = z.infer<typeof updateListingSchema>;
 export type CreateListingResponse = z.infer<typeof createListingResponseSchema>;
+export type CreateDraftListingResponse = z.infer<typeof createDraftListingResponseSchema>;
 export type UpdateListingResponse = z.infer<typeof updateListingResponseSchema>;
 export type DeleteListingResponse = z.infer<typeof deleteListingResponseSchema>;

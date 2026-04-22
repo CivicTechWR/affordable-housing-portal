@@ -32,9 +32,14 @@ export async function SiteHeader() {
             {rawSession?.user ? (
               <>
                 {canCreateListing ? (
-                  <Link href="/listing-form" className={navPillClass}>
-                    New listing
-                  </Link>
+                  <>
+                    <Link href="/my-listings" className={navPillClass}>
+                      My Listings
+                    </Link>
+                    <Link href="/listing-form" className={navPillClass}>
+                      New listing
+                    </Link>
+                  </>
                 ) : null}
 
                 {optionalSession.authzUser?.role === "admin" ? (
