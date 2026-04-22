@@ -22,7 +22,7 @@ interface ListingsCardProps {
 
 const variants = {
   vertical: {
-    card: "w-[260px] sm:w-[290px] lg:w-[320px] flex flex-col min-h-[300px]",
+    card: "w-full max-w-[320px] flex flex-col min-h-[300px]",
     image: "w-full h-[160px] sm:h-[175px] lg:h-[190px] shrink-0",
     content: "p-4 flex flex-col flex-1",
     price: "text-xl",

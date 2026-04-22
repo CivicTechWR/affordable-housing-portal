@@ -71,6 +71,7 @@ export async function findListingSummaries(input: {
   where?: SQL<unknown>;
   page: number;
   limit: number;
+  orderBy?: SQL<unknown>[];
 }) {
   const offset = (input.page - 1) * input.limit;
 
@@ -100,7 +101,7 @@ export async function findListingSummaries(input: {
     .from(listings)
     .innerJoin(properties, eq(listings.propertyId, properties.id))
     .where(input.where)
-    .orderBy(desc(listings.publishedAt), desc(listings.createdAt))
+    .orderBy(...(input.orderBy ?? [desc(listings.publishedAt), desc(listings.createdAt)]))
     .limit(input.limit)
     .offset(offset);
 

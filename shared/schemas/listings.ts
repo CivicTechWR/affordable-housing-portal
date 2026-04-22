@@ -21,12 +21,31 @@ export const listingQuerySchema = z.object({
   limit: positiveIntegerQueryParamWithMaxSchema(100).optional(),
   status: listingStatusSchema.optional(),
   neighborhood: optionalTrimmedString(),
-  bedrooms: z.string().regex(/^\d+$/).optional(),
+  bedrooms: z
+    .string()
+    .regex(/^\d+\+?$/)
+    .optional(),
+  bathrooms: z
+    .string()
+    .regex(/^\d+\+?$/)
+    .optional(),
+  location: optionalTrimmedString(),
+  minPrice: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  maxPrice: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
   maxRent: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
     .optional(),
   accessibility: z.enum(["true", "false"]).optional(),
+  moveInDate: optionalTrimmedString(),
+  sort: z.enum(["newest", "oldest", "price_asc", "price_desc"]).optional(),
+  features: z.union([z.string(), z.array(z.string())]).optional(),
   search: optionalTrimmedString(),
 });
 
