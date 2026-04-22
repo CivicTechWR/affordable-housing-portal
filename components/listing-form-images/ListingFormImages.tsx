@@ -30,6 +30,8 @@ const acceptedImageTypes =
 export interface ListingFormImagesProps {
   control: ListingFormControl;
   listingId?: string;
+  activateDraftListing: (listingId: string) => void;
+  prepareDraftListing: () => Promise<string>;
 }
 
 async function uploadFile(
@@ -70,7 +72,12 @@ function updateImageCaption(
   });
 }
 
-export function ListingFormImages({ control, listingId }: ListingFormImagesProps) {
+export function ListingFormImages({
+  control,
+  listingId,
+  activateDraftListing,
+  prepareDraftListing,
+}: ListingFormImagesProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -90,13 +97,10 @@ export function ListingFormImages({ control, listingId }: ListingFormImagesProps
 
     try {
       const uploadedImages: ListingFormImage[] = [];
+      const resolvedListingId = listingId ?? (await prepareDraftListing());
 
       for (const file of Array.from(files)) {
-        if (!listingId) {
-          throw new Error("Draft listing is still being created. Please try again in a moment.");
-        }
-
-        const uploadedImage = await uploadFile(file, listingId);
+        const uploadedImage = await uploadFile(file, resolvedListingId);
         uploadedImages.push({
           id: uploadedImage.id,
           url: uploadedImage.url,
@@ -105,6 +109,10 @@ export function ListingFormImages({ control, listingId }: ListingFormImagesProps
       }
 
       onChange([...currentImages, ...uploadedImages]);
+
+      if (!listingId) {
+        activateDraftListing(resolvedListingId);
+      }
     } catch (error) {
       setUploadError(
         error instanceof Error ? error.message : "Unable to upload image(s). Please try again.",
@@ -140,10 +148,10 @@ export function ListingFormImages({ control, listingId }: ListingFormImagesProps
                 />
               </FormControl>
               <FormDescription>
-                {!listingId
-                  ? "Preparing draft listing..."
-                  : isUploading
-                    ? "Uploading images..."
+                {isUploading
+                  ? "Uploading images..."
+                  : !listingId
+                    ? "Uploading an image will create a draft automatically."
                     : "You can select multiple files at once. Captions are optional."}
               </FormDescription>
               {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}

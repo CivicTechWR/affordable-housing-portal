@@ -17,7 +17,7 @@ import { useGetListingQuery } from "./useGetListingQuery";
 
 export function useListingForm(initialListingId?: string) {
   const router = useRouter();
-  const hasRequestedDraftRef = useRef(false);
+  const draftBootstrapPromiseRef = useRef<Promise<string> | null>(null);
   const lastAutosavedPayloadRef = useRef<string | null>(null);
   const autosaveTimeoutRef = useRef<number | null>(null);
   const inFlightAutosaveRef = useRef<Promise<void> | null>(null);
@@ -29,7 +29,6 @@ export function useListingForm(initialListingId?: string) {
     message: string;
   } | null>(null);
   const [autosaveFeedback, setAutosaveFeedback] = useState<string | null>(null);
-  const [draftBootstrapError, setDraftBootstrapError] = useState<string | null>(null);
   const form = useForm<ListingFormInput, ListingFormContext, ListingFormData>({
     resolver: zodResolver(listingFormSchema),
     defaultValues: CREATE_FORM_DEFAULTS,
@@ -53,11 +52,10 @@ export function useListingForm(initialListingId?: string) {
   const shouldAutosaveDraft =
     !isPublishedEditMode &&
     Boolean(
-      activeListingId &&
-      initialData &&
       autosavePayload &&
       autosavePayloadKey &&
       lastAutosavedPayloadRef.current !== autosavePayloadKey &&
+      form.formState.isDirty &&
       !isAutosaveInFlight &&
       !isPublishing &&
       !form.formState.isSubmitting,
@@ -65,44 +63,73 @@ export function useListingForm(initialListingId?: string) {
   const shouldWarnOnNavigateAway =
     isPublishedEditMode && form.formState.isDirty && !form.formState.isSubmitting;
 
-  const bootstrapDraft = useCallback(async () => {
-    setDraftBootstrapError(null);
+  const activateDraftListing = useCallback(
+    (listingId: string) => {
+      setActiveListingId(listingId);
+      router.replace(`/listing-form/${listingId}`);
+    },
+    [router],
+  );
 
-    try {
-      const draftListing = await createDraftListing();
-      setActiveListingId(draftListing.id);
-      router.replace(`/listing-form/${draftListing.id}`);
-    } catch (error) {
-      setDraftBootstrapError(
-        error instanceof Error
-          ? error.message
-          : "Unable to create a draft listing. Please try again.",
-      );
+  const createDraftListingId = useCallback(async (): Promise<string> => {
+    if (activeListingId) {
+      return activeListingId;
     }
-  }, [createDraftListing, router]);
+
+    if (draftBootstrapPromiseRef.current) {
+      return draftBootstrapPromiseRef.current;
+    }
+
+    const bootstrapPromise = createDraftListing()
+      .then((draftListing) => draftListing.id)
+      .finally(() => {
+        if (draftBootstrapPromiseRef.current === bootstrapPromise) {
+          draftBootstrapPromiseRef.current = null;
+        }
+      });
+
+    draftBootstrapPromiseRef.current = bootstrapPromise;
+
+    return bootstrapPromise;
+  }, [activeListingId, createDraftListing]);
+
+  const prepareDraftListing = useCallback(async (): Promise<string> => {
+    const listingId = await createDraftListingId();
+
+    if (!form.formState.isDirty) {
+      return listingId;
+    }
+
+    const currentDraftPayload = mapListingFormToAutosaveUpdateInput(form.getValues(), "draft");
+
+    if (!currentDraftPayload) {
+      return listingId;
+    }
+
+    await editListing({
+      listingId,
+      payload: currentDraftPayload,
+    });
+    lastAutosavedPayloadRef.current = JSON.stringify(currentDraftPayload);
+
+    return listingId;
+  }, [createDraftListingId, editListing, form]);
 
   useEffect(() => {
     setActiveListingId(initialListingId);
   }, [initialListingId]);
 
   useEffect(() => {
-    if (initialListingId || hasRequestedDraftRef.current) {
-      return;
-    }
-
-    hasRequestedDraftRef.current = true;
-    void bootstrapDraft();
-  }, [bootstrapDraft, initialListingId]);
-
-  useEffect(() => {
     if (initialData) {
-      form.reset(initialData);
-      lastAutosavedPayloadRef.current = JSON.stringify(
-        mapListingFormToAutosaveUpdateInput(
-          initialData,
-          initialListingId ? initialData.status : "draft",
-        ),
-      );
+      if (!form.formState.isDirty || initialListingId) {
+        form.reset(initialData);
+        lastAutosavedPayloadRef.current = JSON.stringify(
+          mapListingFormToAutosaveUpdateInput(
+            initialData,
+            initialListingId ? initialData.status : "draft",
+          ),
+        );
+      }
       return;
     }
 
@@ -113,7 +140,7 @@ export function useListingForm(initialListingId?: string) {
   }, [activeListingId, form, initialData, initialListingId]);
 
   useEffect(() => {
-    if (!activeListingId || !autosavePayload || !autosavePayloadKey || !shouldAutosaveDraft) {
+    if (!autosavePayload || !autosavePayloadKey || !shouldAutosaveDraft) {
       return;
     }
 
@@ -121,16 +148,33 @@ export function useListingForm(initialListingId?: string) {
       setIsAutosaveInFlight(true);
       setAutosaveFeedback("Saving draft...");
 
-      const autosavePromise = editListing({
-        listingId: activeListingId,
-        payload: autosavePayload,
-      })
+      const autosavePromise = Promise.resolve(
+        activeListingId
+          ? {
+              listingId: activeListingId,
+              shouldActivateDraft: false,
+            }
+          : createDraftListingId().then((listingId) => ({
+              listingId,
+              shouldActivateDraft: true,
+            })),
+      )
+        .then(({ listingId, shouldActivateDraft }) =>
+          editListing({
+            listingId,
+            payload: autosavePayload,
+          }).then(() => {
+            if (shouldActivateDraft) {
+              activateDraftListing(listingId);
+            }
+          }),
+        )
         .then(() => {
           lastAutosavedPayloadRef.current = autosavePayloadKey;
           setAutosaveFeedback("Draft saved");
         })
-        .catch(() => {
-          setAutosaveFeedback("Unable to autosave draft");
+        .catch((error) => {
+          setAutosaveFeedback(error instanceof Error ? error.message : "Unable to autosave draft");
         })
         .finally(() => {
           if (inFlightAutosaveRef.current === autosavePromise) {
@@ -150,7 +194,15 @@ export function useListingForm(initialListingId?: string) {
       }
       window.clearTimeout(timeout);
     };
-  }, [activeListingId, autosavePayload, autosavePayloadKey, editListing, shouldAutosaveDraft]);
+  }, [
+    activeListingId,
+    activateDraftListing,
+    autosavePayload,
+    autosavePayloadKey,
+    createDraftListingId,
+    editListing,
+    shouldAutosaveDraft,
+  ]);
 
   useEffect(() => {
     if (shouldAutosaveDraft || isAutosaveInFlight) {
@@ -226,14 +278,9 @@ export function useListingForm(initialListingId?: string) {
     setSubmitFeedback(null);
     setAutosaveFeedback(null);
     setIsPublishing(true);
+    let createdDraftListingId: string | null = null;
 
     try {
-      if (!activeListingId) {
-        throw new Error(
-          "Draft listing is still being created. Please wait a moment and try again.",
-        );
-      }
-
       if (autosaveTimeoutRef.current !== null) {
         window.clearTimeout(autosaveTimeoutRef.current);
         autosaveTimeoutRef.current = null;
@@ -243,13 +290,23 @@ export function useListingForm(initialListingId?: string) {
         await inFlightAutosaveRef.current;
       }
 
+      let listingId = activeListingId;
+
+      if (!listingId) {
+        listingId = await prepareDraftListing();
+        createdDraftListingId = listingId;
+      }
+
       await editListing({
-        listingId: activeListingId,
+        listingId,
         payload: mapListingFormToUpdateListingInput(data, "published", watchedValues),
       });
-      router.push(`/listings/${activeListingId}`);
+      router.push(`/listings/${listingId}`);
       router.refresh();
     } catch (error) {
+      if (createdDraftListingId) {
+        activateDraftListing(createdDraftListingId);
+      }
       setSubmitFeedback({
         status: "error",
         message:
@@ -263,26 +320,13 @@ export function useListingForm(initialListingId?: string) {
   return {
     form,
     onSubmit,
-    retryDraftBootstrap: async () => {
-      hasRequestedDraftRef.current = false;
-      await bootstrapDraft();
-      hasRequestedDraftRef.current = true;
-    },
+    activateDraftListing,
+    prepareDraftListing,
     listingId: activeListingId,
     autosaveFeedback,
-    isLoading:
-      isCreatingDraft ||
-      (!activeListingId && !initialListingId && !draftBootstrapError) ||
-      isFetching,
-    isError: isFetchError || Boolean(draftBootstrapError),
+    isLoading: isFetching,
+    isError: isFetchError,
     isSubmitting: isCreatingDraft || isEditing || isPublishing || form.formState.isSubmitting,
-    submitFeedback:
-      submitFeedback ??
-      (draftBootstrapError
-        ? {
-            status: "error" as const,
-            message: draftBootstrapError,
-          }
-        : null),
+    submitFeedback,
   };
 }

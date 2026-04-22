@@ -62,6 +62,10 @@ export function MyListingsClient({ initialListings, renderedAt }: MyListingsClie
     };
   }, []);
 
+  useEffect(() => {
+    setListings(sortListings(initialListings));
+  }, [initialListings]);
+
   async function handleDelete(listingId: string) {
     setMutationError(null);
     setMutatingListingId(listingId);

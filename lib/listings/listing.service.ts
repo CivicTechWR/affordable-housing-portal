@@ -46,6 +46,7 @@ import {
   archiveListing,
   createDraftListing,
   createListing,
+  findListingImagesByListingIds,
   findListingImagesByListingId,
   findOwnerListings,
   findPublicBooleanFeatureDefinitions,
@@ -349,17 +350,12 @@ export async function getMyListingsService(): Promise<
 
   const rows = await findOwnerListings(actorResult.value.actor.userId);
   const listingIds = rows.map((row) => row.id);
-  const imageRows = await Promise.all(
-    listingIds.map((listingId) => findListingImagesByListingId(listingId)),
-  );
+  const imageRows = await findListingImagesByListingIds(listingIds);
   const imageByListingId = new Map<string, string>();
 
-  for (let index = 0; index < listingIds.length; index += 1) {
-    const listingId = listingIds[index];
-    const firstImage = imageRows[index]?.[0];
-
-    if (listingId && firstImage) {
-      imageByListingId.set(listingId, getListingImageUrl(firstImage.id, firstImage.imageUrl));
+  for (const image of imageRows) {
+    if (image.listingId && !imageByListingId.has(image.listingId)) {
+      imageByListingId.set(image.listingId, getListingImageUrl(image.id, image.imageUrl));
     }
   }
 

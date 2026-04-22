@@ -218,6 +218,22 @@ export async function findListingImagesByListingId(listingId: ListingIdParam) {
     .orderBy(asc(listingImages.sortOrder));
 }
 
+export async function findListingImagesByListingIds(listingIds: string[]) {
+  if (listingIds.length === 0) {
+    return [];
+  }
+
+  return db
+    .select({
+      id: listingImages.id,
+      listingId: listingImages.listingId,
+      imageUrl: listingImages.imageUrl,
+    })
+    .from(listingImages)
+    .where(inArray(listingImages.listingId, listingIds))
+    .orderBy(asc(listingImages.listingId), asc(listingImages.sortOrder));
+}
+
 export async function createListingImageUpload(input: {
   uploadedByUserId: string;
   listingId: string;
