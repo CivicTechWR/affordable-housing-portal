@@ -144,7 +144,7 @@ export function ListingFormImages({
                   multiple
                   accept={acceptedImageTypes}
                   onChange={(event) => handleImageUpload(event, images, field.onChange)}
-                  disabled={isUploading || !listingId}
+                  disabled={isUploading}
                 />
               </FormControl>
               <FormDescription>

@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
+const DISPLAY_LOCALE = "en-CA";
+
 interface ListingsCardProps {
   id: string;
   title?: string;
@@ -67,6 +69,7 @@ export function ListingsCard({
 }: ListingsCardProps) {
   const v = variants[variant];
   const isHorizontal = variant === "horizontal";
+  const isUploadedListingImage = imageUrl?.startsWith("/api/image-uploads/") ?? false;
   const safeFeatures = accessibilityFeatures || [];
   const MAX_FEATURES = 3;
   const hasMoreFeatures = safeFeatures.length > MAX_FEATURES;
@@ -87,6 +90,7 @@ export function ListingsCard({
             alt={displayAddress}
             fill
             sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
+            unoptimized={isUploadedListingImage}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
@@ -111,7 +115,7 @@ export function ListingsCard({
           <div
             className={`${v.price} font-bold text-foreground tracking-tight flex items-baseline gap-1`}
           >
-            ${price.toLocaleString()}
+            ${price.toLocaleString(DISPLAY_LOCALE)}
             <span className="text-sm font-normal text-muted-foreground">/mo</span>
           </div>
           <h3>{displayAddress}</h3>
