@@ -184,7 +184,12 @@ export function ListingsCard({
           onClick={onClick}
         />
       ) : (
-        <Link href={listingHref} aria-label={ariaLabel} className="absolute inset-0 z-10" />
+        <Link
+          href={listingHref}
+          prefetch={false}
+          aria-label={ariaLabel}
+          className="absolute inset-0 z-10"
+        />
       )}
     </Card>
   );

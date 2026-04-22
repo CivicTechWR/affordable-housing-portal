@@ -26,6 +26,7 @@ export default async function ListingsPage({
   const query = getListingsQueryFromSearchParams({
     ...resolvedSearchParams,
     limit: resolvedSearchParams.limit ?? "50",
+    sort: resolvedSearchParams.sort ?? "newest",
   });
 
   const [initialData, { dynamicGroups }] = await Promise.all([
