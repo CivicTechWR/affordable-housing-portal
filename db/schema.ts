@@ -1,6 +1,5 @@
-import { SQL, sql } from "drizzle-orm";
+import { sql, type SQL } from "drizzle-orm";
 import {
-  AnyPgColumn,
   boolean,
   customType,
   date,
@@ -16,6 +15,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("user_role", ["admin", "partner", "user"]);
 export const userStatusEnum = pgEnum("user_status", [
