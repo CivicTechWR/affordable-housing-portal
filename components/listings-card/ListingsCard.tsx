@@ -73,7 +73,6 @@ export function ListingsCard({
 }: ListingsCardProps) {
   const v = variants[variant];
   const isHorizontal = variant === "horizontal";
-  const isUploadedListingImage = imageUrl?.startsWith("/api/image-uploads/") ?? false;
   const safeFeatures = accessibilityFeatures || [];
   const MAX_FEATURES = 3;
   const hasMoreFeatures = safeFeatures.length > MAX_FEATURES;
