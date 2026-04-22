@@ -1,34 +1,36 @@
 "use client";
 
+import { FilterButton, FilterButtonProps } from "@/components/filter-button/FilterButton";
 import {
   SortOptions as SortOptionsType,
   SortOptions as SortOptionsComponent,
 } from "@/components/sort-options/SortOptions";
-import { FilterButton, FilterButtonProps } from "@/components/filter-button/FilterButton";
 import { Listing } from "@/components/listing-card-list/ListingsCardList";
 
 interface ListingsPanelHeaderProps {
   listings: Listing[];
-  filterButtonProps: FilterButtonProps;
   sortOptionProps: { sortOptions: SortOptionsType[]; onChange: (value: string) => void };
+  filterButtonProps: FilterButtonProps;
   isLoading?: boolean;
 }
 
 export function ListingsPanelHeader({
   listings,
-  filterButtonProps,
   sortOptionProps,
+  filterButtonProps,
   isLoading = false,
 }: ListingsPanelHeaderProps) {
   return (
-    <div className="sticky top-0 z-10 bg-background border-b p-4 flex items-center gap-3">
-      <span className="text-sm text-muted-foreground">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b bg-background p-4 sm:flex-nowrap">
+      <span className="text-sm text-muted-foreground sm:mr-auto">
         {isLoading
           ? "Updating listings..."
           : `${listings.length} listing${listings.length !== 1 ? "s" : ""} found`}
       </span>
-      <SortOptionsComponent {...sortOptionProps} />
-      <FilterButton {...filterButtonProps} />
+      <div className="min-w-0 flex-1 sm:flex-none">
+        <SortOptionsComponent {...sortOptionProps} />
+      </div>
+      <FilterButton {...filterButtonProps} viewport="mobile" />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 
 export type ToggleFieldProps = {
   title?: string;
@@ -13,6 +14,9 @@ export type ToggleFieldProps = {
   onValueChange: (value: string) => void;
   allowEmpty?: boolean;
   variant?: ComponentProps<typeof ToggleGroup>["variant"];
+  className?: string;
+  titleWrapperClassName?: string;
+  labelClassName?: string;
 };
 
 export function ToggleField({
@@ -23,12 +27,17 @@ export function ToggleField({
   onValueChange,
   allowEmpty,
   variant,
+  className,
+  titleWrapperClassName,
+  labelClassName,
 }: ToggleFieldProps) {
   return (
-    <Field>
+    <Field className={className}>
       {title && (
-        <div className="grid gap-1.5 leading-none mb-1">
-          <FieldLabel className="font-medium leading-none">{title}</FieldLabel>
+        <div className={cn("mb-1 grid gap-1.5 leading-none", titleWrapperClassName)}>
+          <FieldLabel className={cn("font-medium leading-none", labelClassName)}>
+            {title}
+          </FieldLabel>
           {description && (
             <p className="text-sm text-muted-foreground whitespace-pre-line">{description}</p>
           )}

@@ -6,6 +6,7 @@ import { ToggleField, ToggleFieldProps } from "../toggle-field/ToggleField";
 import { FeatureAccordion, DynamicFilterGroup } from "../feature-accordian/FeatureAccordian";
 import { ComponentProps } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 // --- Interfaces ---
 export interface ListingFiltersProps {
@@ -16,6 +17,7 @@ export interface ListingFiltersProps {
   getFeatureCheckboxProps: (id: string) => ComponentProps<typeof Checkbox>;
   datePickerProps: DatePickerProps;
   clearFilters: () => Promise<void>;
+  className?: string;
 }
 
 // --- Component ---
@@ -28,9 +30,10 @@ export function ListingFilters({
   datePickerProps,
   clearFilters,
   dynamicGroups,
+  className,
 }: ListingFiltersProps) {
   return (
-    <div className="w-full max-w-sm border p-4 space-y-6">
+    <div className={cn("w-full max-w-sm border p-4 space-y-6", className)}>
       <h2 className="text-lg">Filters</h2>
 
       <PriceRangeInput {...priceRangeProps} />

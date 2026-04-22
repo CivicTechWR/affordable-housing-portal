@@ -35,9 +35,9 @@ export function ListingFilterSearchBar({
   displayModeProps,
 }: ListingFilterSearchBarProps) {
   return (
-    <FieldGroup className="flex flex-row items-center w-full gap-6 space-y-0">
+    <FieldGroup className="w-full gap-3 space-y-0 sm:flex-row sm:items-end sm:gap-4 lg:gap-6">
       {/* Search: Grows to fill available space up to a point */}
-      <div className="flex-1 max-w-sm">
+      <div className="w-full sm:max-w-sm sm:flex-1">
         <div className="relative">
           <HugeiconsIcon
             icon={Search01Icon}
@@ -48,24 +48,41 @@ export function ListingFilterSearchBar({
       </div>
 
       {/* Price Range: Constrained so it doesn't take 1/3 of the page */}
-      <div className="w-full max-w-[280px] shrink-0">
-        <PriceRangeInput {...priceRangeProps} />
+      <div className="w-full sm:max-w-[280px] sm:shrink-0">
+        <PriceRangeInput
+          {...priceRangeProps}
+          fieldClassName="gap-1 sm:gap-1.5"
+          labelClassName="sm:leading-tight"
+        />
       </div>
 
       {/* Property Filters: Compact toggles */}
       <div className="hidden lg:flex items-center gap-6 shrink-0">
-        <ToggleField {...bedroomToggleProps} allowEmpty />
-        <ToggleField {...bathroomToggleProps} allowEmpty />
+        <ToggleField
+          {...bedroomToggleProps}
+          allowEmpty
+          className="gap-1 sm:gap-1.5"
+          titleWrapperClassName="mb-0.5 gap-1"
+        />
+        <ToggleField
+          {...bathroomToggleProps}
+          allowEmpty
+          className="gap-1 sm:gap-1.5"
+          titleWrapperClassName="mb-0.5 gap-1"
+        />
       </div>
 
-      <div>
-        <ToggleField
-          allowEmpty
-          title={"View"}
-          value={displayModeProps.value}
-          onValueChange={displayModeProps.onChange}
-          options={displayModeProps.displayModes}
-        />
+      <div className="w-full sm:w-auto sm:shrink-0">
+        <div className="overflow-x-auto pb-1 sm:overflow-visible sm:pb-0">
+          <ToggleField
+            title={"View"}
+            value={displayModeProps.value}
+            onValueChange={displayModeProps.onChange}
+            options={displayModeProps.displayModes}
+            className="gap-1 sm:gap-1.5"
+            titleWrapperClassName="mb-0.5 gap-1"
+          />
+        </div>
       </div>
     </FieldGroup>
   );

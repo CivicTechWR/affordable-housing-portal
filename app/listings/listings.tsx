@@ -8,7 +8,7 @@ import {
   ListingFilterSearchBar,
 } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
 import { FilterButton } from "@/components/filter-button/FilterButton";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
 import type { ListingListResponse, ListingQuery, ListingSummary } from "@/shared/schemas/listings";
 import dynamic from "next/dynamic";
@@ -38,8 +38,27 @@ export default function ListingsDashboard({
   dynamicGroups,
 }: ListingsDashboardProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.MAP_LIST);
   const isSplitView = displayMode === DisplayMode.MAP_LIST;
+
+  useEffect(() => {
+    const mobileMediaQuery = window.matchMedia("(max-width: 639px)");
+    const syncMobileViewport = () => setIsMobileViewport(mobileMediaQuery.matches);
+
+    syncMobileViewport();
+    mobileMediaQuery.addEventListener("change", syncMobileViewport);
+
+    return () => {
+      mobileMediaQuery.removeEventListener("change", syncMobileViewport);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isMobileViewport && displayMode === DisplayMode.MAP_LIST) {
+      setDisplayMode(DisplayMode.LIST);
+    }
+  }, [displayMode, isMobileViewport]);
 
   const {
     sortOptionProps,
@@ -79,48 +98,70 @@ export default function ListingsDashboard({
   );
   const { data, error, isLoading } = useListingsQuery(query, initialData, initialQueryString);
   const listings = data.data;
+  const displayModes = isMobileViewport
+    ? [
+        { value: DisplayMode.LIST, label: "List" },
+        { value: DisplayMode.MAP, label: "Map" },
+      ]
+    : [
+        { value: DisplayMode.MAP_LIST, label: "Split" },
+        { value: DisplayMode.LIST, label: "List" },
+        { value: DisplayMode.MAP, label: "Map" },
+      ];
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
-      <header className="flex h-16 shrink-0 items-center border-b bg-background px-4">
+      <header className="shrink-0 border-b bg-background px-4 py-3 sm:flex sm:h-16 sm:items-center sm:gap-4 sm:py-0 lg:gap-6">
         <ListingFilterSearchBar
           searchInputProps={searchInputProps}
           priceRangeProps={priceRangeProps}
           bedroomToggleProps={bedroomToggleProps}
           bathroomToggleProps={bathroomToggleProps}
           displayModeProps={{
-            displayModes: [
-              { value: DisplayMode.MAP_LIST, label: "Split" },
-              { value: DisplayMode.LIST, label: "List" },
-              { value: DisplayMode.MAP, label: "Map" },
-            ],
+            displayModes,
             onChange: (value: string) => setDisplayMode(value as DisplayMode),
             value: displayMode,
           }}
         />
-        <FilterButton {...filterButtonProps} />
+        <FilterButton {...filterButtonProps} viewport="desktop" />
       </header>
       {error ? (
         <div className="border-b border-destructive/20 bg-destructive/5 px-4 py-2 text-sm text-destructive">
           {error}
         </div>
       ) : null}
-      <main className="flex min-h-0 flex-1 overflow-hidden">
+      <main className="flex min-h-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
         {displayMode !== DisplayMode.MAP ? (
           <ListingsPanel
             listings={listings}
             displayMode={displayMode}
-            filterButtonProps={filterButtonProps}
             sortOptionProps={sortOptionProps}
+            filterButtonProps={filterButtonProps}
+            mobileFilters={
+              isFilterOpen && isMobileViewport ? (
+                <ListingFilters
+                  bathroomToggleProps={bathroomToggleProps}
+                  bedroomToggleProps={bedroomToggleProps}
+                  priceRangeProps={priceRangeProps}
+                  getFeatureCheckboxProps={getFeatureCheckboxProps}
+                  datePickerProps={datePickerProps}
+                  clearFilters={clearFilters}
+                  dynamicGroups={dynamicGroups}
+                  className="max-w-none rounded-none border-x-0 border-t-0"
+                />
+              ) : null
+            }
             isLoading={isLoading}
           />
         ) : null}
         {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
-          <div className={`min-w-0 flex-1 ${isSplitView ? "lg:basis-1/2" : ""}`}>
+          <div
+            className={`min-w-0 flex-1 ${isSplitView ? "min-h-[320px] lg:basis-1/2" : "min-h-[400px]"}`}
+          >
             <LazyMapView listings={listings} />
           </div>
         )}
-        {isFilterOpen && (
+        {isFilterOpen && !isMobileViewport && (
           <ListingFilters
             bathroomToggleProps={bathroomToggleProps}
             bedroomToggleProps={bedroomToggleProps}

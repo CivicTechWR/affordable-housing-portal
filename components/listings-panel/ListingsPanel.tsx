@@ -1,44 +1,45 @@
 "use client";
 
+import { FilterButtonProps } from "@/components/filter-button/FilterButton";
 import {
   Listing,
   ListingsDisplayMode,
   ListingCardGallery,
 } from "@/components/listing-card-list/ListingsCardList";
 import { SortOptions as SortOptionsType } from "@/components/sort-options/SortOptions";
-import { FilterButtonProps } from "@/components/filter-button/FilterButton";
 import { DisplayMode } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
 import { ListingsPanelHeader } from "@/components/listings-panel-header/ListingsPanelHeader";
 
 interface ListingsPanelProps {
   listings: Listing[];
   displayMode: DisplayMode;
-  filterButtonProps: FilterButtonProps;
   sortOptionProps: { sortOptions: SortOptionsType[]; onChange: (value: string) => void };
+  filterButtonProps: FilterButtonProps;
+  mobileFilters?: React.ReactNode;
   isLoading?: boolean;
 }
 
 export function ListingsPanel({
   listings,
   displayMode,
-  filterButtonProps,
   sortOptionProps,
+  filterButtonProps,
+  mobileFilters,
   isLoading = false,
 }: ListingsPanelProps) {
   return (
     <div
       className={`flex h-full flex-col bg-background ${
-        displayMode === DisplayMode.LIST
-          ? "flex-1"
-          : "min-w-[300px] sm:min-w-[330px] lg:min-w-0 lg:basis-1/2"
+        displayMode === DisplayMode.LIST ? "flex-1" : "min-w-0 w-full lg:min-w-0 lg:basis-1/2"
       }`}
     >
       <ListingsPanelHeader
         listings={listings}
-        filterButtonProps={filterButtonProps}
         sortOptionProps={sortOptionProps}
+        filterButtonProps={filterButtonProps}
         isLoading={isLoading}
       />
+      {mobileFilters}
       <ListingCardGallery
         listings={listings}
         mode={

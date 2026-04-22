@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Field, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
@@ -7,13 +8,24 @@ export interface PriceRangeInputProps {
   step?: number;
   onMinChange: (min: number | undefined) => Promise<void>;
   onMaxChange: (max: number | undefined) => Promise<void>;
+  className?: string;
+  fieldClassName?: string;
+  labelClassName?: string;
 }
 
-export function PriceRangeInput({ min, max, onMinChange, onMaxChange }: PriceRangeInputProps) {
+export function PriceRangeInput({
+  min,
+  max,
+  onMinChange,
+  onMaxChange,
+  className,
+  fieldClassName,
+  labelClassName,
+}: PriceRangeInputProps) {
   return (
-    <FieldSet className="flex-row">
-      <Field>
-        <FieldLabel>Min Price</FieldLabel>
+    <FieldSet className={cn("flex-row", className)}>
+      <Field className={fieldClassName}>
+        <FieldLabel className={labelClassName}>Min Price</FieldLabel>
         <Input
           type="number"
           value={min}
@@ -25,8 +37,8 @@ export function PriceRangeInput({ min, max, onMinChange, onMaxChange }: PriceRan
         />
       </Field>
 
-      <Field>
-        <FieldLabel>Max Price</FieldLabel>
+      <Field className={fieldClassName}>
+        <FieldLabel className={labelClassName}>Max Price</FieldLabel>
 
         <Input
           type="number"
