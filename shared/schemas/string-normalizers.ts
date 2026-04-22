@@ -17,3 +17,15 @@ export const trimmedEmailString = (message = "Invalid email") =>
   z.string().trim().toLowerCase().pipe(z.email(message));
 
 export const trimmedUrlString = (message = "Invalid URL") => z.string().trim().url(message);
+
+export const trimmedAbsoluteOrRootRelativeUrlString = (message = "Invalid URL") =>
+  z
+    .string()
+    .trim()
+    .refine((value) => {
+      if (value.startsWith("/")) {
+        return true;
+      }
+
+      return z.url().safeParse(value).success;
+    }, message);

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
+import { z } from "zod";
 
 import { ListingFormControl, ListingFormImage } from "@/app/listing-form/types";
 import { FormSection } from "@/components/listing-form-layout/ListingFormLayout";
@@ -14,20 +15,32 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { trimmedAbsoluteOrRootRelativeUrlString } from "@/shared/schemas/string-normalizers";
 
-type UploadImageResponse = {
-  data: {
-    url: string;
-  };
-};
+const uploadImageResponseSchema = z.object({
+  data: z.object({
+    id: z.uuid(),
+    url: trimmedAbsoluteOrRootRelativeUrlString(),
+  }),
+});
+
+const acceptedImageTypes =
+  ".jpg,.jpeg,.png,.webp,.avif,.jxl,image/jpeg,image/png,image/webp,image/avif,image/jxl";
 
 export interface ListingFormImagesProps {
   control: ListingFormControl;
+  listingId?: string;
+  activateDraftListing: (listingId: string) => void;
+  prepareDraftListing: () => Promise<string>;
 }
 
-async function uploadFile(file: File): Promise<string> {
+async function uploadFile(
+  file: File,
+  listingId: string,
+): Promise<z.infer<typeof uploadImageResponseSchema>["data"]> {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("listingId", listingId);
 
   const response = await fetch("/api/image-uploads", {
     method: "POST",
@@ -35,11 +48,11 @@ async function uploadFile(file: File): Promise<string> {
   });
 
   if (!response.ok) {
-    throw new Error("Image upload failed.");
+    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+    throw new Error(payload?.message ?? "Image upload failed.");
   }
 
-  const payload = (await response.json()) as UploadImageResponse;
-  return payload.data.url;
+  return uploadImageResponseSchema.parse(await response.json()).data;
 }
 
 function updateImageCaption(
@@ -59,7 +72,12 @@ function updateImageCaption(
   });
 }
 
-export function ListingFormImages({ control }: ListingFormImagesProps) {
+export function ListingFormImages({
+  control,
+  listingId,
+  activateDraftListing,
+  prepareDraftListing,
+}: ListingFormImagesProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -79,18 +97,26 @@ export function ListingFormImages({ control }: ListingFormImagesProps) {
 
     try {
       const uploadedImages: ListingFormImage[] = [];
+      const resolvedListingId = listingId ?? (await prepareDraftListing());
 
       for (const file of Array.from(files)) {
-        const url = await uploadFile(file);
+        const uploadedImage = await uploadFile(file, resolvedListingId);
         uploadedImages.push({
-          url,
+          id: uploadedImage.id,
+          url: uploadedImage.url,
           caption: "",
         });
       }
 
       onChange([...currentImages, ...uploadedImages]);
-    } catch {
-      setUploadError("Unable to upload image(s). Please try again.");
+
+      if (!listingId) {
+        activateDraftListing(resolvedListingId);
+      }
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : "Unable to upload image(s). Please try again.",
+      );
     } finally {
       setIsUploading(false);
       event.target.value = "";
@@ -116,15 +142,17 @@ export function ListingFormImages({ control }: ListingFormImagesProps) {
                 <Input
                   type="file"
                   multiple
-                  accept="image/*"
+                  accept={acceptedImageTypes}
                   onChange={(event) => handleImageUpload(event, images, field.onChange)}
-                  disabled={isUploading}
+                  disabled={isUploading || !listingId}
                 />
               </FormControl>
               <FormDescription>
                 {isUploading
                   ? "Uploading images..."
-                  : "You can select multiple files at once. Captions are optional."}
+                  : !listingId
+                    ? "Uploading an image will create a draft automatically."
+                    : "You can select multiple files at once. Captions are optional."}
               </FormDescription>
               {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
 

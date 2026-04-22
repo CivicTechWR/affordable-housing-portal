@@ -69,4 +69,19 @@ describe("listingFormSchema", () => {
 
     expect(result.error.issues.some((issue) => issue.path.join(".") === "title")).toBe(true);
   });
+
+  it("accepts root-relative uploaded image URLs", () => {
+    const parsed = listingFormSchema.parse({
+      ...validFormInput,
+      images: [
+        {
+          id: "ec53dba9-e6c0-491c-9c8c-f63b8fa43c1a",
+          url: "/api/image-uploads/ec53dba9-e6c0-491c-9c8c-f63b8fa43c1a",
+          caption: "",
+        },
+      ],
+    });
+
+    expect(parsed.images[0]?.url).toBe("/api/image-uploads/ec53dba9-e6c0-491c-9c8c-f63b8fa43c1a");
+  });
 });

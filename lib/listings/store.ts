@@ -46,6 +46,11 @@ export function buildListingCustomFields(input: CreateListingInput): ListingCust
     externalApplicationUrl:
       input.applicationMethod === "external_link" ? (input.externalApplicationUrl ?? null) : null,
     eligibilityCriteria: { ...input.eligibilityCriteria },
+    ...(input.propertyType ? { propertyType: input.propertyType } : {}),
+    ...(input.buildingType ? { buildingType: input.buildingType } : {}),
+    ...(input.unitStory !== undefined ? { unitStory: input.unitStory } : {}),
+    ...(input.leaseTerm ? { leaseTerm: input.leaseTerm } : {}),
+    ...(input.utilitiesIncluded ? { utilitiesIncluded: [...input.utilitiesIncluded] } : {}),
   };
 }
 
@@ -86,6 +91,26 @@ export function mergeListingCustomFields(
       ...getStoredEligibilityCriteria(existing),
       ...input.eligibilityCriteria,
     };
+  }
+
+  if (input.propertyType !== undefined) {
+    next.propertyType = input.propertyType;
+  }
+
+  if (input.buildingType !== undefined) {
+    next.buildingType = input.buildingType;
+  }
+
+  if (input.unitStory !== undefined) {
+    next.unitStory = input.unitStory;
+  }
+
+  if (input.leaseTerm !== undefined) {
+    next.leaseTerm = input.leaseTerm;
+  }
+
+  if (input.utilitiesIncluded !== undefined) {
+    next.utilitiesIncluded = [...input.utilitiesIncluded];
   }
 
   return next;
@@ -139,6 +164,14 @@ export function getStoredStringArray(customFields: ListingCustomFields, key: str
   }
 
   return value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0);
+}
+
+export function getStoredString(customFields: ListingCustomFields, key: string) {
+  return getString(customFields[key]);
+}
+
+export function getStoredNumber(customFields: ListingCustomFields, key: string) {
+  return getNumber(customFields[key]);
 }
 
 export function getStoredAccessibilityFeatures(
@@ -247,6 +280,10 @@ export function buildListingFeatureCategories(
 
 export function formatListingAddress(street1: string, unitNumber: string | null) {
   return unitNumber ? `${street1} #${unitNumber}` : street1;
+}
+
+export function getListingImageUrl(imageId: string, imageUrl: string | null) {
+  return imageUrl ?? `/api/image-uploads/${imageId}`;
 }
 
 export function formatListingTimeAgo(publishedAt: Date | null, createdAt: Date) {

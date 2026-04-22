@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, inArray, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, notInArray, sql, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -12,7 +12,11 @@ import {
   type ListingStatus,
 } from "@/db/schema";
 import { DEFAULT_PROPERTY_COUNTRY, dollarsToCents } from "@/lib/listings/store";
-import type { CreateListingInput, ListingIdParam } from "@/shared/schemas/listings";
+import type {
+  CreateListingInput,
+  ListingIdParam,
+  UpdateListingInput,
+} from "@/shared/schemas/listings";
 
 export type ListingSummaryRow = {
   id: string;
@@ -55,6 +59,7 @@ export type ListingRecord = {
     ownerUserId: string;
     name: string;
     street1: string;
+    street2: string | null;
     city: string;
     province: string;
     postalCode: string;
@@ -65,6 +70,23 @@ export type ListingRecord = {
     contactEmail: string | null;
     contactPhone: string | null;
   };
+};
+
+export type OwnerListingRow = {
+  id: string;
+  title: string;
+  status: ListingStatus;
+  monthlyRentCents: number;
+  bedrooms: number;
+  bathrooms: number;
+  squareFeet: number | null;
+  customFields: ListingCustomFields;
+  unitNumber: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  street1: string;
+  city: string;
 };
 
 export async function findListingSummaries(input: {
@@ -110,6 +132,7 @@ export async function findListingSummaries(input: {
     listingIds.length > 0
       ? await db
           .select({
+            id: listingImages.id,
             listingId: listingImages.listingId,
             imageUrl: listingImages.imageUrl,
             sortOrder: listingImages.sortOrder,
@@ -158,6 +181,7 @@ export async function findListingRecordById(
         ownerUserId: properties.ownerUserId,
         name: properties.name,
         street1: properties.street1,
+        street2: properties.street2,
         city: properties.city,
         province: properties.province,
         postalCode: properties.postalCode,
@@ -185,12 +209,95 @@ export async function findListingRecordById(
 export async function findListingImagesByListingId(listingId: ListingIdParam) {
   return db
     .select({
+      id: listingImages.id,
       imageUrl: listingImages.imageUrl,
       altText: listingImages.altText,
     })
     .from(listingImages)
     .where(eq(listingImages.listingId, listingId))
     .orderBy(asc(listingImages.sortOrder));
+}
+
+export async function findListingImagesByListingIds(listingIds: string[]) {
+  if (listingIds.length === 0) {
+    return [];
+  }
+
+  return db
+    .select({
+      id: listingImages.id,
+      listingId: listingImages.listingId,
+      imageUrl: listingImages.imageUrl,
+    })
+    .from(listingImages)
+    .where(inArray(listingImages.listingId, listingIds))
+    .orderBy(asc(listingImages.listingId), asc(listingImages.sortOrder));
+}
+
+export async function createListingImageUpload(input: {
+  uploadedByUserId: string;
+  listingId: string;
+  imageData: Buffer;
+  originalFilename: string;
+  contentType: string;
+  sizeBytes: number;
+  width: number;
+  height: number;
+}) {
+  const [sortOrderRow] = await db
+    .select({
+      nextSortOrder: sql<number>`coalesce(max(${listingImages.sortOrder}), -1) + 1`,
+    })
+    .from(listingImages)
+    .where(eq(listingImages.listingId, input.listingId));
+
+  const [image] = await db
+    .insert(listingImages)
+    .values({
+      listingId: input.listingId,
+      uploadSessionId: null,
+      uploadedByUserId: input.uploadedByUserId,
+      imageUrl: null,
+      imageData: input.imageData,
+      originalFilename: input.originalFilename,
+      contentType: input.contentType,
+      sizeBytes: input.sizeBytes,
+      width: input.width,
+      height: input.height,
+      altText: null,
+      sortOrder: sortOrderRow?.nextSortOrder ?? 0,
+    })
+    .returning({
+      id: listingImages.id,
+    });
+
+  if (!image) {
+    throw new Error("Failed to create image upload.");
+  }
+
+  return image;
+}
+
+export async function findListingImageById(imageId: string) {
+  const [image] = await db
+    .select({
+      id: listingImages.id,
+      listingId: listingImages.listingId,
+      uploadedByUserId: listingImages.uploadedByUserId,
+      imageUrl: listingImages.imageUrl,
+      imageData: listingImages.imageData,
+      contentType: listingImages.contentType,
+      sizeBytes: listingImages.sizeBytes,
+      listingStatus: listings.status,
+      listingOwnerUserId: properties.ownerUserId,
+    })
+    .from(listingImages)
+    .leftJoin(listings, eq(listingImages.listingId, listings.id))
+    .leftJoin(properties, eq(listings.propertyId, properties.id))
+    .where(eq(listingImages.id, imageId))
+    .limit(1);
+
+  return image ?? null;
 }
 
 export async function findPublicFeatureDefinitionsByKeys(keys: string[]) {
@@ -215,6 +322,135 @@ export async function findPublicFeatureDefinitionsByKeys(keys: string[]) {
     );
 }
 
+export async function findPublicBooleanFeatureDefinitions() {
+  return db
+    .select({
+      key: customListingFields.key,
+      label: customListingFields.label,
+      description: customListingFields.description,
+      category: customListingFields.category,
+      sortOrder: customListingFields.sortOrder,
+    })
+    .from(customListingFields)
+    .where(
+      and(
+        eq(customListingFields.isPublic, true),
+        eq(customListingFields.isFilterable, true),
+        eq(customListingFields.fieldType, "boolean"),
+      ),
+    )
+    .orderBy(
+      asc(customListingFields.category),
+      asc(customListingFields.sortOrder),
+      asc(customListingFields.key),
+    );
+}
+
+export async function createDraftListing(input: { actorUserId: string }) {
+  return db.transaction(async (tx) => {
+    const [property] = await tx
+      .insert(properties)
+      .values({
+        ownerUserId: input.actorUserId,
+        name: "",
+        street1: "",
+        street2: null,
+        city: "",
+        province: "",
+        postalCode: "",
+        country: DEFAULT_PROPERTY_COUNTRY,
+        neighborhood: null,
+        latitude: null,
+        longitude: null,
+        contactName: "",
+        contactEmail: "",
+        contactPhone: "",
+        createdByUserId: input.actorUserId,
+        updatedByUserId: input.actorUserId,
+      })
+      .returning({ id: properties.id });
+
+    if (!property) {
+      throw new Error("Failed to create draft property.");
+    }
+
+    const [listing] = await tx
+      .insert(listings)
+      .values({
+        propertyId: property.id,
+        createdByUserId: input.actorUserId,
+        updatedByUserId: input.actorUserId,
+        title: "",
+        description: null,
+        status: "draft",
+        unitNumber: null,
+        bedrooms: 0,
+        bathrooms: 0,
+        squareFeet: null,
+        monthlyRentCents: 0,
+        availableOn: null,
+        maxIncomeCents: null,
+        applicationUrl: null,
+        applicationEmail: "",
+        applicationPhone: "",
+        applicationInstructions: null,
+        customFields: {
+          units: [
+            {
+              bedrooms: 0,
+              bathrooms: 0,
+              rent: 0,
+            },
+          ],
+          amenities: [],
+          accessibilityFeatures: [],
+          applicationMethod: "internal",
+          eligibilityCriteria: {},
+          utilitiesIncluded: [],
+        },
+        publishedAt: null,
+        archivedAt: null,
+      })
+      .returning({ id: listings.id });
+
+    if (!listing) {
+      throw new Error("Failed to create draft listing.");
+    }
+
+    return listing;
+  });
+}
+
+export async function findOwnerListings(ownerUserId: string): Promise<OwnerListingRow[]> {
+  return db
+    .select({
+      id: listings.id,
+      title: listings.title,
+      status: listings.status,
+      monthlyRentCents: listings.monthlyRentCents,
+      bedrooms: listings.bedrooms,
+      bathrooms: listings.bathrooms,
+      squareFeet: listings.squareFeet,
+      customFields: listings.customFields,
+      unitNumber: listings.unitNumber,
+      publishedAt: listings.publishedAt,
+      createdAt: listings.createdAt,
+      updatedAt: listings.updatedAt,
+      street1: properties.street1,
+      city: properties.city,
+    })
+    .from(listings)
+    .innerJoin(properties, eq(listings.propertyId, properties.id))
+    .where(eq(properties.ownerUserId, ownerUserId))
+    .orderBy(desc(listings.updatedAt), desc(listings.createdAt))
+    .then((rows) =>
+      rows.map((row) => ({
+        ...row,
+        customFields: row.customFields as ListingCustomFields,
+      })),
+    );
+}
+
 export async function createListing(input: {
   actorUserId: string;
   payload: CreateListingInput;
@@ -230,7 +466,7 @@ export async function createListing(input: {
         ownerUserId: input.actorUserId,
         name: input.payload.name,
         street1: input.payload.address.street,
-        street2: null,
+        street2: input.payload.address.street2 ?? null,
         city: input.payload.address.city,
         province: input.payload.address.province,
         postalCode: input.payload.address.postalCode,
@@ -262,15 +498,15 @@ export async function createListing(input: {
         propertyId: property.id,
         createdByUserId: input.actorUserId,
         updatedByUserId: input.actorUserId,
-        title: input.payload.name,
-        description: input.payload.description,
+        title: input.payload.title,
+        description: input.payload.description ?? null,
         status: input.payload.status,
-        unitNumber: null,
+        unitNumber: input.payload.unitNumber ?? null,
         bedrooms: primaryUnit.bedrooms,
         bathrooms: primaryUnit.bathrooms,
-        squareFeet: primaryUnit.sqft,
+        squareFeet: primaryUnit.sqft ?? null,
         monthlyRentCents: input.primaryUnitRentCents,
-        availableOn: primaryUnit.availableDate,
+        availableOn: primaryUnit.availableDate ?? null,
         maxIncomeCents: dollarsToCents(input.payload.eligibilityCriteria.maxIncome),
         applicationUrl:
           input.payload.applicationMethod === "external_link"
@@ -290,14 +526,26 @@ export async function createListing(input: {
     }
 
     if (input.payload.images.length > 0) {
-      await tx.insert(listingImages).values(
-        input.payload.images.map((imageUrl, index) => ({
-          listingId: listing.id,
-          imageUrl,
-          altText: `${input.payload.name} image ${index + 1}`,
-          sortOrder: index,
-        })),
-      );
+      for (const [index, image] of input.payload.images.entries()) {
+        const [updatedImage] = await tx
+          .update(listingImages)
+          .set({
+            listingId: listing.id,
+            altText: image.caption ?? `${input.payload.title} image ${index + 1}`,
+            sortOrder: index,
+          })
+          .where(
+            and(
+              eq(listingImages.id, image.id),
+              eq(listingImages.uploadedByUserId, input.actorUserId),
+            ),
+          )
+          .returning({ id: listingImages.id });
+
+        if (!updatedImage) {
+          throw new Error("Failed to update listing image.");
+        }
+      }
     }
 
     return listing;
@@ -311,6 +559,7 @@ export async function updateListingGraph(input: {
   property: {
     name: string;
     street1: string;
+    street2: string | null;
     city: string;
     province: string;
     postalCode: string;
@@ -325,6 +574,7 @@ export async function updateListingGraph(input: {
     title: string;
     description: string | null;
     status: ListingStatus;
+    unitNumber: string | null;
     bedrooms: number;
     bathrooms: number;
     squareFeet: number | null;
@@ -338,7 +588,7 @@ export async function updateListingGraph(input: {
     publishedAt: Date | null;
     archivedAt: Date | null;
   };
-  images?: string[];
+  images?: NonNullable<UpdateListingInput["images"]>;
   imageAltTextBase: string;
 }) {
   await db.transaction(async (tx) => {
@@ -347,6 +597,7 @@ export async function updateListingGraph(input: {
       .set({
         name: input.property.name,
         street1: input.property.street1,
+        street2: input.property.street2,
         city: input.property.city,
         province: input.property.province,
         postalCode: input.property.postalCode,
@@ -366,6 +617,7 @@ export async function updateListingGraph(input: {
         title: input.listing.title,
         description: input.listing.description,
         status: input.listing.status,
+        unitNumber: input.listing.unitNumber,
         bedrooms: input.listing.bedrooms,
         bathrooms: input.listing.bathrooms,
         squareFeet: input.listing.squareFeet,
@@ -383,18 +635,48 @@ export async function updateListingGraph(input: {
       .where(eq(listings.id, input.listingId));
 
     if (input.images !== undefined) {
-      await tx.delete(listingImages).where(eq(listingImages.listingId, input.listingId));
-
       if (input.images.length > 0) {
-        await tx.insert(listingImages).values(
-          input.images.map((imageUrl, index) => ({
+        await tx
+          .update(listingImages)
+          .set({
             listingId: input.listingId,
-            imageUrl,
-            altText: `${input.imageAltTextBase} image ${index + 1}`,
-            sortOrder: index,
-          })),
+          })
+          .where(
+            and(
+              inArray(
+                listingImages.id,
+                input.images.map((image) => image.id),
+              ),
+              eq(listingImages.uploadedByUserId, input.actorUserId),
+            ),
+          );
+
+        await Promise.all(
+          input.images.map((image, index) =>
+            tx
+              .update(listingImages)
+              .set({
+                altText: image.caption ?? `${input.imageAltTextBase} image ${index + 1}`,
+                sortOrder: index,
+              })
+              .where(
+                and(eq(listingImages.id, image.id), eq(listingImages.listingId, input.listingId)),
+              ),
+          ),
         );
       }
+
+      await tx.delete(listingImages).where(
+        and(
+          eq(listingImages.listingId, input.listingId),
+          input.images.length > 0
+            ? notInArray(
+                listingImages.id,
+                input.images.map((image) => image.id),
+              )
+            : sql`true`,
+        ),
+      );
     }
   });
 }

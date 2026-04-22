@@ -1,7 +1,9 @@
 import { ListingImageCarousel } from "../listing-image-carousel/ListingImageCarousel";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { CardHeader, CardTitle, CardContent, Card } from "../ui/card";
 import { buildAddress } from "@/lib/address";
+import Link from "next/link";
 
 type ListingFeature = {
   name: string;
@@ -20,6 +22,7 @@ type ListingFeatureCategory = {
 
 export interface ListingDetailProps {
   title?: string;
+  editUrl?: string;
   price: number;
   unitNumber?: string;
   street1: string;
@@ -40,6 +43,7 @@ export interface ListingDetailProps {
 
 export function ListingDetails({
   title,
+  editUrl,
   price,
   city,
   beds,
@@ -100,6 +104,11 @@ export function ListingDetails({
             {title && <h2>{title}</h2>}
             <h3 className="sm:text-xl">{`${rentalCost}/month`}</h3>
           </div>
+          {editUrl ? (
+            <Button asChild>
+              <Link href={editUrl}>Edit listing</Link>
+            </Button>
+          ) : null}
         </div>
 
         {images.length > 0 && <ListingImageCarousel images={images} altPrefix={address} />}

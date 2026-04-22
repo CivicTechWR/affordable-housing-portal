@@ -20,8 +20,18 @@ export interface ListingFormProps {
 
 export default function ListingForm({ listingId }: ListingFormProps) {
   const isEditMode = Boolean(listingId);
-  const { form, onSubmit, isLoading, isError, isSubmitting, submitFeedback } =
-    useListingForm(listingId);
+  const {
+    form,
+    onSubmit,
+    activateDraftListing,
+    prepareDraftListing,
+    isLoading,
+    isError,
+    isSubmitting,
+    submitFeedback,
+    autosaveFeedback,
+    listingId: activeListingId,
+  } = useListingForm(listingId);
   const [previewMode, setPreviewMode] = useState<ListingFormPreviewMode>("card");
   const handleOpenDetails = () => {
     setPreviewMode("details");
@@ -43,6 +53,18 @@ export default function ListingForm({ listingId }: ListingFormProps) {
   const previewToggleLabel = isPreviewExpanded
     ? "Hide Listing Details Page Preview"
     : "Show Listing Page Preview";
+  const formHeading =
+    liveFormData.status === "draft"
+      ? "Draft Listing"
+      : isEditMode
+        ? "Update Listing"
+        : "Create New Listing";
+  const submitLabel =
+    liveFormData.status === "draft"
+      ? "Publish Listing"
+      : isEditMode
+        ? "Save Changes"
+        : "Create Listing";
 
   if (isLoading) {
     return <ListingFormSkeleton />;
@@ -55,8 +77,9 @@ export default function ListingForm({ listingId }: ListingFormProps) {
           <div className="bg-destructive/15 text-destructive p-8 rounded-lg border border-destructive/20">
             <h3 className="mb-2">Error Loading Listing</h3>
             <p>
-              We encountered an error while retrieving this listing. It may have been deleted or
-              there is a network issue.
+              {isEditMode
+                ? "We encountered an error while retrieving this listing. It may have been deleted or there is a network issue."
+                : "We encountered an error while preparing this form. Please refresh and try again."}
             </p>
           </div>
         }
@@ -69,7 +92,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
       isPreviewExpanded={isPreviewExpanded}
       formPaneHeader={
         <div>
-          <h2>{isEditMode ? "Update" : "Create New"} Listing</h2>
+          <h2>{formHeading}</h2>
           <p className="text-xs text-muted-foreground">
             Enter listing details, images, and accessibility information.
           </p>
@@ -110,7 +133,12 @@ export default function ListingForm({ listingId }: ListingFormProps) {
         <Form {...form}>
           <form id="listing-form" onSubmit={form.handleSubmit(onSubmit)}>
             <ListingFormFields control={form.control} />
-            <ListingFormImages control={form.control} />
+            <ListingFormImages
+              control={form.control}
+              listingId={activeListingId}
+              activateDraftListing={activateDraftListing}
+              prepareDraftListing={prepareDraftListing}
+            />
             <ListingFormFeatures control={form.control} />
           </form>
         </Form>
@@ -119,12 +147,17 @@ export default function ListingForm({ listingId }: ListingFormProps) {
         <ListingFormPreview
           mode={previewMode}
           formData={liveFormData}
-          listingId={listingId}
+          listingId={activeListingId}
           onOpenDetails={handleOpenDetails}
         />
       }
       footer={
         <div className="flex items-center gap-3">
+          {autosaveFeedback ? (
+            <p className="text-sm text-muted-foreground" role="status" aria-live="polite">
+              {autosaveFeedback}
+            </p>
+          ) : null}
           {submitFeedback && (
             <p
               className={
@@ -139,7 +172,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
             </p>
           )}
           <Button type="submit" form="listing-form" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : isEditMode ? "Save Changes" : "Publish Listing"}
+            {isSubmitting ? "Saving..." : submitLabel}
           </Button>
         </div>
       }

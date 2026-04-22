@@ -1,12 +1,14 @@
 import { z } from "zod";
 import type { Control, UseFormReturn } from "react-hook-form";
 import {
+  trimmedAbsoluteOrRootRelativeUrlString,
   optionalTrimmedStringToUndefined,
   requiredTrimmedString,
 } from "@/shared/schemas/string-normalizers";
 
 export const listingImageSchema = z.object({
-  url: z.string().url("Image URL is invalid"),
+  id: z.uuid("Invalid uploaded image id").optional(),
+  url: trimmedAbsoluteOrRootRelativeUrlString("Image URL is invalid"),
   caption: z.string().trim(),
 });
 

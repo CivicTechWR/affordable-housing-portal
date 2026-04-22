@@ -2,6 +2,7 @@ import { SQL, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   boolean,
+  customType,
   date,
   doublePrecision,
   index,
@@ -62,6 +63,18 @@ export type ListingCustomFields = Record<string, ListingCustomFieldValue>;
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 export type UserStatus = (typeof userStatusEnum.enumValues)[number];
 export type ListingStatus = (typeof listingStatusEnum.enumValues)[number];
+
+const byteaBuffer = customType<{ data: Buffer; driverData: Uint8Array }>({
+  dataType() {
+    return "bytea";
+  },
+  toDriver(value) {
+    return value;
+  },
+  fromDriver(value) {
+    return Buffer.from(value);
+  },
+});
 
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;
@@ -210,15 +223,27 @@ export const listingImages = pgTable(
   "listing_images",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    listingId: uuid("listing_id")
+    listingId: uuid("listing_id").references(() => listings.id, { onDelete: "cascade" }),
+    uploadSessionId: uuid("upload_session_id"),
+    uploadedByUserId: uuid("uploaded_by_user_id")
       .notNull()
-      .references(() => listings.id, { onDelete: "cascade" }),
-    imageUrl: text("image_url").notNull(),
+      .references(() => users.id, { onDelete: "cascade" }),
+    imageUrl: text("image_url"),
+    imageData: byteaBuffer("image_data"),
+    contentType: text("content_type"),
+    sizeBytes: integer("size_bytes"),
+    width: integer("width"),
+    height: integer("height"),
+    originalFilename: text("original_filename"),
     altText: text("alt_text"),
-    sortOrder: integer("sort_order").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("listing_images_listing_id_idx").on(table.listingId)],
+  (table) => [
+    index("listing_images_listing_id_idx").on(table.listingId),
+    index("listing_images_upload_session_id_idx").on(table.uploadSessionId),
+    index("listing_images_uploaded_by_user_id_idx").on(table.uploadedByUserId),
+  ],
 );
 
 export const savedListings = pgTable(

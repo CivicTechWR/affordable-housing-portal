@@ -6,10 +6,12 @@ import {
 } from "@/shared/schemas/listings";
 
 const validCreatePayload = {
+  title: "Suite 204 at Cedar Court",
   name: "Cedar Court",
   description: "Affordable and accessible units in Waterloo.",
   address: {
     street: "123 Main Street",
+    street2: "Building A",
     city: "Waterloo",
     province: "ON",
     postalCode: "N2L 3A1",
@@ -28,13 +30,19 @@ const validCreatePayload = {
   applicationMethod: "external_link" as const,
   externalApplicationUrl: "https://example.org/apply",
   eligibilityCriteria: {},
-  images: ["https://example.org/listing.jpg"],
+  images: [{ id: "6ee785fa-7f75-414f-b6e7-c65fb22083b2", caption: "Front exterior" }],
   contact: {
     name: "Leasing Office",
     email: "leasing@example.org",
     phone: "519-555-0100",
   },
   status: "draft" as const,
+  unitNumber: "204",
+  propertyType: "Rent",
+  buildingType: "Apartment",
+  unitStory: 2,
+  leaseTerm: "1 year",
+  utilitiesIncluded: ["Heat"],
 };
 
 describe("listing API schemas", () => {
@@ -71,6 +79,7 @@ describe("listing API schemas", () => {
   it("trims create payload strings", () => {
     const parsed = createListingSchema.parse({
       ...validCreatePayload,
+      title: "  Suite 204 at Cedar Court  ",
       name: "  Cedar Court  ",
       externalApplicationUrl: "  https://example.org/apply  ",
       contact: {
@@ -79,6 +88,7 @@ describe("listing API schemas", () => {
       },
     });
 
+    expect(parsed.title).toBe("Suite 204 at Cedar Court");
     expect(parsed.name).toBe("Cedar Court");
     expect(parsed.externalApplicationUrl).toBe("https://example.org/apply");
     expect(parsed.contact.email).toBe("leasing@example.org");
@@ -87,7 +97,7 @@ describe("listing API schemas", () => {
   it("rejects whitespace-only required fields in create payloads", () => {
     const result = createListingSchema.safeParse({
       ...validCreatePayload,
-      name: "   ",
+      title: "   ",
     });
 
     expect(result.success).toBe(false);
@@ -96,7 +106,7 @@ describe("listing API schemas", () => {
       throw new Error("Expected schema parse to fail");
     }
 
-    expect(result.error.issues.some((issue) => issue.path.join(".") === "name")).toBe(true);
+    expect(result.error.issues.some((issue) => issue.path.join(".") === "title")).toBe(true);
   });
 
   it("trims values for partial updates and still validates", () => {
@@ -131,6 +141,7 @@ describe("listing API schemas", () => {
 
   it("accepts meaningful nested updates", () => {
     const result = updateListingSchema.safeParse({
+      title: "Updated Title",
       address: { city: "Waterloo" },
       contact: { email: "Leasing@Example.com" },
       eligibilityCriteria: { minAge: 55 },
@@ -144,5 +155,31 @@ describe("listing API schemas", () => {
     }
 
     expect(result.data.contact?.email).toBe("leasing@example.com");
+  });
+
+  it("allows clearing unit number in partial updates", () => {
+    const result = updateListingSchema.safeParse({
+      unitNumber: null,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("allows optional create fields to be omitted when the form leaves them blank", () => {
+    const result = createListingSchema.safeParse({
+      ...validCreatePayload,
+      description: undefined,
+      unitNumber: undefined,
+      images: [],
+      units: [
+        {
+          bedrooms: 2,
+          bathrooms: 1,
+          rent: 1850,
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
   });
 });

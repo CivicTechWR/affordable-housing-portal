@@ -2,18 +2,18 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import ListingForm from "./ListingForm";
+import ListingForm from "../ListingForm";
 import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingFormSkeleton";
 import { getOptionalSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "New Listing | WR Housing Bridge",
+  title: "Edit Listing | WR Housing Bridge",
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function ListingFormPage() {
-  const { session, authzUser } = await getOptionalSession();
+export default async function EditListingFormPage({ params }: { params: Promise<{ id: string }> }) {
+  const [{ id }, { session, authzUser }] = await Promise.all([params, getOptionalSession()]);
 
   if (!session?.user) {
     redirect("/sign-in");
@@ -25,7 +25,7 @@ export default async function ListingFormPage() {
         <div className="mx-auto max-w-3xl rounded-md border border-border bg-background p-6">
           <h1 className="text-xl font-semibold">Listing author access required</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Only partner and admin accounts can create new listings.
+            Only partner and admin accounts can manage listing drafts.
           </p>
         </div>
       </main>
@@ -35,7 +35,7 @@ export default async function ListingFormPage() {
   return (
     <div data-listing-form-page="true" className="h-full">
       <Suspense fallback={<ListingFormSkeleton />}>
-        <ListingForm />
+        <ListingForm listingId={id} />
       </Suspense>
     </div>
   );

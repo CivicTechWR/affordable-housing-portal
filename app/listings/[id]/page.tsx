@@ -22,6 +22,7 @@ async function getListingDetails(id: string): Promise<ListingDetailsData> {
 function mapListingDetailsToDisplay(details: ListingDetailsData): ListingDetailProps {
   return {
     title: details.title,
+    editUrl: details.editUrl,
     price: details.price,
     unitNumber: details.unitNumber,
     street1: details.address.street1,

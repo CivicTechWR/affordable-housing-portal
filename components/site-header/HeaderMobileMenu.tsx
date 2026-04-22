@@ -11,6 +11,7 @@ import { signOutFromHeader } from "@/components/site-header/actions";
 type HeaderMobileMenuProps = {
   isSignedIn: boolean;
   isAdmin: boolean;
+  canCreateListing: boolean;
   user: {
     email?: string | null;
     name?: string | null;
@@ -20,7 +21,12 @@ type HeaderMobileMenuProps = {
 const mobileMenuItemClass =
   "flex w-full items-center justify-between rounded-2xl bg-primary-foreground/10 px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/20";
 
-export function HeaderMobileMenu({ isSignedIn, isAdmin, user }: HeaderMobileMenuProps) {
+export function HeaderMobileMenu({
+  isSignedIn,
+  isAdmin,
+  canCreateListing,
+  user,
+}: HeaderMobileMenuProps) {
   const pathname = usePathname();
   const menuId = useId();
   const [isOpen, setIsOpen] = useState(false);
@@ -53,12 +59,20 @@ export function HeaderMobileMenu({ isSignedIn, isAdmin, user }: HeaderMobileMenu
           className="absolute right-0 top-[calc(100%+0.75rem)] z-20 w-[min(18rem,calc(100vw-2rem))] rounded-3xl border border-primary-foreground/15 bg-primary p-3 shadow-xl shadow-slate-950/20"
         >
           <nav aria-label="Mobile navigation" className="space-y-2">
-            <Link href="/listings" className={mobileMenuItemClass} onClick={() => setIsOpen(false)}>
-              <span>Browse Listings</span>
-            </Link>
-
             {isSignedIn ? (
               <>
+                {canCreateListing ? (
+                  <>
+                    <Link
+                      href="/my-listings"
+                      className={mobileMenuItemClass}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>My Listings</span>
+                    </Link>
+                  </>
+                ) : null}
+
                 {isAdmin ? (
                   <Link
                     href="/admin/custom-listing-fields"

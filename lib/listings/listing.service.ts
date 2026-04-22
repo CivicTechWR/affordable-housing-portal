@@ -10,6 +10,7 @@ import {
   centsToDollars,
   dollarsToCents,
   formatListingAddress,
+  getListingImageUrl,
   formatListingTimeAgo,
   getEnabledBooleanCustomFieldKeys,
   getListingCoordinates,
@@ -18,6 +19,9 @@ import {
   getStoredAccessibilityFeatures,
   getStoredEligibilityCriteria,
   getStoredExternalApplicationUrl,
+  getStoredNumber,
+  getStoredString,
+  getStoredStringArray,
   getStoredUnits,
   mergeListingCustomFields,
   resolveListingStatusTimestamps,
@@ -40,8 +44,12 @@ import {
 } from "@/lib/listings/listing.specifications";
 import {
   archiveListing,
+  createDraftListing,
   createListing,
+  findListingImagesByListingIds,
   findListingImagesByListingId,
+  findOwnerListings,
+  findPublicBooleanFeatureDefinitions,
   findListingRecordById,
   findListingSummaries,
   findPublicFeatureDefinitionsByKeys,
@@ -60,9 +68,12 @@ import { getOptionalSession as getAuthSession } from "@/lib/auth/session";
 import type {
   CreateListingInput,
   CreateListingResponse,
+  CreateDraftListingResponse,
   DeleteListingResponse,
   ListingByIdResponse,
   ListingDetails,
+  ListingEditorData,
+  ListingEditorResponse,
   ListingIdParam,
   ListingListResponse,
   ListingQuery,
@@ -130,8 +141,8 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
 
   const imageByListingId = new Map<string, string>();
   for (const image of imageRows) {
-    if (!imageByListingId.has(image.listingId)) {
-      imageByListingId.set(image.listingId, image.imageUrl);
+    if (image.listingId && !imageByListingId.has(image.listingId)) {
+      imageByListingId.set(image.listingId, getListingImageUrl(image.id, image.imageUrl));
     }
   }
 
@@ -245,7 +256,126 @@ export async function getListingByIdService(
   const details = await buildListingDetailsResponse(listing);
 
   return succeed({
-    data: details,
+    data: {
+      ...details,
+      editUrl:
+        actor.userId === listing.property.ownerUserId ? `/listing-form/${listing.id}` : undefined,
+    },
+  });
+}
+
+export async function getListingEditorByIdService(
+  listingId: ListingIdParam,
+): Promise<DomainResult<ListingEditorResponse>> {
+  const actorResult = await requireListingWriteActor();
+
+  if (!actorResult.ok) {
+    return actorResult;
+  }
+
+  const listing = await findListingRecordById(listingId);
+
+  if (!listing) {
+    return fail("not_found", "Listing not found");
+  }
+
+  if (
+    !canEditListing(
+      {
+        ownerUserId: listing.property.ownerUserId,
+        status: listing.status,
+      },
+      actorResult.value.actor,
+    )
+  ) {
+    return fail("forbidden", "Forbidden");
+  }
+
+  const data = await buildListingEditorData(listing);
+
+  return succeed({
+    data: {
+      id: listing.id,
+      ...data,
+    },
+  });
+}
+
+export async function createDraftListingService(): Promise<
+  DomainResult<CreateDraftListingResponse>
+> {
+  const actorResult = await requireListingWriteActor();
+
+  if (!actorResult.ok) {
+    return actorResult;
+  }
+
+  const listing = await createDraftListing({
+    actorUserId: actorResult.value.actor.userId,
+  });
+
+  return succeed({
+    message: "Draft listing created",
+    data: {
+      id: listing.id,
+    },
+  });
+}
+
+export async function getMyListingsService(): Promise<
+  DomainResult<{
+    data: Array<{
+      id: string;
+      title: string;
+      status: "draft" | "published" | "archived";
+      price: number;
+      address: string;
+      city: string;
+      beds: number;
+      baths: number;
+      sqft: number;
+      imageUrl?: string;
+      updatedAt: string;
+      publishedAt?: string;
+      editUrl: string;
+      viewUrl: string;
+    }>;
+  }>
+> {
+  const actorResult = await requireListingWriteActor();
+
+  if (!actorResult.ok) {
+    return actorResult;
+  }
+
+  const rows = await findOwnerListings(actorResult.value.actor.userId);
+  const listingIds = rows.map((row) => row.id);
+  const imageRows = await findListingImagesByListingIds(listingIds);
+  const imageByListingId = new Map<string, string>();
+
+  for (const image of imageRows) {
+    if (image.listingId && !imageByListingId.has(image.listingId)) {
+      imageByListingId.set(image.listingId, getListingImageUrl(image.id, image.imageUrl));
+    }
+  }
+
+  return succeed({
+    data: rows.map((row) => ({
+      id: row.id,
+      title: row.title || "Untitled draft",
+      status: row.status,
+      price: centsToDollars(row.monthlyRentCents),
+      address: formatListingAddress(row.street1, row.unitNumber) || "Address pending",
+      city: row.city || "Location pending",
+      beds: row.bedrooms,
+      baths: row.bathrooms,
+      sqft: getListingSquareFeet(row.squareFeet, row.customFields),
+      imageUrl: imageByListingId.get(row.id),
+      updatedAt: row.updatedAt.toISOString(),
+      publishedAt: row.publishedAt?.toISOString(),
+      editUrl: `/listing-form/${row.id}`,
+      viewUrl: `/listings/${row.id}`,
+    })),
   });
 }
 
@@ -352,6 +482,7 @@ export async function updateListingByIdService(input: {
     property: {
       name: input.payload.name ?? listing.property.name,
       street1: input.payload.address?.street ?? listing.property.street1,
+      street2: input.payload.address?.street2 ?? listing.property.street2,
       city: input.payload.address?.city ?? listing.property.city,
       province: input.payload.address?.province ?? listing.property.province,
       postalCode: input.payload.address?.postalCode ?? listing.property.postalCode,
@@ -363,9 +494,11 @@ export async function updateListingByIdService(input: {
       contactPhone: input.payload.contact?.phone ?? listing.property.contactPhone,
     },
     listing: {
-      title: input.payload.name ?? listing.title,
+      title: input.payload.title ?? listing.title,
       description: input.payload.description ?? listing.description,
       status: nextStatus,
+      unitNumber:
+        input.payload.unitNumber === undefined ? listing.unitNumber : input.payload.unitNumber,
       bedrooms: primaryUnit?.bedrooms ?? listing.bedrooms,
       bathrooms: primaryUnit?.bathrooms ?? listing.bathrooms,
       squareFeet: primaryUnit?.sqft ?? listing.squareFeet,
@@ -494,6 +627,7 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
     price: centsToDollars(listing.monthlyRentCents),
     address: {
       street1: listing.property.street1,
+      street2: listing.property.street2 ?? undefined,
       city: listing.property.city,
       province: listing.property.province,
       postalCode: listing.property.postalCode,
@@ -503,7 +637,7 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
     sqft: getListingSquareFeet(listing.squareFeet, listing.customFields),
     accessibilityFeatures: getStoredAccessibilityFeatures(listing.customFields),
     images: imageRows.map((image) => ({
-      url: image.imageUrl,
+      url: getListingImageUrl(image.id, image.imageUrl),
       caption: image.altText ?? `${listing.title} image`,
     })),
     timeAgo: formatListingTimeAgo(listing.publishedAt, listing.createdAt),
@@ -516,6 +650,82 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
             phone: listing.property.contactPhone,
           }
         : undefined,
+  };
+}
+
+async function buildListingEditorData(listing: ListingRecord): Promise<ListingEditorData> {
+  const imageRows = await findListingImagesByListingId(listing.id);
+  const storedUnits = getStoredUnits(listing.customFields);
+  const primaryUnit = storedUnits[0];
+  const enabledDefinitionKeys = getEnabledBooleanCustomFieldKeys(listing.customFields);
+  const publicBooleanDefinitions = await findPublicBooleanFeatureDefinitions();
+  const definitionByKey = new Map(
+    publicBooleanDefinitions.map((definition) => [definition.key, definition]),
+  );
+  const definitionByLabel = new Map(
+    publicBooleanDefinitions.map((definition) => [definition.label.toLowerCase(), definition]),
+  );
+  const customFeatures = new Map<string, ListingEditorData["customFeatures"][number]>();
+
+  for (const key of enabledDefinitionKeys) {
+    const definition = definitionByKey.get(key);
+
+    if (!definition) {
+      continue;
+    }
+
+    customFeatures.set(definition.key, {
+      category: definition.category,
+      id: definition.key,
+      name: definition.label,
+      description: definition.description ?? definition.label,
+    });
+  }
+
+  for (const feature of getStoredAccessibilityFeatures(listing.customFields)) {
+    const definition = definitionByLabel.get(feature.name.toLowerCase());
+    const featureId = definition?.key ?? slugifyFeatureName(feature.name);
+
+    if (!customFeatures.has(featureId)) {
+      customFeatures.set(featureId, {
+        category: definition?.category ?? "Accessibility",
+        id: featureId,
+        name: definition?.label ?? feature.name,
+        description: definition?.description ?? feature.description,
+      });
+    }
+  }
+
+  return {
+    title: listing.title,
+    description: listing.description ?? "",
+    propertyType: getStoredString(listing.customFields, "propertyType") ?? "",
+    buildingType: getStoredString(listing.customFields, "buildingType") ?? "",
+    unitStory: getStoredNumber(listing.customFields, "unitStory"),
+    bedrooms: primaryUnit?.bedrooms ?? listing.bedrooms,
+    bathrooms: primaryUnit?.bathrooms ?? listing.bathrooms,
+    squareFeet: primaryUnit?.sqft ?? listing.squareFeet ?? undefined,
+    monthlyRentCents: listing.monthlyRentCents,
+    leaseTerm: getStoredString(listing.customFields, "leaseTerm") ?? "",
+    utilitiesIncluded: getStoredStringArray(listing.customFields, "utilitiesIncluded"),
+    images: imageRows.map((image) => ({
+      id: image.id,
+      url: getListingImageUrl(image.id, image.imageUrl),
+      caption: image.altText ?? "",
+    })),
+    availableOn: primaryUnit?.availableDate ?? listing.availableOn ?? undefined,
+    status: listing.status,
+    unitNumber: listing.unitNumber ?? undefined,
+    name: listing.property.name,
+    street1: listing.property.street1,
+    street2: listing.property.street2 ?? undefined,
+    city: listing.property.city,
+    province: listing.property.province,
+    postalCode: listing.property.postalCode,
+    contactName: listing.property.contactName ?? "",
+    contactEmail: listing.property.contactEmail ?? "",
+    contactPhone: listing.property.contactPhone ?? "",
+    customFeatures: Array.from(customFeatures.values()),
   };
 }
 
@@ -557,4 +767,12 @@ function resolveNextApplicationUrl(input: {
     ok: true as const,
     nextApplicationUrl,
   };
+}
+
+function slugifyFeatureName(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 }
