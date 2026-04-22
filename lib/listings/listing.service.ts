@@ -257,15 +257,8 @@ export async function getListingByIdService(
   return succeed({
     data: {
       ...details,
-      editUrl: canEditListing(
-        {
-          ownerUserId: listing.property.ownerUserId,
-          status: listing.status,
-        },
-        actor,
-      )
-        ? `/listing-form/${listing.id}`
-        : undefined,
+      editUrl:
+        actor.userId === listing.property.ownerUserId ? `/listing-form/${listing.id}` : undefined,
     },
   });
 }

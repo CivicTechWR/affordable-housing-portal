@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,6 +45,35 @@ export function useListingForm(initialListingId?: string) {
     initialListingId ? watchedValues.status : "draft",
   );
   const autosavePayloadKey = autosavePayload ? JSON.stringify(autosavePayload) : null;
+  const isPublishedEditMode = Boolean(initialListingId && initialData?.status === "published");
+  const shouldAutosaveDraft =
+    !isPublishedEditMode &&
+    Boolean(
+      activeListingId &&
+      initialData &&
+      autosavePayload &&
+      autosavePayloadKey &&
+      lastAutosavedPayloadRef.current !== autosavePayloadKey &&
+      !form.formState.isSubmitting,
+    );
+  const shouldWarnOnNavigateAway =
+    isPublishedEditMode && form.formState.isDirty && !form.formState.isSubmitting;
+
+  const bootstrapDraft = useCallback(async () => {
+    setDraftBootstrapError(null);
+
+    try {
+      const draftListing = await createDraftListing();
+      setActiveListingId(draftListing.id);
+      router.replace(`/listing-form/${draftListing.id}`);
+    } catch (error) {
+      setDraftBootstrapError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create a draft listing. Please try again.",
+      );
+    }
+  }, [createDraftListing, router]);
 
   useEffect(() => {
     setActiveListingId(initialListingId);
@@ -56,21 +85,8 @@ export function useListingForm(initialListingId?: string) {
     }
 
     hasRequestedDraftRef.current = true;
-    setDraftBootstrapError(null);
-
-    void createDraftListing()
-      .then((draftListing) => {
-        setActiveListingId(draftListing.id);
-        router.replace(`/listing-form/${draftListing.id}`);
-      })
-      .catch((error) => {
-        setDraftBootstrapError(
-          error instanceof Error
-            ? error.message
-            : "Unable to create a draft listing. Please try again.",
-        );
-      });
-  }, [createDraftListing, initialListingId, router]);
+    void bootstrapDraft();
+  }, [bootstrapDraft, initialListingId]);
 
   useEffect(() => {
     if (initialData) {
@@ -91,14 +107,7 @@ export function useListingForm(initialListingId?: string) {
   }, [activeListingId, form, initialData, initialListingId]);
 
   useEffect(() => {
-    if (
-      !activeListingId ||
-      !initialData ||
-      !autosavePayload ||
-      !autosavePayloadKey ||
-      lastAutosavedPayloadRef.current === autosavePayloadKey ||
-      form.formState.isSubmitting
-    ) {
+    if (!activeListingId || !autosavePayload || !autosavePayloadKey || !shouldAutosaveDraft) {
       return;
     }
 
@@ -117,14 +126,77 @@ export function useListingForm(initialListingId?: string) {
     }, 800);
 
     return () => window.clearTimeout(timeout);
-  }, [
-    activeListingId,
-    autosavePayload,
-    autosavePayloadKey,
-    editListing,
-    form.formState.isSubmitting,
-    initialData,
-  ]);
+  }, [activeListingId, autosavePayload, autosavePayloadKey, editListing, shouldAutosaveDraft]);
+
+  useEffect(() => {
+    if (shouldAutosaveDraft) {
+      return;
+    }
+
+    setAutosaveFeedback(null);
+  }, [shouldAutosaveDraft]);
+
+  useEffect(() => {
+    if (!shouldWarnOnNavigateAway) {
+      return;
+    }
+
+    const warningMessage =
+      "You have unsaved changes to this published listing. Leave this page without saving?";
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = warningMessage;
+    };
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      const link = target.closest("a[href]");
+
+      if (!(link instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      if (link.target === "_blank" || link.hasAttribute("download")) {
+        return;
+      }
+
+      const nextUrl = new URL(link.href, window.location.href);
+
+      if (nextUrl.href === window.location.href) {
+        return;
+      }
+
+      if (!window.confirm(warningMessage)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("click", handleDocumentClick, true);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("click", handleDocumentClick, true);
+    };
+  }, [shouldWarnOnNavigateAway]);
 
   const onSubmit = async (data: ListingFormData) => {
     setSubmitFeedback(null);
@@ -155,9 +227,17 @@ export function useListingForm(initialListingId?: string) {
   return {
     form,
     onSubmit,
+    retryDraftBootstrap: async () => {
+      hasRequestedDraftRef.current = false;
+      await bootstrapDraft();
+      hasRequestedDraftRef.current = true;
+    },
     listingId: activeListingId,
     autosaveFeedback,
-    isLoading: isCreatingDraft || (!activeListingId && !initialListingId) || isFetching,
+    isLoading:
+      isCreatingDraft ||
+      (!activeListingId && !initialListingId && !draftBootstrapError) ||
+      isFetching,
     isError: isFetchError || Boolean(draftBootstrapError),
     isSubmitting: isCreatingDraft || isEditing || form.formState.isSubmitting,
     submitFeedback:

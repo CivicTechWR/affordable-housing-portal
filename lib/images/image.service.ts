@@ -191,7 +191,10 @@ export async function getListingImageByIdService(input: {
     data: image.imageData,
     contentType: image.contentType,
     sizeBytes: image.sizeBytes,
-    cacheControl: image.listingId ? "public, max-age=31536000, immutable" : "private, max-age=60",
+    cacheControl:
+      image.listingStatus === "published"
+        ? "public, max-age=31536000, immutable"
+        : "private, max-age=60",
   });
 }
 

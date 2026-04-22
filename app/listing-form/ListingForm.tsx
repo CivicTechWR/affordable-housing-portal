@@ -29,6 +29,7 @@ export default function ListingForm({ listingId }: ListingFormProps) {
     submitFeedback,
     autosaveFeedback,
     listingId: activeListingId,
+    retryDraftBootstrap,
   } = useListingForm(listingId);
   const [previewMode, setPreviewMode] = useState<ListingFormPreviewMode>("card");
   const handleOpenDetails = () => {
@@ -69,15 +70,24 @@ export default function ListingForm({ listingId }: ListingFormProps) {
   }
 
   if (isError) {
+    const canRetryDraftBootstrap = !isEditMode && !activeListingId;
+
     return (
       <ListingFormLayout
         formContent={
           <div className="bg-destructive/15 text-destructive p-8 rounded-lg border border-destructive/20">
             <h3 className="mb-2">Error Loading Listing</h3>
             <p>
-              We encountered an error while retrieving this listing. It may have been deleted or
-              there is a network issue.
+              {canRetryDraftBootstrap
+                ? (submitFeedback?.message ??
+                  "We couldn't create a draft listing yet. Please try again.")
+                : "We encountered an error while retrieving this listing. It may have been deleted or there is a network issue."}
             </p>
+            {canRetryDraftBootstrap ? (
+              <Button type="button" className="mt-4" onClick={() => void retryDraftBootstrap()}>
+                Retry draft creation
+              </Button>
+            ) : null}
           </div>
         }
       />
