@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MyListingsPage() {
+  const renderedAt = new Date().toISOString();
   const { session, authzUser } = await getOptionalSession();
 
   if (!session?.user) {
@@ -65,7 +66,7 @@ export default async function MyListingsPage() {
           </Button>
         </div>
 
-        <MyListingsClient initialListings={result.value.data} />
+        <MyListingsClient initialListings={result.value.data} renderedAt={renderedAt} />
       </div>
     </main>
   );

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
+import { useEffect, useState } from "react";
+import { formatDistance } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ type MyListingItem = {
 
 type MyListingsClientProps = {
   initialListings: MyListingItem[];
+  renderedAt: string;
 };
 
 const statusVariantByLabel = {
@@ -42,11 +43,24 @@ const statusLabelByValue = {
   archived: "Deleted",
 } as const;
 
-export function MyListingsClient({ initialListings }: MyListingsClientProps) {
+export function MyListingsClient({ initialListings, renderedAt }: MyListingsClientProps) {
   const router = useRouter();
   const [listings, setListings] = useState(sortListings(initialListings));
   const [mutatingListingId, setMutatingListingId] = useState<string | null>(null);
   const [mutationError, setMutationError] = useState<string | null>(null);
+  const [now, setNow] = useState(() => new Date(renderedAt));
+
+  useEffect(() => {
+    setNow(new Date());
+
+    const intervalId = window.setInterval(() => {
+      setNow(new Date());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   async function handleDelete(listingId: string) {
     setMutationError(null);
@@ -184,7 +198,7 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
                       </div>
                       <div className="text-sm text-muted-foreground">
                         Updated{" "}
-                        {formatDistanceToNow(new Date(listing.updatedAt), { addSuffix: true })}
+                        {formatDistance(new Date(listing.updatedAt), now, { addSuffix: true })}
                       </div>
                     </div>
 
