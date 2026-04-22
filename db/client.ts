@@ -26,10 +26,13 @@ function getDatabaseUrl() {
 }
 
 function createSqlClient() {
-  // prepare: false disables prepared statements, required when connecting
-  // through a connection pooler (e.g. PgBouncer) in transaction mode.
+  // Production uses Supabase's pooler, and Next.js runs this client inside
+  // serverless functions. Keep each function instance to a single connection
+  // and recycle idle connections quickly so bursts do not exhaust the pooler.
   return postgres(getDatabaseUrl(), {
     prepare: false,
+    max: 1,
+    idle_timeout: 20,
   });
 }
 
