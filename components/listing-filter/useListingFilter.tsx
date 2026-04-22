@@ -1,10 +1,24 @@
 import { listingSearchParamsParsers } from "@/app/listings/searchParams";
 import { useQueryStates } from "nuqs";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { FilterButtonProps } from "@/components/filter-button/FilterButton";
+
+const LISTING_LOCATION_PLACEHOLDER = "Search city, address, or building";
+
+export function normalizeLocationFilter(value: string) {
+  const trimmedValue = value.trim();
+
+  return trimmedValue.length > 0 ? trimmedValue : null;
+}
 
 export function useListingFilters() {
   const [filters, setFilters] = useQueryStates(listingSearchParamsParsers);
+  const [locationInputValue, setLocationInputValue] = useState(filters.location ?? "");
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    setLocationInputValue(filters.location ?? "");
+  }, [filters.location]);
 
   // --- 1. Static Props (Variables) ---
   const sortOptionProps = useMemo(
@@ -22,32 +36,49 @@ export function useListingFilters() {
 
   const searchInputProps = useMemo(
     () => ({
-      value: filters.location || "Waterloo, ON",
-      onChange: async (e: React.ChangeEvent<HTMLInputElement>) => {
-        await setFilters({ location: e.target.value });
+      autoComplete: "off" as const,
+      placeholder: LISTING_LOCATION_PLACEHOLDER,
+      type: "search" as const,
+      value: locationInputValue,
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+        const nextLocation = e.target.value;
+
+        setLocationInputValue(nextLocation);
+
+        startTransition(() => {
+          void setFilters({ location: normalizeLocationFilter(nextLocation) });
+        });
       },
     }),
-    [filters.location, setFilters],
+    [locationInputValue, setFilters, startTransition],
   );
 
   const priceRangeProps = useMemo(
     () => ({
-      min: filters.minPrice || undefined,
-      max: filters.maxPrice || undefined,
+      min: filters.minPrice ?? undefined,
+      max: filters.maxPrice ?? undefined,
       step: 100,
       onMinChange: async (min: number | undefined) => {
-        if (min && filters.maxPrice && min > filters.maxPrice) {
+        if (
+          typeof min === "number" &&
+          typeof filters.maxPrice === "number" &&
+          min > filters.maxPrice
+        ) {
           await setFilters({ minPrice: min, maxPrice: min });
           return;
         }
-        await setFilters({ minPrice: min });
+        await setFilters({ minPrice: min ?? null });
       },
       onMaxChange: async (max: number | undefined) => {
-        if (max && filters.minPrice && max < filters.minPrice) {
+        if (
+          typeof max === "number" &&
+          typeof filters.minPrice === "number" &&
+          max < filters.minPrice
+        ) {
           await setFilters({ maxPrice: max, minPrice: max });
           return;
         }
-        await setFilters({ maxPrice: max });
+        await setFilters({ maxPrice: max ?? null });
       },
     }),
     [filters.minPrice, filters.maxPrice, setFilters],

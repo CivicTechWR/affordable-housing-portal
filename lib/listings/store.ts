@@ -4,6 +4,11 @@ import { formatDistanceToNow } from "date-fns";
 
 import type { ListingCustomFields, ListingCustomFieldValue, ListingStatus } from "@/db/schema";
 import { sortCustomListingFieldsForDisplay } from "@/lib/custom-listing-fields/custom-listing-field-ordering";
+import {
+  buildListingFeatureDefinitionLookup,
+  type ListingFeatureDefinition,
+  normalizeListingFeatureToken,
+} from "@/lib/listings/listing-feature-definitions";
 import type {
   CreateListingInput,
   ListingDetails,
@@ -28,20 +33,12 @@ type StoredEligibilityCriteria = {
   housingType?: string | null;
 };
 
-type ListingFeatureDefinition = {
-  key: string;
-  label: string;
-  description: string | null;
-  category: string;
-  sortOrder: number;
-};
 type StoredListingFeature = NonNullable<ListingDetails["accessibilityFeatures"]>[number];
 
 export function buildListingCustomFields(input: CreateListingInput): ListingCustomFields {
-  return {
+  const customFields: ListingCustomFields = {
     units: input.units.map((unit) => ({ ...unit })),
     amenities: [...input.amenities],
-    accessibilityFeatures: [...input.accessibilityFeatures],
     applicationMethod: input.applicationMethod,
     externalApplicationUrl:
       input.applicationMethod === "external_link" ? (input.externalApplicationUrl ?? null) : null,
@@ -52,6 +49,10 @@ export function buildListingCustomFields(input: CreateListingInput): ListingCust
     ...(input.leaseTerm ? { leaseTerm: input.leaseTerm } : {}),
     ...(input.utilitiesIncluded ? { utilitiesIncluded: [...input.utilitiesIncluded] } : {}),
   };
+
+  applyAccessibilityFeatureState(customFields, input.accessibilityFeatures);
+
+  return customFields;
 }
 
 export function mergeListingCustomFields(
@@ -73,7 +74,7 @@ export function mergeListingCustomFields(
   }
 
   if (input.accessibilityFeatures !== undefined) {
-    next.accessibilityFeatures = [...input.accessibilityFeatures];
+    applyAccessibilityFeatureState(next, input.accessibilityFeatures);
   }
 
   if (input.applicationMethod !== undefined) {
@@ -205,6 +206,7 @@ export function getStoredAccessibilityFeatures(
 
     return [
       {
+        id: getString(entry.id) ?? undefined,
         name,
         description: getString(entry.description) ?? name,
       },
@@ -241,14 +243,11 @@ export function buildListingFeatureCategories(
   definitions: ListingFeatureDefinition[],
 ): ListingDetails["features"] {
   const categories = new Map<string, ListingDetails["features"][number]>();
-
-  const accessibilityFeatures = getStoredAccessibilityFeatures(customFields);
-  if (accessibilityFeatures.length > 0) {
-    categories.set("Accessibility", {
-      categoryName: "Accessibility",
-      features: accessibilityFeatures.map((feature) => ({ ...feature })),
-    });
-  }
+  const resolvedDefinitions = getResolvedListingFeatureDefinitions(customFields, definitions);
+  const unresolvedLegacyFeatures = getUnresolvedLegacyAccessibilityFeatures(
+    customFields,
+    definitions,
+  );
 
   const amenities = getStoredStringArray(customFields, "amenities");
   if (amenities.length > 0) {
@@ -261,7 +260,7 @@ export function buildListingFeatureCategories(
     });
   }
 
-  for (const definition of sortCustomListingFieldsForDisplay(definitions)) {
+  for (const definition of resolvedDefinitions) {
     const existingCategory = categories.get(definition.category) ?? {
       categoryName: definition.category,
       features: [],
@@ -275,7 +274,42 @@ export function buildListingFeatureCategories(
     categories.set(definition.category, existingCategory);
   }
 
+  if (unresolvedLegacyFeatures.length > 0) {
+    const accessibilityCategory = categories.get("Accessibility") ?? {
+      categoryName: "Accessibility",
+      features: [],
+    };
+
+    accessibilityCategory.features.push(
+      ...unresolvedLegacyFeatures.map((feature) => ({
+        id: feature.id,
+        name: feature.name,
+        description: feature.description,
+      })),
+    );
+
+    categories.set("Accessibility", accessibilityCategory);
+  }
+
   return Array.from(categories.values());
+}
+
+export function getDisplayAccessibilityFeatures(
+  customFields: ListingCustomFields,
+  definitions: ListingFeatureDefinition[],
+): StoredListingFeature[] {
+  const resolvedDefinitions = getResolvedListingFeatureDefinitions(customFields, definitions).map(
+    (definition) => ({
+      id: definition.key,
+      name: definition.label,
+      description: definition.description ?? definition.label,
+    }),
+  );
+
+  return [
+    ...resolvedDefinitions,
+    ...getUnresolvedLegacyAccessibilityFeatures(customFields, definitions),
+  ];
 }
 
 export function formatListingAddress(street1: string, unitNumber: string | null) {
@@ -305,6 +339,85 @@ export function getListingCoordinates(latitude: number | null, longitude: number
 
 export function getListingSquareFeet(squareFeet: number | null, customFields: ListingCustomFields) {
   return squareFeet ?? getStoredUnits(customFields)[0]?.sqft ?? 0;
+}
+
+function applyAccessibilityFeatureState(
+  customFields: ListingCustomFields,
+  features:
+    | CreateListingInput["accessibilityFeatures"]
+    | UpdateListingInput["accessibilityFeatures"],
+) {
+  for (const key of getEnabledBooleanCustomFieldKeys(customFields)) {
+    delete customFields[key];
+  }
+
+  if (!features) {
+    delete customFields.accessibilityFeatures;
+    return;
+  }
+
+  const legacyFeatures: StoredListingFeature[] = [];
+
+  for (const feature of features) {
+    if (feature.id) {
+      customFields[feature.id] = true;
+      continue;
+    }
+
+    legacyFeatures.push({
+      name: feature.name,
+      description: feature.description,
+    });
+  }
+
+  if (legacyFeatures.length > 0) {
+    customFields.accessibilityFeatures = legacyFeatures;
+  } else {
+    delete customFields.accessibilityFeatures;
+  }
+}
+
+function getResolvedListingFeatureDefinitions(
+  customFields: ListingCustomFields,
+  definitions: ListingFeatureDefinition[],
+) {
+  const lookup = buildListingFeatureDefinitionLookup(definitions);
+  const resolvedDefinitions = new Map<string, ListingFeatureDefinition>();
+
+  for (const key of getEnabledBooleanCustomFieldKeys(customFields)) {
+    const definition = lookup.byKey.get(key);
+
+    if (definition) {
+      resolvedDefinitions.set(definition.key, definition);
+    }
+  }
+
+  for (const feature of getStoredAccessibilityFeatures(customFields)) {
+    const definition =
+      (feature.id ? lookup.byKey.get(feature.id) : undefined) ??
+      lookup.byToken.get(normalizeListingFeatureToken(feature.name));
+
+    if (definition) {
+      resolvedDefinitions.set(definition.key, definition);
+    }
+  }
+
+  return sortCustomListingFieldsForDisplay(Array.from(resolvedDefinitions.values()));
+}
+
+function getUnresolvedLegacyAccessibilityFeatures(
+  customFields: ListingCustomFields,
+  definitions: ListingFeatureDefinition[],
+) {
+  const lookup = buildListingFeatureDefinitionLookup(definitions);
+
+  return getStoredAccessibilityFeatures(customFields).filter((feature) => {
+    if (feature.id && lookup.byKey.has(feature.id)) {
+      return false;
+    }
+
+    return !lookup.byToken.has(normalizeListingFeatureToken(feature.name));
+  });
 }
 
 export function resolveListingStatusTimestamps(

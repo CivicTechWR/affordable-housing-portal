@@ -49,6 +49,10 @@ const variants = {
   },
 };
 
+function isProtectedUploadedImageUrl(imageUrl: string) {
+  return imageUrl.startsWith("/api/image-uploads/");
+}
+
 export function ListingsCard({
   id,
   title,
@@ -87,6 +91,7 @@ export function ListingsCard({
             alt={displayAddress}
             fill
             sizes="(max-width: 640px) 260px, (max-width: 1024px) 290px, 320px"
+            unoptimized={isProtectedUploadedImageUrl(imageUrl)}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
