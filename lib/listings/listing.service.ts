@@ -255,7 +255,18 @@ export async function getListingByIdService(
   const details = await buildListingDetailsResponse(listing);
 
   return succeed({
-    data: details,
+    data: {
+      ...details,
+      editUrl: canEditListing(
+        {
+          ownerUserId: listing.property.ownerUserId,
+          status: listing.status,
+        },
+        actor,
+      )
+        ? `/listing-form/${listing.id}`
+        : undefined,
+    },
   });
 }
 

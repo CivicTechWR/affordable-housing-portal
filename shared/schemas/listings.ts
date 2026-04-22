@@ -99,6 +99,7 @@ const listingContactSchema = z.object({
 export const listingDetailsSchema = z.object({
   id: listingIdParamSchema,
   title: nonEmptyString.optional(),
+  editUrl: z.string().optional(),
   unitNumber: nonEmptyString.optional(),
   price: z.number().min(0),
   address: listingDetailsAddressSchema,

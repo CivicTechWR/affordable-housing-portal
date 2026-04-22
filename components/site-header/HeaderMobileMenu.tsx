@@ -59,10 +59,6 @@ export function HeaderMobileMenu({
           className="absolute right-0 top-[calc(100%+0.75rem)] z-20 w-[min(18rem,calc(100vw-2rem))] rounded-3xl border border-primary-foreground/15 bg-primary p-3 shadow-xl shadow-slate-950/20"
         >
           <nav aria-label="Mobile navigation" className="space-y-2">
-            <Link href="/listings" className={mobileMenuItemClass} onClick={() => setIsOpen(false)}>
-              <span>Browse Listings</span>
-            </Link>
-
             {isSignedIn ? (
               <>
                 {canCreateListing ? (
@@ -73,13 +69,6 @@ export function HeaderMobileMenu({
                       onClick={() => setIsOpen(false)}
                     >
                       <span>My Listings</span>
-                    </Link>
-                    <Link
-                      href="/listing-form"
-                      className={mobileMenuItemClass}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>New listing</span>
                     </Link>
                   </>
                 ) : null}

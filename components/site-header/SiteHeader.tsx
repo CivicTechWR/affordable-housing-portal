@@ -25,19 +25,12 @@ export async function SiteHeader() {
           </Link>
 
           <nav className="absolute right-0 hidden items-center gap-2 lg:flex">
-            <Link href="/listings" className={navPillClass}>
-              Browse Listings
-            </Link>
-
             {rawSession?.user ? (
               <>
                 {canCreateListing ? (
                   <>
                     <Link href="/my-listings" className={navPillClass}>
                       My Listings
-                    </Link>
-                    <Link href="/listing-form" className={navPillClass}>
-                      New listing
                     </Link>
                   </>
                 ) : null}

@@ -44,13 +44,13 @@ const statusLabelByValue = {
 
 export function MyListingsClient({ initialListings }: MyListingsClientProps) {
   const router = useRouter();
-  const [listings, setListings] = useState(initialListings);
-  const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [listings, setListings] = useState(sortListings(initialListings));
+  const [mutatingListingId, setMutatingListingId] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
 
   async function handleDelete(listingId: string) {
-    setDeleteError(null);
-    setDeletingListingId(listingId);
+    setMutationError(null);
+    setMutatingListingId(listingId);
 
     try {
       const response = await fetch(`/api/listings/${listingId}`, {
@@ -63,23 +63,66 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
       }
 
       setListings((current) =>
-        current.map((listing) =>
-          listing.id === listingId
-            ? {
-                ...listing,
-                status: "archived",
-                updatedAt: new Date().toISOString(),
-              }
-            : listing,
+        sortListings(
+          current.map((listing) =>
+            listing.id === listingId
+              ? {
+                  ...listing,
+                  status: "archived",
+                  updatedAt: new Date().toISOString(),
+                }
+              : listing,
+          ),
         ),
       );
       router.refresh();
     } catch (error) {
-      setDeleteError(
+      setMutationError(
         error instanceof Error ? error.message : "Unable to delete listing. Please try again.",
       );
     } finally {
-      setDeletingListingId(null);
+      setMutatingListingId(null);
+    }
+  }
+
+  async function handleUndelete(listingId: string) {
+    setMutationError(null);
+    setMutatingListingId(listingId);
+
+    try {
+      const response = await fetch(`/api/listings/${listingId}`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ status: "draft" }),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(payload?.message ?? "Unable to restore listing.");
+      }
+
+      setListings((current) =>
+        sortListings(
+          current.map((listing) =>
+            listing.id === listingId
+              ? {
+                  ...listing,
+                  status: "draft",
+                  updatedAt: new Date().toISOString(),
+                }
+              : listing,
+          ),
+        ),
+      );
+      router.refresh();
+    } catch (error) {
+      setMutationError(
+        error instanceof Error ? error.message : "Unable to restore listing. Please try again.",
+      );
+    } finally {
+      setMutatingListingId(null);
     }
   }
 
@@ -95,16 +138,16 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
 
   return (
     <div className="space-y-4">
-      {deleteError ? (
+      {mutationError ? (
         <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {deleteError}
+          {mutationError}
         </div>
       ) : null}
 
       <div className="grid gap-4">
         {listings.map((listing) => {
           const isDeleted = listing.status === "archived";
-          const isDeleting = deletingListingId === listing.id;
+          const isMutating = mutatingListingId === listing.id;
 
           return (
             <Card key={listing.id}>
@@ -171,7 +214,7 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
                         <Button
                           type="button"
                           variant="outline"
-                          disabled={isDeleting}
+                          disabled={isMutating}
                           onClick={() => {
                             if (
                               window.confirm(
@@ -182,13 +225,23 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
                             }
                           }}
                         >
-                          {isDeleting ? "Deleting..." : "Delete"}
+                          {isMutating ? "Deleting..." : "Delete"}
                         </Button>
                       </>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
-                        This listing is in a deleted state and is no longer publicly visible.
-                      </p>
+                      <>
+                        <p className="text-sm text-muted-foreground">
+                          This listing is in a deleted state and is no longer publicly visible.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={isMutating}
+                          onClick={() => void handleUndelete(listing.id)}
+                        >
+                          {isMutating ? "Restoring..." : "Undelete"}
+                        </Button>
+                      </>
                     )}
                   </CardContent>
                 </div>
@@ -199,4 +252,18 @@ export function MyListingsClient({ initialListings }: MyListingsClientProps) {
       </div>
     </div>
   );
+}
+
+function sortListings(listings: MyListingItem[]) {
+  return [...listings].sort((left, right) => {
+    if (left.status === "archived" && right.status !== "archived") {
+      return 1;
+    }
+
+    if (left.status !== "archived" && right.status === "archived") {
+      return -1;
+    }
+
+    return new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime();
+  });
 }
