@@ -79,7 +79,7 @@ export function HeaderMobileMenu({
                     className={mobileMenuItemClass}
                     onClick={() => setIsOpen(false)}
                   >
-                    <span>Field Dashboard</span>
+                    <span>Custom Fields</span>
                   </Link>
                 ) : null}
 

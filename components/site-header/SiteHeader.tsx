@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { UserIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
+import { HeaderAccountMenu } from "@/components/site-header/HeaderAccountMenu";
 import { HeaderBreadcrumbs } from "@/components/site-header/HeaderBreadcrumbs";
 import { HeaderMobileMenu } from "@/components/site-header/HeaderMobileMenu";
 import { getOptionalSession } from "@/lib/auth/session";
@@ -37,28 +36,11 @@ export async function SiteHeader() {
 
                 {optionalSession.authzUser?.role === "admin" ? (
                   <Link href="/admin/custom-listing-fields" className={navPillClass}>
-                    Field Dashboard
+                    Custom Fields
                   </Link>
                 ) : null}
 
-                {session?.user ? (
-                  <span className="inline-flex max-w-56 items-center gap-1.5 rounded-full bg-primary-foreground/20 px-3 py-1.5 text-sm font-medium text-primary-foreground">
-                    <HugeiconsIcon icon={UserIcon} strokeWidth={2} size={16} />
-                    <span className="truncate">{session.user.name ?? session.user.email}</span>
-                  </span>
-                ) : null}
-
-                <form
-                  action={async () => {
-                    "use server";
-
-                    await signOut({ redirectTo: "/" });
-                  }}
-                >
-                  <button type="submit" className={navPillClass}>
-                    Sign out
-                  </button>
-                </form>
+                {session?.user ? <HeaderAccountMenu user={session.user} /> : null}
               </>
             ) : (
               <Link href="/sign-in" className={navPillClass}>
