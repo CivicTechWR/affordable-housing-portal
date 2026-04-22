@@ -15,6 +15,10 @@ export type RecentAccountInviteRow = {
   invitedAt: Date;
 };
 
+export type PendingAccountInviteRow = RecentAccountInviteRow & {
+  expiresAt: Date;
+};
+
 export class InviteUnavailableError extends Error {
   constructor() {
     super("Invite is no longer valid.");
@@ -83,6 +87,47 @@ export async function findRecentAccountInvites(limit: number): Promise<RecentAcc
         role: row.role,
         organization: row.organization,
         invitedAt: row.sentAt,
+      },
+    ];
+  });
+}
+
+export async function findPendingAccountInvites(): Promise<PendingAccountInviteRow[]> {
+  const rows = await db
+    .select({
+      id: userInvites.id,
+      email: userInvites.email,
+      name: users.fullName,
+      role: users.role,
+      organization: users.organization,
+      sentAt: userInvites.sentAt,
+      expiresAt: userInvites.expiresAt,
+    })
+    .from(userInvites)
+    .innerJoin(users, eq(userInvites.userId, users.id))
+    .where(
+      and(
+        isNull(userInvites.acceptedAt),
+        isNotNull(userInvites.sentAt),
+        gt(userInvites.expiresAt, new Date()),
+      ),
+    )
+    .orderBy(desc(userInvites.sentAt), desc(userInvites.createdAt));
+
+  return rows.flatMap((row) => {
+    if (!row.sentAt) {
+      return [];
+    }
+
+    return [
+      {
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        role: row.role,
+        organization: row.organization,
+        invitedAt: row.sentAt,
+        expiresAt: row.expiresAt,
       },
     ];
   });

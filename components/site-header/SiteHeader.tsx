@@ -35,9 +35,14 @@ export async function SiteHeader() {
                 ) : null}
 
                 {optionalSession.authzUser?.role === "admin" ? (
-                  <Link href="/admin/custom-listing-fields" className={navPillClass}>
-                    Custom Fields
-                  </Link>
+                  <>
+                    <Link href="/admin/custom-listing-fields" className={navPillClass}>
+                      Custom Fields
+                    </Link>
+                    <Link href="/admin/users" className={navPillClass}>
+                      Manage Users
+                    </Link>
+                  </>
                 ) : null}
 
                 {session?.user ? <HeaderAccountMenu user={session.user} /> : null}

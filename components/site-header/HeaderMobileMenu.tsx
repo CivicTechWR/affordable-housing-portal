@@ -74,13 +74,22 @@ export function HeaderMobileMenu({
                 ) : null}
 
                 {isAdmin ? (
-                  <Link
-                    href="/admin/custom-listing-fields"
-                    className={mobileMenuItemClass}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <span>Custom Fields</span>
-                  </Link>
+                  <>
+                    <Link
+                      href="/admin/custom-listing-fields"
+                      className={mobileMenuItemClass}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>Custom Fields</span>
+                    </Link>
+                    <Link
+                      href="/admin/users"
+                      className={mobileMenuItemClass}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>Manage Users</span>
+                    </Link>
+                  </>
                 ) : null}
 
                 {user ? (

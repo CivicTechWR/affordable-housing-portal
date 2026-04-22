@@ -12,6 +12,7 @@ const segmentLabelMap: Record<string, string> = {
   preview: "Preview",
   "admin-invite": "Admin Invite",
   "sign-in": "Sign In",
+  users: "Users",
 };
 
 function formatSegment(segment: string) {
