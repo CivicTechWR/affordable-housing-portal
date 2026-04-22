@@ -1,4 +1,4 @@
-import { and, eq, ilike, lte, or, sql, type SQL } from "drizzle-orm";
+import { and, eq, gte, ilike, lte, or, sql, type SQL } from "drizzle-orm";
 
 import { listings, properties, type ListingStatus } from "@/db/schema";
 
@@ -32,6 +32,50 @@ export function listingBedroomsSpecification(bedrooms: number | null): ListingFi
   }
 
   return eq(listings.bedrooms, bedrooms);
+}
+
+export function listingBedroomsAtLeastSpecification(
+  bedrooms: number | null,
+): ListingFilterSpecification {
+  if (typeof bedrooms !== "number") {
+    return undefined;
+  }
+
+  return gte(listings.bedrooms, bedrooms);
+}
+
+export function listingBathroomsSpecification(
+  bathrooms: number | null,
+): ListingFilterSpecification {
+  if (typeof bathrooms !== "number") {
+    return undefined;
+  }
+
+  return eq(listings.bathrooms, bathrooms);
+}
+
+export function listingBathroomsAtLeastSpecification(
+  bathrooms: number | null,
+): ListingFilterSpecification {
+  if (typeof bathrooms !== "number") {
+    return undefined;
+  }
+
+  return gte(listings.bathrooms, bathrooms);
+}
+
+export function listingMinRentSpecification(minRent: string | null): ListingFilterSpecification {
+  if (!minRent) {
+    return undefined;
+  }
+
+  const minRentInCents = dollarsStringToCents(minRent);
+
+  if (minRentInCents === null) {
+    return undefined;
+  }
+
+  return gte(listings.monthlyRentCents, minRentInCents);
 }
 
 export function listingMaxRentSpecification(maxRent: string | null): ListingFilterSpecification {
@@ -82,6 +126,37 @@ export function listingSearchSpecification(search: string | null): ListingFilter
     ilike(properties.street1, searchTerm),
     ilike(properties.city, searchTerm),
   );
+}
+
+export function listingAvailableBySpecification(
+  moveInDate: string | null,
+): ListingFilterSpecification {
+  if (!moveInDate) {
+    return undefined;
+  }
+
+  const parsedDate = new Date(moveInDate);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return undefined;
+  }
+
+  const dateValue = parsedDate.toISOString().slice(0, 10);
+
+  return lte(listings.availableOn, dateValue);
+}
+
+export function listingFeatureKeysSpecification(featureKeys: string[]): ListingFilterSpecification {
+  if (featureKeys.length === 0) {
+    return undefined;
+  }
+
+  const activeFeatureSpecs = featureKeys.map(
+    (featureKey) =>
+      sql<boolean>`coalesce(${listings.customFields} ->> ${featureKey}, 'false') = 'true'`,
+  );
+
+  return and(...activeFeatureSpecs);
 }
 
 export function andListingSpecifications(

@@ -8,10 +8,11 @@ import {
   ListingFilterSearchBar,
 } from "@/components/listing-filter-search-bar/ListingFilterSearchBar";
 import { FilterButton } from "@/components/filter-button/FilterButton";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
-import type { ListingSummary } from "@/shared/schemas/listings";
+import type { ListingListResponse, ListingQuery, ListingSummary } from "@/shared/schemas/listings";
 import dynamic from "next/dynamic";
+import { useListingsQuery } from "./useListingsQuery";
 
 const LazyMapView = dynamic<{ listings: ListingSummary[] }>(
   () => import("../../components/map-view/MapView.tsx").then((mod) => mod.MapView),
@@ -26,16 +27,18 @@ const LazyMapView = dynamic<{ listings: ListingSummary[] }>(
 );
 
 interface ListingsDashboardProps {
-  initialListings: ListingSummary[];
+  initialData: ListingListResponse;
+  initialQueryString: string;
   dynamicGroups: DynamicFilterGroup[];
 }
 
 export default function ListingsDashboard({
-  initialListings,
+  initialData,
+  initialQueryString,
   dynamicGroups,
 }: ListingsDashboardProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.LIST);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.MAP_LIST);
   const isSplitView = displayMode === DisplayMode.MAP_LIST;
 
   const {
@@ -48,10 +51,34 @@ export default function ListingsDashboard({
     datePickerProps,
     clearFilters,
     getFilterButtonProps,
+    bathrooms,
+    bedrooms,
+    features,
+    location,
+    maxPrice,
+    minPrice,
+    moveInDate,
+    sort,
   } = useListingFilters();
   const filterButtonProps = getFilterButtonProps(isFilterOpen, () =>
     setIsFilterOpen(!isFilterOpen),
   );
+  const query = useMemo<ListingQuery>(
+    () => ({
+      limit: "50",
+      bathrooms: bathrooms ?? undefined,
+      bedrooms: bedrooms ?? undefined,
+      features: features.length > 0 ? features : undefined,
+      location: location ?? undefined,
+      maxPrice: typeof maxPrice === "number" ? maxPrice.toString() : undefined,
+      minPrice: typeof minPrice === "number" ? minPrice.toString() : undefined,
+      moveInDate: moveInDate?.toISOString(),
+      sort: sort as ListingQuery["sort"],
+    }),
+    [bathrooms, bedrooms, features, location, maxPrice, minPrice, moveInDate, sort],
+  );
+  const { data, error, isLoading } = useListingsQuery(query, initialData, initialQueryString);
+  const listings = data.data;
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col">
@@ -63,9 +90,9 @@ export default function ListingsDashboard({
           bathroomToggleProps={bathroomToggleProps}
           displayModeProps={{
             displayModes: [
+              { value: DisplayMode.MAP_LIST, label: "Split" },
               { value: DisplayMode.LIST, label: "List" },
               { value: DisplayMode.MAP, label: "Map" },
-              { value: DisplayMode.MAP_LIST, label: "Split" },
             ],
             onChange: (value: string) => setDisplayMode(value as DisplayMode),
             value: displayMode,
@@ -73,18 +100,24 @@ export default function ListingsDashboard({
         />
         <FilterButton {...filterButtonProps} />
       </header>
+      {error ? (
+        <div className="border-b border-destructive/20 bg-destructive/5 px-4 py-2 text-sm text-destructive">
+          {error}
+        </div>
+      ) : null}
       <main className="flex min-h-0 flex-1 overflow-hidden">
         {displayMode !== DisplayMode.MAP ? (
           <ListingsPanel
-            listings={initialListings}
+            listings={listings}
             displayMode={displayMode}
             filterButtonProps={filterButtonProps}
             sortOptionProps={sortOptionProps}
+            isLoading={isLoading}
           />
         ) : null}
         {[DisplayMode.MAP, DisplayMode.MAP_LIST].includes(displayMode) && (
           <div className={`min-w-0 flex-1 ${isSplitView ? "lg:basis-1/2" : ""}`}>
-            <LazyMapView listings={initialListings} />
+            <LazyMapView listings={listings} />
           </div>
         )}
         {isFilterOpen && (

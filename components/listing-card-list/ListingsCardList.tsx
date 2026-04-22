@@ -18,12 +18,11 @@ export function ListingCardGallery({ listings, mode }: ListingCardGalleryProps) 
   const isFullscreen = mode === ListingsDisplayMode.FULLSCREEN;
 
   return (
-    // Added h-full and w-full so it fills the parent column and enables actual scrolling
     <ScrollArea className="flex-1 h-full w-full">
       <div
         className={`p-4 grid gap-4 ${
           isFullscreen
-            ? "grid-cols-[260px] sm:grid-cols-[290px_290px] lg:grid-cols-[320px_320px_320px] xl:grid-cols-[320px_320px_320px_320px]"
+            ? "justify-items-center grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]"
             : "grid-cols-1"
         }`}
       >

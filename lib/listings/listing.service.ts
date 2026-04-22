@@ -1,6 +1,8 @@
 import "server-only";
 
-import type { ListingCustomFields } from "@/db/schema";
+import { asc, desc, type SQL } from "drizzle-orm";
+
+import { listings, type ListingCustomFields } from "@/db/schema";
 import type { getOptionalSession } from "@/lib/auth/session";
 import {
   buildListingFeatureCategories,
@@ -23,7 +25,13 @@ import {
 import {
   andListingSpecifications,
   listingAccessibilitySpecification,
+  listingAvailableBySpecification,
+  listingBathroomsAtLeastSpecification,
+  listingBathroomsSpecification,
+  listingBedroomsAtLeastSpecification,
   listingBedroomsSpecification,
+  listingFeatureKeysSpecification,
+  listingMinRentSpecification,
   listingMaxRentSpecification,
   listingNeighborhoodSpecification,
   listingOwnerSpecification,
@@ -77,6 +85,11 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
   const page = query.page ? Number(query.page) : 1;
   const limit = query.limit ? Number(query.limit) : 20;
   const visibility = getListingListVisibility(actor, query.status ?? null);
+  const search = query.search ?? query.location ?? null;
+  const maxRent = query.maxRent ?? query.maxPrice ?? null;
+  const selectedFeatures = normalizeQueryFeatures(query.features);
+  const bedroomFilter = parseCountFilter(query.bedrooms);
+  const bathroomFilter = parseCountFilter(query.bathrooms);
 
   if (!visibility.isAccessible) {
     return {
@@ -94,16 +107,25 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
     listingStatusSpecification(visibility.status),
     listingOwnerSpecification(visibility.ownerUserId),
     listingNeighborhoodSpecification(query.neighborhood ?? null),
-    listingBedroomsSpecification(query.bedrooms ? Number(query.bedrooms) : null),
-    listingMaxRentSpecification(query.maxRent ?? null),
+    bedroomFilter.isAtLeast
+      ? listingBedroomsAtLeastSpecification(bedroomFilter.value)
+      : listingBedroomsSpecification(bedroomFilter.value),
+    bathroomFilter.isAtLeast
+      ? listingBathroomsAtLeastSpecification(bathroomFilter.value)
+      : listingBathroomsSpecification(bathroomFilter.value),
+    listingMinRentSpecification(query.minPrice ?? null),
+    listingMaxRentSpecification(maxRent),
     listingAccessibilitySpecification(query.accessibility),
-    listingSearchSpecification(query.search ?? null),
+    listingSearchSpecification(search),
+    listingAvailableBySpecification(query.moveInDate ?? null),
+    listingFeatureKeysSpecification(selectedFeatures),
   );
 
   const { total, rows, imageRows } = await findListingSummaries({
     where,
     page,
     limit,
+    orderBy: getListingSortOrder(query.sort),
   });
 
   const imageByListingId = new Map<string, string>();
@@ -147,6 +169,54 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
       totalPages: total === 0 ? 0 : Math.ceil(total / limit),
     },
   };
+}
+
+function parseCountFilter(rawValue: string | undefined) {
+  if (!rawValue) {
+    return {
+      isAtLeast: false,
+      value: null,
+    };
+  }
+
+  const isAtLeast = rawValue.endsWith("+");
+  const normalized = isAtLeast ? rawValue.slice(0, -1) : rawValue;
+  const value = Number.parseInt(normalized, 10);
+
+  return {
+    isAtLeast,
+    value: Number.isFinite(value) ? value : null,
+  };
+}
+
+function normalizeQueryFeatures(features: ListingQuery["features"]) {
+  if (!features) {
+    return [];
+  }
+
+  const normalizedFeatures = Array.isArray(features) ? features : features.split(",");
+
+  return normalizedFeatures
+    .map((feature) => feature.trim())
+    .filter((feature) => feature.length > 0);
+}
+
+function getListingSortOrder(sort: ListingQuery["sort"]): SQL<unknown>[] {
+  switch (sort) {
+    case "oldest":
+      return [asc(listings.publishedAt), asc(listings.createdAt)];
+    case "price_asc":
+      return [asc(listings.monthlyRentCents), desc(listings.publishedAt), desc(listings.createdAt)];
+    case "price_desc":
+      return [
+        desc(listings.monthlyRentCents),
+        desc(listings.publishedAt),
+        desc(listings.createdAt),
+      ];
+    case "newest":
+    default:
+      return [desc(listings.publishedAt), desc(listings.createdAt)];
+  }
 }
 
 export async function getListingByIdService(

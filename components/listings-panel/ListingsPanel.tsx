@@ -15,6 +15,7 @@ interface ListingsPanelProps {
   displayMode: DisplayMode;
   filterButtonProps: FilterButtonProps;
   sortOptionProps: { sortOptions: SortOptionsType[]; onChange: (value: string) => void };
+  isLoading?: boolean;
 }
 
 export function ListingsPanel({
@@ -22,6 +23,7 @@ export function ListingsPanel({
   displayMode,
   filterButtonProps,
   sortOptionProps,
+  isLoading = false,
 }: ListingsPanelProps) {
   return (
     <div
@@ -35,6 +37,7 @@ export function ListingsPanel({
         listings={listings}
         filterButtonProps={filterButtonProps}
         sortOptionProps={sortOptionProps}
+        isLoading={isLoading}
       />
       <ListingCardGallery
         listings={listings}
