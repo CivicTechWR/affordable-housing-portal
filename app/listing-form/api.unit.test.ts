@@ -222,4 +222,92 @@ describe("mapListingFormToCreateListingInput", () => {
       utilitiesIncluded: [],
     });
   });
+
+  it("marks unit number as null in autosave payloads when the field is explicitly cleared", () => {
+    expect(
+      mapListingFormToAutosaveUpdateInput({
+        ...CREATE_FORM_DEFAULTS,
+        title: "Draft title",
+        monthlyRentCents: 0,
+        unitNumber: "",
+      }),
+    ).toEqual({
+      title: "Draft title",
+      accessibilityFeatures: [],
+      images: [],
+      status: "draft",
+      unitNumber: null,
+      units: [
+        {
+          bedrooms: 0,
+          bathrooms: 0,
+          rent: 0,
+        },
+      ],
+      utilitiesIncluded: [],
+    });
+  });
+
+  it("preserves explicit unit number clearing on publish updates", () => {
+    const rawInput: ListingFormInput = {
+      ...validFormData,
+      unitNumber: "   ",
+    };
+
+    expect(
+      mapListingFormToUpdateListingInput(
+        {
+          ...validFormData,
+          unitNumber: undefined,
+        },
+        "published",
+        rawInput,
+      ),
+    ).toEqual({
+      title: "Accessible Two Bedroom",
+      name: "Cedar Court",
+      description: undefined,
+      address: {
+        street: "123 Main Street",
+        street2: "Building A",
+        city: "Waterloo",
+        province: "ON",
+        postalCode: "N2L 3A1",
+      },
+      units: [
+        {
+          bedrooms: 2,
+          bathrooms: 1.5,
+          sqft: 920,
+          rent: 1850,
+          availableDate: "2026-05-01",
+        },
+      ],
+      amenities: [],
+      accessibilityFeatures: [
+        {
+          name: "Ramp entry",
+          description: "Step-free building entry",
+        },
+      ],
+      images: [
+        {
+          id: "6ee785fa-7f75-414f-b6e7-c65fb22083b2",
+          caption: "Front exterior",
+        },
+      ],
+      contact: {
+        name: "Leasing Office",
+        email: "leasing@example.org",
+        phone: "519-555-0100",
+      },
+      status: "published",
+      unitNumber: null,
+      propertyType: "Rent",
+      buildingType: "Apartment",
+      unitStory: 2,
+      leaseTerm: "1 year",
+      utilitiesIncluded: ["Heat", "Water"],
+    });
+  });
 });

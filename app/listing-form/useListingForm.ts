@@ -19,7 +19,11 @@ export function useListingForm(initialListingId?: string) {
   const router = useRouter();
   const hasRequestedDraftRef = useRef(false);
   const lastAutosavedPayloadRef = useRef<string | null>(null);
+  const autosaveTimeoutRef = useRef<number | null>(null);
+  const inFlightAutosaveRef = useRef<Promise<void> | null>(null);
   const [activeListingId, setActiveListingId] = useState(initialListingId);
+  const [isAutosaveInFlight, setIsAutosaveInFlight] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [submitFeedback, setSubmitFeedback] = useState<{
     status: "success" | "error";
     message: string;
@@ -54,6 +58,8 @@ export function useListingForm(initialListingId?: string) {
       autosavePayload &&
       autosavePayloadKey &&
       lastAutosavedPayloadRef.current !== autosavePayloadKey &&
+      !isAutosaveInFlight &&
+      !isPublishing &&
       !form.formState.isSubmitting,
     );
   const shouldWarnOnNavigateAway =
@@ -111,30 +117,48 @@ export function useListingForm(initialListingId?: string) {
       return;
     }
 
-    const timeout = window.setTimeout(async () => {
-      try {
-        setAutosaveFeedback("Saving draft...");
-        await editListing({
-          listingId: activeListingId,
-          payload: autosavePayload,
+    const timeout = window.setTimeout(() => {
+      setIsAutosaveInFlight(true);
+      setAutosaveFeedback("Saving draft...");
+
+      const autosavePromise = editListing({
+        listingId: activeListingId,
+        payload: autosavePayload,
+      })
+        .then(() => {
+          lastAutosavedPayloadRef.current = autosavePayloadKey;
+          setAutosaveFeedback("Draft saved");
+        })
+        .catch(() => {
+          setAutosaveFeedback("Unable to autosave draft");
+        })
+        .finally(() => {
+          if (inFlightAutosaveRef.current === autosavePromise) {
+            inFlightAutosaveRef.current = null;
+          }
+          setIsAutosaveInFlight(false);
         });
-        lastAutosavedPayloadRef.current = autosavePayloadKey;
-        setAutosaveFeedback("Draft saved");
-      } catch {
-        setAutosaveFeedback("Unable to autosave draft");
-      }
+
+      inFlightAutosaveRef.current = autosavePromise;
     }, 800);
 
-    return () => window.clearTimeout(timeout);
+    autosaveTimeoutRef.current = timeout;
+
+    return () => {
+      if (autosaveTimeoutRef.current === timeout) {
+        autosaveTimeoutRef.current = null;
+      }
+      window.clearTimeout(timeout);
+    };
   }, [activeListingId, autosavePayload, autosavePayloadKey, editListing, shouldAutosaveDraft]);
 
   useEffect(() => {
-    if (shouldAutosaveDraft) {
+    if (shouldAutosaveDraft || isAutosaveInFlight) {
       return;
     }
 
     setAutosaveFeedback(null);
-  }, [shouldAutosaveDraft]);
+  }, [isAutosaveInFlight, shouldAutosaveDraft]);
 
   useEffect(() => {
     if (!shouldWarnOnNavigateAway) {
@@ -201,6 +225,7 @@ export function useListingForm(initialListingId?: string) {
   const onSubmit = async (data: ListingFormData) => {
     setSubmitFeedback(null);
     setAutosaveFeedback(null);
+    setIsPublishing(true);
 
     try {
       if (!activeListingId) {
@@ -209,9 +234,18 @@ export function useListingForm(initialListingId?: string) {
         );
       }
 
+      if (autosaveTimeoutRef.current !== null) {
+        window.clearTimeout(autosaveTimeoutRef.current);
+        autosaveTimeoutRef.current = null;
+      }
+
+      if (inFlightAutosaveRef.current) {
+        await inFlightAutosaveRef.current;
+      }
+
       await editListing({
         listingId: activeListingId,
-        payload: mapListingFormToUpdateListingInput(data, "published"),
+        payload: mapListingFormToUpdateListingInput(data, "published", watchedValues),
       });
       router.push(`/listings/${activeListingId}`);
       router.refresh();
@@ -221,6 +255,8 @@ export function useListingForm(initialListingId?: string) {
         message:
           error instanceof Error ? error.message : "Unable to save listing. Please try again.",
       });
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -239,7 +275,7 @@ export function useListingForm(initialListingId?: string) {
       (!activeListingId && !initialListingId && !draftBootstrapError) ||
       isFetching,
     isError: isFetchError || Boolean(draftBootstrapError),
-    isSubmitting: isCreatingDraft || isEditing || form.formState.isSubmitting,
+    isSubmitting: isCreatingDraft || isEditing || isPublishing || form.formState.isSubmitting,
     submitFeedback:
       submitFeedback ??
       (draftBootstrapError

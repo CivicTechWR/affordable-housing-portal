@@ -25,6 +25,7 @@ export function mapListingFormToCreateListingInput(data: ListingFormData): Creat
 export function mapListingFormToUpdateListingInput(
   data: ListingFormData,
   status = data.status,
+  rawInput?: ListingFormInput,
 ): UpdateListingInput {
   const {
     applicationMethod: _applicationMethod,
@@ -34,8 +35,13 @@ export function mapListingFormToUpdateListingInput(
     ...buildListingPayloadFromForm(data),
     status,
   };
+  const patch: Record<string, unknown> = payload;
 
-  return updateListingSchema.parse(payload);
+  if (shouldClearOptionalString(rawInput?.unitNumber)) {
+    patch.unitNumber = null;
+  }
+
+  return updateListingSchema.parse(patch);
 }
 
 export function mapListingFormToAutosaveUpdateInput(
@@ -58,7 +64,7 @@ export function mapListingFormToAutosaveUpdateInput(
   assignTrimmedString(contact, "name", data.contactName);
   assignTrimmedString(contact, "email", data.contactEmail);
   assignTrimmedString(contact, "phone", data.contactPhone);
-  assignTrimmedString(patch, "unitNumber", data.unitNumber);
+  assignClearableTrimmedString(patch, "unitNumber", data.unitNumber);
   assignTrimmedString(patch, "propertyType", data.propertyType);
   assignTrimmedString(patch, "buildingType", data.buildingType);
   assignTrimmedString(patch, "leaseTerm", data.leaseTerm);
@@ -235,6 +241,23 @@ function assignTrimmedString(
   if (normalized) {
     target[key] = normalized;
   }
+}
+
+function assignClearableTrimmedString(
+  target: Record<string, unknown>,
+  key: string,
+  value: string | undefined,
+) {
+  if (value === undefined) {
+    return;
+  }
+
+  const normalized = normalizeOptionalString(value);
+  target[key] = normalized ?? null;
+}
+
+function shouldClearOptionalString(value: string | undefined) {
+  return value !== undefined && normalizeOptionalString(value) === undefined;
 }
 
 function getTodayIsoDate() {

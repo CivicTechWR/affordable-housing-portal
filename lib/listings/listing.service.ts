@@ -501,7 +501,8 @@ export async function updateListingByIdService(input: {
       title: input.payload.title ?? listing.title,
       description: input.payload.description ?? listing.description,
       status: nextStatus,
-      unitNumber: input.payload.unitNumber ?? listing.unitNumber,
+      unitNumber:
+        input.payload.unitNumber === undefined ? listing.unitNumber : input.payload.unitNumber,
       bedrooms: primaryUnit?.bedrooms ?? listing.bedrooms,
       bathrooms: primaryUnit?.bathrooms ?? listing.bathrooms,
       squareFeet: primaryUnit?.sqft ?? listing.squareFeet,

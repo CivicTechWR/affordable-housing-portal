@@ -157,6 +157,14 @@ describe("listing API schemas", () => {
     expect(result.data.contact?.email).toBe("leasing@example.com");
   });
 
+  it("allows clearing unit number in partial updates", () => {
+    const result = updateListingSchema.safeParse({
+      unitNumber: null,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
   it("allows optional create fields to be omitted when the form leaves them blank", () => {
     const result = createListingSchema.safeParse({
       ...validCreatePayload,

@@ -189,7 +189,7 @@ const updateListingBasePayloadSchema = z.object({
   images: z.array(listingUploadedImageInputSchema).optional(),
   contact: listingContactPatchSchema.optional(),
   status: listingStatusSchema.optional(),
-  unitNumber: nonEmptyString.optional(),
+  unitNumber: z.union([nonEmptyString, z.null()]).optional(),
   propertyType: nonEmptyString.optional(),
   buildingType: nonEmptyString.optional(),
   unitStory: z.number().optional(),
