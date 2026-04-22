@@ -5,6 +5,10 @@ import { asc, desc, type SQL } from "drizzle-orm";
 import { listings, type ListingCustomFields } from "@/db/schema";
 import type { getOptionalSession } from "@/lib/auth/session";
 import {
+  buildListingFeatureDefinitionLookup,
+  normalizeListingFeatureToken,
+} from "@/lib/listings/listing-feature-definitions";
+import {
   buildListingFeatureCategories,
   buildListingCustomFields,
   centsToDollars,
@@ -12,6 +16,7 @@ import {
   formatListingAddress,
   getListingImageUrl,
   formatListingTimeAgo,
+  getDisplayAccessibilityFeatures,
   getEnabledBooleanCustomFieldKeys,
   getListingCoordinates,
   getListingSquareFeet,
@@ -34,7 +39,7 @@ import {
   listingBathroomsSpecification,
   listingBedroomsAtLeastSpecification,
   listingBedroomsSpecification,
-  listingFeatureKeysSpecification,
+  listingFeatureDefinitionsSpecification,
   listingMinRentSpecification,
   listingMaxRentSpecification,
   listingNeighborhoodSpecification,
@@ -49,10 +54,9 @@ import {
   findListingImagesByListingIds,
   findListingImagesByListingId,
   findOwnerListings,
-  findPublicBooleanFeatureDefinitions,
   findListingRecordById,
   findListingSummaries,
-  findPublicFeatureDefinitionsByKeys,
+  findPublicBooleanFeatureDefinitions,
   updateListingGraph,
   type ListingRecord,
 } from "@/lib/listings/listing.repository";
@@ -114,6 +118,11 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
     };
   }
 
+  const publicBooleanDefinitions = await findPublicBooleanFeatureDefinitions();
+  const selectedFeatureDefinitions = publicBooleanDefinitions.filter((definition) =>
+    selectedFeatures.includes(definition.key),
+  );
+
   const where = andListingSpecifications(
     listingStatusSpecification(visibility.status),
     listingOwnerSpecification(visibility.ownerUserId),
@@ -129,7 +138,7 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
     listingAccessibilitySpecification(query.accessibility),
     listingSearchSpecification(search),
     listingAvailableBySpecification(query.moveInDate ?? null),
-    listingFeatureKeysSpecification(selectedFeatures),
+    listingFeatureDefinitionsSpecification(selectedFeatureDefinitions),
   );
 
   const { total, rows, imageRows } = await findListingSummaries({
@@ -149,7 +158,10 @@ export async function getListingsService(query: ListingQuery): Promise<ListingLi
   return {
     data: rows.map((row) => {
       const coordinates = getListingCoordinates(row.latitude, row.longitude);
-      const accessibilityFeatures = getStoredAccessibilityFeatures(row.customFields);
+      const accessibilityFeatures = getDisplayAccessibilityFeatures(
+        row.customFields,
+        publicBooleanDefinitions,
+      );
       const listingSummary = {
         id: row.id,
         price: centsToDollars(row.monthlyRentCents),
@@ -616,9 +628,7 @@ function toListingActor(optionalSession: OptionalSessionResult): ListingActor {
 
 async function buildListingDetailsResponse(listing: ListingRecord): Promise<ListingDetails> {
   const imageRows = await findListingImagesByListingId(listing.id);
-
-  const enabledDefinitionKeys = getEnabledBooleanCustomFieldKeys(listing.customFields);
-  const featureDefinitions = await findPublicFeatureDefinitionsByKeys(enabledDefinitionKeys);
+  const featureDefinitions = await findPublicBooleanFeatureDefinitions();
 
   return {
     id: listing.id,
@@ -635,7 +645,10 @@ async function buildListingDetailsResponse(listing: ListingRecord): Promise<List
     beds: listing.bedrooms,
     baths: listing.bathrooms,
     sqft: getListingSquareFeet(listing.squareFeet, listing.customFields),
-    accessibilityFeatures: getStoredAccessibilityFeatures(listing.customFields),
+    accessibilityFeatures: getDisplayAccessibilityFeatures(
+      listing.customFields,
+      featureDefinitions,
+    ),
     images: imageRows.map((image) => ({
       url: getListingImageUrl(image.id, image.imageUrl),
       caption: image.altText ?? `${listing.title} image`,
@@ -659,16 +672,11 @@ async function buildListingEditorData(listing: ListingRecord): Promise<ListingEd
   const primaryUnit = storedUnits[0];
   const enabledDefinitionKeys = getEnabledBooleanCustomFieldKeys(listing.customFields);
   const publicBooleanDefinitions = await findPublicBooleanFeatureDefinitions();
-  const definitionByKey = new Map(
-    publicBooleanDefinitions.map((definition) => [definition.key, definition]),
-  );
-  const definitionByLabel = new Map(
-    publicBooleanDefinitions.map((definition) => [definition.label.toLowerCase(), definition]),
-  );
+  const featureDefinitionLookup = buildListingFeatureDefinitionLookup(publicBooleanDefinitions);
   const customFeatures = new Map<string, ListingEditorData["customFeatures"][number]>();
 
   for (const key of enabledDefinitionKeys) {
-    const definition = definitionByKey.get(key);
+    const definition = featureDefinitionLookup.byKey.get(key);
 
     if (!definition) {
       continue;
@@ -683,7 +691,9 @@ async function buildListingEditorData(listing: ListingRecord): Promise<ListingEd
   }
 
   for (const feature of getStoredAccessibilityFeatures(listing.customFields)) {
-    const definition = definitionByLabel.get(feature.name.toLowerCase());
+    const definition =
+      (feature.id ? featureDefinitionLookup.byKey.get(feature.id) : undefined) ??
+      featureDefinitionLookup.byToken.get(normalizeListingFeatureToken(feature.name));
     const featureId = definition?.key ?? slugifyFeatureName(feature.name);
 
     if (!customFeatures.has(featureId)) {

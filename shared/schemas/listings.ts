@@ -50,6 +50,7 @@ export const listingQuerySchema = z.object({
 });
 
 export const listingFeatureSchema = z.object({
+  id: z.string().optional(),
   name: nonEmptyString,
   description: nonEmptyString,
 });

@@ -109,6 +109,7 @@ export function mapListingFormToAutosaveUpdateInput(
 
   patch.utilitiesIncluded = data.utilitiesIncluded ?? [];
   patch.accessibilityFeatures = (data.customFeatures ?? []).map((feature) => ({
+    id: feature.id,
     name: feature.name,
     description: normalizeOptionalString(feature.description) ?? feature.name,
   }));
@@ -192,6 +193,7 @@ function buildListingPayloadFromForm(data: ListingFormData) {
     ],
     amenities: [],
     accessibilityFeatures: (data.customFeatures ?? []).map((feature) => ({
+      id: feature.id,
       name: feature.name,
       description: normalizeOptionalString(feature.description) ?? feature.name,
     })),

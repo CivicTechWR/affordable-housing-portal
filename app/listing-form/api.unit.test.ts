@@ -77,6 +77,7 @@ describe("mapListingFormToCreateListingInput", () => {
       amenities: [],
       accessibilityFeatures: [
         {
+          id: "ramp_entry",
           name: "Ramp entry",
           description: "Step-free building entry",
         },
@@ -119,6 +120,7 @@ describe("mapListingFormToCreateListingInput", () => {
       }).accessibilityFeatures,
     ).toEqual([
       {
+        id: "ramp_entry",
         name: "Ramp entry",
         description: "Ramp entry",
       },
@@ -161,6 +163,7 @@ describe("mapListingFormToCreateListingInput", () => {
       amenities: [],
       accessibilityFeatures: [
         {
+          id: "ramp_entry",
           name: "Ramp entry",
           description: "Step-free building entry",
         },
@@ -286,6 +289,7 @@ describe("mapListingFormToCreateListingInput", () => {
       amenities: [],
       accessibilityFeatures: [
         {
+          id: "ramp_entry",
           name: "Ramp entry",
           description: "Step-free building entry",
         },
