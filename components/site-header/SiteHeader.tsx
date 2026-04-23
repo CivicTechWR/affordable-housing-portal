@@ -1,14 +1,12 @@
 import Link from "next/link";
 
-import { auth } from "@/auth";
 import { HeaderAccountMenu } from "@/components/site-header/HeaderAccountMenu";
 import { HeaderBreadcrumbs } from "@/components/site-header/HeaderBreadcrumbs";
 import { HeaderMobileMenu } from "@/components/site-header/HeaderMobileMenu";
 import { getOptionalSession } from "@/lib/auth/session";
 
 export async function SiteHeader() {
-  const rawSession = await auth();
-  const optionalSession = await getOptionalSession(rawSession);
+  const optionalSession = await getOptionalSession();
   const session = optionalSession.session;
   const isSignedIn = Boolean(session?.user);
   const canCreateListing =
