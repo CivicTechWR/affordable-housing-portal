@@ -12,7 +12,6 @@ import type {
   CustomListingFieldDefinition,
   CustomListingFieldListResponse,
   CustomListingFieldQuery,
-  CustomListingFieldType,
 } from "@/shared/schemas/custom-listing-fields";
 
 function slugifyCategory(category: string): string {
@@ -68,18 +67,16 @@ export async function getCustomListingFieldsService(
       });
     }
 
-    const group = groups.get(groupId);
-    if (group) {
-      group.options.push({
-        id: row.key,
-        label: row.label,
-        type: row.fieldType as CustomListingFieldType,
-        description: row.description ?? undefined,
-        helpText: row.helpText ?? undefined,
-        placeholder: row.placeholder ?? undefined,
-        selectableOptions: row.options ?? undefined,
-      });
-    }
+    const group = groups.get(groupId)!;
+    group.options.push({
+      id: row.key,
+      label: row.label,
+      type: row.fieldType,
+      description: row.description ?? undefined,
+      helpText: row.helpText ?? undefined,
+      placeholder: row.placeholder ?? undefined,
+      selectableOptions: row.options ?? undefined,
+    });
   }
 
   return {

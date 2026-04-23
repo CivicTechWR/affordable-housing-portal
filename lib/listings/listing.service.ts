@@ -204,11 +204,10 @@ function parseCountFilter(rawValue: string | undefined) {
 
   const isAtLeast = rawValue.endsWith("+");
   const normalized = isAtLeast ? rawValue.slice(0, -1) : rawValue;
-  const value = Number.parseInt(normalized, 10);
 
   return {
     isAtLeast,
-    value: Number.isFinite(value) ? value : null,
+    value: Number.parseInt(normalized, 10),
   };
 }
 
@@ -401,16 +400,7 @@ export async function createListingService(
   }
 
   const primaryUnit = payload.units[0];
-
-  if (!primaryUnit) {
-    return fail("validation", "At least one unit is required");
-  }
-
-  const primaryUnitRentCents = dollarsToCents(primaryUnit.rent);
-
-  if (primaryUnitRentCents === null) {
-    return fail("validation", "Primary unit rent is required.");
-  }
+  const primaryUnitRentCents = Math.round(primaryUnit.rent * 100);
 
   const statusTimestamps = resolveListingStatusTimestamps(payload.status);
   const customFields = buildListingCustomFields(payload);
