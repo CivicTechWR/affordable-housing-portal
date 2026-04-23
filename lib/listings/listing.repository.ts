@@ -488,10 +488,6 @@ export async function createListing(input: {
 
     const primaryUnit = input.payload.units[0];
 
-    if (!primaryUnit) {
-      throw new Error("At least one unit is required.");
-    }
-
     const [listing] = await tx
       .insert(listings)
       .values({

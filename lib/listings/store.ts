@@ -461,7 +461,6 @@ function mergeStoredUnits(
   existing: StoredUnit[],
   updates: NonNullable<UpdateListingInput["units"]>,
 ) {
-  // Omitted trailing indexes are untouched; use `null` at an index to remove a stored unit.
   return Array.from({ length: Math.max(existing.length, updates.length) }, (_, index) => {
     const update = updates[index];
 
@@ -475,9 +474,7 @@ function mergeStoredUnits(
       ...existing[index],
       ...update,
     };
-  })
-    .filter((_, index) => updates[index] !== null)
-    .filter((unit) => Object.keys(unit).length > 0);
+  }).filter((unit) => Object.keys(unit).length > 0);
 }
 
 function isRecord(value: ListingCustomFieldValue | unknown): value is Record<string, unknown> {

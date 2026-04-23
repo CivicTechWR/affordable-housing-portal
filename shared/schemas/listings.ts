@@ -223,7 +223,7 @@ const listingPayloadSchema = z.object({
   name: nonEmptyString,
   description: optionalTrimmedString(),
   address: listingAddressSchema,
-  units: z.array(listingUnitSchema).min(1, "At least one unit is required."),
+  units: z.tuple([listingUnitSchema], listingUnitSchema),
   amenities: z.array(nonEmptyString),
   accessibilityFeatures: z.array(listingFeatureSchema),
   applicationMethod: listingApplicationMethodSchema,
