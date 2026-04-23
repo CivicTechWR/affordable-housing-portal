@@ -251,6 +251,36 @@ describe("mapListingFormToCreateListingInput", () => {
     });
   });
 
+  it("omits invalid in-progress contact emails from autosave payloads", () => {
+    expect(
+      mapListingFormToAutosaveUpdateInput({
+        ...CREATE_FORM_DEFAULTS,
+        title: "Draft title",
+        contactName: "Leasing Office",
+        contactEmail: "leasing@",
+        contactPhone: "519-555-0100",
+        monthlyRentCents: 0,
+      }),
+    ).toEqual({
+      title: "Draft title",
+      contact: {
+        name: "Leasing Office",
+        phone: "519-555-0100",
+      },
+      accessibilityFeatures: [],
+      images: [],
+      status: "draft",
+      units: [
+        {
+          bedrooms: 0,
+          bathrooms: 0,
+          rent: 0,
+        },
+      ],
+      utilitiesIncluded: [],
+    });
+  });
+
   it("preserves explicit unit number clearing on publish updates", () => {
     const rawInput: ListingFormInput = {
       ...validFormData,
