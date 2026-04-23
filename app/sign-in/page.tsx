@@ -2,9 +2,11 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { SignInForm } from "@/components/auth/SignInForm";
+import { getOptionalSession } from "@/lib/auth/session";
 
 export default async function SignInPage() {
-  const session = await auth();
+  const rawSession = await auth();
+  const { session } = await getOptionalSession(rawSession);
 
   if (session?.user) {
     redirect("/");
