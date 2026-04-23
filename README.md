@@ -6,28 +6,47 @@ Affordable Housing Portal is [Civic Tech Waterloo Region](https://github.com/Civ
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-The platform is a [Next.js](https://nextjs.org) application using the App Router, [shadcn/ui](https://ui.shadcn.com) components, and [Tailwind CSS](https://tailwindcss.com) for styling.
+The platform is a [Next.js](https://nextjs.org) App Router application using React 19, [Tailwind CSS](https://tailwindcss.com), [shadcn/ui](https://ui.shadcn.com) components, NextAuth credentials auth, Drizzle ORM, and Postgres.
+
+Current user-facing areas include:
+
+- public listing search and listing detail pages
+- partner/admin listing authoring, draft autosave, image uploads, and "My Listings"
+- admin user invites and account management
+- admin-configurable custom listing fields that can drive public filters
 
 ## Repository Structure
 
 ```
-app/                  → Pages and API routes (Next.js App Router)
+app/                  → Pages, layouts, server actions, and API route handlers
+├── admin/            → Admin account and custom listing field pages
 ├── api/
-│   ├── listings/     → Listing CRUD endpoints
-│   └── admin/        → Admin account management endpoints
-├── listings/         → Listing browse/search page
-└── page.tsx          → Landing page
+│   ├── admin/        → Admin account, invite, and custom field endpoints
+│   ├── auth/         → NextAuth route handler
+│   ├── custom-listing-fields/
+│   ├── image-uploads/
+│   ├── listing-drafts/
+│   └── listings/     → Listing read/write endpoints
+├── listing-form/     → Create/edit listing workflow
+├── listings/         → Public listing browse/search and detail pages
+├── my-listings/      → Partner/admin listing management
+├── sign-in/          → Credentials sign-in
+└── page.tsx          → Redirects housing seekers to /listings
 
 components/           → React components
 ├── ui/               → shadcn/ui primitives (button, card, input, etc.)
-├── listing-filter/   → Search and filter controls
-├── listings-sidebar/ → Sidebar listing results
+├── listing-form-*    → Listing authoring form sections
+├── listing-filter*/  → Search and filter controls
+├── listings-panel/   → Listing results panel
 ├── map-view/         → Map display
-├── search-header/    → Search bar
+├── site-header/      → Header and account menu
 └── ...               → Other shared components
 
-lib/                  → Utilities
+db/                   → Drizzle schema, client, and seed data
+drizzle/              → Generated SQL migrations and snapshots
+lib/                  → Domain services, repositories, auth, policies, utilities
 shared/               → Shared runtime schemas and TypeScript types
+test/                 → Test-only mocks and helpers
 ```
 
 ## Shared Schemas and Types
@@ -36,6 +55,7 @@ Use `shared/schemas/*.ts` for contracts that must stay consistent across fronten
 
 - Define request/response contracts once with `zod`.
 - Export inferred TypeScript types with `z.infer<typeof schema>`.
+- API route handlers use these schemas with `next-rest-framework` where applicable.
 
 ## Quick Start
 
@@ -51,6 +71,20 @@ npm install
 ```
 
 ### Run Locally
+
+Copy the example environment file and set values as needed:
+
+```bash
+cp .env.example .env.local
+```
+
+For a local Postgres instance, `DATABASE_URL` must point at that database. If you use the Docker Compose database from this repo, the host port is `5433` by default:
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/affordable_housing_portal
+```
+
+Install dependencies, then run the app:
 
 ```bash
 npm run dev
@@ -83,39 +117,57 @@ npm run docker:down:volumes
 
 ## Database
 
-The app now includes a Drizzle + Postgres schema for users, listings, saved listings, saved searches, and admin-configurable listing fields.
+The app includes a Drizzle + Postgres schema for users, invites, properties, listings, listing images, saved listings, saved searches, and admin-configurable listing fields.
 
 1. Copy `.env.example` to `.env.local` or provide `DATABASE_URL` through Infisical.
 2. Generate migrations after schema changes with `npm run db:generate`.
 3. Apply migrations with `npm run db:migrate`.
 4. Inspect the schema with `npm run db:studio`.
+5. Seed local data with `npm run db:seed`.
 
 When using Docker Compose, `db:migrate` and `db:seed` are run automatically when the app container starts.
 
 If you set `ADMIN_PASSWORD`, the app enables a one-time bootstrap admin sign-in for `ADMIN_EMAIL` (default `admin@example.com`) until an admin user has a stored local password. This is intended for first-run setup and local/dev recovery from external-auth-only data.
 
+## Development Commands
+
+```bash
+npm run typecheck
+npm run lint
+npm run format:check
+npm test
+npm run test:unit
+npm run test:integration
+```
+
+Use `npm run format` and `npm run lint:fix` for automatic formatting and lint fixes.
+
+## Architecture Notes
+
+- Public listing search is server-first: `app/listings/page.tsx` calls shared listing services directly for the initial render, while client-side filter refinements fetch `/api/listings`.
+- Route handlers should remain thin and delegate business logic to services under `lib/`.
+- Authorization is enforced through NextAuth in `auth.ts` and `proxy.ts`. Admin pages/API routes require an active admin user; listing writes require an active admin or partner user.
+- Keep cross-boundary contracts in `shared/schemas/` so page code, services, route handlers, and tests use the same validation rules.
+
 ## Contributing
 
-Contributions are welcomed! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to participate. By contributing, you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.md).
+Contributions are welcomed. This repository does not currently include separate `CONTRIBUTING.md` or `CODE_OF_CONDUCT.md` files, so use the workflow below unless project maintainers provide more specific guidance.
 
 ### Issue Tracking
 
-Development tasks are managed through [GitHub Issues](https://github.com/CivicTechWR/affordable-housing-portal/issues). Please feel free to submit issues even if you don't plan on implementing them yourself. Before creating an issue, check first to see if one already exists. When creating an issue, fill out all provided fields and add as much information as possible, including screenshots where helpful.
+Development tasks are managed through [GitHub Issues](https://github.com/CivicTechWR/affordable-housing-portal/issues). Please feel free to submit issues even if you don't plan on implementing them yourself. Before creating an issue, check first to see if one already exists. Include as much information as possible, including screenshots where helpful.
 
 ### Committing
 
-We use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/). You can either:
-
-- Globally install commitizen (`npm install -g commitizen`) and commit with `git cz` for a guided experience, or
-- Run `git commit` with your own message — the linter will fail if it doesn't follow the conventional standard.
+The Husky pre-commit hook runs secret scanning, `lint-staged`, and `npm run typecheck`. The pre-push hook runs `npm run build`.
 
 ### Pull Requests
 
-Pull requests are opened to the `main` branch. When opening a PR, fill out the pull request template, including:
+Pull requests are opened to the `main` branch. The CI workflow currently runs:
 
-- Linking the related issue
-- A description of your changes
-- Instructions for reviewers on how to test
-- The testing checklist
+- `npm run lint`
+- `npm run format:check`
+- `npm test`
+- `npm run build`
 
-Label your PR `needs review(s)` when ready, or `wip` if it's still in progress.
+When opening a PR, include the related issue, a description of the change, and testing notes for reviewers.
