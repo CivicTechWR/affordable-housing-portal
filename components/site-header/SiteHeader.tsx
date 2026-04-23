@@ -10,6 +10,7 @@ export async function SiteHeader() {
   const rawSession = await auth();
   const optionalSession = await getOptionalSession(rawSession);
   const session = optionalSession.session;
+  const isSignedIn = Boolean(session?.user);
   const canCreateListing =
     optionalSession.authzUser?.role === "admin" || optionalSession.authzUser?.role === "partner";
   const navPillClass =
@@ -24,7 +25,7 @@ export async function SiteHeader() {
           </Link>
 
           <nav className="absolute right-0 hidden items-center gap-2 lg:flex">
-            {rawSession?.user ? (
+            {isSignedIn ? (
               <>
                 {canCreateListing ? (
                   <>
@@ -55,7 +56,7 @@ export async function SiteHeader() {
           </nav>
 
           <HeaderMobileMenu
-            isSignedIn={Boolean(rawSession?.user)}
+            isSignedIn={isSignedIn}
             isAdmin={optionalSession.authzUser?.role === "admin"}
             canCreateListing={canCreateListing}
             user={session?.user ?? null}
