@@ -40,7 +40,7 @@ export function useListingForm(initialListingId?: string) {
     data: initialData,
     isLoading: isFetching,
     isError: isFetchError,
-  } = useGetListingQuery(activeListingId);
+  } = useGetListingQuery(initialListingId);
   const { createDraftListing, isLoading: isCreatingDraft } = useCreateDraftListingQuery();
   const { editListing, isLoading: isEditing } = useEditListingQuery();
   const autosavePayload = mapListingFormToAutosaveUpdateInput(
@@ -63,13 +63,10 @@ export function useListingForm(initialListingId?: string) {
   const shouldWarnOnNavigateAway =
     isPublishedEditMode && form.formState.isDirty && !form.formState.isSubmitting;
 
-  const activateDraftListing = useCallback(
-    (listingId: string) => {
-      setActiveListingId(listingId);
-      router.replace(`/listing-form/${listingId}`);
-    },
-    [router],
-  );
+  const activateDraftListing = useCallback((listingId: string) => {
+    setActiveListingId(listingId);
+    window.history.replaceState(null, "", `/listing-form/${listingId}`);
+  }, []);
 
   const createDraftListingId = useCallback(async (): Promise<string> => {
     if (activeListingId) {
