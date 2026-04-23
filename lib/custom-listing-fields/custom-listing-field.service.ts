@@ -59,13 +59,15 @@ export async function getCustomListingFieldsService(
 
     const groupLabel = formatCustomListingFieldCategoryLabel(row.category);
 
-    const group = groups.get(groupId) ?? {
-      groupId,
-      groupLabel,
-      options: [],
-    };
+    if (!groups.has(groupId)) {
+      groups.set(groupId, {
+        groupId,
+        groupLabel,
+        options: [],
+      });
+    }
 
-    groups.set(groupId, group);
+    const group = groups.get(groupId)!;
     group.options.push({
       id: row.key,
       label: row.label,
