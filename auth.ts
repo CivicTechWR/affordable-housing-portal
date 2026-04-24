@@ -88,29 +88,35 @@ const authConfig = {
     },
     async authorized({ auth: currentAuth, request }) {
       const pathname = request.nextUrl.pathname;
+      const requiresListingAccess =
+        pathname.startsWith("/listings") || pathname.startsWith("/api/listings");
       const requiresAdminAccess =
         pathname.startsWith("/api/admin") || pathname.startsWith("/admin");
       const requiresListingWriteAccess =
         pathname.startsWith("/api/listings") && request.method !== "GET";
-      const requiresRoleCheck = requiresAdminAccess || requiresListingWriteAccess;
+      const requiresSessionCheck = requiresListingAccess || requiresAdminAccess;
 
       if (!currentAuth?.user?.id) {
-        return !requiresRoleCheck;
+        return !requiresSessionCheck;
       }
 
-      if (!requiresRoleCheck) {
+      if (!requiresSessionCheck) {
         return true;
       }
 
       const authzUser = await getUserForSession(currentAuth.user.id);
       const isActiveUser = authzUser ? isUserAllowedToSignIn(authzUser.status) : false;
 
+      if (!isActiveUser) {
+        return false;
+      }
+
       if (requiresAdminAccess) {
-        return isActiveUser && authzUser?.role === "admin";
+        return authzUser?.role === "admin";
       }
 
       if (requiresListingWriteAccess) {
-        return isActiveUser && (authzUser?.role === "admin" || authzUser?.role === "partner");
+        return authzUser?.role === "admin" || authzUser?.role === "partner";
       }
 
       return true;
