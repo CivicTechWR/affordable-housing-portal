@@ -3,6 +3,7 @@
 import { AuthError } from "next-auth";
 
 import { signIn } from "@/auth";
+import { signInSchema } from "@/lib/auth/validation";
 
 type SignInState = {
   error: string;
@@ -12,10 +13,19 @@ export async function signInWithPassword(
   _state: SignInState,
   formData: FormData,
 ): Promise<SignInState> {
+  const parsed = signInSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
+
+  if (!parsed.success) {
+    return { error: "Invalid email or password." };
+  }
+
   try {
     await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
+      email: parsed.data.email,
+      password: parsed.data.password,
       redirectTo: "/",
     });
   } catch (error) {
