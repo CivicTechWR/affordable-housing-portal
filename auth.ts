@@ -94,8 +94,7 @@ const authConfig = {
       const requiresAdminAccess =
         pathname.startsWith("/api/admin") || pathname.startsWith("/admin");
       const requiresListingWriteAccess =
-        (pathname.startsWith("/api/listings") && request.method !== "GET") ||
-        requiresListingAuthorAccess;
+        pathname.startsWith("/api/listings") && request.method !== "GET";
       const requiresSessionCheck =
         requiresListingAccess || requiresListingAuthorAccess || requiresAdminAccess;
 
