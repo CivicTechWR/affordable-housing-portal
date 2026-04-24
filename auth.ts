@@ -90,11 +90,14 @@ const authConfig = {
       const pathname = request.nextUrl.pathname;
       const requiresListingAccess =
         pathname.startsWith("/listings") || pathname.startsWith("/api/listings");
+      const requiresListingAuthorAccess = pathname.startsWith("/listing-form");
       const requiresAdminAccess =
         pathname.startsWith("/api/admin") || pathname.startsWith("/admin");
       const requiresListingWriteAccess =
-        pathname.startsWith("/api/listings") && request.method !== "GET";
-      const requiresSessionCheck = requiresListingAccess || requiresAdminAccess;
+        (pathname.startsWith("/api/listings") && request.method !== "GET") ||
+        requiresListingAuthorAccess;
+      const requiresSessionCheck =
+        requiresListingAccess || requiresListingAuthorAccess || requiresAdminAccess;
 
       if (!currentAuth?.user?.id) {
         return !requiresSessionCheck;
