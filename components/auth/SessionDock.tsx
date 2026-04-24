@@ -1,7 +1,8 @@
 import Link from "next/link";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { signOutFromHeader } from "@/components/site-header/actions";
 import { getOptionalSession } from "@/lib/auth/session";
 
 export async function SessionDock() {
@@ -19,13 +20,7 @@ export async function SessionDock() {
                 {session.user.name ?? session.user.email}
               </span>
             ) : null}
-            <form
-              action={async () => {
-                "use server";
-
-                await signOut({ redirectTo: "/" });
-              }}
-            >
+            <form action={signOutFromHeader}>
               <Button type="submit" variant="ghost" size="sm" className="rounded-full px-3">
                 Sign out
               </Button>
