@@ -18,11 +18,16 @@ const initialState = {
   error: "",
 };
 
-export function SignInForm() {
+type SignInFormProps = {
+  callbackUrl: string;
+};
+
+export function SignInForm({ callbackUrl }: SignInFormProps) {
   const [state, action, pending] = useActionState(signInWithPassword, initialState);
 
   return (
     <form action={action}>
+      <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <Card className="w-full max-w-md border border-border/80 shadow-xl shadow-black/5">
         <CardHeader className="border-b border-border/60">
           <CardTitle>Sign in</CardTitle>

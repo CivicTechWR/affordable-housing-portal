@@ -3,6 +3,7 @@
 import { AuthError } from "next-auth";
 
 import { signIn } from "@/auth";
+import { getSafeCallbackPath } from "@/lib/auth/callback-url";
 import { signInSchema } from "@/lib/auth/validation";
 
 type SignInState = {
@@ -26,7 +27,7 @@ export async function signInWithPassword(
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: "/",
+      redirectTo: getSafeCallbackPath(formData.get("callbackUrl")),
     });
   } catch (error) {
     if (error instanceof AuthError) {
