@@ -70,6 +70,8 @@ export function BulkEditDialog({
   };
 
   const preventDismissWhileSaving = (event: Event) => {
+    event.stopPropagation();
+
     if (isSaving) {
       event.preventDefault();
     }

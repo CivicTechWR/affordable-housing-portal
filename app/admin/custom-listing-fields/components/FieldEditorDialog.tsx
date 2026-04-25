@@ -134,6 +134,8 @@ export function FieldEditorDialog({
   };
 
   const handleDismiss = (event: Event) => {
+    event.stopPropagation();
+
     if (isSaving) {
       event.preventDefault();
       return;

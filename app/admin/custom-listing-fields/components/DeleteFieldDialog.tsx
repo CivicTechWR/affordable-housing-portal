@@ -30,6 +30,8 @@ export function DeleteFieldDialog({
   };
 
   const preventDismissWhileDeleting = (event: Event) => {
+    event.stopPropagation();
+
     if (isDeleting) {
       event.preventDefault();
     }
