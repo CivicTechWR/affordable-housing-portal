@@ -61,10 +61,27 @@ export function BulkEditDialog({
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isSaving) {
+      onClose();
+    }
+  };
+
+  const preventDismissWhileSaving = (event: Event) => {
+    if (isSaving) {
+      event.preventDefault();
+    }
+  };
+
   return (
-    <DialogOverlay>
+    <DialogOverlay open onOpenChange={handleOpenChange}>
       <Form {...form}>
-        <DialogFormPanel className="max-w-xl" onSubmit={form.handleSubmit(handleSubmit)}>
+        <DialogFormPanel
+          className="max-w-xl"
+          onSubmit={form.handleSubmit(handleSubmit)}
+          onEscapeKeyDown={preventDismissWhileSaving}
+          onInteractOutside={preventDismissWhileSaving}
+        >
           <DialogHeader>
             <DialogTitle>Bulk Edit Fields</DialogTitle>
             <DialogDescription>

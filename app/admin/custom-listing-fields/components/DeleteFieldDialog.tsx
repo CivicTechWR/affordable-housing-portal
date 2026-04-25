@@ -20,9 +20,24 @@ export function DeleteFieldDialog({
   onClose: () => void;
   onConfirm: () => void;
 }) {
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isDeleting) {
+      onClose();
+    }
+  };
+
+  const preventDismissWhileDeleting = (event: Event) => {
+    if (isDeleting) {
+      event.preventDefault();
+    }
+  };
+
   return (
-    <DialogOverlay>
-      <DialogPanel>
+    <DialogOverlay open onOpenChange={handleOpenChange}>
+      <DialogPanel
+        onEscapeKeyDown={preventDismissWhileDeleting}
+        onInteractOutside={preventDismissWhileDeleting}
+      >
         <DialogHeader>
           <DialogTitle>Delete Custom Field</DialogTitle>
           <DialogDescription className="mt-2">
