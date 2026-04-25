@@ -69,7 +69,7 @@ export function BulkEditDialog({
     }
   };
 
-  const preventDismissWhileSaving = (event: Event) => {
+  const handleDismiss = (event: Event) => {
     event.stopPropagation();
 
     if (isSaving) {
@@ -84,8 +84,8 @@ export function BulkEditDialog({
           className="max-w-xl"
           onSubmit={form.handleSubmit(handleSubmit)}
           onCloseAutoFocus={restoreFocusToOpener}
-          onEscapeKeyDown={preventDismissWhileSaving}
-          onInteractOutside={preventDismissWhileSaving}
+          onEscapeKeyDown={handleDismiss}
+          onInteractOutside={handleDismiss}
         >
           <DialogHeader>
             <DialogTitle>Bulk Edit Fields</DialogTitle>

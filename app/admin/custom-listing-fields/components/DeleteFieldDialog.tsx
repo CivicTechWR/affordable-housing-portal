@@ -29,7 +29,7 @@ export function DeleteFieldDialog({
     }
   };
 
-  const preventDismissWhileDeleting = (event: Event) => {
+  const handleDismiss = (event: Event) => {
     event.stopPropagation();
 
     if (isDeleting) {
@@ -41,8 +41,8 @@ export function DeleteFieldDialog({
     <DialogOverlay open onOpenChange={handleOpenChange}>
       <DialogPanel
         onCloseAutoFocus={restoreFocusToOpener}
-        onEscapeKeyDown={preventDismissWhileDeleting}
-        onInteractOutside={preventDismissWhileDeleting}
+        onEscapeKeyDown={handleDismiss}
+        onInteractOutside={handleDismiss}
       >
         <DialogHeader>
           <DialogTitle>Delete Custom Field</DialogTitle>
