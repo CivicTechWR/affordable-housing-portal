@@ -8,6 +8,8 @@ import { formatDistance } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertBanner } from "@/components/ui/alert-banner";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type MyListingItem = {
   id: string;
@@ -147,8 +149,10 @@ export function MyListingsClient({ initialListings, renderedAt }: MyListingsClie
   if (listings.length === 0) {
     return (
       <Card>
-        <CardContent className="py-10 text-sm text-muted-foreground">
-          No listings yet. Start a draft to begin publishing inventory.
+        <CardContent>
+          <EmptyState size="spacious" className="border-0">
+            No listings yet. Start a draft to begin publishing inventory.
+          </EmptyState>
         </CardContent>
       </Card>
     );
@@ -157,9 +161,9 @@ export function MyListingsClient({ initialListings, renderedAt }: MyListingsClie
   return (
     <div className="space-y-4">
       {mutationError ? (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+        <AlertBanner variant="error" size="default" className="rounded-lg">
           {mutationError}
-        </div>
+        </AlertBanner>
       ) : null}
 
       <div className="grid gap-4">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { AppPageShell, PageMessage } from "@/components/page-shell/AppPageShell";
 import { getOptionalSession } from "@/lib/auth/session";
 import { getMyListingsService } from "@/lib/listings/listing.service";
 import { MyListingsClient } from "./MyListingsClient";
@@ -16,25 +17,29 @@ export default async function MyListingsPage() {
 
   if (!session?.user) {
     return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/40 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-5xl rounded-xl border bg-background p-6">
-          <h1 className="text-2xl font-semibold">My Listings</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in to manage your listings.</p>
-        </div>
-      </main>
+      <PageMessage
+        title="My Listings"
+        width="5xl"
+        className="bg-muted/40 px-4 py-8 sm:px-6"
+        contentClassName="rounded-xl"
+        titleClassName="text-2xl"
+      >
+        Sign in to manage your listings.
+      </PageMessage>
     );
   }
 
   if (authzUser?.role !== "admin" && authzUser?.role !== "partner") {
     return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/40 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-5xl rounded-xl border bg-background p-6">
-          <h1 className="text-2xl font-semibold">My Listings</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Only partner and admin accounts can manage listings.
-          </p>
-        </div>
-      </main>
+      <PageMessage
+        title="My Listings"
+        width="5xl"
+        className="bg-muted/40 px-4 py-8 sm:px-6"
+        contentClassName="rounded-xl"
+        titleClassName="text-2xl"
+      >
+        Only partner and admin accounts can manage listings.
+      </PageMessage>
     );
   }
 
@@ -42,17 +47,21 @@ export default async function MyListingsPage() {
 
   if (!result.ok) {
     return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/40 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-5xl rounded-xl border bg-background p-6">
-          <h1 className="text-2xl font-semibold">My Listings</h1>
-          <p className="mt-2 text-sm text-destructive">{result.error.message}</p>
-        </div>
-      </main>
+      <PageMessage
+        title="My Listings"
+        width="5xl"
+        tone="error"
+        className="bg-muted/40 px-4 py-8 sm:px-6"
+        contentClassName="rounded-xl"
+        titleClassName="text-2xl"
+      >
+        {result.error.message}
+      </PageMessage>
     );
   }
 
   return (
-    <main className="min-h-[calc(100vh-7rem)] bg-muted/40 px-4 py-8 sm:px-6">
+    <AppPageShell>
       <div className="mx-auto max-w-5xl space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -68,6 +77,6 @@ export default async function MyListingsPage() {
 
         <MyListingsClient initialListings={result.value.data} renderedAt={renderedAt} />
       </div>
-    </main>
+    </AppPageShell>
   );
 }

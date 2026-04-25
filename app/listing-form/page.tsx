@@ -4,6 +4,7 @@ import { Suspense } from "react";
 
 import ListingForm from "./ListingForm";
 import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingFormSkeleton";
+import { PageMessage } from "@/components/page-shell/AppPageShell";
 import { getOptionalSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
@@ -21,14 +22,9 @@ export default async function ListingFormPage() {
 
   if (authzUser?.role !== "admin" && authzUser?.role !== "partner") {
     return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/60 px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-md border border-border bg-background p-6">
-          <h1 className="text-xl font-semibold">Listing author access required</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Only partner and admin accounts can create new listings.
-          </p>
-        </div>
-      </main>
+      <PageMessage title="Listing author access required">
+        Only partner and admin accounts can create new listings.
+      </PageMessage>
     );
   }
 

@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
 
+import { AppPageShell, PageMessage } from "@/components/page-shell/AppPageShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { getOptionalSession } from "@/lib/auth/session";
 import { findPendingAccountInvites } from "@/lib/auth/invite-store";
 import { getAccountsService } from "@/lib/accounts/account.service";
+import { cn } from "@/lib/utils";
 import type { AccountListResponse } from "@/shared/schemas/account-management";
 
 export const metadata: Metadata = {
@@ -138,6 +142,85 @@ function formatStatus(status: AccountListResponse["data"][number]["status"]) {
   }
 }
 
+function AdminDataSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <Card className="gap-0 overflow-hidden py-0">
+      <CardHeader className="border-b bg-background py-4">
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      {children}
+    </Card>
+  );
+}
+
+function DesktopDataTable({ columns, children }: { columns: string[]; children: ReactNode }) {
+  return (
+    <div className="hidden overflow-x-auto lg:block">
+      <table className="min-w-full border-collapse text-left text-sm">
+        <thead className="bg-muted/60 text-muted-foreground">
+          <tr>
+            {columns.map((column) => (
+              <th key={column} className="px-4 py-3 font-medium">
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>{children}</tbody>
+      </table>
+    </div>
+  );
+}
+
+function DesktopDataRow({ children }: { children: ReactNode }) {
+  return <tr className="border-t border-border/80 align-top">{children}</tr>;
+}
+
+function DesktopDataCell({ children, muted = false }: { children: ReactNode; muted?: boolean }) {
+  return <td className={cn("px-4 py-4", muted && "text-muted-foreground")}>{children}</td>;
+}
+
+function MobileDataList({ children }: { children: ReactNode }) {
+  return <CardContent className="grid gap-4 p-4 lg:hidden">{children}</CardContent>;
+}
+
+function MobileDataCard({ children }: { children: ReactNode }) {
+  return <div className="rounded-xl border border-border bg-background p-4">{children}</div>;
+}
+
+function MobileDataHeader({
+  title,
+  subtitle,
+  badges,
+}: {
+  title: string;
+  subtitle: string;
+  badges: ReactNode;
+}) {
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="space-y-1">
+        <p className="font-medium text-foreground">{title}</p>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+      <div className="flex flex-wrap gap-2">{badges}</div>
+    </div>
+  );
+}
+
+function MobileDetails({ children }: { children: ReactNode }) {
+  return <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">{children}</dl>;
+}
+
+function MobileDetail({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <dt className="text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-foreground">{children}</dd>
+    </div>
+  );
+}
+
 export default async function AdminUsersPage() {
   const { session, authzUser } = await getOptionalSession();
 
@@ -147,14 +230,7 @@ export default async function AdminUsersPage() {
 
   if (authzUser?.role !== "admin") {
     return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/60 px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-md border border-border bg-background p-6">
-          <h1 className="text-xl font-semibold">Admin access required</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Only admin accounts can manage users.
-          </p>
-        </div>
-      </main>
+      <PageMessage title="Admin access required">Only admin accounts can manage users.</PageMessage>
     );
   }
 
@@ -162,20 +238,13 @@ export default async function AdminUsersPage() {
   const pendingInvites = await findPendingAccountInvites();
 
   if (!result.ok) {
-    return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/60 px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-md border border-border bg-background p-6">
-          <h1 className="text-xl font-semibold">Unable to load users</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{result.error.message}</p>
-        </div>
-      </main>
-    );
+    return <PageMessage title="Unable to load users">{result.error.message}</PageMessage>;
   }
 
   const accounts = result.value.data;
 
   return (
-    <main className="min-h-[calc(100vh-7rem)] bg-muted/40 px-4 py-8 sm:px-6">
+    <AppPageShell>
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
@@ -189,213 +258,146 @@ export default async function AdminUsersPage() {
           </Button>
         </div>
 
-        <Card className="gap-0 overflow-hidden py-0">
-          <CardHeader className="border-b bg-background py-4">
-            <CardTitle>Pending invites</CardTitle>
-          </CardHeader>
+        <AdminDataSection title="Pending invites">
+          <DesktopDataTable
+            columns={["Invitee", "Organization", "Role", "Status", "Invited", "Expires"]}
+          >
+            {pendingInvites.length > 0 ? (
+              pendingInvites.map((invite) => (
+                <DesktopDataRow key={invite.id}>
+                  <DesktopDataCell>
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">{invite.name}</p>
+                      <p className="text-xs text-muted-foreground">{invite.email}</p>
+                    </div>
+                  </DesktopDataCell>
+                  <DesktopDataCell muted>{invite.organization ?? "Not provided"}</DesktopDataCell>
+                  <DesktopDataCell>
+                    <Badge variant={roleBadgeVariant(invite.role)}>{formatRole(invite.role)}</Badge>
+                  </DesktopDataCell>
+                  <DesktopDataCell>
+                    <Badge variant="outline">Pending</Badge>
+                  </DesktopDataCell>
+                  <DesktopDataCell muted>
+                    {formatDateTime(invite.invitedAt.toISOString())}
+                  </DesktopDataCell>
+                  <DesktopDataCell muted>
+                    {formatDateTime(invite.expiresAt.toISOString())}
+                  </DesktopDataCell>
+                </DesktopDataRow>
+              ))
+            ) : (
+              <tr className="border-t border-border/80">
+                <td colSpan={6} className="px-4 py-8">
+                  <EmptyState className="border-0 bg-transparent py-0">
+                    No active invites found.
+                  </EmptyState>
+                </td>
+              </tr>
+            )}
+          </DesktopDataTable>
 
-          <div className="hidden overflow-x-auto lg:block">
-            <table className="min-w-full border-collapse text-left text-sm">
-              <thead className="bg-muted/60 text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Invitee</th>
-                  <th className="px-4 py-3 font-medium">Organization</th>
-                  <th className="px-4 py-3 font-medium">Role</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Invited</th>
-                  <th className="px-4 py-3 font-medium">Expires</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingInvites.length > 0 ? (
-                  pendingInvites.map((invite) => (
-                    <tr key={invite.id} className="border-t border-border/80 align-top">
-                      <td className="px-4 py-4">
-                        <div className="space-y-1">
-                          <p className="font-medium text-foreground">{invite.name}</p>
-                          <p className="text-xs text-muted-foreground">{invite.email}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground">
-                        {invite.organization ?? "Not provided"}
-                      </td>
-                      <td className="px-4 py-4">
+          <MobileDataList>
+            {pendingInvites.length > 0 ? (
+              pendingInvites.map((invite) => (
+                <MobileDataCard key={invite.id}>
+                  <MobileDataHeader
+                    title={invite.name}
+                    subtitle={invite.email}
+                    badges={
+                      <>
                         <Badge variant={roleBadgeVariant(invite.role)}>
                           {formatRole(invite.role)}
                         </Badge>
-                      </td>
-                      <td className="px-4 py-4">
                         <Badge variant="outline">Pending</Badge>
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground">
-                        {formatDateTime(invite.invitedAt.toISOString())}
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground">
-                        {formatDateTime(invite.expiresAt.toISOString())}
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr className="border-t border-border/80">
-                    <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                      No active invites found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <CardContent className="grid gap-4 p-4 lg:hidden">
-            {pendingInvites.length > 0 ? (
-              pendingInvites.map((invite) => (
-                <div key={invite.id} className="rounded-xl border border-border bg-background p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="font-medium text-foreground">{invite.name}</p>
-                      <p className="text-sm text-muted-foreground">{invite.email}</p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant={roleBadgeVariant(invite.role)}>
-                        {formatRole(invite.role)}
-                      </Badge>
-                      <Badge variant="outline">Pending</Badge>
-                    </div>
-                  </div>
-
-                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    <div>
-                      <dt className="text-muted-foreground">Organization</dt>
-                      <dd className="mt-1 text-foreground">
-                        {invite.organization ?? "Not provided"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Invited</dt>
-                      <dd className="mt-1 text-foreground">
-                        {formatDateTime(invite.invitedAt.toISOString())}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Expires</dt>
-                      <dd className="mt-1 text-foreground">
-                        {formatDateTime(invite.expiresAt.toISOString())}
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
+                      </>
+                    }
+                  />
+                  <MobileDetails>
+                    <MobileDetail label="Organization">
+                      {invite.organization ?? "Not provided"}
+                    </MobileDetail>
+                    <MobileDetail label="Invited">
+                      {formatDateTime(invite.invitedAt.toISOString())}
+                    </MobileDetail>
+                    <MobileDetail label="Expires">
+                      {formatDateTime(invite.expiresAt.toISOString())}
+                    </MobileDetail>
+                  </MobileDetails>
+                </MobileDataCard>
               ))
             ) : (
-              <div className="rounded-xl border border-dashed border-border bg-background px-4 py-8 text-center text-sm text-muted-foreground">
-                No active invites found.
-              </div>
+              <EmptyState>No active invites found.</EmptyState>
             )}
-          </CardContent>
-        </Card>
+          </MobileDataList>
+        </AdminDataSection>
 
-        <Card className="gap-0 overflow-hidden py-0">
-          <CardHeader className="border-b bg-background py-4">
-            <CardTitle>User directory</CardTitle>
-          </CardHeader>
-
-          <div className="hidden overflow-x-auto lg:block">
-            <table className="min-w-full border-collapse text-left text-sm">
-              <thead className="bg-muted/60 text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 font-medium">User</th>
-                  <th className="px-4 py-3 font-medium">Organization</th>
-                  <th className="px-4 py-3 font-medium">Role</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Created</th>
-                  <th className="px-4 py-3 font-medium">Last login</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accounts.map((account) => (
-                  <tr key={account.id} className="border-t border-border/80 align-top">
-                    <td className="px-4 py-4">
-                      <div className="space-y-1">
-                        <p className="font-medium text-foreground">
-                          {account.name ?? account.email ?? "Unnamed user"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {account.email ?? "No email"}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-muted-foreground">
-                      {account.organization ?? "Not provided"}
-                    </td>
-                    <td className="px-4 py-4">
-                      <Badge variant={roleBadgeVariant(account.role)}>
-                        {formatRole(account.role)}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4">
-                      <Badge variant={statusBadgeVariant(account.status)}>
-                        {formatStatus(account.status)}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-4 text-muted-foreground">
-                      <div className="space-y-1">
-                        <p>{formatDateTime(account.createdAt)}</p>
-                        <p className="text-xs">Updated {formatDateTime(account.updatedAt)}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-muted-foreground">
-                      {formatDateTime(account.lastLoginAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <CardContent className="grid gap-4 p-4 lg:hidden">
+        <AdminDataSection title="User directory">
+          <DesktopDataTable
+            columns={["User", "Organization", "Role", "Status", "Created", "Last login"]}
+          >
             {accounts.map((account) => (
-              <div key={account.id} className="rounded-xl border border-border bg-background p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+              <DesktopDataRow key={account.id}>
+                <DesktopDataCell>
                   <div className="space-y-1">
                     <p className="font-medium text-foreground">
                       {account.name ?? account.email ?? "Unnamed user"}
                     </p>
-                    <p className="text-sm text-muted-foreground">{account.email ?? "No email"}</p>
+                    <p className="text-xs text-muted-foreground">{account.email ?? "No email"}</p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Badge variant={roleBadgeVariant(account.role)}>
-                      {formatRole(account.role)}
-                    </Badge>
-                    <Badge variant={statusBadgeVariant(account.status)}>
-                      {formatStatus(account.status)}
-                    </Badge>
+                </DesktopDataCell>
+                <DesktopDataCell muted>{account.organization ?? "Not provided"}</DesktopDataCell>
+                <DesktopDataCell>
+                  <Badge variant={roleBadgeVariant(account.role)}>{formatRole(account.role)}</Badge>
+                </DesktopDataCell>
+                <DesktopDataCell>
+                  <Badge variant={statusBadgeVariant(account.status)}>
+                    {formatStatus(account.status)}
+                  </Badge>
+                </DesktopDataCell>
+                <DesktopDataCell muted>
+                  <div className="space-y-1">
+                    <p>{formatDateTime(account.createdAt)}</p>
+                    <p className="text-xs">Updated {formatDateTime(account.updatedAt)}</p>
                   </div>
-                </div>
-
-                <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                  <div>
-                    <dt className="text-muted-foreground">Organization</dt>
-                    <dd className="mt-1 text-foreground">
-                      {account.organization ?? "Not provided"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Created</dt>
-                    <dd className="mt-1 text-foreground">{formatDateTime(account.createdAt)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Updated</dt>
-                    <dd className="mt-1 text-foreground">{formatDateTime(account.updatedAt)}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-muted-foreground">Last login</dt>
-                    <dd className="mt-1 text-foreground">{formatDateTime(account.lastLoginAt)}</dd>
-                  </div>
-                </dl>
-              </div>
+                </DesktopDataCell>
+                <DesktopDataCell muted>{formatDateTime(account.lastLoginAt)}</DesktopDataCell>
+              </DesktopDataRow>
             ))}
-          </CardContent>
-        </Card>
+          </DesktopDataTable>
+
+          <MobileDataList>
+            {accounts.map((account) => (
+              <MobileDataCard key={account.id}>
+                <MobileDataHeader
+                  title={account.name ?? account.email ?? "Unnamed user"}
+                  subtitle={account.email ?? "No email"}
+                  badges={
+                    <>
+                      <Badge variant={roleBadgeVariant(account.role)}>
+                        {formatRole(account.role)}
+                      </Badge>
+                      <Badge variant={statusBadgeVariant(account.status)}>
+                        {formatStatus(account.status)}
+                      </Badge>
+                    </>
+                  }
+                />
+                <MobileDetails>
+                  <MobileDetail label="Organization">
+                    {account.organization ?? "Not provided"}
+                  </MobileDetail>
+                  <MobileDetail label="Created">{formatDateTime(account.createdAt)}</MobileDetail>
+                  <MobileDetail label="Updated">{formatDateTime(account.updatedAt)}</MobileDetail>
+                  <MobileDetail label="Last login">
+                    {formatDateTime(account.lastLoginAt)}
+                  </MobileDetail>
+                </MobileDetails>
+              </MobileDataCard>
+            ))}
+          </MobileDataList>
+        </AdminDataSection>
       </div>
-    </main>
+    </AppPageShell>
   );
 }

@@ -13,6 +13,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  DialogDescription,
+  DialogFooter,
+  DialogFormPanel,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog-shell";
+import {
   Form,
   FormControl,
   FormDescription,
@@ -22,6 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   FIELD_HELP_TEXT,
@@ -76,18 +85,18 @@ export function FieldEditorDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 px-4 py-6">
+    <DialogOverlay className="py-6">
       <Form {...form}>
-        <form
+        <DialogFormPanel
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-md border border-border bg-background shadow-2xl"
+          className="max-h-[92vh] max-w-4xl overflow-y-auto"
         >
-          <div className="flex items-start justify-between border-b border-border px-6 py-5">
+          <DialogHeader className="flex items-start justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Add Custom Field</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <DialogTitle>Add Custom Field</DialogTitle>
+              <DialogDescription>
                 Configure how this field appears on listing forms, listing pages, and filters.
-              </p>
+              </DialogDescription>
             </div>
             <button
               type="button"
@@ -97,7 +106,7 @@ export function FieldEditorDialog({
             >
               Close
             </button>
-          </div>
+          </DialogHeader>
 
           <div className="grid gap-5 px-6 py-5 md:grid-cols-2">
             <FormField
@@ -171,15 +180,14 @@ export function FieldEditorDialog({
                     {FIELD_HELP_TEXT.visibility}
                   </FormDescription>
                   <FormControl>
-                    <select
+                    <NativeSelect
                       value={field.value ? "public" : "internal"}
                       onChange={(event) => field.onChange(event.target.value === "public")}
                       disabled={isSaving}
-                      className="h-7 w-full rounded-md border border-input bg-input/20 px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 md:text-xs"
                     >
                       <option value="public">Public</option>
                       <option value="internal">Internal</option>
-                    </select>
+                    </NativeSelect>
                   </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
@@ -224,17 +232,17 @@ export function FieldEditorDialog({
             ) : null}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
+          <DialogFooter className="border-t border-border">
             <Button type="button" variant="outline" size="lg" onClick={onClose} disabled={isSaving}>
               Cancel
             </Button>
             <Button type="submit" size="lg" disabled={isSaving}>
               {isSaving ? "Saving..." : "Add Field"}
             </Button>
-          </div>
-        </form>
+          </DialogFooter>
+        </DialogFormPanel>
       </Form>
-    </div>
+    </DialogOverlay>
   );
 }
 

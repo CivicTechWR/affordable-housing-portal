@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import verbiage from "@/content/verbiage.json";
 import { buildInviteRecordFromAccountInvite } from "@/components/admin-invite/invite-records";
 import { AdminInvitePanel } from "@/components/admin-invite/AdminInvitePanel";
+import { PageMessage } from "@/components/page-shell/AppPageShell";
 import { getOptionalSession } from "@/lib/auth/session";
 import { getRecentAccountInvitesService } from "@/lib/accounts/account.service";
 
@@ -33,14 +34,13 @@ export default async function AdminInvitePage() {
 
   if (authzUser?.role !== "admin") {
     return (
-      <main className="min-h-screen bg-background px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-md border border-border bg-card p-6">
-          <h1 className="text-xl font-semibold text-foreground">Admin access required</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Only admin accounts can send and review account invites.
-          </p>
-        </div>
-      </main>
+      <PageMessage
+        title="Admin access required"
+        className="min-h-screen bg-background"
+        contentClassName="bg-card"
+      >
+        Only admin accounts can send and review account invites.
+      </PageMessage>
     );
   }
 

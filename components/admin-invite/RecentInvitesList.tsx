@@ -1,5 +1,6 @@
 import verbiage from "@/content/verbiage.json";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { InviteRecord } from "@/components/admin-invite/types";
 import { inviteRoleLabels } from "@/components/admin-invite/types";
 
@@ -23,9 +24,7 @@ export function RecentInvitesList({ invites }: RecentInvitesListProps) {
       </header>
 
       {invites.length === 0 ? (
-        <p className="rounded-md border border-dashed px-3 py-4 text-xs text-muted-foreground">
-          {copy.emptyState}
-        </p>
+        <EmptyState size="sm">{copy.emptyState}</EmptyState>
       ) : (
         <ul className="space-y-2">
           {invites.map((invite) => (
