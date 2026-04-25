@@ -26,7 +26,9 @@ function useDialogOpenerFocus() {
 
   return React.useCallback((event: Event) => {
     event.preventDefault();
-    openerRef.current?.focus({ preventScroll: true });
+    window.setTimeout(() => {
+      openerRef.current?.focus({ preventScroll: true });
+    }, 0);
   }, []);
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Control, useForm } from "react-hook-form";
 
@@ -59,6 +59,7 @@ export function FieldEditorDialog({
 }) {
   const [keyWasEdited, setKeyWasEdited] = useState(false);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const discardReturnFocusRef = useRef<HTMLElement | null>(null);
   const normalizedCategories = getUniqueCategoryOptions(categories);
   const form = useForm<CreateFieldDialogValues>({
     resolver: zodResolver(createFieldDialogSchema),
@@ -89,13 +90,37 @@ export function FieldEditorDialog({
     }
   };
 
-  const requestClose = () => {
+  const openDiscardConfirm = (returnFocusTarget?: HTMLElement | null) => {
+    if (returnFocusTarget) {
+      discardReturnFocusRef.current = returnFocusTarget;
+    } else if (
+      discardReturnFocusRef.current === null &&
+      document.activeElement instanceof HTMLElement
+    ) {
+      discardReturnFocusRef.current = document.activeElement;
+    }
+
+    setDiscardConfirmOpen(true);
+  };
+
+  const focusDiscardReturnTarget = () => {
+    window.setTimeout(() => {
+      discardReturnFocusRef.current?.focus({ preventScroll: true });
+    }, 0);
+  };
+
+  const closeDiscardConfirm = () => {
+    setDiscardConfirmOpen(false);
+    focusDiscardReturnTarget();
+  };
+
+  const requestClose = (returnFocusTarget?: HTMLElement | null) => {
     if (isSaving) {
       return;
     }
 
     if (isDirty) {
-      setDiscardConfirmOpen(true);
+      openDiscardConfirm(returnFocusTarget);
       return;
     }
 
@@ -116,8 +141,13 @@ export function FieldEditorDialog({
 
     if (isDirty) {
       event.preventDefault();
-      setDiscardConfirmOpen(true);
+      openDiscardConfirm();
     }
+  };
+
+  const restoreFocusToDiscardRequester = (event: Event) => {
+    event.preventDefault();
+    focusDiscardReturnTarget();
   };
 
   return (
@@ -128,6 +158,9 @@ export function FieldEditorDialog({
           className="max-h-[92vh] max-w-4xl overflow-y-auto"
           onCloseAutoFocus={restoreFocusToOpener}
           onEscapeKeyDown={handleDismiss}
+          onFocusCapture={(event) => {
+            discardReturnFocusRef.current = event.target;
+          }}
           onInteractOutside={handleDismiss}
         >
           <DialogHeader className="flex items-start justify-between">
@@ -140,7 +173,7 @@ export function FieldEditorDialog({
             <button
               type="button"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
-              onClick={requestClose}
+              onClick={(event) => requestClose(event.currentTarget)}
               disabled={isSaving}
             >
               Close
@@ -276,7 +309,7 @@ export function FieldEditorDialog({
               type="button"
               variant="outline"
               size="lg"
-              onClick={requestClose}
+              onClick={(event) => requestClose(event.currentTarget)}
               disabled={isSaving}
             >
               Cancel
@@ -288,8 +321,18 @@ export function FieldEditorDialog({
         </DialogFormPanel>
       </Form>
 
-      <DialogOverlay open={discardConfirmOpen} onOpenChange={setDiscardConfirmOpen}>
-        <DialogPanel>
+      <DialogOverlay
+        open={discardConfirmOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            setDiscardConfirmOpen(true);
+            return;
+          }
+
+          closeDiscardConfirm();
+        }}
+      >
+        <DialogPanel onCloseAutoFocus={restoreFocusToDiscardRequester}>
           <DialogHeader>
             <DialogTitle>Discard Custom Field?</DialogTitle>
             <DialogDescription className="mt-2">
@@ -297,12 +340,7 @@ export function FieldEditorDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              onClick={() => setDiscardConfirmOpen(false)}
-            >
+            <Button type="button" variant="outline" size="lg" onClick={closeDiscardConfirm}>
               Keep Editing
             </Button>
             <Button type="button" variant="destructive" size="lg" onClick={onClose}>
