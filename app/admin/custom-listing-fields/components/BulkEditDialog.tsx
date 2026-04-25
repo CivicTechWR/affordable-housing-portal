@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogOverlay,
   DialogTitle,
+  useDialogOpenerFocus,
 } from "@/components/ui/dialog-shell";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -46,6 +47,7 @@ export function BulkEditDialog({
   const visibilityEnabled = form.watch("visibilityEnabled");
   const filterableEnabled = form.watch("filterableEnabled");
   const requiredEnabled = form.watch("requiredEnabled");
+  const restoreFocusToOpener = useDialogOpenerFocus();
 
   const handleSubmit = async (values: BulkEditDialogValues) => {
     if (isSaving) {
@@ -79,6 +81,7 @@ export function BulkEditDialog({
         <DialogFormPanel
           className="max-w-xl"
           onSubmit={form.handleSubmit(handleSubmit)}
+          onCloseAutoFocus={restoreFocusToOpener}
           onEscapeKeyDown={preventDismissWhileSaving}
           onInteractOutside={preventDismissWhileSaving}
         >

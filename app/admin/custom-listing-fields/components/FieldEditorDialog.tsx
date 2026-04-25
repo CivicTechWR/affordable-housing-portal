@@ -20,6 +20,7 @@ import {
   DialogOverlay,
   DialogPanel,
   DialogTitle,
+  useDialogOpenerFocus,
 } from "@/components/ui/dialog-shell";
 import {
   Form,
@@ -64,6 +65,7 @@ export function FieldEditorDialog({
     defaultValues: getDefaultCreateFieldDialogValues(state),
   });
   const { isDirty } = form.formState;
+  const restoreFocusToOpener = useDialogOpenerFocus();
 
   const handleLabelChange = (label: string) => {
     form.setValue("label", label, { shouldDirty: true, shouldValidate: true });
@@ -124,6 +126,7 @@ export function FieldEditorDialog({
         <DialogFormPanel
           onSubmit={form.handleSubmit(handleSubmit)}
           className="max-h-[92vh] max-w-4xl overflow-y-auto"
+          onCloseAutoFocus={restoreFocusToOpener}
           onEscapeKeyDown={handleDismiss}
           onInteractOutside={handleDismiss}
         >

@@ -10,8 +10,25 @@ type DialogOverlayProps = React.ComponentProps<"div"> &
 
 type DialogContentDismissProps = Pick<
   React.ComponentProps<typeof DialogPrimitive.Content>,
-  "onEscapeKeyDown" | "onInteractOutside"
+  "onCloseAutoFocus" | "onEscapeKeyDown" | "onInteractOutside"
 >;
+
+function useDialogOpenerFocus() {
+  const openerRef = React.useRef<HTMLElement | null>(null);
+
+  if (
+    openerRef.current === null &&
+    typeof document !== "undefined" &&
+    document.activeElement instanceof HTMLElement
+  ) {
+    openerRef.current = document.activeElement;
+  }
+
+  return React.useCallback((event: Event) => {
+    event.preventDefault();
+    openerRef.current?.focus({ preventScroll: true });
+  }, []);
+}
 
 function DialogOverlay({ className, open, onOpenChange, ...props }: DialogOverlayProps) {
   return (
@@ -44,12 +61,13 @@ function DialogPanel({
 
 function DialogFormPanel({
   className,
+  onCloseAutoFocus,
   onEscapeKeyDown,
   onInteractOutside,
   ...props
 }: React.ComponentProps<"form"> & DialogContentDismissProps) {
   return (
-    <DialogPrimitive.Content asChild {...{ onEscapeKeyDown, onInteractOutside }}>
+    <DialogPrimitive.Content asChild {...{ onCloseAutoFocus, onEscapeKeyDown, onInteractOutside }}>
       <form
         className={cn(
           "w-full max-w-md rounded-md border border-border bg-background shadow-2xl",
@@ -93,4 +111,5 @@ export {
   DialogOverlay,
   DialogPanel,
   DialogTitle,
+  useDialogOpenerFocus,
 };

@@ -6,6 +6,7 @@ import {
   DialogOverlay,
   DialogPanel,
   DialogTitle,
+  useDialogOpenerFocus,
 } from "@/components/ui/dialog-shell";
 import type { AdminCustomListingField } from "@/shared/schemas/custom-listing-fields";
 
@@ -20,6 +21,8 @@ export function DeleteFieldDialog({
   onClose: () => void;
   onConfirm: () => void;
 }) {
+  const restoreFocusToOpener = useDialogOpenerFocus();
+
   const handleOpenChange = (open: boolean) => {
     if (!open && !isDeleting) {
       onClose();
@@ -35,6 +38,7 @@ export function DeleteFieldDialog({
   return (
     <DialogOverlay open onOpenChange={handleOpenChange}>
       <DialogPanel
+        onCloseAutoFocus={restoreFocusToOpener}
         onEscapeKeyDown={preventDismissWhileDeleting}
         onInteractOutside={preventDismissWhileDeleting}
       >
