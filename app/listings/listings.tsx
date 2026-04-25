@@ -13,6 +13,7 @@ import { ListingsPanel } from "@/components/listings-panel/ListingsPanel";
 import type { ListingListResponse, ListingQuery, ListingSummary } from "@/shared/schemas/listings";
 import dynamic from "next/dynamic";
 import { useListingsQuery } from "./useListingsQuery";
+import { AlertBanner } from "@/components/ui/alert-banner";
 
 const LazyMapView = dynamic<{ listings: ListingSummary[] }>(
   () => import("../../components/map-view/MapView.tsx").then((mod) => mod.MapView),
@@ -126,9 +127,9 @@ export default function ListingsDashboard({
         <FilterButton {...filterButtonProps} viewport="desktop" />
       </header>
       {error ? (
-        <div className="border-b border-destructive/20 bg-destructive/5 px-4 py-2 text-sm text-destructive">
+        <AlertBanner variant="error" size="flush" className="border-b">
           {error}
-        </div>
+        </AlertBanner>
       ) : null}
       <main className="flex min-h-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
         {displayMode !== DisplayMode.MAP ? (

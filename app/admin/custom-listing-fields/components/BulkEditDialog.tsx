@@ -12,7 +12,16 @@ import {
 } from "../custom-listing-fields-dashboard-forms";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DialogDescription,
+  DialogFooter,
+  DialogFormPanel,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+} from "@/components/ui/dialog-shell";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { NativeSelect } from "@/components/ui/native-select";
 import { type BulkEditPayload } from "../custom-listing-fields-dashboard-utils";
 import { CategoryCombobox } from "./CategoryCombobox";
 
@@ -53,18 +62,15 @@ export function BulkEditDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 px-4">
+    <DialogOverlay>
       <Form {...form}>
-        <form
-          className="w-full max-w-xl rounded-md border border-border bg-background shadow-2xl"
-          onSubmit={form.handleSubmit(handleSubmit)}
-        >
-          <div className="border-b border-border px-6 py-5">
-            <h2 className="text-xl font-semibold">Bulk Edit Fields</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+        <DialogFormPanel className="max-w-xl" onSubmit={form.handleSubmit(handleSubmit)}>
+          <DialogHeader>
+            <DialogTitle>Bulk Edit Fields</DialogTitle>
+            <DialogDescription>
               Apply changes to {selectedCount} selected {selectedCount === 1 ? "field" : "fields"}.
-            </p>
-          </div>
+            </DialogDescription>
+          </DialogHeader>
 
           <div className="space-y-5 px-6 py-5">
             <BulkEditOption
@@ -103,15 +109,14 @@ export function BulkEditDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <select
+                      <NativeSelect
                         value={field.value}
                         onChange={field.onChange}
                         disabled={!visibilityEnabled || isSaving}
-                        className="h-7 w-full rounded-md border border-input bg-input/20 px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 md:text-xs"
                       >
                         <option value="public">Public</option>
                         <option value="internal">Internal</option>
-                      </select>
+                      </NativeSelect>
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -131,15 +136,14 @@ export function BulkEditDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <select
+                      <NativeSelect
                         value={field.value ? "yes" : "no"}
                         onChange={(event) => field.onChange(event.target.value === "yes")}
                         disabled={!filterableEnabled || isSaving}
-                        className="h-7 w-full rounded-md border border-input bg-input/20 px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 md:text-xs"
                       >
                         <option value="yes">Filterable</option>
                         <option value="no">Not filterable</option>
-                      </select>
+                      </NativeSelect>
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -159,15 +163,14 @@ export function BulkEditDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <select
+                      <NativeSelect
                         value={field.value ? "yes" : "no"}
                         onChange={(event) => field.onChange(event.target.value === "yes")}
                         disabled={!requiredEnabled || isSaving}
-                        className="h-7 w-full rounded-md border border-input bg-input/20 px-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50 md:text-xs"
                       >
                         <option value="yes">Required</option>
                         <option value="no">Not required</option>
-                      </select>
+                      </NativeSelect>
                     </FormControl>
                     <FormMessage className="text-xs" />
                   </FormItem>
@@ -180,17 +183,17 @@ export function BulkEditDialog({
             ) : null}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
+          <DialogFooter className="border-t border-border">
             <Button type="button" variant="outline" size="lg" onClick={onClose} disabled={isSaving}>
               Cancel
             </Button>
             <Button type="submit" size="lg" disabled={isSaving}>
               {isSaving ? "Applying..." : "Apply Bulk Edit"}
             </Button>
-          </div>
-        </form>
+          </DialogFooter>
+        </DialogFormPanel>
       </Form>
-    </div>
+    </DialogOverlay>
   );
 }
 

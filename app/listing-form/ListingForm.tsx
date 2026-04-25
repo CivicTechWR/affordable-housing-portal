@@ -11,6 +11,7 @@ import {
   type ListingFormPreviewMode,
 } from "@/components/listing-form-preview/ListingFormPreview";
 import { ListingFormSkeleton } from "@/components/listing-form-skeleton/ListingFormSkeleton";
+import { AlertBanner } from "@/components/ui/alert-banner";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
@@ -74,14 +75,14 @@ export default function ListingForm({ listingId }: ListingFormProps) {
     return (
       <ListingFormLayout
         formContent={
-          <div className="bg-destructive/15 text-destructive p-8 rounded-lg border border-destructive/20">
+          <AlertBanner variant="error" size="lg">
             <h3 className="mb-2">Error Loading Listing</h3>
             <p>
               {isEditMode
                 ? "We encountered an error while retrieving this listing. It may have been deleted or there is a network issue."
                 : "We encountered an error while preparing this form. Please refresh and try again."}
             </p>
-          </div>
+          </AlertBanner>
         }
       />
     );

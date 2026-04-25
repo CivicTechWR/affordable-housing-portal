@@ -9,6 +9,7 @@ import { getOptionalSession } from "@/lib/auth/session";
 import { findPendingAccountInvites } from "@/lib/auth/invite-store";
 import { getAccountsService } from "@/lib/accounts/account.service";
 import type { AccountListResponse } from "@/shared/schemas/account-management";
+import { AppPageShell, PageMessage } from "@/components/page-shell/AppPageShell";
 
 export const metadata: Metadata = {
   title: "Manage Users | WR Housing Bridge",
@@ -147,14 +148,7 @@ export default async function AdminUsersPage() {
 
   if (authzUser?.role !== "admin") {
     return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/60 px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-md border border-border bg-background p-6">
-          <h1 className="text-xl font-semibold">Admin access required</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Only admin accounts can manage users.
-          </p>
-        </div>
-      </main>
+      <PageMessage title="Admin access required">Only admin accounts can manage users.</PageMessage>
     );
   }
 
@@ -162,20 +156,13 @@ export default async function AdminUsersPage() {
   const pendingInvites = await findPendingAccountInvites();
 
   if (!result.ok) {
-    return (
-      <main className="min-h-[calc(100vh-7rem)] bg-muted/60 px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-md border border-border bg-background p-6">
-          <h1 className="text-xl font-semibold">Unable to load users</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{result.error.message}</p>
-        </div>
-      </main>
-    );
+    return <PageMessage title="Unable to load users">{result.error.message}</PageMessage>;
   }
 
   const accounts = result.value.data;
 
   return (
-    <main className="min-h-[calc(100vh-7rem)] bg-muted/40 px-4 py-8 sm:px-6">
+    <AppPageShell>
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
@@ -396,6 +383,6 @@ export default async function AdminUsersPage() {
           </CardContent>
         </Card>
       </div>
-    </main>
+    </AppPageShell>
   );
 }
