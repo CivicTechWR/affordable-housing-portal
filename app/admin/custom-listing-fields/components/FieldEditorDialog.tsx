@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Control, useForm } from "react-hook-form";
 
@@ -18,7 +18,9 @@ import {
   DialogFormPanel,
   DialogHeader,
   DialogOverlay,
+  DialogPanel,
   DialogTitle,
+  useDialogOpenerFocus,
 } from "@/components/ui/dialog-shell";
 import {
   Form,
@@ -56,11 +58,15 @@ export function FieldEditorDialog({
   onCreate: (payload: CreateFieldDialogPayload) => Promise<void>;
 }) {
   const [keyWasEdited, setKeyWasEdited] = useState(false);
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const discardReturnFocusRef = useRef<HTMLElement | null>(null);
   const normalizedCategories = getUniqueCategoryOptions(categories);
   const form = useForm<CreateFieldDialogValues>({
     resolver: zodResolver(createFieldDialogSchema),
     defaultValues: getDefaultCreateFieldDialogValues(state),
   });
+  const { isDirty } = form.formState;
+  const restoreFocusToOpener = useDialogOpenerFocus();
 
   const handleLabelChange = (label: string) => {
     form.setValue("label", label, { shouldDirty: true, shouldValidate: true });
@@ -84,12 +90,80 @@ export function FieldEditorDialog({
     }
   };
 
+  function openDiscardConfirm(returnFocusTarget?: HTMLElement | null) {
+    if (returnFocusTarget) {
+      discardReturnFocusRef.current = returnFocusTarget;
+    } else if (
+      discardReturnFocusRef.current === null &&
+      document.activeElement instanceof HTMLElement
+    ) {
+      discardReturnFocusRef.current = document.activeElement;
+    }
+
+    setDiscardConfirmOpen(true);
+  }
+
+  function focusDiscardReturnTarget() {
+    window.setTimeout(() => {
+      discardReturnFocusRef.current?.focus({ preventScroll: true });
+    }, 0);
+  }
+
+  function closeDiscardConfirm() {
+    setDiscardConfirmOpen(false);
+    focusDiscardReturnTarget();
+  }
+
+  function requestClose(returnFocusTarget?: HTMLElement | null) {
+    if (isSaving) {
+      return;
+    }
+
+    if (isDirty) {
+      openDiscardConfirm(returnFocusTarget);
+      return;
+    }
+
+    onClose();
+  }
+
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      requestClose();
+    }
+  }
+
+  function handleDismiss(event: Event) {
+    event.stopPropagation();
+
+    if (isSaving) {
+      event.preventDefault();
+      return;
+    }
+
+    if (isDirty) {
+      event.preventDefault();
+      openDiscardConfirm();
+    }
+  }
+
+  function restoreFocusToDiscardRequester(event: Event) {
+    event.preventDefault();
+    focusDiscardReturnTarget();
+  }
+
   return (
-    <DialogOverlay className="py-6">
+    <DialogOverlay className="py-6" open onOpenChange={handleOpenChange}>
       <Form {...form}>
         <DialogFormPanel
           onSubmit={form.handleSubmit(handleSubmit)}
           className="max-h-[92vh] max-w-4xl overflow-y-auto"
+          onCloseAutoFocus={restoreFocusToOpener}
+          onEscapeKeyDown={handleDismiss}
+          onFocusCapture={(event) => {
+            discardReturnFocusRef.current = event.target;
+          }}
+          onInteractOutside={handleDismiss}
         >
           <DialogHeader className="flex items-start justify-between">
             <div>
@@ -101,7 +175,7 @@ export function FieldEditorDialog({
             <button
               type="button"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
-              onClick={onClose}
+              onClick={(event) => requestClose(event.currentTarget)}
               disabled={isSaving}
             >
               Close
@@ -233,7 +307,13 @@ export function FieldEditorDialog({
           </div>
 
           <DialogFooter className="border-t border-border">
-            <Button type="button" variant="outline" size="lg" onClick={onClose} disabled={isSaving}>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={(event) => requestClose(event.currentTarget)}
+              disabled={isSaving}
+            >
               Cancel
             </Button>
             <Button type="submit" size="lg" disabled={isSaving}>
@@ -242,6 +322,35 @@ export function FieldEditorDialog({
           </DialogFooter>
         </DialogFormPanel>
       </Form>
+
+      <DialogOverlay
+        open={discardConfirmOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            setDiscardConfirmOpen(true);
+            return;
+          }
+
+          closeDiscardConfirm();
+        }}
+      >
+        <DialogPanel onCloseAutoFocus={restoreFocusToDiscardRequester}>
+          <DialogHeader>
+            <DialogTitle>Discard Custom Field?</DialogTitle>
+            <DialogDescription className="mt-2">
+              You have unsaved changes. Discard this custom field and lose the entered values?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" size="lg" onClick={closeDiscardConfirm}>
+              Keep Editing
+            </Button>
+            <Button type="button" variant="destructive" size="lg" onClick={onClose}>
+              Discard Changes
+            </Button>
+          </DialogFooter>
+        </DialogPanel>
+      </DialogOverlay>
     </DialogOverlay>
   );
 }

@@ -6,6 +6,7 @@ import {
   DialogOverlay,
   DialogPanel,
   DialogTitle,
+  useDialogOpenerFocus,
 } from "@/components/ui/dialog-shell";
 import type { AdminCustomListingField } from "@/shared/schemas/custom-listing-fields";
 
@@ -20,9 +21,29 @@ export function DeleteFieldDialog({
   onClose: () => void;
   onConfirm: () => void;
 }) {
+  const restoreFocusToOpener = useDialogOpenerFocus();
+
+  function handleOpenChange(open: boolean) {
+    if (!open && !isDeleting) {
+      onClose();
+    }
+  }
+
+  function handleDismiss(event: Event) {
+    event.stopPropagation();
+
+    if (isDeleting) {
+      event.preventDefault();
+    }
+  }
+
   return (
-    <DialogOverlay>
-      <DialogPanel>
+    <DialogOverlay open onOpenChange={handleOpenChange}>
+      <DialogPanel
+        onCloseAutoFocus={restoreFocusToOpener}
+        onEscapeKeyDown={handleDismiss}
+        onInteractOutside={handleDismiss}
+      >
         <DialogHeader>
           <DialogTitle>Delete Custom Field</DialogTitle>
           <DialogDescription className="mt-2">
