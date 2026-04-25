@@ -29,6 +29,53 @@ export interface ListingFormLayoutProps {
   isPreviewExpanded?: boolean;
 }
 
+function PaneHeader({ children }: { children: ReactNode }) {
+  return <div className="border-b border-foreground/10 px-4 py-3 md:px-6">{children}</div>;
+}
+
+function PaneFooter({ children }: { children: ReactNode }) {
+  return (
+    <div className="mt-10 flex justify-end gap-4 border-t border-foreground/10 pt-8">
+      {children}
+    </div>
+  );
+}
+
+function PaneBody({
+  children,
+  footer,
+  isSticky = false,
+}: {
+  children: ReactNode;
+  footer?: ReactNode;
+  isSticky?: boolean;
+}) {
+  return (
+    <div className={cn("px-4 py-5 md:px-6 md:py-6", isSticky && "lg:sticky lg:top-0")}>
+      {children}
+      {footer ? <PaneFooter>{footer}</PaneFooter> : null}
+    </div>
+  );
+}
+
+function StickyPaneScroll({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
+  return (
+    <ScrollArea type="always" className="lg:sticky lg:top-0 lg:h-[calc(100vh-10rem)]">
+      <PaneBody footer={footer}>{children}</PaneBody>
+    </ScrollArea>
+  );
+}
+
+function PreviewDivider({ dividerControl }: { dividerControl?: ReactNode }) {
+  return (
+    <div className="order-1 hidden bg-background lg:order-2 lg:flex lg:border-x lg:border-foreground/10">
+      <div className="sticky top-0 flex h-full min-h-[calc(100vh-10rem)] w-full items-stretch justify-center">
+        {dividerControl ?? <div className="h-full w-full" />}
+      </div>
+    </div>
+  );
+}
+
 export function ListingFormLayout({
   formPaneHeader,
   previewPaneHeader,
@@ -51,51 +98,23 @@ export function ListingFormLayout({
         )}
       >
         <section className={cn("order-2 min-w-0 bg-muted/60 lg:order-1")}>
-          {formPaneHeader && (
-            <div className="border-b border-foreground/10 px-4 py-3 md:px-6">{formPaneHeader}</div>
-          )}
+          {formPaneHeader && <PaneHeader>{formPaneHeader}</PaneHeader>}
           {isExpandedWithPreview ? (
-            <ScrollArea type="always" className="lg:sticky lg:top-0 lg:h-[calc(100vh-10rem)]">
-              <div className="px-4 py-5 md:px-6 md:py-6">
-                {formContent}
-                {footer && (
-                  <div className="mt-10 flex justify-end gap-4 border-t border-foreground/10 pt-8">
-                    {footer}
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+            <StickyPaneScroll footer={footer}>{formContent}</StickyPaneScroll>
           ) : (
-            <div className="px-4 py-5 md:px-6 md:py-6">
-              {formContent}
-              {footer && (
-                <div className="mt-10 flex justify-end gap-4 border-t border-foreground/10 pt-8">
-                  {footer}
-                </div>
-              )}
-            </div>
+            <PaneBody footer={footer}>{formContent}</PaneBody>
           )}
         </section>
 
         {previewContent && (
           <>
-            <div className="order-1 hidden bg-background lg:order-2 lg:flex lg:border-x lg:border-foreground/10">
-              <div className="sticky top-0 flex h-full min-h-[calc(100vh-10rem)] w-full items-stretch justify-center">
-                {dividerControl ?? <div className="h-full w-full" />}
-              </div>
-            </div>
+            <PreviewDivider dividerControl={dividerControl} />
             <section className="order-1 min-w-0 lg:order-3">
-              {previewPaneHeader && (
-                <div className="border-b border-foreground/10 px-4 py-3 md:px-6">
-                  {previewPaneHeader}
-                </div>
-              )}
+              {previewPaneHeader && <PaneHeader>{previewPaneHeader}</PaneHeader>}
               {isExpandedWithPreview ? (
-                <ScrollArea type="always" className="lg:sticky lg:top-0 lg:h-[calc(100vh-10rem)]">
-                  <div className="px-4 py-5 md:px-6 md:py-6">{previewContent}</div>
-                </ScrollArea>
+                <StickyPaneScroll>{previewContent}</StickyPaneScroll>
               ) : (
-                <div className="px-4 py-5 md:px-6 md:py-6 lg:sticky lg:top-0">{previewContent}</div>
+                <PaneBody isSticky>{previewContent}</PaneBody>
               )}
             </section>
           </>

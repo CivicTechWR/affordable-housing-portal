@@ -53,6 +53,17 @@ function isProtectedUploadedImageUrl(imageUrl: string) {
   return imageUrl.startsWith("/api/image-uploads/");
 }
 
+function FeatureBadge({ children }: { children: string }) {
+  return (
+    <Badge
+      variant="secondary"
+      className="border-transparent bg-secondary/60 px-1.5 py-0 text-[10px] font-normal"
+    >
+      {children}
+    </Badge>
+  );
+}
+
 export function ListingsCard({
   id,
   title,
@@ -143,13 +154,7 @@ export function ListingsCard({
           >
             <div className="flex flex-wrap gap-1.5 items-center">
               {baseFeatures.map((f, idx) => (
-                <Badge
-                  variant="secondary"
-                  key={`${f}-${idx}`}
-                  className="font-normal text-[10px] px-1.5 py-0 border-transparent bg-secondary/60"
-                >
-                  {f}
-                </Badge>
+                <FeatureBadge key={`${f}-${idx}`}>{f}</FeatureBadge>
               ))}
 
               {hasMoreFeatures && (
@@ -160,13 +165,7 @@ export function ListingsCard({
                   </summary>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {extraFeatures.map((f, idx) => (
-                      <Badge
-                        variant="secondary"
-                        key={`${f}-${MAX_FEATURES + idx}`}
-                        className="font-normal text-[10px] px-1.5 py-0 border-transparent bg-secondary/60"
-                      >
-                        {f}
-                      </Badge>
+                      <FeatureBadge key={`${f}-${MAX_FEATURES + idx}`}>{f}</FeatureBadge>
                     ))}
                   </div>
                 </details>

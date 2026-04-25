@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertBanner } from "@/components/ui/alert-banner";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type MyListingItem = {
   id: string;
@@ -148,8 +149,10 @@ export function MyListingsClient({ initialListings, renderedAt }: MyListingsClie
   if (listings.length === 0) {
     return (
       <Card>
-        <CardContent className="py-10 text-sm text-muted-foreground">
-          No listings yet. Start a draft to begin publishing inventory.
+        <CardContent>
+          <EmptyState size="spacious" className="border-0">
+            No listings yet. Start a draft to begin publishing inventory.
+          </EmptyState>
         </CardContent>
       </Card>
     );
