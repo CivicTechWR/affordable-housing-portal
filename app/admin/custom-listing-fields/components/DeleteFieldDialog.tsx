@@ -23,19 +23,19 @@ export function DeleteFieldDialog({
 }) {
   const restoreFocusToOpener = useDialogOpenerFocus();
 
-  const handleOpenChange = (open: boolean) => {
+  function handleOpenChange(open: boolean) {
     if (!open && !isDeleting) {
       onClose();
     }
-  };
+  }
 
-  const handleDismiss = (event: Event) => {
+  function handleDismiss(event: Event) {
     event.stopPropagation();
 
     if (isDeleting) {
       event.preventDefault();
     }
-  };
+  }
 
   return (
     <DialogOverlay open onOpenChange={handleOpenChange}>

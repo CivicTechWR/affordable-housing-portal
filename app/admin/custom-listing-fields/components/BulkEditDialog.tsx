@@ -63,19 +63,19 @@ export function BulkEditDialog({
     }
   };
 
-  const handleOpenChange = (open: boolean) => {
+  function handleOpenChange(open: boolean) {
     if (!open && !isSaving) {
       onClose();
     }
-  };
+  }
 
-  const handleDismiss = (event: Event) => {
+  function handleDismiss(event: Event) {
     event.stopPropagation();
 
     if (isSaving) {
       event.preventDefault();
     }
-  };
+  }
 
   return (
     <DialogOverlay open onOpenChange={handleOpenChange}>

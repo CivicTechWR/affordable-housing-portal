@@ -90,7 +90,7 @@ export function FieldEditorDialog({
     }
   };
 
-  const openDiscardConfirm = (returnFocusTarget?: HTMLElement | null) => {
+  function openDiscardConfirm(returnFocusTarget?: HTMLElement | null) {
     if (returnFocusTarget) {
       discardReturnFocusRef.current = returnFocusTarget;
     } else if (
@@ -101,20 +101,20 @@ export function FieldEditorDialog({
     }
 
     setDiscardConfirmOpen(true);
-  };
+  }
 
-  const focusDiscardReturnTarget = () => {
+  function focusDiscardReturnTarget() {
     window.setTimeout(() => {
       discardReturnFocusRef.current?.focus({ preventScroll: true });
     }, 0);
-  };
+  }
 
-  const closeDiscardConfirm = () => {
+  function closeDiscardConfirm() {
     setDiscardConfirmOpen(false);
     focusDiscardReturnTarget();
-  };
+  }
 
-  const requestClose = (returnFocusTarget?: HTMLElement | null) => {
+  function requestClose(returnFocusTarget?: HTMLElement | null) {
     if (isSaving) {
       return;
     }
@@ -125,15 +125,15 @@ export function FieldEditorDialog({
     }
 
     onClose();
-  };
+  }
 
-  const handleOpenChange = (open: boolean) => {
+  function handleOpenChange(open: boolean) {
     if (!open) {
       requestClose();
     }
-  };
+  }
 
-  const handleDismiss = (event: Event) => {
+  function handleDismiss(event: Event) {
     event.stopPropagation();
 
     if (isSaving) {
@@ -145,12 +145,12 @@ export function FieldEditorDialog({
       event.preventDefault();
       openDiscardConfirm();
     }
-  };
+  }
 
-  const restoreFocusToDiscardRequester = (event: Event) => {
+  function restoreFocusToDiscardRequester(event: Event) {
     event.preventDefault();
     focusDiscardReturnTarget();
-  };
+  }
 
   return (
     <DialogOverlay className="py-6" open onOpenChange={handleOpenChange}>
