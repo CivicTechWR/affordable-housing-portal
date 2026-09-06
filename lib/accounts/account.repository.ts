@@ -4,6 +4,7 @@ import { and, count, desc, eq, isNull, type SQL } from "drizzle-orm";
 
 import { db } from "@/db";
 import { sessions, userInvites, users, type UserRole, type UserStatus } from "@/db/schema";
+import { fail, succeed, type DomainResult } from "@/lib/http/domain-result";
 
 export type AccountListRow = {
   id: string;
@@ -12,6 +13,7 @@ export type AccountListRow = {
   role: UserRole;
   organization: string | null;
   status: UserStatus;
+  inviteAcceptedAt: Date | null;
   lastLoginAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -39,6 +41,7 @@ export async function findAccounts(input: { where?: SQL<unknown>; page: number; 
       role: users.role,
       organization: users.organization,
       status: users.status,
+      inviteAcceptedAt: users.inviteAcceptedAt,
       lastLoginAt: users.lastLoginAt,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
@@ -64,6 +67,7 @@ export async function findAccountById(accountId: string): Promise<AccountRecord 
       role: users.role,
       organization: users.organization,
       status: users.status,
+      inviteAcceptedAt: users.inviteAcceptedAt,
       lastLoginAt: users.lastLoginAt,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
@@ -97,8 +101,26 @@ export async function updateAccountById(input: {
   role?: UserRole;
   status?: UserStatus;
   organization?: string | null;
-}) {
+}): Promise<DomainResult<{ id: string }>> {
   return db.transaction(async (tx) => {
+    if (input.status === "invited") {
+      // Invitation acceptance takes this lock too. Read its result before
+      // deciding whether an admin update may keep the account invited.
+      const [user] = await tx
+        .select({ inviteAcceptedAt: users.inviteAcceptedAt })
+        .from(users)
+        .where(eq(users.id, input.accountId))
+        .for("update");
+
+      if (!user) return fail("not_found", "Account not found");
+      if (user.inviteAcceptedAt) {
+        return fail(
+          "conflict",
+          "This account already accepted its invitation and cannot return to invited. Restore active instead.",
+        );
+      }
+    }
+
     const [updatedUser] = await tx
       .update(users)
       .set({
@@ -110,6 +132,8 @@ export async function updateAccountById(input: {
       .where(eq(users.id, input.accountId))
       .returning({ id: users.id });
 
+    if (!updatedUser) return fail("not_found", "Account not found");
+
     if (input.status && input.status !== "active")
       await tx.delete(sessions).where(eq(sessions.userId, input.accountId));
     if (input.status === "suspended" || input.status === "deactivated") {
@@ -118,7 +142,7 @@ export async function updateAccountById(input: {
         .set({ expiresAt: new Date(), revokedAt: new Date(), sealedUrl: null })
         .where(and(eq(userInvites.userId, input.accountId), isNull(userInvites.acceptedAt)));
     }
-    return updatedUser ?? null;
+    return succeed(updatedUser);
   });
 }
 

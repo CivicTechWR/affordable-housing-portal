@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { emailDeliveryAttempts, users } from "@/db/schema";
 import { sendEmail } from "@/lib/email";
+import { auth } from "@/lib/auth";
 
 import type { Job, PgBoss } from "pg-boss";
 
@@ -212,6 +213,14 @@ async function sendEmailForJob(data: EmailJobData, signal: AbortSignal): Promise
       if (user?.status !== "active" || new Date(data.expiresAt) <= new Date())
         return { status: "skipped", reason: "reset_unavailable" };
       const url = openEmailJobSecret(data.secret);
+      const token = new URL(url).searchParams.get("token");
+      const verification = token
+        ? await (
+            await auth.$context
+          ).internalAdapter.findVerificationValue(`reset-password:${token}`)
+        : null;
+      if (verification?.value !== user.id || verification.expiresAt.getTime() <= Date.now())
+        return { status: "skipped", reason: "reset_unavailable" };
       const result = await sendEmail({
         to: user.email,
         subject: "Reset your HomeHub password",

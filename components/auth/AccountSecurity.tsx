@@ -11,6 +11,11 @@ export function AccountSecurity() {
   const { data: passkeys, refetch } = authClient.useListPasskeys();
   const [message, setMessage] = useState("");
   const [passkeyMessage, setPasskeyMessage] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<{
+    password?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }>({});
   const [pending, setPending] = useState(false);
   const [setup, setSetup] = useState<{ totpURI: string; backupCodes: string[] } | null>(null);
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -67,16 +72,38 @@ export function AccountSecurity() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    if (data.get("newPassword") !== data.get("confirmPassword")) {
-      setMessage("Passwords do not match.");
+    const currentPassword = String(data.get("password"));
+    const newPassword = String(data.get("newPassword"));
+    const errors: typeof passwordErrors = {};
+    setMessage("");
+    if (!currentPassword) errors.password = "Enter your current password.";
+    if (newPassword.length < 12 || newPassword.length > 128) {
+      errors.newPassword = "Use 12 to 128 characters.";
+    }
+    if (newPassword !== data.get("confirmPassword")) {
+      errors.confirmPassword = "Passwords do not match.";
+    }
+    setPasswordErrors(errors);
+    if (Object.keys(errors).length) {
+      form.querySelector<HTMLInputElement>(`[name="${Object.keys(errors)[0]}"]`)?.focus();
       return;
     }
     void run(async () => {
       const result = await authClient.changePassword({
-        currentPassword: String(data.get("password")),
-        newPassword: String(data.get("newPassword")),
+        currentPassword,
+        newPassword,
         revokeOtherSessions: true,
       });
+      if (result.error?.code === "INVALID_PASSWORD") {
+        setPasswordErrors({ password: "Your current password is incorrect." });
+        form.querySelector<HTMLInputElement>('[name="password"]')?.focus();
+        return;
+      }
+      if (["PASSWORD_TOO_SHORT", "PASSWORD_TOO_LONG"].includes(result.error?.code ?? "")) {
+        setPasswordErrors({ newPassword: "Use 12 to 128 characters." });
+        form.querySelector<HTMLInputElement>('[name="newPassword"]')?.focus();
+        return;
+      }
       check(result.error);
       form.reset();
       setMessage("Password changed. Other sessions have been signed out.");
@@ -268,7 +295,7 @@ export function AccountSecurity() {
       </section>
       <section className={sectionClass}>
         <h2 className="text-xl font-semibold">Password</h2>
-        <form onSubmit={changePassword} className="space-y-3">
+        <form onSubmit={changePassword} className="space-y-3" noValidate>
           <label htmlFor="current-password">Current password</label>
           <Input
             id="current-password"
@@ -276,7 +303,14 @@ export function AccountSecurity() {
             type="password"
             autoComplete="current-password"
             required
+            aria-invalid={!!passwordErrors.password}
+            aria-describedby={passwordErrors.password ? "current-password-error" : undefined}
           />
+          {passwordErrors.password && (
+            <p id="current-password-error" role="alert" className="text-sm text-destructive">
+              {passwordErrors.password}
+            </p>
+          )}
           <label htmlFor="new-password">New password, 12 to 128 characters</label>
           <Input
             id="new-password"
@@ -286,7 +320,14 @@ export function AccountSecurity() {
             minLength={12}
             maxLength={128}
             required
+            aria-invalid={!!passwordErrors.newPassword}
+            aria-describedby={passwordErrors.newPassword ? "new-password-error" : undefined}
           />
+          {passwordErrors.newPassword && (
+            <p id="new-password-error" role="alert" className="text-sm text-destructive">
+              {passwordErrors.newPassword}
+            </p>
+          )}
           <label htmlFor="confirm-password">Confirm new password</label>
           <Input
             id="confirm-password"
@@ -296,7 +337,14 @@ export function AccountSecurity() {
             minLength={12}
             maxLength={128}
             required
+            aria-invalid={!!passwordErrors.confirmPassword}
+            aria-describedby={passwordErrors.confirmPassword ? "confirm-password-error" : undefined}
           />
+          {passwordErrors.confirmPassword && (
+            <p id="confirm-password-error" role="alert" className="text-sm text-destructive">
+              {passwordErrors.confirmPassword}
+            </p>
+          )}
           <Button disabled={pending}>Change password</Button>
         </form>
       </section>

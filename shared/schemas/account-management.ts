@@ -52,6 +52,7 @@ const accountResponseDataSchema = z.object({
   role: accountRoleSchema.nullable(),
   organization: z.string().nullable(),
   status: accountStatusSchema.nullable(),
+  inviteAcceptedAt: z.string().nullable(),
   lastLoginAt: z.string().nullable(),
   createdAt: z.string().nullable(),
   updatedAt: z.string().nullable(),

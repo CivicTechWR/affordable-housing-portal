@@ -26,6 +26,8 @@ jest.mock("pg-boss", () => ({
   fromDrizzle: jest.fn(),
 }));
 
+jest.mock("@/lib/auth", () => ({ auth: {} }));
+
 jest.mock("@/lib/auth/invite-email", () => ({
   sendInviteEmail: jest.fn(),
 }));

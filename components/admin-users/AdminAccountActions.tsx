@@ -92,11 +92,22 @@ export function AdminAccountActions({ account }: { account: AccountListResponse[
                   defaultValue={account.status ?? "invited"}
                   className="w-full rounded-md border bg-background p-2"
                 >
-                  <option value="invited">Invited</option>
+                  {/** Accepted invitations are terminal: returning to invited
+                      leaves sign-in and recovery disabled with re-invitation
+                      rejected, so hide the option once inviteAcceptedAt is set. */}
+                  {(account.status === "invited" || !account.inviteAcceptedAt) && (
+                    <option value="invited">Invited</option>
+                  )}
                   <option value="active">Active</option>
                   <option value="suspended">Suspended</option>
                   <option value="deactivated">Deactivated</option>
                 </select>
+                {account.status !== "invited" && Boolean(account.inviteAcceptedAt) && (
+                  <p className="text-xs text-muted-foreground">
+                    This account already accepted its invitation and cannot return to invited.
+                    Restore active instead.
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground">
                   Suspending or deactivating this account signs out its devices. You cannot remove
                   your own admin access.

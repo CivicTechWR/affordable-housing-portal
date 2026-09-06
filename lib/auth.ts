@@ -1,6 +1,6 @@
 import "server-only";
 
-import { betterAuth } from "better-auth";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { APIError, createAuthMiddleware, getSessionFromCtx } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
@@ -24,7 +24,10 @@ import { hashOpaqueToken } from "@/lib/auth/token";
 
 type AuthTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-export function createAuth(database: typeof db | AuthTransaction = db) {
+export function createAuth(
+  database: typeof db | AuthTransaction = db,
+  backgroundTasks?: NonNullable<BetterAuthOptions["advanced"]>["backgroundTasks"],
+) {
   const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
   const secret = process.env.BETTER_AUTH_SECRET;
   if (!secret || secret.length < 32)
@@ -52,7 +55,11 @@ export function createAuth(database: typeof db | AuthTransaction = db) {
         rateLimit: authRateLimits,
       },
     }),
-    advanced: { database: { generateId: "uuid" }, ipAddress: { ipAddressHeaders: ["x-real-ip"] } },
+    advanced: {
+      database: { generateId: "uuid" },
+      ipAddress: { ipAddressHeaders: ["x-real-ip"] },
+      backgroundTasks,
+    },
     user: {
       fields: { name: "fullName" },
       additionalFields: {
@@ -72,6 +79,12 @@ export function createAuth(database: typeof db | AuthTransaction = db) {
       resetPasswordTokenExpiresIn: 60 * 60,
       revokeSessionsOnPasswordReset: true,
       sendResetPassword: queueAuthEmail,
+      onPasswordReset: async ({ user }) => {
+        // A successful reset retires every other outstanding reset link for the
+        // account. Better Auth consumes only the presented token; siblings would
+        // otherwise remain usable and could overwrite the just-set password.
+        await database.delete(verifications).where(eq(verifications.value, user.id));
+      },
     },
     session: {
       expiresIn: 60 * 60 * 24 * 7,
@@ -146,6 +159,26 @@ export function createAuth(database: typeof db | AuthTransaction = db) {
         }
       }),
       after: createAuthMiddleware(async (ctx) => {
+        if (ctx.path === "/change-password") {
+          const returnedChange: unknown = ctx.context.returned;
+          if (
+            typeof returnedChange !== "object" ||
+            returnedChange === null ||
+            !("user" in returnedChange)
+          )
+            return;
+          const changedUser = returnedChange.user;
+          if (
+            typeof changedUser !== "object" ||
+            changedUser === null ||
+            !("id" in changedUser) ||
+            typeof changedUser.id !== "string"
+          )
+            return;
+          // Only a successful password change retires outstanding reset links.
+          await database.delete(verifications).where(eq(verifications.value, changedUser.id));
+          return;
+        }
         const returned: unknown = ctx.context.returned;
         if (
           ctx.path !== "/reset-password" ||
